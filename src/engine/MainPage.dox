@@ -1,0 +1,51 @@
+
+/**	@mainpage ShadowFox Engine
+ *
+ *	@section intro Introduction
+ *		ShadowFox Engine aims to be a workable, extensible, and open, game engine
+ *		that allows the user to do what they want by either using some of the given
+ *		modules/samples, or starting from scratch on their project. This may help
+ *		people who have a certain project in mind, and one of the included samples
+ *		just happens to be a great basis for that. It also works for the opposite,
+ *		because then no clutter has to be tolerated or removed. In this sense, it
+ *		may be similar to Unity3D.
+ *
+ *	@section install Installation
+ *		Using SFE for your projects shouldn't be too difficult. By default, it comes with
+ *		binaries for Windows, Linux, and OSX (32- and 64-bit versions of each). If you
+ *		aren't going to be modifying the engine code, then you can simply stick with these,
+ *		and not download the source. Otherwise, you can grab a package containing the
+ *		source code at the sourceforge page (https://www.sourceforge.net/projects/shadowfoxengine).
+ *		@par Outside Editor
+ *			So, to use the engine, modified or not (I'll cover building from source shortly),
+ *			outside the editor, make sure to add the SFE/src directory to your C++ project's
+ *			include directories, and SFE/bin32/platform and/or SFE/bin64/platform to linker
+ *			directories. Then, add SFEngine.so to your list of libraries to link to.
+ *		@par Within Editor
+ *			Coming soon...
+ *
+ *	@section impl Implementation
+ *		Now that you know where the binaries and headers are, you can start a project. You don't
+ *		have to use the Editor, but it is highly suggested, because otherwise you will have to find
+ *		your own way to setup scenes. Anyway, you can start a new project in the editor, and it will
+ *		generate a new C++ header and source set. The class declared and implemented in these files
+ *		is the primary class of your project and is a child class of sfs::Engine. By default, the
+ *		`sfe` namespace isn't used, but you can do that for ease simply by adding: "using namespace sfs;".
+ *		@par Game Loop
+ *			The main functions that will be used for the manipulation of the game loop in all classes
+ *			of SFE are: Init(), Update(), and OnDestroy(). If you want/need to overwrite any of these
+ *			methods, then you will usually want to call the parent class' version (eg. sfs::Engine::Init()),
+ *			but, for example, if you want to use a custom Time class, then you have to fully overwrite
+ *			Init() in your main class (that inherits sfs::Engine) that spawns all the subsystems.
+ *			These functions can be used in any class that stems from Entity or Component. Just be sure
+ *			that, in C++, you always make these methods virtual.
+ *
+ *	@section script Scripting
+ *		In SFE, scripting is possible via any language that you can write a parser for (fairly simple).
+ *		A sfs::ScriptParser subclass is used to translate a given language into Squirrel, which is the
+ *		primary scripting language of SFE. This is done because I like Squirrel, it's quite fast (about
+ *		as fast as Lua), and running multiple script VMs at once can be computationally expensive. So, using
+ *		Squirrel directly will create the fastest scripts, but using other languages will only make it a bit
+ *		slower compiling the script, but not the running of it. There may be certain languages, though, that
+ *		can't be reasonably converted to Squirrel. http://www.squirrel-lang.org/
+ */
