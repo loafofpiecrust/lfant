@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?fileVersion 4.0.0?><cproject storage_type_id="org.eclipse.cdt.core.XmlProjectDescriptionStorage">
+	<storageModule moduleId="org.eclipse.cdt.core.settings">
+		<cconfiguration id="cdt.managedbuild.toolchain.gnu.cross.base.454855882">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.toolchain.gnu.cross.base.454855882" moduleId="org.eclipse.cdt.core.settings" name="Default">
+				<macros>
+					<stringListMacro name="Build_Warnings" type="VALUE_TEXT_LIST">
+						<value name="all"/>
+						<value name="init-self"/>
+					</stringListMacro>
+					<stringMacro name="Arch" type="VALUE_TEXT" value="64"/>
+					<stringListMacro name="Libs" type="VALUE_PATH_FILE_LIST"/>
+					<stringListMacro name="Includes" type="VALUE_PATH_DIR_LIST">
+						<value name="../zlib"/>
+					</stringListMacro>
+					<stringListMacro name="Build_Options" type="VALUE_TEXT_LIST">
+						<value name="fPIC"/>
+						<value name="std=gnu++11"/>
+						<value name="O3"/>
+					</stringListMacro>
+					<stringListMacro name="Force_Include" type="VALUE_PATH_FILE_LIST"/>
+					<stringListMacro name="Exclude_Folders" type="VALUE_PATH_DIR_LIST">
+						<value name="contrib/pngminus"/>
+						<value name="contrib/gregbook"/>
+					</stringListMacro>
+					<stringListMacro name="Defines" type="VALUE_TEXT_LIST"/>
+					<stringMacro name="Output" type="VALUE_TEXT" value="png"/>
+					<stringMacro name="Lib_Type" type="VALUE_TEXT" value="static"/>
+					<stringListMacro name="Exclude_Files" type="VALUE_PATH_FILE_LIST"/>
+					<stringMacro name="Source_Dir" type="VALUE_TEXT" value="."/>
+					<stringMacro name="Work_Root" type="VALUE_PATH_DIR" value="${DIR_SFE}"/>
+					<stringListMacro name="Lib_Dirs" type="VALUE_PATH_DIR_LIST"/>
+				</macros>
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.VCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.MakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration buildProperties="" description="" id="cdt.managedbuild.toolchain.gnu.cross.base.454855882" name="Default" parent="org.eclipse.cdt.build.core.emptycfg">
+					<folderInfo id="cdt.managedbuild.toolchain.gnu.cross.base.454855882.595243236" name="/" resourcePath="">
+						<toolChain id="cdt.managedbuild.toolchain.gnu.cross.base.457291016" name="cdt.managedbuild.toolchain.gnu.cross.base">
+							<option id="cdt.managedbuild.option.gnu.cross.prefix.1087724873" name="Prefix" superClass="cdt.managedbuild.option.gnu.cross.prefix"/>
+							<option id="cdt.managedbuild.option.gnu.cross.path.106204205" name="Path" superClass="cdt.managedbuild.option.gnu.cross.path"/>
+							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="cdt.managedbuild.targetPlatform.gnu.cross.1726285333" isAbstract="false" osList="all"/>
+							<builder arguments="-f ${makefile}" command="make" id="cdt.managedbuild.builder.gnu.cross.2080241432" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder"/>
+							<tool id="cdt.managedbuild.tool.gnu.cross.c.compiler.1039577700" name="Cross GCC Compiler">
+								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1447432477" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.cross.cpp.compiler.1671653508" name="Cross G++ Compiler">
+								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1123844034" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.cross.c.linker.1889282837" name="Cross GCC Linker"/>
+							<tool id="cdt.managedbuild.tool.gnu.cross.cpp.linker.232214588" name="Cross G++ Linker">
+								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.2122680454" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
+									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
+									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
+								</inputType>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.cross.archiver.547533369" name="Cross GCC Archiver"/>
+							<tool id="cdt.managedbuild.tool.gnu.cross.assembler.132042226" name="Cross GCC Assembler">
+								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1472563977" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+							</tool>
+						</toolChain>
+					</folderInfo>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+		</cconfiguration>
+	</storageModule>
+	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+		<project id="png.null.1988551653" name="png"/>
+	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
+	<storageModule moduleId="refreshScope" versionNumber="2">
+		<configuration configurationName="Default">
+			<resource resourceType="PROJECT" workspacePath="/png"/>
+		</configuration>
+	</storageModule>
+	<storageModule moduleId="scannerConfiguration">
+		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.cross.base.454855882;cdt.managedbuild.toolchain.gnu.cross.base.454855882.595243236;cdt.managedbuild.tool.gnu.cross.c.compiler.1039577700;cdt.managedbuild.tool.gnu.c.compiler.input.1447432477">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileC"/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.cross.base.454855882;cdt.managedbuild.toolchain.gnu.cross.base.454855882.595243236;cdt.managedbuild.tool.gnu.cross.cpp.compiler.1671653508;cdt.managedbuild.tool.gnu.cpp.compiler.input.1123844034">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileCPP"/>
+		</scannerConfigBuildInfo>
+	</storageModule>
+</cproject>

@@ -1,0 +1,2 @@
+ID += -IC:/ShadowFox/MinGW64/lib/gcc/x86_64-w64-mingw32/4.7.1/include/c++ -IC:/ShadowFox/MinGW64/lib/gcc/x86_64-w64-mingw32/4.7.1/include/c++/x86_64-w64-mingw32 -IC:/ShadowFox/ShadowFox-Engine/src/external/bullet/src/. -IC:/ShadowFox/ShadowFox-Engine/src/external/bullet/src/. -IC:/ShadowFox/ShadowFox-Engine/src/external/bullet/src/../../opencl/include 
+ LBD += -LC:/ShadowFox/ShadowFox-Engine/bin64/windows -LC:/ShadowFox/ShadowFox-Engine/bin64/windows/lib -LC:/ShadowFox/ShadowFox-Engine/bin64/windows -LC:/ShadowFox/ShadowFox-Engine/bin64/windows/lib
