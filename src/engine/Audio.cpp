@@ -25,7 +25,8 @@
 // Internal
 #include "Console.hpp"
 
-using namespace sfs;
+namespace sfs
+{
 
 Audio::Audio()
 {
@@ -80,5 +81,7 @@ void Audio::Init()
 
 void Audio::Update()
 {
+
+}
 
 }

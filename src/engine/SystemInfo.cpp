@@ -25,7 +25,8 @@
 #include "Console.hpp"
 #include "StringUtil.hpp"
 
-using namespace sfs;
+namespace sfs
+{
 
 SystemInfo::SystemInfo()
 {
@@ -227,3 +228,5 @@ void SystemInfo::Init()
 	computerName = result_spl[1];
 }
 #endif
+
+}

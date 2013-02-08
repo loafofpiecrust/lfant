@@ -27,26 +27,26 @@
 
 namespace sfs
 {
-	/** @addtogroup Engine
-	 *	 @{
-	 */
-	/** @addtogroup Utilities
-	 *	 @{
-	 */
+/** @addtogroup Engine
+ *	 @{
+ */
+/** @addtogroup Utilities
+ *	 @{
+ */
 
-	template<typename T>
-	struct OpContains
+template<typename T>
+struct OpContains
+{
+	template<typename O>
+	bool operator()(T && left, O && right) const
 	{
-		template<typename O>
-		bool operator()(T && left, O && right) const
-		{
-			return string(left).find(string(right)) != string::npos;
-		}
-	};
+		return string(left).find(string(right)) != string::npos;
+	}
+};
 
-	IDOP_CREATE_LEFT_HANDED_RET(<, _contains_, >, OpContains, bool)
+IDOP_CREATE_LEFT_HANDED_RET(<, _contains_, >, OpContains, bool)
 #define contains <_contains_>
 
-	/** @} */
-	/** @} */
+/** @} */
+/** @} */
 }

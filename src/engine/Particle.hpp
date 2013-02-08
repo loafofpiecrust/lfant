@@ -28,77 +28,77 @@
 
 namespace sfs
 {
-	class ParticleSystem;
+class ParticleSystem;
 
-	/** @addtogroup Engine
-	 *	 @{
-	 */
-	/** @addtogroup Particles
-	 *	 @{
-	 */
+/** @addtogroup Engine
+ *	 @{
+ */
+/** @addtogroup Particles
+ *	 @{
+ */
 
-	/**	Particle
-	 *	@details
-	 *		Description
-	 *	@todo
-	 *		Todo
-	 */
-	class Particle
+/**	Particle
+ *	@details
+ *		Description
+ *	@todo
+ *		Todo
+ */
+class Particle
+{
+public:
+	Particle();
+	virtual ~Particle();
+
+	// Make these virtual when they need to be inherited and overwritten.
+	void Init();
+	void Update(double delta);
+	void Destroy();
+
+	//void Launch();
+
+	void Activate(bool reset = false);
+	void Deactivate();
+	void SetVelocity(vec3 vel);
+	void SetSpeed(float speed);
+	void SetSizeRange(float start, float end)
 	{
-	public:
-		Particle();
-		virtual ~Particle();
+		size.min = start;
+		size.max = end;
+	}
+	void SetGravity(vec3 gravity)
+	{
+		this->gravity = gravity;
+	}
+	void StartLife(float life);
+	void InterpParams(double delta);
+	void SetParamDiffs();
+	void ApplyForce(vec3 force);
+	void ApplyForce(float speed, vec3 dir);
 
-		// Make these virtual when they need to be inherited and overwritten.
-		void Init();
-		void Update(double delta);
-		void Destroy();
+	/// Converts the velocity vector into a speed float.
+	float GetSpeed();
 
-		//void Launch();
+	Transform* transform;
+	float speed;
+	vec3 velocity;
+	Range<vec3> velRange;
+	vec3 velDiff;
+	vec3 gravity;
+	float lifetime;
+	float age;
+	Range<float> size;
+	float sizeDiff;
+	Range<rgba> color;
+	rgba colorDiff;
+	bool active;
 
-		void Activate(bool reset = false);
-		void Deactivate();
-		void SetVelocity(vec3 vel);
-		void SetSpeed(float speed);
-		void SetSizeRange(float start, float end)
-		{
-			size.min = start;
-			size.max = end;
-		}
-		void SetGravity(vec3 gravity)
-		{
-			this->gravity = gravity;
-		}
-		void StartLife(float life);
-		void InterpParams(double delta);
-		void SetParamDiffs();
-		void ApplyForce(vec3 force);
-		void ApplyForce(float speed, vec3 dir);
+	ParticleSystem* system;
 
-		/// Converts the velocity vector into a speed float.
-		float GetSpeed();
+protected:
 
-		Transform* transform;
-		float speed;
-		vec3 velocity;
-		Range<vec3> velRange;
-		vec3 velDiff;
-		vec3 gravity;
-		float lifetime;
-		float age;
-		Range<float> size;
-		float sizeDiff;
-		Range<rgba> color;
-		rgba colorDiff;
-		bool active;
+private:
+};
 
-		ParticleSystem* system;
-
-	protected:
-
-	private:
-	};
-
-	/** @} */
-	/** @} */
+/** @} */
+/** @} */
 }

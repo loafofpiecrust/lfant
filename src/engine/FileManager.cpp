@@ -26,8 +26,10 @@
 
 // Internal
 
-using namespace sfs;
 using namespace boost::filesystem;
+
+namespace sfs
+{
 
 FileManager::FileManager()
 {
@@ -102,4 +104,6 @@ vector<path> FileManager::GetGameFiles(string dir, string ext)
 		copy(directory_iterator(dir), directory_iterator(), back_inserter(result));
 	}
 	return result;
+}
+
 }

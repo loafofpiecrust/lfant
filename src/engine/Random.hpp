@@ -28,31 +28,31 @@
 
 namespace sfs
 {
-	/** @addtogroup Engine
-	 *	 @{
-	 */
-	/** @addtogroup Utilities
-	 *	 @{
-	 */
+/** @addtogroup Engine
+ *	 @{
+ */
+/** @addtogroup Utilities
+ *	 @{
+ */
 
-	void seedrand();
+void seedrand();
 
 /// These use mt19937 or mt19937_64, when the bool is true, it uses truly random numbers (20x slower)
-	double random(double min, double max, bool slow = false);
+double random(double min, double max, bool slow = false);
 
-	float random(float min, float max, bool slow = false);
+float random(float min, float max, bool slow = false);
 
-	template<typename T>
-	T random(T min, T max);
+template<typename T>
+T random(T min, T max);
 
-	uint32_t random(uint32_t min, uint32_t max);
+uint32_t random(uint32_t min, uint32_t max);
 
-	uint64_t random(uint64_t min, uint64_t max);
+uint64_t random(uint64_t min, uint64_t max);
 
-	rgba random(rgba min, rgba max, bool slow = false);
+rgba random(rgba min, rgba max, bool slow = false);
 
-	vec3 random(vec3 min, vec3 max, bool slow = false);
+vec3 random(vec3 min, vec3 max, bool slow = false);
 
-	/** @} */
-	/** @} */
+/** @} */
+/** @} */
 }

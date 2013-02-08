@@ -24,7 +24,8 @@
 
 // Internal
 
-using namespace sfs;
+namespace sfs
+{
 
 Time::Time() :
 	timeScale(1.0f)
@@ -65,4 +66,6 @@ void Time::Init()
 void Time::Update()
 {
 	UpdateTimes();
+}
+
 }

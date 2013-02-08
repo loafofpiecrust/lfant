@@ -30,7 +30,8 @@
 #include "Type.hpp"
 #include "Console.hpp"
 
-using namespace sfs;
+namespace sfs
+{
 
 Entity::Entity()
 {
@@ -224,4 +225,6 @@ void Entity::SetActiveRecursive(bool active)
 	{
 		children[i]->active = active;
 	}
+}
+
 }

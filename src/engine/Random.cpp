@@ -29,69 +29,69 @@
 
 namespace sfs
 {
-	boost::random::mt19937 randfast;
-	boost::random::mt19937_64 randfast64;
+boost::random::mt19937 randfast;
+boost::random::mt19937_64 randfast64;
 
-	boost::random::random_device randomizer;
+boost::random::random_device randomizer;
 
-	void seedrand()
+void seedrand()
+{
+	randfast.seed(time(0));
+	randfast64.seed(time(0));
+}
+
+double random(double min, double max, bool slow)
+{
+	boost::random::uniform_real_distribution<double> d(min, max);
+	if(slow)
 	{
-		randfast.seed(time(0));
-		randfast64.seed(time(0));
+		return d(randomizer);
 	}
+	return d(randfast64);
+}
 
-	double random(double min, double max, bool slow)
+float random(float min, float max, bool slow)
+{
+	boost::random::uniform_real_distribution<float> d(min, max);
+	if(slow)
 	{
-		boost::random::uniform_real_distribution<double> d(min, max);
-		if(slow)
-		{
-			return d(randomizer);
-		}
+		return d(randomizer);
+	}
+	return d(randfast);
+}
+
+template<typename T>
+T random(T min, T max, bool slow)
+{
+	boost::random::uniform_int_distribution<T> d(min, max);
+	if(slow)
+	{
+		return d(randomizer);
+	}
+	if(sizeof(T) >= 8)
+	{
+		// If we want 64-bit, use 64-bit generator.
 		return d(randfast64);
 	}
+	return d(randfast);
+}
 
-	float random(float min, float max, bool slow)
-	{
-		boost::random::uniform_real_distribution<float> d(min, max);
-		if(slow)
-		{
-			return d(randomizer);
-		}
-		return d(randfast);
-	}
+rgba random(rgba min, rgba max, bool slow)
+{
+	rgba result;
+	result.r = random(min.r, max.r, slow);
+	result.g = random(min.g, max.g, slow);
+	result.b = random(min.b, max.b, slow);
+	result.a = random(min.a, max.a, slow);
+	return result;
+}
 
-	template<typename T>
-	T random(T min, T max, bool slow)
-	{
-		boost::random::uniform_int_distribution<T> d(min, max);
-		if(slow)
-		{
-			return d(randomizer);
-		}
-		if(sizeof(T) >= 8)
-		{
-			// If we want 64-bit, use 64-bit generator.
-			return d(randfast64);
-		}
-		return d(randfast);
-	}
-
-	rgba random(rgba min, rgba max, bool slow)
-	{
-		rgba result;
-		result.r = random(min.r, max.r, slow);
-		result.g = random(min.g, max.g, slow);
-		result.b = random(min.b, max.b, slow);
-		result.a = random(min.a, max.a, slow);
-		return result;
-	}
-
-	vec3 random(vec3 min, vec3 max, bool slow)
-	{
-		vec3 result;
-		result.x = random(min.x, max.x, slow);
-		result.y = random(min.y, max.y, slow);
-		result.z = random(min.z, max.z, slow);
-		return result;
-	}
+vec3 random(vec3 min, vec3 max, bool slow)
+{
+	vec3 result;
+	result.x = random(min.x, max.x, slow);
+	result.y = random(min.y, max.y, slow);
+	result.z = random(min.z, max.z, slow);
+	return result;
+}
 }

@@ -21,64 +21,32 @@
 #include "stdafx.hpp"
 
 // External
-#include <AL/alut.h>
 
 // Internal
 
 namespace sfs
 {
-	class Audio
-	{
-	public:
-		Audio();
-		virtual ~Audio();
+class Audio
+{
+public:
+	Audio();
+	virtual ~Audio();
 
-		/** Access the current global audio context.
-		 */
-		ALCcontext* GetContext()
-		{
-			return context;
-		}
+	/**	Plays a sound at the origin to the global listener at the origin.
+	 *	@details Use for things like music, but if music is to be heard by just
+	 *		a single entity, it's recommended to simply attach an AudioSource to
+	 *		that entity, and play the music only to it's AudioListener.
+	 *	@param file The audio file to load and play.
+	 */
+	void PlaySound(string file);
 
-		/** Set the global audio context
-		 */
-		void SetContext(ALCcontext* val)
-		{
-			context = val;
-		}
+protected:
+	virtual void Init();
+	virtual void Update();
 
-		/** Access the current audio device.
-		 */
-		ALCdevice* GetDevice()
-		{
-			return device;
-		}
-
-		/** Set the current audio device to another instance.
-		 */
-		void SetDevice(ALCdevice* val)
-		{
-			device = val;
-		}
-
-		/**	Plays a sound at the origin to the global listener at the origin.
-		 *	@details Use for things like music, but if music is to be heard by just
-		 *		a single entity, it's recommended to simply attach an AudioSource to
-		 *		that entity, and play the music only to it's AudioListener.
-		 *	@param file The audio file to load and play.
-		 */
-		void PlaySound(string file);
-
-	protected:
-		virtual void Init();
-		virtual void Update();
-
-	private:
-		ALCdevice* device;
-
-		ALCcontext* context;
-		uint32_t source;
-		uint32_t listener;
-		uint32_t buffer;
-	};
+private:
+	uint32_t source;
+	uint32_t listener;
+	uint32_t buffer;
+};
 }

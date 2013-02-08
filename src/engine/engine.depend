@@ -3,11 +3,10 @@
 	"Audio.hpp"
 	"Console.hpp"
 
-1360033224 /home/taylorsnead/ShadowFox/ShadowFox-Engine/src/engine/Audio.hpp
+1360289234 /home/taylorsnead/ShadowFox/ShadowFox-Engine/src/engine/Audio.hpp
 	"stdafx.hpp"
-	<AL/alut.h>
 
-1359950834 /home/taylorsnead/ShadowFox/ShadowFox-Engine/src/engine/stdafx.hpp
+1360290287 /home/taylorsnead/ShadowFox/ShadowFox-Engine/src/engine/stdafx.hpp
 	<windows.h>
 	<conio.h>
 	<unistd.h>
@@ -28,7 +27,6 @@
 	<glm/gtc/quaternion.hpp>
 	<glm/gtx/quaternion.hpp>
 	<boost/assign/std/vector.hpp>
-	<boost/assign/list_inserter.hpp>
 	<boost/function.hpp>
 	<boost/bind.hpp>
 	<boost/type_traits.hpp>
@@ -303,7 +301,7 @@
 1356183586 /home/taylorsnead/ShadowFox/ShadowFox-Engine/src/external/glm/glm/gtx/quaternion.inl
 	<limits>
 
-1206222355 /home/taylorsnead/ShadowFox/ShadowFox-Engine/src/external/boost/boost/assign/std/vector.hpp
+1360291122 /home/taylorsnead/ShadowFox/ShadowFox-Engine/src/external/boost/boost/assign/std/vector.hpp
 	<boost/assign/list_inserter.hpp>
 	<boost/config.hpp>
 	<vector>
@@ -4199,11 +4197,12 @@
 1357466802 /home/taylorsnead/ShadowFox/ShadowFox-Engine/src/engine/Subsystem.hpp
 	"Object.hpp"
 
-1360033223 /home/taylorsnead/ShadowFox/ShadowFox-Engine/src/engine/Object.hpp
+1360289963 /home/taylorsnead/ShadowFox/ShadowFox-Engine/src/engine/Object.hpp
 	"stdafx.hpp"
 	<boost/signals2.hpp>
 	<typeinfo>
 	"Type.hpp"
+	"Property.hpp"
 
 1344271511 /home/taylorsnead/ShadowFox/ShadowFox-Engine/src/external/boost/boost/signals2.hpp
 	<boost/signals2/deconstruct.hpp>
@@ -6033,7 +6032,7 @@
 	<boost/signals2/connection.hpp>
 	<boost/weak_ptr.hpp>
 
-1360033224 /home/taylorsnead/ShadowFox/ShadowFox-Engine/src/engine/Type.hpp
+1360289806 /home/taylorsnead/ShadowFox/ShadowFox-Engine/src/engine/Type.hpp
 	"stdafx.hpp"
 	<cxxabi.h>
 	<type_traits>
@@ -6057,7 +6056,7 @@
 	"Property.hpp"
 	"Entity.hpp"
 
-1360033223 /home/taylorsnead/ShadowFox/ShadowFox-Engine/src/engine/Transform.hpp
+1360289329 /home/taylorsnead/ShadowFox/ShadowFox-Engine/src/engine/Transform.hpp
 	"stdafx.hpp"
 	"Object.hpp"
 	"Property.hpp"
@@ -7837,7 +7836,7 @@
 1360033224 /home/taylorsnead/ShadowFox/ShadowFox-Engine/src/engine/Vertex.hpp
 	"stdafx.hpp"
 
-1360033224 /home/taylorsnead/ShadowFox/ShadowFox-Engine/src/engine/Input.hpp
+1360217235 /home/taylorsnead/ShadowFox/ShadowFox-Engine/src/engine/Input.hpp
 	"stdafx.hpp"
 	<GL/glfw.h>
 	"Subsystem.hpp"
@@ -8875,9 +8874,6 @@
 1360033223 /home/taylorsnead/ShadowFox/ShadowFox-Engine/src/engine/Light.hpp
 	"Component.hpp"
 
-1360033223 source:/home/taylorsnead/ShadowFox/ShadowFox-Engine/src/engine/main.cpp
-	<iostream>
-
 1358904834 source:/home/taylorsnead/ShadowFox/ShadowFox-Engine/src/engine/Mesh.cpp
 	"Mesh.hpp"
 
@@ -9140,13 +9136,13 @@
 	"Transform.hpp"
 	"Range.hpp"
 
-1360033224 /home/taylorsnead/ShadowFox/ShadowFox-Engine/src/engine/ParticleSystem.hpp
+1360125842 /home/taylorsnead/ShadowFox/ShadowFox-Engine/src/engine/ParticleSystem.hpp
 	"Component.hpp"
 	"Range.hpp"
 	"Material.hpp"
 	"Vertex.hpp"
 
-1360033224 source:/home/taylorsnead/ShadowFox/ShadowFox-Engine/src/engine/ParticleSystem.cpp
+1360125860 source:/home/taylorsnead/ShadowFox/ShadowFox-Engine/src/engine/ParticleSystem.cpp
 	"ParticleSystem.hpp"
 	"Particle.hpp"
 	"Random.hpp"
@@ -9658,7 +9654,7 @@
 	<boost/config.hpp>
 	<boost/config/auto_link.hpp>
 
-1360033223 source:/home/taylorsnead/ShadowFox/ShadowFox-Engine/src/engine/Renderer.cpp
+1360194648 source:/home/taylorsnead/ShadowFox/ShadowFox-Engine/src/engine/Renderer.cpp
 	"Renderer.hpp"
 	<iostream>
 	<fstream>
@@ -9678,8 +9674,8 @@
 	"Scene.hpp"
 	"Camera.hpp"
 	"FileManager.hpp"
-	"FileLoaders/ShaderLoader.hpp"
-	"FileLoaders/TextureLoader.hpp"
+	"ShaderLoader.hpp"
+	"TextureLoader.hpp"
 
 1344268748 /home/taylorsnead/ShadowFox/ShadowFox-Engine/src/external/glew/include/GL/glew.h
 	<stddef.h>
@@ -9702,11 +9698,11 @@
 	"Mesh.hpp"
 	"Material.hpp"
 
-1360028674 /home/taylorsnead/ShadowFox/ShadowFox-Engine/src/engine/FileLoaders/ShaderLoader.hpp
+1360028674 /home/taylorsnead/ShadowFox/ShadowFox-Engine/src/engine/ShaderLoader.hpp
 	"stdafx.hpp"
 	"Shader.hpp"
 
-1358296550 /home/taylorsnead/ShadowFox/ShadowFox-Engine/src/engine/FileLoaders/TextureLoader.hpp
+1358296550 /home/taylorsnead/ShadowFox/ShadowFox-Engine/src/engine/TextureLoader.hpp
 	"stdafx.hpp"
 	"Texture.hpp"
 
@@ -9735,7 +9731,7 @@
 1360033224 source:/home/taylorsnead/ShadowFox/ShadowFox-Engine/src/engine/sfRigidBody.cpp
 	"sfRigidBody.hpp"
 
-1360033224 /home/taylorsnead/ShadowFox/ShadowFox-Engine/src/engine/sfRigidBody.hpp
+1360221689 /home/taylorsnead/ShadowFox/ShadowFox-Engine/src/engine/sfRigidBody.hpp
 	<btBulletDynamicsCommon.h>
 	<BulletDynamics/Dynamics/btRigidBody.h>
 
@@ -9767,10 +9763,6 @@
 	"Console.hpp"
 	"StringUtil.hpp"
 
-1360033224 source:/home/taylorsnead/ShadowFox/ShadowFox-Engine/src/engine/Texture.cpp
-	"Texture.hpp"
-	"FileLoaders/TextureLoader.hpp"
-
 1360033223 source:/home/taylorsnead/ShadowFox/ShadowFox-Engine/src/engine/Thread.cpp
 	"Thread.hpp"
 
@@ -9794,4 +9786,112 @@
 	"Entity.hpp"
 	"MathUtil.hpp"
 	"Console.hpp"
+
+1360205893 source:/home/taylorsnead/ShadowFox/ShadowFox-Engine/src/engine/Texture.cpp
+	"Texture.hpp"
+	"TextureLoader.hpp"
+
+1360289575 source:/home/taylorsnead/ShadowFox/ShadowFox-Engine/src/engine/AudioSource.cpp
+	<irrKlang.h>
+	"AudioSource.hpp"
+
+1338467294 /home/taylorsnead/ShadowFox/ShadowFox-Engine/src/external/irrklang/include/irrKlang.h
+	"ik_irrKlangTypes.h"
+	"ik_vec3d.h"
+	"ik_IRefCounted.h"
+	"ik_IVirtualRefCounted.h"
+	"ik_ESoundOutputDrivers.h"
+	"ik_ESoundEngineOptions.h"
+	"ik_EStreamModes.h"
+	"ik_SAudioStreamFormat.h"
+	"ik_ISoundEngine.h"
+	"ik_ISoundSource.h"
+	"ik_ISound.h"
+	"ik_IAudioStream.h"
+	"ik_IAudioStreamLoader.h"
+	"ik_ISoundEffectControl.h"
+	"ik_ISoundStopEventReceiver.h"
+	"ik_IFileFactory.h"
+	"ik_IFileReader.h"
+	"ik_ISoundDeviceList.h"
+	"ik_IAudioRecorder.h"
+	"ik_ISoundMixedOutputReceiver.h"
+
+1230648496 /home/taylorsnead/ShadowFox/ShadowFox-Engine/src/external/irrklang/include/ik_irrKlangTypes.h
+
+1230648498 /home/taylorsnead/ShadowFox/ShadowFox-Engine/src/external/irrklang/include/ik_vec3d.h
+	<math.h>
+	"ik_irrKlangTypes.h"
+
+1233843222 /home/taylorsnead/ShadowFox/ShadowFox-Engine/src/external/irrklang/include/ik_IRefCounted.h
+	"ik_irrKlangTypes.h"
+
+1233841798 /home/taylorsnead/ShadowFox/ShadowFox-Engine/src/external/irrklang/include/ik_IVirtualRefCounted.h
+	"ik_irrKlangTypes.h"
+
+1266417806 /home/taylorsnead/ShadowFox/ShadowFox-Engine/src/external/irrklang/include/ik_ESoundOutputDrivers.h
+
+1230648496 /home/taylorsnead/ShadowFox/ShadowFox-Engine/src/external/irrklang/include/ik_ESoundEngineOptions.h
+
+1230648496 /home/taylorsnead/ShadowFox/ShadowFox-Engine/src/external/irrklang/include/ik_EStreamModes.h
+
+1230648498 /home/taylorsnead/ShadowFox/ShadowFox-Engine/src/external/irrklang/include/ik_SAudioStreamFormat.h
+	"ik_IRefCounted.h"
+
+1338468172 /home/taylorsnead/ShadowFox/ShadowFox-Engine/src/external/irrklang/include/ik_ISoundEngine.h
+	"ik_IRefCounted.h"
+	"ik_vec3d.h"
+	"ik_ISoundSource.h"
+	"ik_ISound.h"
+	"ik_EStreamModes.h"
+	"ik_IFileFactory.h"
+	"ik_ISoundMixedOutputReceiver.h"
+
+1230648496 /home/taylorsnead/ShadowFox/ShadowFox-Engine/src/external/irrklang/include/ik_ISoundSource.h
+	"ik_IVirtualRefCounted.h"
+	"ik_vec3d.h"
+	"ik_EStreamModes.h"
+	"ik_SAudioStreamFormat.h"
+
+1338468242 /home/taylorsnead/ShadowFox/ShadowFox-Engine/src/external/irrklang/include/ik_ISound.h
+	"ik_IVirtualRefCounted.h"
+	"ik_ISoundEffectControl.h"
+	"ik_vec3d.h"
+
+1230648496 /home/taylorsnead/ShadowFox/ShadowFox-Engine/src/external/irrklang/include/ik_ISoundEffectControl.h
+	"ik_IVirtualRefCounted.h"
+	"ik_vec3d.h"
+
+1230648496 /home/taylorsnead/ShadowFox/ShadowFox-Engine/src/external/irrklang/include/ik_IFileFactory.h
+	"ik_IRefCounted.h"
+
+1266419264 /home/taylorsnead/ShadowFox/ShadowFox-Engine/src/external/irrklang/include/ik_ISoundMixedOutputReceiver.h
+	"ik_IRefCounted.h"
+	"ik_SAudioStreamFormat.h"
+
+1230648496 /home/taylorsnead/ShadowFox/ShadowFox-Engine/src/external/irrklang/include/ik_IAudioStream.h
+	"ik_IRefCounted.h"
+	"ik_SAudioStreamFormat.h"
+
+1230648496 /home/taylorsnead/ShadowFox/ShadowFox-Engine/src/external/irrklang/include/ik_IAudioStreamLoader.h
+	"ik_IRefCounted.h"
+	"ik_IFileReader.h"
+
+1230648496 /home/taylorsnead/ShadowFox/ShadowFox-Engine/src/external/irrklang/include/ik_IFileReader.h
+	"ik_IRefCounted.h"
+
+1230648496 /home/taylorsnead/ShadowFox/ShadowFox-Engine/src/external/irrklang/include/ik_ISoundStopEventReceiver.h
+	"ik_IRefCounted.h"
+	"ik_SAudioStreamFormat.h"
+
+1230648496 /home/taylorsnead/ShadowFox/ShadowFox-Engine/src/external/irrklang/include/ik_ISoundDeviceList.h
+	"ik_IRefCounted.h"
+
+1230651650 /home/taylorsnead/ShadowFox/ShadowFox-Engine/src/external/irrklang/include/ik_IAudioRecorder.h
+	"ik_IRefCounted.h"
+	"ik_ISoundSource.h"
+
+1360289342 /home/taylorsnead/ShadowFox/ShadowFox-Engine/src/engine/AudioSource.hpp
+	"stdafx.hpp"
+	"Component.hpp"
 

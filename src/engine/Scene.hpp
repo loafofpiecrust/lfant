@@ -27,70 +27,70 @@
 
 namespace sfs
 {
-	class Entity;
-	class Camera;
+class Entity;
+class Camera;
 
-	/** @addtogroup Engine
-	 *	@{
-	 */
-	/** @addtogroup Subsystems
-	 *	@{
-	 */
+/** @addtogroup Engine
+ *	@{
+ */
+/** @addtogroup Subsystems
+ *	@{
+ */
+
+/**
+ *	@details
+ *
+ *	@todo
+ *
+ */
+class Scene : public Subsystem
+{
+	friend class Engine;
+
+public:
+	Scene();
+	virtual ~Scene();
+
+	virtual void Init();
+	virtual void Update();
+	virtual void OnDestroy();
 
 	/**
-	 *	@details
-	 *
-	 *	@todo
-	 *
+	 *	Gets the first entity with a certain name.
 	 */
-	class Scene : public Subsystem
-	{
-		friend class Engine;
+	Entity* GetEntity(string name);
 
-	public:
-		Scene();
-		virtual ~Scene();
+	/**
+	 *	Gets the first entity with a certain tag.
+	 */
+	Entity* GetEntityByTag(string tag);
 
-		virtual void Init();
-		virtual void Update();
-		virtual void OnDestroy();
+	/**
+	 *	Gets an entity by its unique id.
+	 */
+	Entity* GetEntityById(uint32_t id);
 
-		/**
-		 *	Gets the first entity with a certain name.
-		 */
-		Entity* GetEntity(string name);
+	/**
+	 *	Gets the first entity in a given layer.
+	 *	@todo
+	 *		Not sure whether layer should be uint16 or string.
+	 */
+	Entity* GetEntityByLayer(string layer);
 
-		/**
-		 *	Gets the first entity with a certain tag.
-		 */
-		Entity* GetEntityByTag(string tag);
+	/**
+	 *	Saves the scene to a specific file.
+	 */
+	void Save(string file = "");
 
-		/**
-		 *	Gets an entity by its unique id.
-		 */
-		Entity* GetEntityById(uint32_t id);
+	vector<Entity*> entities;
+	Camera* mainCamera;
+	string name;
 
-		/**
-		 *	Gets the first entity in a given layer.
-		 *	@todo
-		 *		Not sure whether layer should be uint16 or string.
-		 */
-		Entity* GetEntityByLayer(string layer);
+protected:
 
-		/**
-		 *	Saves the scene to a specific file.
-		 */
-		void Save(string file = "");
+private:
 
-		vector<Entity*> entities;
-		Camera* mainCamera;
-		string name;
-
-	protected:
-
-	private:
-
-	};
+};
 
 /// @}
 /// @}

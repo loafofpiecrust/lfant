@@ -26,68 +26,68 @@
 
 namespace sfs
 {
-	/** @addtogroup Engine
-	 *	 @{
-	 */
-	/** @addtogroup Subsystems
-	 *	 @{
-	 */
+/** @addtogroup Engine
+ *	 @{
+ */
+/** @addtogroup Subsystems
+ *	 @{
+ */
 
-	/**
-	 *
-	 *	@details
-	 *	@todo
-	 */
-	template<typename TEnum, typename TType = byte>
-	class BitField
+/**
+ *
+ *	@details
+ *	@todo
+ */
+template<typename TEnum, typename TType = byte>
+class BitField
+{
+public:
+	BitField()
 	{
-	public:
-		BitField()
-		{
-		}
-		~BitField()
-		{
-		}
+	}
+	~BitField()
+	{
+	}
 
-		void add(const TEnum flag)
-		{
-			value |= flag;
-		}
+	void add(const TEnum flag)
+	{
+		value |= flag;
+	}
 
-		bool check(const TEnum flag)
-		{
-			return value & flag;
-		}
+	bool check(const TEnum flag)
+	{
+		return value & flag;
+	}
 
-		void remove(const TEnum flag)
-		{
-			value &= ~flag;
-		}
+	void remove(const TEnum flag)
+	{
+		value &= ~flag;
+	}
 
-		void clear()
-		{
-			value = 0;
-		}
+	void clear()
+	{
+		value = 0;
+	}
 
-		void operator+=(const TEnum flag)
-		{
-			add(flag);
-		}
+	void operator+=(const TEnum flag)
+	{
+		add(flag);
+	}
 
-		void operator-=(const TEnum flag)
-		{
-			remove(flag);
-		}
+	void operator-=(const TEnum flag)
+	{
+		remove(flag);
+	}
 
-		bool operator==(const TEnum flag)
-		{
-			return check(flag);
-		}
+	bool operator==(const TEnum flag)
+	{
+		return check(flag);
+	}
 
-	private:
-		TType value;
-	};
+private:
+	TType value;
+};
 
-	/** @} */
-	/** @} */
+/** @} */
+/** @} */
 }

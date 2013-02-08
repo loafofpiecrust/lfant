@@ -29,7 +29,8 @@
 #include "Renderer.hpp"
 #include "Console.hpp"
 
-using namespace sfs;
+namespace sfs
+{
 
 Input::Input() :
 	lockMouse(false), mouseSpeed(0.005f)
@@ -293,4 +294,6 @@ void Input::SetMousePos(int32_t x, int32_t y)
 void Input::SetMousePos(ivec2 pos)
 {
 	glfwSetMousePos(pos.x, pos.y);
+}
+
 }

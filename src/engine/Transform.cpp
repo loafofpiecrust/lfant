@@ -26,7 +26,8 @@
 #include "MathUtil.hpp"
 #include "Console.hpp"
 
-using namespace sfs;
+namespace sfs
+{
 
 Transform::Transform(Entity* owner) :
 	owner(owner)
@@ -45,36 +46,36 @@ Transform::Transform(Entity* owner) :
 	}*/
 }
 
-vec3& Transform::GetPos()
+vec3& Transform::GetPosition()
 {
 	return _position;
 }
 
-void Transform::SetPos(vec3 pos)
+void Transform::SetPosition(vec3 pos)
 {
 	_position = pos;
 	trigger("SetPos", position);
 }
 
-quat Transform::GetRotQuat()
+quat Transform::GetRotationQuat()
 {
 	return quat(rotation * degToRad);
 }
 
-void Transform::SetRotQuat(quat rot)
+void Transform::SetRotationQuat(quat rot)
 {
 	_rotationQuat = rot;
 	rotation = eulerAngles(rot);
 	trigger("SetRot", rotation);
 }
 
-vec3& Transform::GetRot()
+vec3& Transform::GetRotation()
 {
 	Log("Transform::GetRot(): Getting rot");
 	return _rotation;
 }
 
-void Transform::SetRot(vec3 rot)
+void Transform::SetRotation(vec3 rot)
 {
 	_rotation = rot;
 	_rotationQuat = quat(_rotation * degToRad);
@@ -91,7 +92,7 @@ void Transform::SetScale(vec3 scl)
 	trigger("SetScale", scale);
 }
 
-vec3 Transform::GetWorldPos()
+vec3 Transform::GetWorldPosition()
 {
 	if(owner->parent)
 	{
@@ -103,26 +104,26 @@ vec3 Transform::GetWorldPos()
 	}
 }
 
-void Transform::SetWorldPos(vec3 pos)
+void Transform::SetWorldPosition(vec3 pos)
 {
 	position = pos - parent->worldPosition;
 }
 
-quat Transform::GetWorldRotQuat()
+quat Transform::GetWorldRotationQuat()
 {
 	return quat(worldRotation * degToRad);
 }
 
-void Transform::SetWorldRotQuat(quat rot)
+void Transform::SetWorldRotationQuat(quat rot)
 {
 	rotation = eulerAngles(rot) - parent->worldRotation();
 }
 
-vec3 Transform::GetWorldRot()
+vec3 Transform::GetWorldRotation()
 {
 	if(owner->parent)
 	{
-		return owner->parent->transform->GetWorldRot() + _rotation;
+		return owner->parent->transform->worldRotation + _rotation;
 	}
 	else
 	{
@@ -130,7 +131,7 @@ vec3 Transform::GetWorldRot()
 	}
 }
 
-void Transform::SetWorldRot(vec3 rot)
+void Transform::SetWorldRotation(vec3 rot)
 {
 	rotation = rot - parent->worldRotation;
 }
@@ -193,4 +194,6 @@ void Transform::Scale(vec3 scl)
 {
 	scale *= scl;
 	trigger("SetScale", scale);
+}
+
 }

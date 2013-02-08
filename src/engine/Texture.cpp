@@ -22,11 +22,14 @@
 // External
 
 // Internal
-#include "FileLoaders/TextureLoader.hpp"
+#include "TextureLoader.hpp"
 
-using namespace sfs;
+namespace sfs
+{
 
 void Texture::operator=(string file)
 {
 	*this = LoadTexture(file);
+}
+
 }

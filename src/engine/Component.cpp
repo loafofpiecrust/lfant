@@ -25,10 +25,11 @@
 // Internal
 #include "Entity.hpp"
 
-using namespace sfs;
+namespace sfs
+{
 
-Component::Component( Entity* owner ) :
-	owner( owner ), transform( owner->transform )
+Component::Component(Entity* owner) :
+	owner(owner), transform(owner->transform)
 {
 }
 
@@ -44,7 +45,7 @@ Component::~Component()
 void Component::Destroy()
 {
 	OnDestroy();
-	owner->RemoveComponent( this );
+	owner->RemoveComponent(this);
 	delete this;
 }
 
@@ -56,7 +57,7 @@ void Component::Destroy()
 void Component::SetEnabled(bool enable)
 {
 	_enabled = enable;
-	if( _enabled )
+	if(_enabled)
 	{
 		OnEnable();
 	}
@@ -69,4 +70,6 @@ void Component::SetEnabled(bool enable)
 bool Component::GetEnabled()
 {
 	return _enabled;
+}
+
 }

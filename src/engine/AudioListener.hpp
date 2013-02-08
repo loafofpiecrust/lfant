@@ -27,30 +27,30 @@
 
 namespace sfs
 {
-	/** @addtogroup Engine
-	 *	@{
-	 */
-	/** @addtogroup
-	 *	@{
-	 */
+/** @addtogroup Engine
+ *	@{
+ */
+/** @addtogroup
+ *	@{
+ */
 
-	/**
-	 *	@details
-	 *
-	 *	@todo
-	 *
-	 */
-	class AudioListener: public Component
-	{
-	public:
-		float gain;
-		vec3 velocity;
+/**
+ *	@details
+ *
+ *	@todo
+ *
+ */
+class AudioListener: public Component
+{
+public:
+	float gain;
+	vec3 velocity;
 
-	protected:
+protected:
 
-	private:
+private:
 
-	};
+};
 
 /// @}
 /// @}

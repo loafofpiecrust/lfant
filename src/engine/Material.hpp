@@ -28,45 +28,45 @@
 
 namespace sfs
 {
-	/** @addtogroup Engine
-	 *	 @{
-	 */
-	/** @addtogroup Rendering
-	 *	 @{
-	 */
+/** @addtogroup Engine
+ *	 @{
+ */
+/** @addtogroup Rendering
+ *	 @{
+ */
 
-	/**
-	 *
-	 *	@details
-	 *	@todo
-	 */
-	class Material
+/**
+ *
+ *	@details
+ *	@todo
+ */
+class Material
+{
+public:
+	// Path and name for the texture file.
+	Texture texture;
+	uint32_t textureUnif;
+	Shader shader;
+	vec2 tiling { 1, 1 };
+	vec2 offset { 0, 0 };
+	rgba color { 255, 255, 255, 255 };
+
+	Material()
 	{
-	public:
-		// Path and name for the texture file.
-		Texture texture;
-		uint32_t textureUnif;
-		Shader shader;
-		vec2 tiling { 1, 1 };
-		vec2 offset { 0, 0 };
-		rgba color { 255, 255, 255, 255 };
+	}
 
-		Material()
-		{
-		}
+	Material(Texture texture, Shader shader) :
+		texture(texture), shader(shader)
+	{
+	}
 
-		Material(Texture texture, Shader shader) :
-			texture(texture), shader(shader)
-		{
-		}
-
-		Material& operator()(Texture texture, Shader shader)
-		{
-			this->texture = texture;
-			this->shader = shader;
-			return *this;
-		}
-	};
+	Material& operator()(Texture texture, Shader shader)
+	{
+		this->texture = texture;
+		this->shader = shader;
+		return *this;
+	}
+};
 
 /// @}
 /// @}

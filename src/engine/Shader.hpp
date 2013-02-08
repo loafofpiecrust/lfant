@@ -26,44 +26,44 @@
 
 namespace sfs
 {
-	/** @addtogroup Engine
-	 *	@{
-	 */
-	/** @addtogroup
-	 *	@{
-	 */
+/** @addtogroup Engine
+ *	@{
+ */
+/** @addtogroup
+ *	@{
+ */
 
-	/**
-	 *	@details
-	 *
-	 *	@todo
-	 *
-	 */
-	class Shader
+/**
+ *	@details
+ *
+ *	@todo
+ *
+ */
+class Shader
+{
+public:
+	string name = "";
+	uint32_t id = 0;
+
+	Shader()
 	{
-	public:
-		string name = "";
-		uint32_t id = 0;
+	}
 
-		Shader()
-		{
-		}
+	Shader(string name, uint32_t id) :
+		name(name), id(id)
+	{
+	}
 
-		Shader(string name, uint32_t id) :
-			name(name), id(id)
-		{
-		}
+	operator string()
+	{
+		return name;
+	}
 
-		operator string()
-		{
-			return name;
-		}
-
-		operator uint32_t()
-		{
-			return id;
-		}
-	};
+	operator uint32_t()
+	{
+		return id;
+	}
+};
 
 /// @}
 /// @}

@@ -29,99 +29,99 @@
 
 namespace sfs
 {
-	/** @addtogroup Engine
-	 *	@{
-	 */
-	/** @addtogroup Components
-	 *	@{
-	 */
+/** @addtogroup Engine
+ *	@{
+ */
+/** @addtogroup Components
+ *	@{
+ */
 
-	/**	This class handles a Camera Component for the Owner Entity.
-	 *	@details
-	 *		This is a Component to allow easy use of Cameras for Players,
-	 *		and the ability to add/remove a Camera without having to create
-	 *		and destroy the Entity. It could be an Entity, and allowed to be
-	 *		a child of the one in need of it, but then I wouldn't be taking
-	 *		advantage of having a Component-based Entity system.
-	 *	@todo
+/**	This class handles a Camera Component for the Owner Entity.
+ *	@details
+ *		This is a Component to allow easy use of Cameras for Players,
+ *		and the ability to add/remove a Camera without having to create
+ *		and destroy the Entity. It could be an Entity, and allowed to be
+ *		a child of the one in need of it, but then I wouldn't be taking
+ *		advantage of having a Component-based Entity system.
+ *	@todo
+ */
+class Camera : public Component
+{
+	friend class Renderer;
+
+public:
+	Camera();
+	virtual ~Camera();
+
+	virtual void Init();
+	virtual void Update();
+	//virtual void OnDestroy();
+
+	/**	Sets the projection of this Camera for viewing.
+	 *	@param fov The FoV to use, eg. 70
+	 *	@param aspect Aspect ratio to use, eg. 16/10 or 16/9
+	 *	@param min The closest distance to render.
+	 *	@param max The farthest distance to render.
 	 */
-	class Camera : public Component
+	void SetProjection(float fov, float aspect, float min, float max);
+
+	/**	Updates the projection to use the current settings
+	 */
+	void UpdateProjection();
+
+	void UpdateView();
+	void OnViewChange(vec3 change)
 	{
-		friend class Renderer;
+		UpdateView();
+	}
 
-	public:
-		Camera();
-		virtual ~Camera();
+	/**	Sets the Field Of View for this Camera's perspective.
+	 */
+	void SetFOV(float fov);
 
-		virtual void Init();
-		virtual void Update();
-		//virtual void OnDestroy();
+	/**	Sets the Aspect Ratio to use.
+	 */
+	void SetRatio(float ratio);
 
-		/**	Sets the projection of this Camera for viewing.
-		 *	@param fov The FoV to use, eg. 70
-		 *	@param aspect Aspect ratio to use, eg. 16/10 or 16/9
-		 *	@param min The closest distance to render.
-		 *	@param max The farthest distance to render.
-		 */
-		void SetProjection(float fov, float aspect, float min, float max);
+	/**	Sets the viewing range to use (near and far).
+	 */
+	void SetRange(float near, float far);
 
-		/**	Updates the projection to use the current settings
-		 */
-		void UpdateProjection();
+	/// Field of view, eg. 40.0f
+	float fov = 100.0f;
 
-		void UpdateView();
-		void OnViewChange(vec3 change)
-		{
-			UpdateView();
-		}
+	/// Aspect ratio, eg. 16.0f/9.0f
+	float aspectRatio = 16 / 9;
 
-		/**	Sets the Field Of View for this Camera's perspective.
-		 */
-		void SetFOV(float fov);
+	/// The projection matrix for rendering the projection.
+	mat4 projection = mat4(0);
 
-		/**	Sets the Aspect Ratio to use.
-		 */
-		void SetRatio(float ratio);
+	vec3 direction;
+	vec3 right;
+	vec3 up;
+	mat4 view = mat4(0);
 
-		/**	Sets the viewing range to use (near and far).
-		 */
-		void SetRange(float near, float far);
+	/// The viewing range (near and far) of this camera's view, eg. (0.1f, 1000.0f)
+	Range<float> viewRange = { 0.1f, 1000.0f };
 
-		/// Field of view, eg. 40.0f
-		float fov = 100.0f;
+	vec3 lastPos;
 
-		/// Aspect ratio, eg. 16.0f/9.0f
-		float aspectRatio = 16 / 9;
+	Rect<uint32_t> _viewport;
 
-		/// The projection matrix for rendering the projection.
-		mat4 projection = mat4(0);
-
-		vec3 direction;
-		vec3 right;
-		vec3 up;
-		mat4 view = mat4(0);
-
-		/// The viewing range (near and far) of this camera's view, eg. (0.1f, 1000.0f)
-		Range<float> viewRange = { 0.1f, 1000.0f };
-
-		vec3 lastPos;
-
-		Rect<uint32_t> _viewport;
-
-		enum ProjectionMode
-		{
-			PM_PERSPECTIVE, PM_ORTHO
-		};
-		ProjectionMode projectionMode = PM_PERSPECTIVE;
+	enum ProjectionMode
+	{
+		PM_PERSPECTIVE, PM_ORTHO
+	};
+	ProjectionMode projectionMode = PM_PERSPECTIVE;
 
 //		PROP_RW(Camera, viewport, GetViewport, SetViewport)
 
-	protected:
+protected:
 
-	private:
+private:
 
-	};
+};
 
-	/** @} */
-	/** @} */
+/** @} */
+/** @} */
 }

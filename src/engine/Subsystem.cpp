@@ -23,8 +23,8 @@
 
 // Internal
 
-
-using namespace sfs;
+namespace sfs
+{
 
 Subsystem::Subsystem()
 {
@@ -34,4 +34,6 @@ Subsystem::Subsystem()
 Subsystem::~Subsystem()
 {
 	// TODO Auto-generated destructor stub
+}
+
 }

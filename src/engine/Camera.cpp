@@ -27,7 +27,8 @@
 #include "MathUtil.hpp"
 #include "Console.hpp"
 
-using namespace sfs;
+namespace sfs
+{
 
 Camera::Camera()
 {
@@ -108,4 +109,6 @@ void Camera::SetRange(float min, float max)
 	viewRange.min = min;
 	viewRange.max = max;
 	UpdateProjection();
+}
+
 }

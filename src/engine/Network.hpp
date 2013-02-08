@@ -31,113 +31,113 @@
 
 namespace sfs
 {
-	/**	@addtogroup Engine
-	 *	@{
-	 */
-	/**	@addtogroup Subsystems
-	 *	@{
-	 */
+/**	@addtogroup Engine
+ *	@{
+ */
+/**	@addtogroup Subsystems
+ *	@{
+ */
 
-	/** Each instance of Connection handles a connection to a server.
-	 *	@details
-	 *		Also, extension instances are included. For example, I
-	 *		include FullyConnectedMesh2 and ConnectionGraph2 for new
-	 *		kinds of connections.
-	 *	@todo
-	 *		If possible, make it more interchangeable.
-	 */
-	class Connection
+/** Each instance of Connection handles a connection to a server.
+ *	@details
+ *		Also, extension instances are included. For example, I
+ *		include FullyConnectedMesh2 and ConnectionGraph2 for new
+ *		kinds of connections.
+ *	@todo
+ *		If possible, make it more interchangeable.
+ */
+class Connection
+{
+public:
+	RakNet::RakPeerInterface* peer;
+	RakNet::FullyConnectedMesh2 fcm;
+	RakNet::ConnectionGraph2 cg;
+	RakNet::SocketDescriptor socket;
+	uint16_t maxPeers = 64;
+
+	Connection(uint16_t port, uint16_t maxPeers = 64) :
+		socket(port, 0), maxPeers(maxPeers)
 	{
-	public:
-		RakNet::RakPeerInterface* peer;
-		RakNet::FullyConnectedMesh2 fcm;
-		RakNet::ConnectionGraph2 cg;
-		RakNet::SocketDescriptor socket;
-		uint16_t maxPeers = 64;
+		peer = RakNet::RakPeerInterface::GetInstance();
+		peer->AttachPlugin(&fcm);
+		peer->AttachPlugin(&cg);
+		fcm.SetAutoparticipateConnections(true);
+		// Attach any more plugins you want here.
+	}
 
-		Connection(uint16_t port, uint16_t maxPeers = 64) :
-			socket(port, 0), maxPeers(maxPeers)
-		{
-			peer = RakNet::RakPeerInterface::GetInstance();
-			peer->AttachPlugin(&fcm);
-			peer->AttachPlugin(&cg);
-			fcm.SetAutoparticipateConnections(true);
-			// Attach any more plugins you want here.
-		}
-
-		~Connection()
-		{
-			RakNet::RakPeerInterface::DestroyInstance(peer);
-		}
-
-		bool ready = false;
-	};
-
-	/**	This class manages Networking capabilities
-	 *	@details
-	 *		Uses RakNet for networking, with a p2p basis, but also with
-	 *		the ability to use FCM. Setup for a game server and chat server,
-	 *		as separate peer instances. Custom
-	 *	@todo
-	 *		Todo
-	 */
-	class Network: public Subsystem
+	~Connection()
 	{
-		friend class Engine;
+		RakNet::RakPeerInterface::DestroyInstance(peer);
+	}
 
-	public:
-		Network();
-		virtual ~Network();
+	bool ready = false;
+};
 
-		/**	Attempts to host a sole server via IPv6 and/or IPv4
-		 *	@details
-		 *		Hosts a server that allows direct connection, but not FCM. If
-		 *		FCM2 capabilities are desired, \p ConnectFCM will "host" a server
-		 *		if there isn't one on the given IP.
-		 *	@todo
-		 *		Admin controls when host.
-		 *		Differentiate between client and host (commands, and scoreboard).
-		 */
-		bool Setup(Connection* con);
+/**	This class manages Networking capabilities
+ *	@details
+ *		Uses RakNet for networking, with a p2p basis, but also with
+ *		the ability to use FCM. Setup for a game server and chat server,
+ *		as separate peer instances. Custom
+ *	@todo
+ *		Todo
+ */
+class Network: public Subsystem
+{
+	friend class Engine;
 
-		/**	Connects client to a remote host via IP
-		 *	@details
-		 *		Connects the client to a server directly, without
-		 *		host switching. This type of connection is inflexible
-		 *		and depends on the host server.
-		 */
-		bool Connect(Connection* con, string host, string password = "");
+public:
+	Network();
+	virtual ~Network();
 
-		/**	Connects clients via FCM2.
-		 *	@details
-		 *		FullyConnectedMesh2 Connects a group of clients together.
-		 *		The first to "connect", before the rest of the clients connect,
-		 *		becomes the host. Then, if he disconnects, the next best candidate
-		 *		becomes host.
-		 *	@todo
-		 *		Have a specifier enum to turn off admin controls in FCM mode.
-		 */
-		bool ConnectFCM(Connection* con, string host, string password = "");
+	/**	Attempts to host a sole server via IPv6 and/or IPv4
+	 *	@details
+	 *		Hosts a server that allows direct connection, but not FCM. If
+	 *		FCM2 capabilities are desired, \p ConnectFCM will "host" a server
+	 *		if there isn't one on the given IP.
+	 *	@todo
+	 *		Admin controls when host.
+	 *		Differentiate between client and host (commands, and scoreboard).
+	 */
+	bool Setup(Connection* con);
 
-		/**	Disconnects from the current server.
-		 *	@details
-		 *		Disconnects the client from the server it is currently connected to,
-		 *		whether it is FCM, Direct, or chat.
-		 *	@todo
-		 *		Have different ports for different connection types, so specific connections can be ended.
-		 *		Grab those ports from XML, or config.
-		 */
-		void Disconnect(Connection* con);
+	/**	Connects client to a remote host via IP
+	 *	@details
+	 *		Connects the client to a server directly, without
+	 *		host switching. This type of connection is inflexible
+	 *		and depends on the host server.
+	 */
+	bool Connect(Connection* con, string host, string password = "");
 
-	protected:
-		virtual void Init();
-		virtual void Update();
+	/**	Connects clients via FCM2.
+	 *	@details
+	 *		FullyConnectedMesh2 Connects a group of clients together.
+	 *		The first to "connect", before the rest of the clients connect,
+	 *		becomes the host. Then, if he disconnects, the next best candidate
+	 *		becomes host.
+	 *	@todo
+	 *		Have a specifier enum to turn off admin controls in FCM mode.
+	 */
+	bool ConnectFCM(Connection* con, string host, string password = "");
 
-	public:
-		Connection* chatPeer;
-		Connection* gamePeer;
-	};
+	/**	Disconnects from the current server.
+	 *	@details
+	 *		Disconnects the client from the server it is currently connected to,
+	 *		whether it is FCM, Direct, or chat.
+	 *	@todo
+	 *		Have different ports for different connection types, so specific connections can be ended.
+	 *		Grab those ports from XML, or config.
+	 */
+	void Disconnect(Connection* con);
 
-	/** @} */
-	/** @} */
+protected:
+	virtual void Init();
+	virtual void Update();
+
+public:
+	Connection* chatPeer;
+	Connection* gamePeer;
+};
+
+/** @} */
+/** @} */
 }

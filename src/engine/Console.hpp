@@ -31,127 +31,128 @@
 
 namespace sfs
 {
-	class Console : public Subsystem
+	
+class Console : public Subsystem
+{
+public:
+	typedef boost::function<void(vector<string>)> CommandFunc;
+	typedef void (CommandFuncRaw)(vector<string>);
+	typedef boost::function<void()> CommandFuncSimple;
+	typedef void (CommandFuncSimpleRaw)();
+
+	struct Command
 	{
-	public:
-		typedef boost::function<void(vector<string>)> CommandFunc;
-		typedef void (CommandFuncRaw)(vector<string>);
-		typedef boost::function<void()> CommandFuncSimple;
-		typedef void (CommandFuncSimpleRaw)();
+		string name;
+		CommandFunc func;
+		string desc;
 
-		struct Command
-		{
-			string name;
-			CommandFunc func;
-			string desc;
-
-			Command(string name, CommandFunc func, string desc) :
-				name(name), func(func), desc(desc)
-			{
-			}
-		};
-
-		struct CommandSimple
-		{
-			string name;
-			CommandFuncSimple func;
-			string desc;
-
-			CommandSimple(string name, CommandFuncSimple func, string desc) :
-				name(name), func(func), desc(desc)
-			{
-			}
-		};
-
-		struct Variable
-		{
-			string name;
-			float value;
-			string desc;
-			bool readOnly;
-
-			Variable(string name, float val, string desc = "", bool readOnly = false) :
-				name(name), value(val), desc(desc), readOnly(readOnly)
-			{
-			}
-		};
-
-		Console();
-		virtual ~Console();
-
-		virtual void Init();
-		virtual void Update()
+		Command(string name, CommandFunc func, string desc) :
+			name(name), func(func), desc(desc)
 		{
 		}
-		virtual void OnDestroy()
-		{
-		}
-
-		void Input(string line);
-
-		template<typename T = string>
-		void Print(T msg)
-		{
-			ofstream file;
-			// Print to console window
-			cout << msg << "\n";
-			// Load log file
-			file.open(logFile.c_str(), ios::app);
-			// Append message to file
-			file << msg << "\n";
-			file.close();
-		}
-
-		template<typename T = string>
-		void LinePrint(T msg)
-		{
-			ofstream file;
-			// Print to console window
-			cout << msg;
-			// Load log file
-			file.open(logFile.c_str(), ios::app);
-			// Append message to file
-			file << msg;
-			file.close();
-		}
-
-		void RegisterCommand(string name, CommandFuncRaw func, string desc = "");
-		void RegisterCommand(string name, CommandFuncSimpleRaw func, string desc = "");
-
-		void RegisterVar(string name, float val, string desc = "", bool readOnly = false);
-
-		bool CallCommand(string name, vector<string> args);
-
-		Variable* GetVar(string name);
-		Command* GetCommand(string name);
-		CommandSimple* GetSimpleCommand(string name);
-
-		float GetValue(string name);
-		void SetValue(string name, float value);
-
-		static void CmdExit();
-
-	protected:
-
-	private:
-		vector<Command> commands;
-		vector<CommandSimple> simpleCommands;
-		vector<Variable> variables;
-
-		string logFile = "game.log";
 	};
 
-	template<typename T = const char*>
-	void Log(T msg)
+	struct CommandSimple
 	{
-		game->console->Print(msg);
+		string name;
+		CommandFuncSimple func;
+		string desc;
+
+		CommandSimple(string name, CommandFuncSimple func, string desc) :
+			name(name), func(func), desc(desc)
+		{
+		}
+	};
+
+	struct Variable
+	{
+		string name;
+		float value;
+		string desc;
+		bool readOnly;
+
+		Variable(string name, float val, string desc = "", bool readOnly = false) :
+			name(name), value(val), desc(desc), readOnly(readOnly)
+		{
+		}
+	};
+
+	Console();
+	virtual ~Console();
+
+	virtual void Init();
+	virtual void Update()
+	{
+	}
+	virtual void OnDestroy()
+	{
 	}
 
-	template<typename T, typename P, typename ... A>
-	void Log(T msg, P msg2, A ... args)
+	void Input(string line);
+
+	template<typename T = string>
+	void Print(T msg)
 	{
-		game->console->LinePrint(msg);
-		Log(msg2, args...);
+		ofstream file;
+		// Print to console window
+		cout << msg << "\n";
+		// Load log file
+		file.open(logFile.c_str(), ios::app);
+		// Append message to file
+		file << msg << "\n";
+		file.close();
 	}
+
+	template<typename T = string>
+	void LinePrint(T msg)
+	{
+		ofstream file;
+		// Print to console window
+		cout << msg;
+		// Load log file
+		file.open(logFile.c_str(), ios::app);
+		// Append message to file
+		file << msg;
+		file.close();
+	}
+
+	void RegisterCommand(string name, CommandFuncRaw func, string desc = "");
+	void RegisterCommand(string name, CommandFuncSimpleRaw func, string desc = "");
+
+	void RegisterVar(string name, float val, string desc = "", bool readOnly = false);
+
+	bool CallCommand(string name, vector<string> args);
+
+	Variable* GetVar(string name);
+	Command* GetCommand(string name);
+	CommandSimple* GetSimpleCommand(string name);
+
+	float GetValue(string name);
+	void SetValue(string name, float value);
+
+	static void CmdExit();
+
+protected:
+
+private:
+	vector<Command> commands;
+	vector<CommandSimple> simpleCommands;
+	vector<Variable> variables;
+
+	string logFile = "game.log";
+};
+
+template<typename T = const char*>
+void Log(T msg)
+{
+	game->console->Print(msg);
+}
+
+template<typename T, typename P, typename ... A>
+void Log(T msg, P msg2, A ... args)
+{
+	game->console->LinePrint(msg);
+	Log(msg2, args...);
+}
 
 } /* namespace sfs */
