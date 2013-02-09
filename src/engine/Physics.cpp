@@ -26,7 +26,8 @@
 #include "Engine.hpp"
 #include "Time.hpp"
 
-using namespace sfs;
+namespace sfs
+{
 
 Physics::Physics()
 {
@@ -193,4 +194,6 @@ bool Physics::OnCollideStay(btManifoldPoint& cp, void* body0, void* body1)
 bool Physics::OnCollideExit(void* userPersistentData)
 {
 //	return OnCollide( "Exit", cp, colObj0, partId0, index0, colObj1, partId1, index1 );
+}
+
 }

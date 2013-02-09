@@ -44,12 +44,13 @@
 #include "Camera.hpp"
 #include "FileManager.hpp"
 
-#include "FileLoaders/ShaderLoader.hpp"
-#include "FileLoaders/TextureLoader.hpp"
+#include "ShaderLoader.hpp"
+#include "TextureLoader.hpp"
 
 #define OFFSET(i) ((byte*)0 + (i))
 
-using namespace sfs;
+namespace sfs
+{
 
 Renderer::Renderer()
 {
@@ -589,4 +590,6 @@ void Renderer::HideMouse(bool hide)
 	{
 		glfwEnable(GLFW_MOUSE_CURSOR);
 	}
+}
+
 }

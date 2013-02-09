@@ -24,7 +24,8 @@
 
 // Internal
 
-using namespace sfs;
+namespace sfs
+{
 
 Object::Object()
 {
@@ -63,4 +64,6 @@ void Object::Bind()
 	 cls.Func("OnDestroy", &Object::OnDestroy);*/
 	//cls.FUNC( Object, Init );
 	//cls.FUNC( Object, Update );
+}
+
 }

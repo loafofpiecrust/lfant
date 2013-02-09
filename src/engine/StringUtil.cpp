@@ -27,31 +27,31 @@
 namespace sfs
 {
 
-	vector<string> split(string str, string dropDelim, string keepDelim)
+vector<string> split(string str, string dropDelim, string keepDelim)
+{
+	using namespace boost;
+	vector<string> result;
+	char_separator<char> sep(dropDelim.c_str(), keepDelim.c_str(), drop_empty_tokens);
+	tokenizer<char_separator<char>> tok(str, sep);
+	for(tokenizer<char_separator<char>>::iterator i = tok.begin(); i != tok.end(); ++i)
 	{
-		using namespace boost;
-		vector<string> result;
-		char_separator<char> sep(dropDelim.c_str(), keepDelim.c_str(), drop_empty_tokens);
-		tokenizer<char_separator<char>> tok(str, sep);
-		for(tokenizer<char_separator<char>>::iterator i = tok.begin(); i != tok.end(); ++i)
-		{
-			result += *i;
-		}
-		return result;
+		result += *i;
 	}
+	return result;
+}
 
-	vector<string> split(vector<string> str, string dropDelim, string keepDelim)
+vector<string> split(vector<string> str, string dropDelim, string keepDelim)
+{
+	vector<string> final;
+	vector<string> each;
+	for(uint i = 0; i < str.size(); ++i)
 	{
-		vector<string> final;
-		vector<string> each;
-		for(uint i = 0; i < str.size(); ++i)
+		each = split(str[i], dropDelim, keepDelim);
+		for(uint i = 0; i < each.size(); ++i)
 		{
-			each = split(str[i], dropDelim, keepDelim);
-			for(uint i = 0; i < each.size(); ++i)
-			{
-				final += each[i];
-			}
+			final += each[i];
 		}
-		return final;
 	}
+	return final;
+}
 }

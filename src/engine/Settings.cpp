@@ -17,3 +17,12 @@
  *	limitations under the License.
  *
  ******************************************************************************/
+
+// External
+
+// Internal
+
+namespace sfs
+{
+	
+}

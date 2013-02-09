@@ -32,123 +32,123 @@
 
 namespace sfs
 {
-	class Entity;
-	class Rigidbody;
-	class Joint;
+class Entity;
+class Rigidbody;
+class Joint;
 
-	/** @addtogroup Engine
-	 *	 @{
-	 */
-	/** @addtogroup Subsystems
-	 *	 @{
-	 */
+/** @addtogroup Engine
+ *	 @{
+ */
+/** @addtogroup Subsystems
+ *	 @{
+ */
 
-	struct GravPoint
+struct GravPoint
+{
+	string name;
+	vec3* point;
+	float force;
+
+	GravPoint(string name, vec3* pt, float fc) :
+		name(name), point(pt), force(fc)
 	{
-		string name;
-		vec3* point;
-		float force;
+	}
+};
 
-		GravPoint(string name, vec3* pt, float fc) :
-			name(name), point(pt), force(fc)
-		{
-		}
+/**	Physics
+ *	@details
+ *		Description
+ *	@todo
+ *		Todo
+ */
+class Physics : public Subsystem
+{
+	friend class Rigidbody;
+public:
+
+	struct RaycastHit
+	{
+		Vertex vertex;
+		float distance;
+		//Collider* collider;
+		Entity* entity;
 	};
 
-	/**	Physics
+	Physics();
+	virtual ~Physics();
+
+	virtual void Init();
+	virtual void Update();
+	virtual void OnDestroy();
+
+	//void AddConstraint(ConstraintType ct, Entity *p1, Entity *p2);
+	void AddJoint(Joint* joint);
+	void RemoveJoint(Joint* joint);
+
+	void AddRigidbody(Rigidbody* ent);
+	void RemoveRigidbody(Rigidbody* ent, bool destroy = false);
+
+	/**
+	 *	Returns the gravity point with the given name.
+	 *	@param name The name of the GravPoint to return.
+	 */
+	GravPoint* GetGravityPoint(string name);
+
+	/**
+	 *	Adds or sets the gravity point with the given name.
 	 *	@details
-	 *		Description
-	 *	@todo
-	 *		Todo
+	 *		If a gravity point with the given name exists, then its point
+	 *		and force are set according to the other parameters.
+	 *	@param name The name of the gravity point to set.
+	 *	@param point The locational point of gravity.
+	 *	@param force The gravitational force of this gravity point.
 	 */
-	class Physics : public Subsystem
+	void SetGravityPoint(string name, vec3 point, float force);
+	void SetGravityPoint(string name, vec3& point, float force);
+	void SetGravityPoint(string name, float force);
+
+	/**
+	 *	Casts a ray and returns the first collider it intersects with.
+	 *	@param origin The point to begin the ray at.
+	 *	@param direction The direction to cast the ray.
+	 *	@param distance The distance to cast the ray. Defaults to infinity as 0.0f.
+	 */
+	RaycastHit Raycast(vec3 origin, vec3 direction, float distance = 0.0f);
+
+	/**
+	 *	Casts a ray and returns all the colliders it intersects with.
+	 *	@param origin The point to begin the ray at.
+	 *	@param direction The direction to cast the ray.
+	 *	@param distance The distance to cast the ray. Defaults to infinity as 0.0f.
+	 */
+	vector<RaycastHit> RaycastAll(vec3 origin, vec3 direction, float distance = 0.0f);
+
+protected:
+	virtual void ApplyGravity()
 	{
-		friend class Rigidbody;
-	public:
+	}
 
-		struct RaycastHit
-		{
-			Vertex vertex;
-			float distance;
-			//Collider* collider;
-			Entity* entity;
-		};
+private:
+	static bool OnCollide(string func, btManifoldPoint& cp, const btCollisionObject* colObj0, int partId0, int index0,
+						  const btCollisionObject* colObj1, int partId1, int index1);
 
-		Physics();
-		virtual ~Physics();
+	static bool OnCollideEnter(btManifoldPoint& cp, const btCollisionObject* colObj0, int partId0, int index0,
+							   const btCollisionObject* colObj1, int partId1, int index1);
 
-		virtual void Init();
-		virtual void Update();
-		virtual void OnDestroy();
+	static bool OnCollideStay(btManifoldPoint& cp, void* body0, void* body1);
 
-		//void AddConstraint(ConstraintType ct, Entity *p1, Entity *p2);
-		void AddJoint(Joint* joint);
-		void RemoveJoint(Joint* joint);
+	static bool OnCollideExit(void* userPersistentData);
 
-		void AddRigidbody(Rigidbody* ent);
-		void RemoveRigidbody(Rigidbody* ent, bool destroy = false);
+	btDiscreteDynamicsWorld* world;
+	btBroadphaseInterface* broadphase;
+	btCollisionDispatcher* dispatcher;
+	btConstraintSolver* solver;
+	btDefaultCollisionConfiguration* collisionConfig;
 
-		/**
-		 *	Returns the gravity point with the given name.
-		 *	@param name The name of the GravPoint to return.
-		 */
-		GravPoint* GetGravityPoint(string name);
+	vector<Rigidbody*> bodies;
+	vector<GravPoint*> gravityPoints;
+};
 
-		/**
-		 *	Adds or sets the gravity point with the given name.
-		 *	@details
-		 *		If a gravity point with the given name exists, then its point
-		 *		and force are set according to the other parameters.
-		 *	@param name The name of the gravity point to set.
-		 *	@param point The locational point of gravity.
-		 *	@param force The gravitational force of this gravity point.
-		 */
-		void SetGravityPoint(string name, vec3 point, float force);
-		void SetGravityPoint(string name, vec3& point, float force);
-		void SetGravityPoint(string name, float force);
-
-		/**
-		 *	Casts a ray and returns the first collider it intersects with.
-		 *	@param origin The point to begin the ray at.
-		 *	@param direction The direction to cast the ray.
-		 *	@param distance The distance to cast the ray. Defaults to infinity as 0.0f.
-		 */
-		RaycastHit Raycast(vec3 origin, vec3 direction, float distance = 0.0f);
-
-		/**
-		 *	Casts a ray and returns all the colliders it intersects with.
-		 *	@param origin The point to begin the ray at.
-		 *	@param direction The direction to cast the ray.
-		 *	@param distance The distance to cast the ray. Defaults to infinity as 0.0f.
-		 */
-		vector<RaycastHit> RaycastAll(vec3 origin, vec3 direction, float distance = 0.0f);
-
-	protected:
-		virtual void ApplyGravity()
-		{
-		}
-
-	private:
-		static bool OnCollide(string func, btManifoldPoint& cp, const btCollisionObject* colObj0, int partId0, int index0,
-							  const btCollisionObject* colObj1, int partId1, int index1);
-
-		static bool OnCollideEnter(btManifoldPoint& cp, const btCollisionObject* colObj0, int partId0, int index0,
-								   const btCollisionObject* colObj1, int partId1, int index1);
-
-		static bool OnCollideStay(btManifoldPoint& cp, void* body0, void* body1);
-
-		static bool OnCollideExit(void* userPersistentData);
-
-		btDiscreteDynamicsWorld* world;
-		btBroadphaseInterface* broadphase;
-		btCollisionDispatcher* dispatcher;
-		btConstraintSolver* solver;
-		btDefaultCollisionConfiguration* collisionConfig;
-
-		vector<Rigidbody*> bodies;
-		vector<GravPoint*> gravityPoints;
-	};
-
-	/** @} */
-	/** @} */
+/** @} */
+/** @} */
 }

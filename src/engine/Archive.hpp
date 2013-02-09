@@ -26,55 +26,54 @@
 
 namespace sfs
 {
-	/**	@addtogroup Engine
-	 *	@{
-	 */
-	/** @addtogroup Utilities
-	 *	@{
-	 */
+/**	@addtogroup Engine
+ *	@{
+ */
+/** @addtogroup Utilities
+ *	@{
+ */
 
-	/**
-	 *
-	 *	@details
-	 *	@todo
-	 */
-	class Archive
+/**
+ *
+ *	@details
+ *	@todo
+ */
+class Archive
+{
+public:
+	Archive(string file) : file(file)
 	{
-	public:
-		Archive(string file) :
-			file(file)
-		{
-		}
+	}
 
-		~Archive();
+	~Archive();
 
-		void newClass(string type, string name)
-		{
+	void newClass(string type, string name)
+	{
 
-		}
+	}
 
-		void endClass()
-		{
-			data << "</class>";
-		}
+	void endClass()
+	{
+		data << "</class>";
+	}
 
-		template<typename T>
-		void newVar(string name, T val)
-		{
-			data << "<var name=\"" << name << "\" type=\"" << Type(val)
-				 << "\" value=\"" << "/>";
-		}
+	template<typename T>
+	void newVar(string name, T val)
+	{
+		data << "<var name=\"" << name << "\" type=\"" << Type(val)
+			 << "\" value=\"" << "/>";
+	}
 
-		template<typename T>
-		void add(string name, T& val)
-		{
-			data << "<";
-		}
+	template<typename T>
+	void add(string name, T& val)
+	{
+		data << "<";
+	}
 
-		string file;
-		xmldoc data;
-	};
+	string file;
+	xmldoc data;
+};
 
-	/** @} */
-	/** @} */
+/** @} */
+/** @} */
 }

@@ -30,95 +30,95 @@
 
 namespace sfs
 {
-	/** @addtogroup Engine
-	 *	 @{
-	 */
-	/** @addtogroup Components
-	 *	 @{
-	 */
+/** @addtogroup Engine
+ *	 @{
+ */
+/** @addtogroup Components
+ *	 @{
+ */
 
-	/**	The base class for all Entity Components.
-	 *	@details
-	 *		Component is the basis for all things to be attached to
-	 *		Entity instances. These Components can be added or removed
-	 *		at will to modify the overall capable functionality of the
-	 *		owner Entity. This supports an aggregate over inheritance
-	 *		engine structure.
-	 *	@todo
-	 *		Make a name generator.
-	 *		Organize!
+/**	The base class for all Entity Components.
+ *	@details
+ *		Component is the basis for all things to be attached to
+ *		Entity instances. These Components can be added or removed
+ *		at will to modify the overall capable functionality of the
+ *		owner Entity. This supports an aggregate over inheritance
+ *		engine structure.
+ *	@todo
+ *		Make a name generator.
+ *		Organize!
+ */
+class Component : public Object
+{
+public:
+	Component(Entity* owner);
+
+	/**
+	 *	Destroys this Component instance.
 	 */
-	class Component : public Object
+	void Destroy();
+
+	/// The owner of this Component.
+	Entity* owner;
+
+	// Default components
+	Transform* transform;
+
+protected:
+	friend class Entity;
+	Component()
 	{
-	public:
-		Component(Entity* owner);
+	}
+	virtual ~Component();
 
-		/**
-		 *	Destroys this Component instance.
-		 */
-		void Destroy();
+	virtual void Init()
+	{
+	}
 
-		/// The owner of this Component.
-		Entity* owner;
+	virtual void Update()
+	{
+	}
 
-		// Default components
-		Transform* transform;
+	virtual void OnDestroy()
+	{
+	}
 
-	protected:
-		friend class Entity;
-		Component()
-		{
-		}
-		virtual ~Component();
+	virtual void OnEnable()
+	{
+	}
 
-		virtual void Init()
-		{
-		}
+	virtual void OnDisable()
+	{
+	}
 
-		virtual void Update()
-		{
-		}
+	virtual void OnAddComponent(Component* comp)
+	{
+	}
 
-		virtual void OnDestroy()
-		{
-		}
+	virtual void OnRemoveComponent(Component* comp)
+	{
+	}
 
-		virtual void OnEnable()
-		{
-		}
+private:
+	/**
+	 *	Returns whether this component is enabled.
+	 */
+	bool GetEnabled();
 
-		virtual void OnDisable()
-		{
-		}
+	/**
+	 *	Enables or disables this component.
+	 */
+	void SetEnabled(bool enable);
 
-		virtual void OnAddComponent(Component* comp)
-		{
-		}
+	/// Whether this component should Update or not.
+	bool _enabled = true;
 
-		virtual void OnRemoveComponent(Component* comp)
-		{
-		}
+public:
 
-	private:
-		/**
-		 *	Returns whether this component is enabled.
-		 */
-		bool GetEnabled();
+	// Properties
+	PROP_RW(Component, enabled, GetEnabled, SetEnabled)
+};
 
-		/**
-		 *	Enables or disables this component.
-		 */
-		void SetEnabled(bool enable);
-
-		/// Whether this component should Update or not.
-		bool _enabled = true;
-
-	public:
-
-		// Properties
-		PROP_RW(Component, enabled, GetEnabled, SetEnabled)
-	};
-
-	/**	@}*/
-	/**	@}*/
+/**	@}*/
+/**	@}*/
 }

@@ -29,7 +29,8 @@
 #include "Time.hpp"
 #include "Renderer.hpp"
 
-using namespace sfs;
+namespace sfs
+{
 
 ParticleSystem::ParticleSystem()
 {
@@ -205,4 +206,6 @@ void ParticleSystem::GenerateVelocity(Particle* pt)
 uint32_t ParticleSystem::GetCount()
 {
 	return particles.size();
+}
+
 }

@@ -26,58 +26,58 @@
 
 namespace sfs
 {
-	/** @addtogroup Engine
-	 *	 @{
-	 */
-	/** @addtogroup Rendering
-	 *	 @{
-	 */
+/** @addtogroup Engine
+ *	 @{
+ */
+/** @addtogroup Rendering
+ *	 @{
+ */
 
-	/**
-	 *
-	 *	@details
-	 *	@todo
-	 */
-	template<typename T = uint32_t>
-	class Rect
+/**
+ *
+ *	@details
+ *	@todo
+ */
+template<typename T = uint32_t>
+class Rect
+{
+public:
+	typedef tvec2<T> vec_t;
+
+	Rect()
 	{
-	public:
-		typedef tvec2<T> vec_t;
+	}
 
-		Rect()
-		{
-		}
+	Rect(T x, T y, T width, T height) :
+		x(x), y(y), width(width), height(height)
+	{
+	}
 
-		Rect(T x, T y, T width, T height) :
-			x(x), y(y), width(width), height(height)
-		{
-		}
+	Rect(vec_t pos, T width, T height) :
+		Rect(pos.x, pos.y, width, height)
+	{
+	}
 
-		Rect(vec_t pos, T width, T height) :
-			Rect(pos.x, pos.y, width, height)
-		{
-		}
+	Rect(T x, T y, vec_t size) :
+		Rect(x, y, size.x, size.y)
+	{
+	}
 
-		Rect(T x, T y, vec_t size) :
-			Rect(x, y, size.x, size.y)
-		{
-		}
+	Rect(vec_t pos, vec_t size) :
+		Rect(pos.x, pos.y, size.x, size.y)
+	{
+	}
 
-		Rect(vec_t pos, vec_t size) :
-			Rect(pos.x, pos.y, size.x, size.y)
-		{
-		}
+	~Rect()
+	{
+	}
 
-		~Rect()
-		{
-		}
+	T x;
+	T y;
+	T width;
+	T height;
+};
 
-		T x;
-		T y;
-		T width;
-		T height;
-	};
-
-	/** @} */
-	/** @} */
+/** @} */
+/** @} */
 }

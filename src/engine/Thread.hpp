@@ -26,15 +26,15 @@
 
 namespace sfs
 {
-	/** @addtogroup Engine
-	 *	 @{
-	 */
-	/** @addtogroup Threads
-	 *	 @{
-	 */
+/** @addtogroup Engine
+ *	 @{
+ */
+/** @addtogroup Threads
+ *	 @{
+ */
 
-	void sleep(uint32_t milli);
+void sleep(uint32_t milli);
 
-	/** @} */
-	/** @} */
+/** @} */
+/** @} */
 }

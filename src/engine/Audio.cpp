@@ -21,11 +21,13 @@
 #include "Audio.hpp"
 
 // External
+#include <fmod.hpp>
 
 // Internal
 #include "Console.hpp"
 
-using namespace sfs;
+namespace sfs
+{
 
 Audio::Audio()
 {
@@ -39,46 +41,32 @@ Audio::~Audio()
 
 void Audio::Init()
 {
-	/*
-	 //int error;
-	 if (!alutInitWithoutContext(0, 0))
-	 {
-	 //error = alutGetError();
-	 //Log("Audio: There is an ALUT error: ", alutGetErrorString(alutGetError()));
-	 }
-
-	 SetDevice(alcOpenDevice(0));
-	 if (!GetDevice())
-	 {
-	 //	Log("Audio: Couldn't create the OpenAL audio device.");
-	 }
-
-	 context = alcCreateContext(device, 0);
-	 if (!GetContext())
-	 {
-	 //	Log("Audio: Couldn't create the OpenAL audio context.");
-	 }
-
-	 alcMakeContextCurrent(context);
-
-	 alListener3f(AL_POSITION, 0, 0, 0);
-	 alListener3f(AL_VELOCITY, 0, 0, 0);
-	 alListener3f(AL_ORIENTATION, 0, 0, -1);
-
-	 alGenSources(1, &source);
-
-	 alSourcef(source, AL_PITCH, 1);
-	 alSourcef(source, AL_GAIN, 1);
-	 alSource3f(source, AL_POSITION, 0, 0, 0);
-	 alSource3f(source, AL_VELOCITY, 0, 0, 0);
-	 alSourcei(source, AL_LOOPING, AL_FALSE);
-
-	 //alGenBuffers(1, &mBuffer);
-	 //alutLoadMemoryWaveform(,)
-	 */
+	FMOD::System_Create(&soundSystem);
+	soundSystem->init(maxChannels, FMOD_INIT_NORMAL, 0);
 }
 
 void Audio::Update()
 {
+
+}
+
+void Audio::OnDestroy()
+{
+}
+
+FMOD::Sound* Audio::PlaySound(string file, bool loop)
+{
+	FMOD::Sound* snd;
+	soundSystem->createSound(file.c_str(), FMOD_SOFTWARE | FMOD_2D, 0, &snd);
+	if(loop)
+	{
+		snd->setMode(FMOD_LOOP_NORMAL);
+	}
+	return snd;
+}
+
+FMOD::Sound* Audio::PlaySound3d(string file, vec3 position, bool loop)
+{
+}
 
 }

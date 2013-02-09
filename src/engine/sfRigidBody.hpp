@@ -27,22 +27,21 @@
 
 namespace sfs
 {
-	class sfRigidBody : public btRigidBody
-	{
-	public:
-		sfRigidBody(const btRigidBodyConstructionInfo& constructionInfo);
-		virtual ~sfRigidBody();
+class sfRigidBody : public btRigidBody
+{
+public:
+	sfRigidBody(const btRigidBodyConstructionInfo& constructionInfo);
+	virtual ~sfRigidBody();
 
-		// @ShadowFox
-		void applyPointGravity(btVector3 point, const btScalar force);
+	void applyPointGravity(btVector3 point, const btScalar force);
 
-		void setupRigidBody(const btRigidBodyConstructionInfo& constructionInfo);
+	void setupRigidBody(const btRigidBodyConstructionInfo& constructionInfo);
 
-	protected:
-		btScalar m_gravityMult;
+protected:
+	btScalar m_gravityMult;
 
-	private:
+private:
 
-	};
+};
 }
 

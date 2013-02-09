@@ -27,7 +27,8 @@
 #include "Entity.hpp"
 #include "Rigidbody.hpp"
 
-using namespace sfs;
+namespace sfs
+{
 
 Joint::Joint() :
 	Component(nullptr)
@@ -66,4 +67,6 @@ void Joint::OnRemoveComponent(Component* comp)
 	{
 		rigidbody = nullptr;
 	}
+}
+
 }

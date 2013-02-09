@@ -28,36 +28,36 @@
 
 namespace sfs
 {
-	/** @addtogroup Engine
-	 *	@{
-	 */
-	/** @addtogroup Subsystems
-	 *	@{
-	 */
+/** @addtogroup Engine
+ *	@{
+ */
+/** @addtogroup Subsystems
+ *	@{
+ */
 
-	/**	My custom DynamicsWorld class, adding new functionality.
-	 *	@details
-	 *		Adds some new functionality, such as point-based gravity allowing
-	 *		you to create realistic solar systems, or just points that pull
-	 *		you in. More soon...
-	 *	@todo
-	 *		Todo
-	 */
-	class sfDynamicsWorld : public btDiscreteDynamicsWorld
-	{
-	public:
-		sfDynamicsWorld(btDispatcher* dispatcher, btBroadphaseInterface* pairCache, btConstraintSolver* constraintSolver,
-						btCollisionConfiguration* collisionConfiguration);
-		virtual ~sfDynamicsWorld();
+/**	My custom DynamicsWorld class, adding new functionality.
+ *	@details
+ *		Adds some new functionality, such as point-based gravity allowing
+ *		you to create realistic solar systems, or just points that pull
+ *		you in. More soon...
+ *	@todo
+ *		Todo
+ */
+class sfDynamicsWorld : public btDiscreteDynamicsWorld
+{
+public:
+	sfDynamicsWorld(btDispatcher* dispatcher, btBroadphaseInterface* pairCache, btConstraintSolver* constraintSolver,
+					btCollisionConfiguration* collisionConfiguration);
+	virtual ~sfDynamicsWorld();
 
-		/// Apply all gravity as points, disabling normal gravity.
-		virtual void applyGravity();
+	/// Apply all gravity as points, disabling normal gravity.
+	virtual void applyGravity();
 
-	protected:
+protected:
 
-	private:
-	};
+private:
+};
 
-	/** @} */
-	/** @} */
+/** @} */
+/** @} */
 }

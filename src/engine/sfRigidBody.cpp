@@ -23,7 +23,8 @@
 
 // Internal
 
-using namespace sfs;
+namespace sfs
+{
 
 sfRigidBody::sfRigidBody(const btRigidBodyConstructionInfo& constructionInfo) :
 	btRigidBody(constructionInfo)
@@ -78,4 +79,6 @@ void sfRigidBody::applyPointGravity(btVector3 point, const btScalar force)
 	 //	btRigidBody::setDamping( 0.0f, 0.0f );
 	 //}
 	 */
+}
+
 }

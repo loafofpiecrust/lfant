@@ -24,7 +24,8 @@
 
 // Internal
 
-using namespace sfs;
+namespace sfs
+{
 
 Mesh::Mesh()
 {
@@ -46,5 +47,7 @@ void Mesh::Update()
 
 void Mesh::OnDestroy()
 {
+
+}
 
 }

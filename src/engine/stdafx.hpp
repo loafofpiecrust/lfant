@@ -70,7 +70,6 @@
 #include <glm/gtx/quaternion.hpp>
 
 #include <boost/assign/std/vector.hpp>
-#include <boost/assign/list_inserter.hpp>
 #include <boost/function.hpp>
 #include <boost/bind.hpp>
 #include <boost/type_traits.hpp>

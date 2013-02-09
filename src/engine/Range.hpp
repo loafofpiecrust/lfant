@@ -26,47 +26,47 @@
 
 namespace sfs
 {
-	/** @addtogroup Engine
-	 *	@{
-	 */
-	/** @addtogroup Types
-	 *	@{
-	 */
+/** @addtogroup Engine
+ *	@{
+ */
+/** @addtogroup Types
+ *	@{
+ */
 
-	template<typename T = float>
-	class Range
+template<typename T = float>
+class Range
+{
+public:
+	union
 	{
-	public:
-		union
-		{
-			T min, start, major, primary, first;
-		};
-		union
-		{
-			T max, end, minor, secondary, second;
-		};
-
-		T operator[](byte idx)
-		{
-			if(idx == 0)
-			{
-				return min;
-			}
-			else
-			{
-				return max;
-			}
-		}
-
-		Range(T one, T two) :
-			min(one), max(two)
-		{
-		}
-
-		Range()
-		{
-		}
+		T min, start, major, primary, first;
 	};
+	union
+	{
+		T max, end, minor, secondary, second;
+	};
+
+	T operator[](byte idx)
+	{
+		if(idx == 0)
+		{
+			return min;
+		}
+		else
+		{
+			return max;
+		}
+	}
+
+	Range(T one, T two) :
+		min(one), max(two)
+	{
+	}
+
+	Range()
+	{
+	}
+};
 
 /// @}
 /// @}

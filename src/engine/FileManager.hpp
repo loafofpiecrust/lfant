@@ -30,56 +30,56 @@
 namespace sfs
 {
 #if WINDOWS
-	const string UserPath = getenv("UserProfile");
+const string UserPath = getenv("UserProfile");
 #elif UNIX
-	const string UserPath = getenv("HOME");
+const string UserPath = getenv("HOME");
 #endif
 
-	const string GameName = "ShadowFox";
+const string GameName = "ShadowFox";
 
-	/** @addtogroup Engine
-	 *	 @{
-	 */
-	/** @addtogroup Subsystems
-	 *	 @{
-	 */
+/** @addtogroup Engine
+ *	 @{
+ */
+/** @addtogroup Subsystems
+ *	 @{
+ */
 
-	// Typedefs for ease-of-use and switchability
-	typedef tinyxml2::XMLDocument xmldoc;
-	typedef tinyxml2::XMLElement xmlelem;
-	typedef tinyxml2::XMLNode xmlnode;
-	typedef tinyxml2::XMLAttribute xmlattr;
+// Typedefs for ease-of-use and switchability
+typedef tinyxml2::XMLDocument xmldoc;
+typedef tinyxml2::XMLElement xmlelem;
+typedef tinyxml2::XMLNode xmlnode;
+typedef tinyxml2::XMLAttribute xmlattr;
 
-	/**	FileManager
-	 *	@details
-	 *		Description
-	 *	@todo
-	 *		Todo
-	 */
-	class FileManager : public Subsystem
-	{
-	public:
-		FileManager();
-		~FileManager();
+/**	FileManager
+ *	@details
+ *		Description
+ *	@todo
+ *		Todo
+ */
+class FileManager : public Subsystem
+{
+public:
+	FileManager();
+	~FileManager();
 
-		void Init();
+	void Init();
 
-		xmldoc LoadXML(string type, string dir);
-		void UnloadXML(xmldoc doc);
+	xmldoc LoadXML(string type, string dir);
+	void UnloadXML(xmldoc doc);
 
-		filesystem::path GetGameFile(string name);
-		vector<filesystem::path> GetGameFiles(string dir, string ext = "");
-		filesystem::path GetUserFile(string name);
+	filesystem::path GetGameFile(string name);
+	vector<filesystem::path> GetGameFiles(string dir, string ext = "");
+	filesystem::path GetUserFile(string name);
 
-		string ConvertPath(string curr);
+	string ConvertPath(string curr);
 
-	protected:
+protected:
 
-	private:
-		string gameFolder;
-		string userFolder;
-	};
+private:
+	string gameFolder;
+	string userFolder;
+};
 
-	/** @} */
-	/** @} */
+/** @} */
+/** @} */
 }

@@ -28,72 +28,72 @@
 
 namespace sfs
 {
-	/** @addtogroup Engine
-	 *	 @{
+/** @addtogroup Engine
+ *	 @{
+ */
+/** @addtogroup Subsystems
+ *	 @{
+ */
+
+struct STimer
+{
+	string name;
+	double length;
+	boost::function<void()> callback;
+};
+
+typedef boost::chrono::high_resolution_clock sfclock;
+
+/**	Timer
+ *	@details
+ *		Description
+ *	@todo
+ *		Todo
+ */
+class Time : public Subsystem
+{
+public:
+	Time();
+	~Time();
+
+	virtual void Init();
+	virtual void Update();
+
+	/// Gets the amount of seconds since Engine::Init was called.
+	double GetTime();
+	void ResetTime();
+	void UpdateTimes();
+
+	/** Sets a timer using a name, length, and optionally a callback function. Shouldn't be used for long time periods (1 hour+).
+	 *	@param name The name of this timer for retrieval before finish.
+	 *	@param length The amount of time this timer should wait before finishing.
+	 *	@param callback The function to call when the timer ends. Should be set with boost::bind(&func, &inst);
 	 */
-	/** @addtogroup Subsystems
-	 *	 @{
-	 */
+	STimer& SetTimer(string name, const double length, boost::function<void()> callback /*= nullptr*/);
 
-	struct STimer
-	{
-		string name;
-		double length;
-		boost::function<void()> callback;
-	};
+	STimer& GetTimer(string name);
 
-	typedef boost::chrono::high_resolution_clock sfclock;
+	void CallTimer(STimer& timer);
+	void CallTimer(string name);
+	void CallTimer(int idx);
 
-	/**	Timer
-	 *	@details
-	 *		Description
-	 *	@todo
-	 *		Todo
-	 */
-	class Time : public Subsystem
-	{
-	public:
-		Time();
-		~Time();
+	/// This function is called on a new thread to handle a timer efficiently.
+	void TimerThread(STimer& tmr);
 
-		virtual void Init();
-		virtual void Update();
+	// Properties
 
-		/// Gets the amount of seconds since Engine::Init was called.
-		double GetTime();
-		void ResetTime();
-		void UpdateTimes();
+	/// Deltatime in seconds
+	double deltaTime;
+	double deltaTimeFixed;
+	double frameRate;
+	double timeScale;
 
-		/** Sets a timer using a name, length, and optionally a callback function. Shouldn't be used for long time periods (1 hour+).
-		 *	@param name The name of this timer for retrieval before finish.
-		 *	@param length The amount of time this timer should wait before finishing.
-		 *	@param callback The function to call when the timer ends. Should be set with boost::bind(&func, &inst);
-		 */
-		STimer& SetTimer(string name, const double length, boost::function<void()> callback /*= nullptr*/);
+private:
+	double lastFrame;
+	vector<STimer> timers;
+	sfclock::time_point startTime;
+};
 
-		STimer& GetTimer(string name);
-
-		void CallTimer(STimer& timer);
-		void CallTimer(string name);
-		void CallTimer(int idx);
-
-		/// This function is called on a new thread to handle a timer efficiently.
-		void TimerThread(STimer& tmr);
-
-		// Properties
-
-		/// Deltatime in seconds
-		double deltaTime;
-		double deltaTimeFixed;
-		double frameRate;
-		double timeScale;
-
-	private:
-		double lastFrame;
-		vector<STimer> timers;
-		sfclock::time_point startTime;
-	};
-
-	/** @} */
-	/** @} */
+/** @} */
+/** @} */
 }

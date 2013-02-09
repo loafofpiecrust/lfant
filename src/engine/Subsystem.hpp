@@ -26,25 +26,25 @@
 
 namespace sfs
 {
-	/** @addtogroup Engine
-	 *	@{
-	 */
-	/** @addtogroup Subsystems
-	 *	@{
-	 */
+/** @addtogroup Engine
+ *	@{
+ */
+/** @addtogroup Subsystems
+ *	@{
+ */
 
-	/**	
-	 *	@details
-	 *		
-	 *	@todo
-	 *		
-	 */
-	class Subsystem : public Object
-	{
-	protected:
-		Subsystem();
-		virtual ~Subsystem();
-	};
+/**
+ *	@details
+ *
+ *	@todo
+ *
+ */
+class Subsystem : public Object
+{
+protected:
+	Subsystem();
+	virtual ~Subsystem();
+};
 
 /// @}
 /// @}

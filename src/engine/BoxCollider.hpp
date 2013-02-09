@@ -27,30 +27,30 @@
 
 namespace sfs
 {
-	/** @addtogroup Engine
-	 *	 @{
-	 */
-	/** @addtogroup Components
-	 *	 @{
-	 */
+/** @addtogroup Engine
+ *	 @{
+ */
+/** @addtogroup Components
+ *	 @{
+ */
 
-	class BoxCollider : public Collider
-	{
-	public:
+class BoxCollider : public Collider
+{
+public:
 
-	protected:
+protected:
 //		using Collider::Collider;
 //		using Collider::~Collider;
 
-		virtual void Update();
-		virtual void OnSetScale(vec3 scale);
+	virtual void Update();
+	virtual void OnSetScale(vec3 scale);
 
-		btBoxShape* shape;
+	btBoxShape* shape;
 
-	private:
+private:
 
-	};
+};
 
-	/** @} */
-	/** @} */
+/** @} */
+/** @} */
 }

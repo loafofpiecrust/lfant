@@ -28,45 +28,45 @@
 
 namespace sfs
 {
-	class Rigidbody;
+class Rigidbody;
 
-	/**	@addtogroup Engine
-	 *	@{
-	 */
-	/** @addtogroup Components
-	 *	@{
-	 */
+/**	@addtogroup Engine
+ *	@{
+ */
+/** @addtogroup Components
+ *	@{
+ */
 
-	/**
-	 *
-	 *	@details
-	 *	@todo
-	 */
-	class Joint : public Component
-	{
-		friend class Physics;
+/**
+ *
+ *	@details
+ *	@todo
+ */
+class Joint : public Component
+{
+	friend class Physics;
 
-	public:
-		virtual ~Joint();
+public:
+	virtual ~Joint();
 
-		Rigidbody* rigidbody;
-		Rigidbody* connectedBody;
+	Rigidbody* rigidbody;
+	Rigidbody* connectedBody;
 
-	protected:
-		Joint();
+protected:
+	Joint();
 
-		virtual void Init();
-		virtual void OnAddComponent(Component* comp);
-		virtual void OnRemoveComponent(Component* comp);
+	virtual void Init();
+	virtual void OnAddComponent(Component* comp);
+	virtual void OnRemoveComponent(Component* comp);
 
-	private:
+private:
 
-		virtual btTypedConstraint* GetConstraint() = 0;
-		virtual void SetConstraint(btTypedConstraint* con) = 0;
+	virtual btTypedConstraint* GetConstraint() = 0;
+	virtual void SetConstraint(btTypedConstraint* con) = 0;
 
-		PROP_RW(Joint, pvCon, GetConstraint, SetConstraint)
-	};
+	PROP_RW(Joint, pvCon, GetConstraint, SetConstraint)
+};
 
-	/** @} */
-	/** @} */
+/** @} */
+/** @} */
 }

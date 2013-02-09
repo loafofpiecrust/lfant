@@ -37,10 +37,8 @@
 
 namespace sfs
 {
-	Engine* game;
-}
 
-using namespace sfs;
+Engine* game;
 
 extern "C" void Launch()
 {
@@ -140,4 +138,6 @@ void Engine::Destroy()
 void Engine::Exit()
 {
 	destroy = true;
+}
+
 }

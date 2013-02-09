@@ -27,7 +27,8 @@
 #include "Time.hpp"
 #include "Console.hpp"
 
-using namespace sfs;
+namespace sfs
+{
 
 Sprite::Sprite()
 {
@@ -159,5 +160,7 @@ void Sprite::PlayAnim(string name, AnimPlayMode mode, bool reverse)
 
 void Sprite::PauseAnim()
 {
+
+}
 
 }

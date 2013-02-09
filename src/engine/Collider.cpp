@@ -25,7 +25,8 @@
 // Internal
 #include "Rigidbody.hpp"
 
-using namespace sfs;
+namespace sfs
+{
 
 void Collider::Init()
 {
@@ -40,3 +41,4 @@ void Collider::OnAddComponent(Component* comp)
 	}
 }
 
+}

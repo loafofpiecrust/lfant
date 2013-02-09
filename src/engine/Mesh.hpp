@@ -29,59 +29,59 @@
 
 namespace sfs
 {
-	/** @addtogroup Engine
-	 *	@{
-	 */
-	/** @addtogroup Rendering
-	 *	@{
-	 */
+/** @addtogroup Engine
+ *	@{
+ */
+/** @addtogroup Rendering
+ *	@{
+ */
 
-	/**	The Mesh class that holds a 3D mesh and possibly an animated skeleton.
-	 *	@remarks
-	 *		This class controls a Mesh as defined by the 3d importing library.
-	 *		It handles holding a list of vertices, bones, faces, etc. It also
-	 *		holds a list of animations and things involving that. Keep in mind
-	 *		that this class isn't used directly for MeshRendering for Entities.
-	 *		The MeshRenderer class is used for that, and MeshRenderer has functions
-	 *		to manage changing the model and animset of the Mesh, and for attaching
-	 *		children mesh to it (possible, not sure yet)
-	 *	@todo
-	 *		Be sure this works fully in conjuction with the importers Mesh classes.
-	 *		Have this display as-is (ONLY for debug purposes; Later, require an Entity with MeshRenderer and SceneNode)
-	 */
-	class Mesh : public Component
-	{
-		friend class Renderer;
-	public:
-		Mesh();
-		~Mesh();
+/**	The Mesh class that holds a 3D mesh and possibly an animated skeleton.
+ *	@remarks
+ *		This class controls a Mesh as defined by the 3d importing library.
+ *		It handles holding a list of vertices, bones, faces, etc. It also
+ *		holds a list of animations and things involving that. Keep in mind
+ *		that this class isn't used directly for MeshRendering for Entities.
+ *		The MeshRenderer class is used for that, and MeshRenderer has functions
+ *		to manage changing the model and animset of the Mesh, and for attaching
+ *		children mesh to it (possible, not sure yet)
+ *	@todo
+ *		Be sure this works fully in conjuction with the importers Mesh classes.
+ *		Have this display as-is (ONLY for debug purposes; Later, require an Entity with MeshRenderer and SceneNode)
+ */
+class Mesh : public Component
+{
+	friend class Renderer;
+public:
+	Mesh();
+	~Mesh();
 
-		virtual void Init();
-		virtual void Update();
-		virtual void OnDestroy();
+	virtual void Init();
+	virtual void Update();
+	virtual void OnDestroy();
 
-		void SetInput(string path);
-		void SetTexture(string name);
+	void SetInput(string path);
+	void SetTexture(string name);
 
-		vector<Vertex> vertices;
-		vector<uint32_t> indices;
+	vector<Vertex> vertices;
+	vector<uint32_t> indices;
 
-		Material material;
+	Material material;
 
-	protected:
-		string file = "";
+protected:
+	string file = "";
 
-		uint32_t vertexBuffer = 0;
-		uint32_t indexBuffer = 0;
+	uint32_t vertexBuffer = 0;
+	uint32_t indexBuffer = 0;
 
-		uint32_t matrixId = 0;
-		bool castShadows = true;
-		bool receiveShadows = true;
+	uint32_t matrixId = 0;
+	bool castShadows = true;
+	bool receiveShadows = true;
 
-		bool initialized = false;
+	bool initialized = false;
 
-	private:
-	};
+private:
+};
 
 /// @}
 /// @}
