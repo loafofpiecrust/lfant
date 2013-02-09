@@ -62,38 +62,38 @@ struct CLASSTYPE##NAME : public Property\
 } NAME;\
 
 #define PROP_RW(CLASSTYPE, NAME, GETFUNC, SETFUNC)\
-class CLASSTYPE##NAME : public Property\
+class prop_CLASSTYPE##NAME : public Property\
 {\
 public:\
-    typedef CLASSTYPE##NAME MyType;\
-    typedef RETURN_TYPE(&CLASSTYPE::GETFUNC) GETTYPE;\
-    typedef typename remove_ref<GETTYPE>::type GETTYPESIMPLE;\
-    typedef ARG_TYPE(&CLASSTYPE::SETFUNC, 1) SETTYPE;\
-    operator const GETTYPE()\
-    {\
-        return get();\
-    }\
-    GETTYPE operator ()() const \
-    {\
-        return get();\
-    }\
-    GETTYPE get() const \
-    {\
-       return reinterpret_cast<CLASSTYPE*>((MyType*)(this) - offsetof(CLASSTYPE, NAME))->GETFUNC();\
-    }\
+	typedef prop_CLASSTYPE##NAME MyType;\
+	typedef RETURN_TYPE(&CLASSTYPE::GETFUNC) GETTYPE;\
+	typedef typename remove_ref<GETTYPE>::type GETTYPESIMPLE;\
+	typedef ARG_TYPE(&CLASSTYPE::SETFUNC, 1) SETTYPE;\
+	operator const GETTYPE()\
+	{\
+		return get();\
+	}\
+	GETTYPE operator ()() const \
+	{\
+		return get();\
+	}\
+	GETTYPE get() const \
+	{\
+	   return reinterpret_cast<CLASSTYPE*>((MyType*)(this) - offsetof(CLASSTYPE, NAME))->GETFUNC();\
+	}\
 	GETTYPE set(SETTYPE value)\
-    {\
-       reinterpret_cast<CLASSTYPE*>((MyType*)(this) - offsetof(CLASSTYPE, NAME))->SETFUNC(value);\
-       return get();\
-    }\
-    GETTYPE operator =(SETTYPE value)\
-    {\
-        set(value);\
-        return get();\
-    }\
-    GETTYPE operator->() {\
-    	return get();\
-    }\
+	{\
+	   reinterpret_cast<CLASSTYPE*>((MyType*)(this) - offsetof(CLASSTYPE, NAME))->SETFUNC(value);\
+	   return get();\
+	}\
+	GETTYPE operator =(SETTYPE value)\
+	{\
+		set(value);\
+		return get();\
+	}\
+	GETTYPE operator->() {\
+		return get();\
+	}\
 } NAME;
 
 #define PROP_BINARY_OP(OP) \

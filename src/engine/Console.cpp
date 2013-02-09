@@ -198,7 +198,7 @@ void Console::RegisterCommand(string name, CommandFuncSimpleRaw func, string des
 			return;
 		}
 	}
-	simpleCommands += CommandSimple(name, func, desc);
+	simpleCommands.push_back(CommandSimple(name, func, desc));
 }
 
 bool Console::CallCommand(string name, vector<string> args)

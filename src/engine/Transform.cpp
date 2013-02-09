@@ -54,7 +54,7 @@ vec3& Transform::GetPosition()
 void Transform::SetPosition(vec3 pos)
 {
 	_position = pos;
-	trigger("SetPos", position);
+	Trigger("SetPosition", position);
 }
 
 quat Transform::GetRotationQuat()
@@ -66,12 +66,12 @@ void Transform::SetRotationQuat(quat rot)
 {
 	_rotationQuat = rot;
 	rotation = eulerAngles(rot);
-	trigger("SetRot", rotation);
+//	Trigger("SetRotation", rotation);
 }
 
 vec3& Transform::GetRotation()
 {
-	Log("Transform::GetRot(): Getting rot");
+	Log("Transform::GetRotation(): Getting rot");
 	return _rotation;
 }
 
@@ -89,7 +89,7 @@ vec3 Transform::GetScale()
 void Transform::SetScale(vec3 scl)
 {
 	_scale = scl;
-	trigger("SetScale", scale);
+	Trigger("SetScale", scale);
 }
 
 vec3 Transform::GetWorldPosition()
@@ -158,7 +158,7 @@ mat4 Transform::GetMatrix()
 void Transform::SetDirection()
 {
 	Log("Transform::SetDirection(): Entered function");
-	vec3 rot = GetWorldRot();
+	vec3 rot = GetWorldRotation();
 	Log("Transform::SetDirection(): Grabbed world rot");
 	rot *= vec3(degToRad);
 	Log("Transform::SetDirection(): Transmute worldRotation to radians");
@@ -187,13 +187,13 @@ void Transform::Rotate(vec3 rot)
 	//_rotationQuat = rotate( _rotationQuat, rot.x, xdir );
 	//_rotationQuat = rotate( _rotationQuat, rot.y, ydir );
 	//_rotationQuat = rotate( _rotationQuat, rot.z, zdir );
-	trigger("SetRot", rotation);
+//	Trigger("SetRotation", rotation);
 }
 
 void Transform::Scale(vec3 scl)
 {
 	scale *= scl;
-	trigger("SetScale", scale);
+//	Trigger("SetScale", scale);
 }
 
 }

@@ -24,10 +24,18 @@
 
 // Internal
 
+namespace FMOD
+{
+class System;
+class Sound;
+}
+
 namespace sfs
 {
+
 class Audio
 {
+	friend class AudioSource;
 public:
 	Audio();
 	virtual ~Audio();
@@ -38,15 +46,20 @@ public:
 	 *		that entity, and play the music only to it's AudioListener.
 	 *	@param file The audio file to load and play.
 	 */
-	void PlaySound(string file);
+	FMOD::Sound* PlaySound(string file, bool loop = false);
+
+	FMOD::Sound* PlaySound3d(string file, vec3 position = vec3(0), bool loop = false);
+
+	uint8_t maxChannels = 10;
 
 protected:
 	virtual void Init();
 	virtual void Update();
+	virtual void OnDestroy();
+
+	FMOD::System* soundSystem;
 
 private:
-	uint32_t source;
-	uint32_t listener;
-	uint32_t buffer;
 };
+
 }

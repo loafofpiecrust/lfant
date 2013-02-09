@@ -41,8 +41,7 @@ namespace sfs
 class Archive
 {
 public:
-	Archive(string file) :
-		file(file)
+	Archive(string file) : file(file)
 	{
 	}
 
