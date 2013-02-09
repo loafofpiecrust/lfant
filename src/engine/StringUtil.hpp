@@ -28,16 +28,16 @@
 
 namespace sfs
 {
-	/** @addtogroup Engine
-	 *	 @{
-	 */
-	/** @addtogroup Utilities
-	 *	 @{
-	 */
+/** @addtogroup Engine
+ *	 @{
+ */
+/** @addtogroup Utilities
+ *	 @{
+ */
 
-	vector<string> split(string str, string dropDelim = " ", string keepDelim = "");
-	vector<string> split(vector<string> str, string dropDelim = " ", string keepDelim = "");
+vector<string> split(string str, string dropDelim = " ", string keepDelim = "");
+vector<string> split(vector<string> str, string dropDelim = " ", string keepDelim = "");
 
-	/** @} */
-	/** @} */
+/** @} */
+/** @} */
 }

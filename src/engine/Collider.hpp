@@ -29,51 +29,51 @@
 
 namespace sfs
 {
-	class Rigidbody;
+class Rigidbody;
 
-	/** @addtogroup Engine
-	 *	 @{
-	 */
-	/** @addtogroup Components
-	 *	 @{
-	 */
+/** @addtogroup Engine
+ *	 @{
+ */
+/** @addtogroup Components
+ *	 @{
+ */
 
-	class Collider : public Component
+class Collider : public Component
+{
+public:
+	bool trigger;
+	//SurfaceMaterial* material;
+	vec3 center;
+
+protected:
+	Collider()
 	{
-	public:
-		bool trigger;
-		//SurfaceMaterial* material;
-		vec3 center;
-
-	protected:
-		Collider()
-		{
-		}
-		virtual ~Collider()
-		{
-		}
+	}
+	virtual ~Collider()
+	{
+	}
 //		using Component::Component;
 //		using Component::~Component;
 
-		virtual void Init();
-		virtual void OnAddComponent(Component* comp);
-		virtual void OnSetScale(vec3 scale)
-		{
-		}
+	virtual void Init();
+	virtual void OnAddComponent(Component* comp);
+	virtual void OnSetScale(vec3 scale)
+	{
+	}
 
-		virtual btCollisionShape* GetShape()
-		{
-		}
+	virtual btCollisionShape* GetShape()
+	{
+	}
 
-		Rigidbody* rigidbody;
+	Rigidbody* rigidbody;
 
-	private:
+private:
 
-	public:
-		PROP_RO(Collider, shape, GetShape)
+public:
+	PROP_RO(Collider, shape, GetShape)
 
-	};
+};
 
-	/** @} */
-	/** @} */
+/** @} */
+/** @} */
 }

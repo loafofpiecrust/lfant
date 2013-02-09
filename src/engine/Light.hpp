@@ -26,55 +26,55 @@
 
 namespace sfs
 {
-	/** @addtogroup Engine
-	 *	 @{
-	 */
-	/** @addtogroup Components
-	 *	 @{
-	 */
+/** @addtogroup Engine
+ *	 @{
+ */
+/** @addtogroup Components
+ *	 @{
+ */
 
-	/**	Physics
-	 *	@details
-	 *		Description
-	 *	@todo
-	 *		Todo
+/**	Physics
+ *	@details
+ *		Description
+ *	@todo
+ *		Todo
+ */
+class Light : public Component
+{
+public:
+
+	/**
+	 *	Supported light types.
 	 */
-	class Light : public Component
+	enum LightType
 	{
-	public:
-
-		/**
-		 *	Supported light types.
-		 */
-		enum LightType
-		{
-			Directional = 1,
-			Point = 2,
-			Spot = 3
-		};
-
-		Light();
-		~Light();
-
-		virtual void Init();
-		virtual void Update();
-
-	protected:
-
-		float radius;
-		float intensity;
-		/// ?
-		float innerAngle;
-		/// ?
-		float outerAngle;
-
-		rgba color;
-		LightType type;
-
-	private:
-
+		Directional = 1,
+		Point = 2,
+		Spot = 3
 	};
 
-	/** @} */
-	/** @} */
+	Light();
+	~Light();
+
+	virtual void Init();
+	virtual void Update();
+
+protected:
+
+	float radius;
+	float intensity;
+	/// ?
+	float innerAngle;
+	/// ?
+	float outerAngle;
+
+	rgba color;
+	LightType type;
+
+private:
+
+};
+
+/** @} */
+/** @} */
 }

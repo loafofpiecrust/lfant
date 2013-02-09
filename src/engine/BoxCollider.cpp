@@ -24,9 +24,12 @@
 
 // Internal
 
-using namespace sfs;
+namespace sfs
+{
 
 void BoxCollider::OnSetScale(vec3 scale)
 {
 	shape->setLocalScaling(vec3_cast<btVector3>(scale));
+}
+
 }

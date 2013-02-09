@@ -25,27 +25,27 @@
 
 namespace sfs
 {
-	/** @addtogroup Engine
-	 *	 @{
-	 */
-	/** @addtogroup Subsystems
-	 *	 @{
-	 */
+/** @addtogroup Engine
+ *	 @{
+ */
+/** @addtogroup Subsystems
+ *	 @{
+ */
 
-	/**	Manages game settings from a config file for individual users.
-	 *	@details
-	 *		Description
-	 *	@todo
-	 *		Maybe combine with a ResourceManager that handles file paths, as LoadProfile and SaveProfile;
-	 *			or keep all that stuff inside this class?
-	 */
-	class Settings : public Subsystem
-	{
-	public:
-		Settings();
-		~Settings();
-	};
+/**	Manages game settings from a config file for individual users.
+ *	@details
+ *		Description
+ *	@todo
+ *		Maybe combine with a ResourceManager that handles file paths, as LoadProfile and SaveProfile;
+ *			or keep all that stuff inside this class?
+ */
+class Settings : public Subsystem
+{
+public:
+	Settings();
+	~Settings();
+};
 
-	/** @} */
-	/** @} */
+/** @} */
+/** @} */
 }

@@ -23,8 +23,8 @@
 
 // Internal
 
-
-using namespace sfs;
+namespace sfs
+{
 
 sfDynamicsWorld::sfDynamicsWorld(btDispatcher* dispatcher, btBroadphaseInterface* pairCache,
 								 btConstraintSolver* constraintSolver, btCollisionConfiguration* collisionConfiguration) :
@@ -50,5 +50,7 @@ sfDynamicsWorld::~sfDynamicsWorld()
 
 void sfDynamicsWorld::applyGravity()
 {
+
+}
 
 }

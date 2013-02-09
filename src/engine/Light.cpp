@@ -24,7 +24,8 @@
 
 // Internal
 
-using namespace sfs;
+namespace sfs
+{
 
 Light::Light()
 {
@@ -43,5 +44,7 @@ void Light::Init()
 
 void Light::Update()
 {
+
+}
 
 }

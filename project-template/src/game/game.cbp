@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="projectName" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="32">
+				<Option output="../../bin32/$(PLATFORM)/sfengine" prefix_auto="1" extension_auto="1" />
+				<Option object_output="$(TARGET_OUTPUT_DIR)/build/$(PROJECT_NAME)" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-m32" />
+				</Compiler>
+			</Target>
+			<Target title="64">
+				<Option output="../../bin64/$(PLATFORM)/projectName" prefix_auto="1" extension_auto="1" />
+				<Option object_output="$(TARGET_OUTPUT_DIR)/build/$(PROJECT_NAME)" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-m64" />
+				</Compiler>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Os" />
+			<Add option="-O3" />
+			<Add option="-fexceptions" />
+			<Add option="-std=gnu++11" />
+			<Add option="-Wno-invalid-offsetof" />
+			<Add directory="$(DIR_SFE)/src/external/glm" />
+			<Add directory="$(DIR_SFE)/src/external/boost" />
+			<Add directory="$(DIR_SFE)/src/external/alut/include" />
+			<Add directory="$(DIR_SFE)/src/external/raknet/Source" />
+			<Add directory="$(DIR_SFE)/src/external/png" />
+			<Add directory="$(DIR_SFE)/src/external/zlib" />
+			<Add directory="$(DIR_SFE)/src/external/glew/include" />
+			<Add directory="$(DIR_SFE)/src/external/glfw/include" />
+			<Add directory="$(DIR_SFE)/src/external/bullet/src" />
+		</Compiler>
+		<Linker>
+			<Add library="sfengine" />
+			<Add library="png" />
+			<Add library="z" />
+			<Add library="bullet" />
+			<Add library="raknet" />
+			<Add library="boost" />
+			<Add library="glew" />
+			<Add directory="$(TARGET_OUTPUT_DIR)" />
+			<Add directory="$(DIR_SFE)/bin64/$(PLATFORM)" />
+		</Linker>
+		<Unit filename="projectTitle.hpp" />
+		<Unit filename="projectTitle.cpp" />
+		<Extensions>
+			<code_completion />
+			<debugger />
+			<envvars />
+			<DoxyBlocks>
+				<comment_style block="0" line="0" />
+				<doxyfile_build extract_all="1" />
+				<doxyfile_warnings warn_no_param_doc="0" />
+				<doxyfile_output />
+				<doxyfile_dot class_diagrams="1" />
+				<general use_at_in_tags="1" />
+			</DoxyBlocks>
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

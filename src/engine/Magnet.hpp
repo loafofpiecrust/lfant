@@ -26,40 +26,40 @@
 
 namespace sfs
 {
-	/** @addtogroup Engine
-	 *	 @{
-	 */
-	/** @addtogroup Components
-	 *	 @{
-	 */
+/** @addtogroup Engine
+ *	 @{
+ */
+/** @addtogroup Components
+ *	 @{
+ */
 
-	/**	This class adds Magnet capabilities to the Owner.
-	 *	@details
-	 *		Allows attraction and repulsion based on the position and rotation
-	 *		of two magnetic Entities.
-	 *	@todo
-	 *		Efficient handling of Magnet to Magnet interaction.
-	 *		Using rotation and position to roughly guess how much force to use.
-	 */
-	class Magnet : public Component
-	{
-	public:
-		Magnet();
-		~Magnet();
+/**	This class adds Magnet capabilities to the Owner.
+ *	@details
+ *		Allows attraction and repulsion based on the position and rotation
+ *		of two magnetic Entities.
+ *	@todo
+ *		Efficient handling of Magnet to Magnet interaction.
+ *		Using rotation and position to roughly guess how much force to use.
+ */
+class Magnet : public Component
+{
+public:
+	Magnet();
+	~Magnet();
 
-	protected:
+protected:
 
-	private:
-		/// The strength and range of attraction and repulsion to use.
-		float mMagnetism;
+private:
+	/// The strength and range of attraction and repulsion to use.
+	float mMagnetism;
 
-		/// The mode of magnetism. 0 = none. 1 = attraction. 2 = repulsion. 3 = both.
-		byte mMode;
+	/// The mode of magnetism. 0 = none. 1 = attraction. 2 = repulsion. 3 = both.
+	byte mMode;
 
-		/// The axis at which to split the poles. 0 = x; 1 = y; 2 = z.
-		byte mAxis;
-	};
+	/// The axis at which to split the poles. 0 = x; 1 = y; 2 = z.
+	byte mAxis;
+};
 
-	/** @} */
-	/** @} */
+/** @} */
+/** @} */
 }

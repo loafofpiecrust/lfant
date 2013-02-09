@@ -62,38 +62,38 @@ struct CLASSTYPE##NAME : public Property\
 } NAME;\
 
 #define PROP_RW(CLASSTYPE, NAME, GETFUNC, SETFUNC)\
-class CLASSTYPE##NAME : public Property\
+class prop_CLASSTYPE##NAME : public Property\
 {\
 public:\
-    typedef CLASSTYPE##NAME MyType;\
-    typedef RETURN_TYPE(&CLASSTYPE::GETFUNC) GETTYPE;\
-    typedef typename remove_ref<GETTYPE>::type GETTYPESIMPLE;\
-    typedef ARG_TYPE(&CLASSTYPE::SETFUNC, 1) SETTYPE;\
-    operator const GETTYPE()\
-    {\
-        return get();\
-    }\
-    GETTYPE operator ()() const \
-    {\
-        return get();\
-    }\
-    GETTYPE get() const \
-    {\
-       return reinterpret_cast<CLASSTYPE*>((MyType*)(this) - offsetof(CLASSTYPE, NAME))->GETFUNC();\
-    }\
+	typedef prop_CLASSTYPE##NAME MyType;\
+	typedef RETURN_TYPE(&CLASSTYPE::GETFUNC) GETTYPE;\
+	typedef typename remove_ref<GETTYPE>::type GETTYPESIMPLE;\
+	typedef ARG_TYPE(&CLASSTYPE::SETFUNC, 1) SETTYPE;\
+	operator const GETTYPE()\
+	{\
+		return get();\
+	}\
+	GETTYPE operator ()() const \
+	{\
+		return get();\
+	}\
+	GETTYPE get() const \
+	{\
+	   return reinterpret_cast<CLASSTYPE*>((MyType*)(this) - offsetof(CLASSTYPE, NAME))->GETFUNC();\
+	}\
 	GETTYPE set(SETTYPE value)\
-    {\
-       reinterpret_cast<CLASSTYPE*>((MyType*)(this) - offsetof(CLASSTYPE, NAME))->SETFUNC(value);\
-       return get();\
-    }\
-    GETTYPE operator =(SETTYPE value)\
-    {\
-        set(value);\
-        return get();\
-    }\
-    GETTYPE operator->() {\
-    	return get();\
-    }\
+	{\
+	   reinterpret_cast<CLASSTYPE*>((MyType*)(this) - offsetof(CLASSTYPE, NAME))->SETFUNC(value);\
+	   return get();\
+	}\
+	GETTYPE operator =(SETTYPE value)\
+	{\
+		set(value);\
+		return get();\
+	}\
+	GETTYPE operator->() {\
+		return get();\
+	}\
 } NAME;
 
 #define PROP_BINARY_OP(OP) \
@@ -127,7 +127,7 @@ auto operator OPC (TA& a, TB& b) -> typename boost::enable_if_c<!is_property<TA>
   return a = a OP b.get();\
 }\
 template <class TA, class TB> \
-auto operator OPC (TA& a, TB b) -> typename boost::enable_if_c<is_property<TA>::value && !is_property<TB>::value, typename TA::GETTYPE >::type \
+auto operator OPC (TA& a, TB b) -> typename boost::enable_if_c<is_property<TA>::value && !is_property<TB>::value, typename remove_ref<typename TA::GETTYPE>::type >::type \
 { \
   return a.set(a.get() OP b);\
 }\
@@ -140,174 +140,174 @@ auto operator OPC (TA& a, TB& b) -> typename boost::enable_if_c<is_property<TA>:
 namespace sfs
 {
 
-	class Property
-	{
-	};
+class Property
+{
+};
 
-	template<typename T>
-	struct remove_ref
-	{
-		typedef T type;
-	};
+template<typename T>
+struct remove_ref
+{
+	typedef T type;
+};
 
-	template<typename T>
-	struct remove_ref<T&>
-	{
-		typedef T type;
-	};
+template<typename T>
+struct remove_ref<T&>
+{
+	typedef T type;
+};
 
-	template<typename T>
-	struct remove_ref < T && >
-	{
-		typedef T type;
-	};
+template<typename T>
+struct remove_ref < T && >
+{
+	typedef T type;
+};
 
-	template<typename T>
-	struct is_property : public boost::is_base_of<Property, typename remove_ref<T>::type>
-	{
-	};
+template<typename T>
+struct is_property : public boost::is_base_of<Property, typename remove_ref<T>::type>
+{
+};
 
-	template<typename TA, typename TB, typename R>
-	struct enable_if_any_prop : public boost::enable_if_c < is_property<TA>::value || is_property<TB>::value,
-			typename remove_ref<R>::type >
-	{
-	};
+template<typename TA, typename TB, typename R>
+struct enable_if_any_prop : public boost::enable_if_c < is_property<TA>::value || is_property<TB>::value,
+		typename remove_ref<R>::type >
+{
+};
 
-	template<typename TA, typename TB, typename R>
-	struct enable_if_both_prop : public boost::enable_if_c < is_property<TA>::value && is_property<TB>::value,
-			typename remove_ref<R>::type >
-	{
-	};
+template<typename TA, typename TB, typename R>
+struct enable_if_both_prop : public boost::enable_if_c < is_property<TA>::value && is_property<TB>::value,
+		typename remove_ref<R>::type >
+{
+};
 
-	template<typename TA, typename R>
-	struct enable_if_prop : public boost::enable_if_c<is_property<TA>::value, typename remove_ref<R>::type>
-	{
-	};
+template<typename TA, typename R>
+struct enable_if_prop : public boost::enable_if_c<is_property<TA>::value, typename remove_ref<R>::type>
+{
+};
 
-	template<typename TA, typename R>
-	struct enable_if_not_prop : public boost::enable_if_c < !is_property<TA>::value, typename remove_ref<R>::type >
-	{
-	};
-	template<typename T>
-	auto eval(T& v) -> typename enable_if_not_prop<T, T>::type
-	{
-		return v;
-	}
+template<typename TA, typename R>
+struct enable_if_not_prop : public boost::enable_if_c < !is_property<TA>::value, typename remove_ref<R>::type >
+{
+};
+template<typename T>
+auto eval(T& v) -> typename enable_if_not_prop<T, T>::type
+{
+	return v;
+}
 
-	template<typename T>
-	auto eval(T& v) -> typename enable_if_prop<T, typename T::GETTYPE >::type
-	{
-		return v.get();
-	}
+template<typename T>
+auto eval(T& v) -> typename enable_if_prop<T, typename T::GETTYPE >::type
+{
+	return v.get();
+}
 
-	PROP_BINARY_OP(+)
-	PROP_BINARY_OP(-)
-	PROP_BINARY_OP(*)
-	PROP_BINARY_OP( /)
-	PROP_BINARY_OP( %)
+PROP_BINARY_OP(+)
+PROP_BINARY_OP(-)
+PROP_BINARY_OP(*)
+PROP_BINARY_OP( /)
+PROP_BINARY_OP( %)
 
-	PROP_BOOL_OP( >)
-	PROP_BOOL_OP( <)
-	PROP_BOOL_OP( >=)
-	PROP_BOOL_OP( <=)
-	PROP_BOOL_OP( ==)
-	PROP_BOOL_OP( !=)
-	PROP_BOOL_OP( &&)
-	PROP_BOOL_OP( ||)
+PROP_BOOL_OP( >)
+PROP_BOOL_OP( <)
+PROP_BOOL_OP( >=)
+PROP_BOOL_OP( <=)
+PROP_BOOL_OP( ==)
+PROP_BOOL_OP( !=)
+PROP_BOOL_OP( &&)
+PROP_BOOL_OP( ||)
 
-	PROP_COMPOUND_OP( += , +)
-	PROP_COMPOUND_OP( -= , -)
-	PROP_COMPOUND_OP( *= , *)
-	PROP_COMPOUND_OP( /= , /)
-	PROP_COMPOUND_OP( %= , %)
+PROP_COMPOUND_OP( += , +)
+PROP_COMPOUND_OP( -= , -)
+PROP_COMPOUND_OP( *= , *)
+PROP_COMPOUND_OP( /= , /)
+PROP_COMPOUND_OP( %= , %)
 }
 
 namespace sfs
 {
-	/** @addtogroup Engine
-	 *	 @{
-	 */
-	/** @addtogroup Utilities
-	 *	 @{
-	 */
+/** @addtogroup Engine
+ *	 @{
+ */
+/** @addtogroup Utilities
+ *	 @{
+ */
 
-	/**
-	 *
-	 *	@details
-	 *	@todo
-	 */
-	/*template<class C, typename G, typename S>
-	 class Property
-	 {
-	 public:
-	 typedef G (C::*getType)();
-	 typedef void (C::*setType)( S );
+/**
+ *
+ *	@details
+ *	@todo
+ */
+/*template<class C, typename G, typename S>
+ class Property
+ {
+ public:
+ typedef G (C::*getType)();
+ typedef void (C::*setType)( S );
 
-	 Property( C* ptr, getType get ) :
-	 instance( ptr ), get( get ), readOnly( true )
-	 {
-	 }
+ Property( C* ptr, getType get ) :
+ instance( ptr ), get( get ), readOnly( true )
+ {
+ }
 
-	 Property( C* ptr, getType get, setType set ) :
-	 instance( ptr ), get( get ), set( set )
-	 {
-	 }
+ Property( C* ptr, getType get, setType set ) :
+ instance( ptr ), get( get ), set( set )
+ {
+ }
 
-	 ~Property()
-	 {
-	 }
+ ~Property()
+ {
+ }
 
-	 operator G() const
-	 {
-	 return (instance->*get)();
-	 }
+ operator G() const
+ {
+ return (instance->*get)();
+ }
 
-	 operator S()
-	 {
-	 return (instance->*get)();
-	 }
+ operator S()
+ {
+ return (instance->*get)();
+ }
 
-	 G operator=( S value ) const
-	 {
-	 if (!readOnly) (instance->*set)( value );
-	 return operator G();
-	 }
+ G operator=( S value ) const
+ {
+ if (!readOnly) (instance->*set)( value );
+ return operator G();
+ }
 
-	 template<typename TT>
-	 bool operator==( TT other ) const
-	 {
-	 return operator G() == other;
-	 }
+ template<typename TT>
+ bool operator==( TT other ) const
+ {
+ return operator G() == other;
+ }
 
-	 G operator()() const
-	 {
-	 return operator G();
-	 }
+ G operator()() const
+ {
+ return operator G();
+ }
 
-	 G operator()( S arg )
-	 {
-	 operator=( arg );
-	 return operator G();
-	 }
+ G operator()( S arg )
+ {
+ operator=( arg );
+ return operator G();
+ }
 
-	 G operator->() const
-	 {
-	 return operator G();
-	 }
+ G operator->() const
+ {
+ return operator G();
+ }
 
-	 Property<C, G, S>& operator()( C* ptr, getType get, setType set )
-	 {
-	 return *(new Property( ptr, get, set ));
-	 }
+ Property<C, G, S>& operator()( C* ptr, getType get, setType set )
+ {
+ return *(new Property( ptr, get, set ));
+ }
 
-	 private:
+ private:
 
-	 C* instance;
-	 getType get;
-	 setType set;
-	 bool readOnly = false;
-	 };*/
+ C* instance;
+ getType get;
+ setType set;
+ bool readOnly = false;
+ };*/
 
-	/**	@}*/
-	/**	@}*/
+/**	@}*/
+/**	@}*/
 }

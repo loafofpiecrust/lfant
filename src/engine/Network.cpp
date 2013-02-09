@@ -30,8 +30,10 @@
 
 // Internal
 
-using namespace sfs;
 using namespace RakNet;
+
+namespace sfs
+{
 
 Network::Network()
 {
@@ -219,5 +221,7 @@ void Network::Disconnect(Connection* con)
 	// Turn off Raknet
 	con->peer->Shutdown(100);
 	// Revise this function to keep chat connection running?
+}
+
 }
 

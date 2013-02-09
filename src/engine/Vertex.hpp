@@ -26,34 +26,34 @@
 
 namespace sfs
 {
-	class Entity;
+class Entity;
 
-	/** @addtogroup Engine
-	 *	 @{
-	 */
-	/** @addtogroup Utilities
-	 *	 @{
-	 */
+/** @addtogroup Engine
+ *	 @{
+ */
+/** @addtogroup Utilities
+ *	 @{
+ */
 
-	// 56 bytes
-	// 5,952 tris/mb
-	// 5,952,000 tris/gb
-	struct Vertex
+// 56 bytes
+// 5,952 tris/mb
+// 5,952,000 tris/gb
+struct Vertex
+{
+	vec3 vert;
+	vec2 tex;
+	vec3 normal;
+	vec3 tangent;
+	vec3 bitangent;
+	//byte padding[4];
+
+	Vertex(vec3 vert = vec3(0), vec2 tex = vec2(0), vec3 normal = vec3(0, 0, 1), vec3 tangent = vec3(0), vec3 bitangent =
+			   vec3(0)) :
+		vert(vert), tex(tex), normal(normal), tangent(tangent), bitangent(bitangent)
 	{
-		vec3 vert;
-		vec2 tex;
-		vec3 normal;
-		vec3 tangent;
-		vec3 bitangent;
-		//byte padding[4];
+	}
+};
 
-		Vertex(vec3 vert = vec3(0), vec2 tex = vec2(0), vec3 normal = vec3(0, 0, 1), vec3 tangent = vec3(0), vec3 bitangent =
-				   vec3(0)) :
-			vert(vert), tex(tex), normal(normal), tangent(tangent), bitangent(bitangent)
-		{
-		}
-	};
-
-	/** @} */
-	/** @} */
+/** @} */
+/** @} */
 }

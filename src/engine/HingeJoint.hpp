@@ -27,55 +27,55 @@
 
 namespace sfs
 {
-	/**	@addtogroup Engine
-	 *	@{
-	 */
-	/** @addtogroup Components
-	 *	@{
-	 */
+/**	@addtogroup Engine
+ *	@{
+ */
+/** @addtogroup Components
+ *	@{
+ */
 
-	/**
-	 *
-	 *	@details
-	 *	@todo
-	 */
-	class HingeJoint : public Joint
+/**
+ *
+ *	@details
+ *	@todo
+ */
+class HingeJoint : public Joint
+{
+	//	friend class Physics;
+public:
+	using Joint::~Joint;
+
+	struct SpringInfo
 	{
-		//	friend class Physics;
-	public:
-		using Joint::~Joint;
-
-		struct SpringInfo
-		{
-			bool use;
-			float force;
-			float damping;
-		};
-
-		struct Limits
-		{
-			bool use;
-			float min;
-			float max;
-			float bounceMin;
-			float bounceMax;
-		};
-
-		vec3 anchor;
-		vec3 axis;
-		SpringInfo spring;
-		Limits limits;
-		float breakForce;
-
-	protected:
-		using Joint::Joint;
-
-	private:
-		virtual btTypedConstraint* GetConstraint();
-		virtual void SetConstraint(btTypedConstraint* con);
-
+		bool use;
+		float force;
+		float damping;
 	};
 
-	/** @} */
-	/** @} */
+	struct Limits
+	{
+		bool use;
+		float min;
+		float max;
+		float bounceMin;
+		float bounceMax;
+	};
+
+	vec3 anchor;
+	vec3 axis;
+	SpringInfo spring;
+	Limits limits;
+	float breakForce;
+
+protected:
+	using Joint::Joint;
+
+private:
+	virtual btTypedConstraint* GetConstraint();
+	virtual void SetConstraint(btTypedConstraint* con);
+
+};
+
+/** @} */
+/** @} */
 }

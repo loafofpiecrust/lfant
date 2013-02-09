@@ -26,37 +26,37 @@
 
 namespace sfs
 {
-	/**	@addtogroup Engine
-	 *	@{
-	 */
-	/**	@addtogroup Math
-	 *	@{
-	 */
+/**	@addtogroup Engine
+ *	@{
+ */
+/**	@addtogroup Math
+ *	@{
+ */
 
-	template<typename R = int>
-	inline R round(float x)
+template<typename R = int>
+inline R round(float x)
+{
+	if(x > 0.0f)
 	{
-		if(x > 0.0f)
-		{
-			return floor(x + 0.5f);
-		}
-		else
-		{
-			return ceil(x - 0.5f);
-		}
-		//	return (x > 0.0f) ? floor(x + 0.5f) : ceil(x - 0.5f);
+		return floor(x + 0.5f);
 	}
-
-	template<typename R = float>
-	inline R round(R x, int decimal)
+	else
 	{
-		return floor(x * pow(10, decimal) + 0.5) / pow(10, decimal);
+		return ceil(x - 0.5f);
 	}
+	//	return (x > 0.0f) ? floor(x + 0.5f) : ceil(x - 0.5f);
+}
 
-	const float pi = 3.14159265358979323846f;
-	const float degToRad = pi / 180;
-	const float radToDeg = 180 / pi;
+template<typename R = float>
+inline R round(R x, int decimal)
+{
+	return floor(x * pow(10, decimal) + 0.5) / pow(10, decimal);
+}
 
-	/** @} */
-	/** @} */
+const float pi = 3.14159265358979323846f;
+const float degToRad = pi / 180;
+const float radToDeg = 180 / pi;
+
+/** @} */
+/** @} */
 }

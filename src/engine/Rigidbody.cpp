@@ -27,7 +27,8 @@
 #include "Physics.hpp"
 #include "Engine.hpp"
 
-using namespace sfs;
+namespace sfs
+{
 
 Rigidbody::Rigidbody()
 {
@@ -120,4 +121,6 @@ btTypedConstraint* Rigidbody::GetConstraint(uint16_t idx)
 void Rigidbody::RemoveConstraint(uint16_t idx)
 {
 //	game->physics->RemoveConstraint( GetConstraint( idx ) );
+}
+
 }

@@ -26,73 +26,73 @@
 
 namespace sfs
 {
-	/** @addtogroup Engine
-	 *	 @{
-	 */
-	/** @addtogroup Rendering
-	 *	 @{
-	 */
+/** @addtogroup Engine
+ *	 @{
+ */
+/** @addtogroup Rendering
+ *	 @{
+ */
 
-	/**	Base class for texture handling.
-	 *	@details
-	 *	@todo
-	 */
-	class Texture
+/**	Base class for texture handling.
+ *	@details
+ *	@todo
+ */
+class Texture
+{
+public:
+
+	enum FilterMode
 	{
-	public:
-
-		enum FilterMode
-		{
-			FM_POINT, FM_BILINEAR, FM_TRILINEAR
-		};
-
-		enum WrapMode
-		{
-			WM_CLAMP, WM_REPEAT
-		};
-
-		enum TexFormat
-		{
-			TF_COMPRESSED, TF_16BIT, TF_TRUECOLOR
-		};
-
-		string name = "";
-		WrapMode wrapMode = WM_REPEAT;
-		FilterMode filterMode = FM_BILINEAR;
-		uint16_t anisoLevel = 1;
-		TexFormat format = TF_COMPRESSED;
-		uint16_t width;
-		uint16_t height;
-		uint32_t id;
-		uint32_t uniformId;
-
-		operator uint32_t()
-		{
-			return id;
-		}
-
-		operator string()
-		{
-			return name;
-		}
-
-		void operator=(uint32_t texId)
-		{
-			id = texId;
-		}
-
-		void operator=(string file);
-
-		Texture()
-		{
-		}
-
-		Texture(string file, uint16_t width, uint16_t height, uint32_t id) :
-			name(file), width(width), height(height), id(id)
-		{
-		}
+		FM_POINT, FM_BILINEAR, FM_TRILINEAR
 	};
 
-	/** @} */
-	/** @} */
+	enum WrapMode
+	{
+		WM_CLAMP, WM_REPEAT
+	};
+
+	enum TexFormat
+	{
+		TF_COMPRESSED, TF_16BIT, TF_TRUECOLOR
+	};
+
+	string name = "";
+	WrapMode wrapMode = WM_REPEAT;
+	FilterMode filterMode = FM_BILINEAR;
+	uint16_t anisoLevel = 1;
+	TexFormat format = TF_COMPRESSED;
+	uint16_t width;
+	uint16_t height;
+	uint32_t id;
+	uint32_t uniformId;
+
+	operator uint32_t()
+	{
+		return id;
+	}
+
+	operator string()
+	{
+		return name;
+	}
+
+	void operator=(uint32_t texId)
+	{
+		id = texId;
+	}
+
+	void operator=(string file);
+
+	Texture()
+	{
+	}
+
+	Texture(string file, uint16_t width, uint16_t height, uint32_t id) :
+		name(file), width(width), height(height), id(id)
+	{
+	}
+};
+
+/** @} */
+/** @} */
 }

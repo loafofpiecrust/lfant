@@ -26,7 +26,8 @@
 #include "Console.hpp"
 #include "Camera.hpp"
 
-using namespace sfs;
+namespace sfs
+{
 
 Scene::Scene()
 {
@@ -77,4 +78,6 @@ Entity* Scene::GetEntity(string name)
 			return entities[i];
 		}
 	}
+}
+
 }

@@ -28,60 +28,60 @@
 
 namespace sfs
 {
-	/** @addtogroup Engine
-	 *	 @{
-	 */
-	/** @addtogroup Subsystems
-	 *	 @{
-	 */
+/** @addtogroup Engine
+ *	 @{
+ */
+/** @addtogroup Subsystems
+ *	 @{
+ */
 
-	/**
-	 *	@details
-	 *	@todo
-	 */
-	class SystemInfo : public Subsystem
+/**
+ *	@details
+ *	@todo
+ */
+class SystemInfo : public Subsystem
+{
+public:
+
+	struct HardDrive
 	{
-	public:
-
-		struct HardDrive
-		{
-			string name;
-			float total;
-			float free;
-		};
-
-		struct Monitor
-		{
-			string name;
-			vec2 resolution;
-		};
-
-		struct Processor
-		{
-			string name;
-			uint16_t cores;
-		};
-
-		SystemInfo();
-		virtual ~SystemInfo();
-
-		virtual void Init();
-
-		string computerName;
-		float memory;
-		string OS;
-		vector<HardDrive> drives;
-		Processor cpu;
-		string gpu;
-		string username;
-		Monitor monitor;
-		Range<uint16_t> glVersion = { 0, 0 };
-
-	protected:
-
-	private:
+		string name;
+		float total;
+		float free;
 	};
 
-	/** @} */
-	/** @} */
+	struct Monitor
+	{
+		string name;
+		vec2 resolution;
+	};
+
+	struct Processor
+	{
+		string name;
+		uint16_t cores;
+	};
+
+	SystemInfo();
+	virtual ~SystemInfo();
+
+	virtual void Init();
+
+	string computerName;
+	float memory;
+	string OS;
+	vector<HardDrive> drives;
+	Processor cpu;
+	string gpu;
+	string username;
+	Monitor monitor;
+	Range<uint16_t> glVersion = { 0, 0 };
+
+protected:
+
+private:
+};
+
+/** @} */
+/** @} */
 }

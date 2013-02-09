@@ -31,109 +31,109 @@ using namespace std;
 
 namespace sfs
 {
-	class Renderer;
-	class Input;
-	class Time;
-	class Physics;
-	class Settings;
-	class Audio;
-	class Scene;
-	class FileManager;
-	class Console;
-	class SystemInfo;
+class Renderer;
+class Input;
+class Time;
+class Physics;
+class Settings;
+class Audio;
+class Scene;
+class FileManager;
+class Console;
+class SystemInfo;
 
-	/** @addtogroup Engine
-	 *	@{
-	 */
-	/** @addtogroup Subsystems
-	 *	@{
-	 */
+/** @addtogroup Engine
+ *	@{
+ */
+/** @addtogroup Subsystems
+ *	@{
+ */
 
-	/**	The main Game class controls the starting and updating of the game->
-	 *	@details
-	 *		This class controls the creation of a scene and the base
-	 *		control of the main game subsystems. This includes networking,
-	 *		input, settings, physics, and scripts. It doesn't directly
-	 *		control these, but it holds pointers to the classes that do.
+/**	The main Game class controls the starting and updating of the game->
+ *	@details
+ *		This class controls the creation of a scene and the base
+ *		control of the main game subsystems. This includes networking,
+ *		input, settings, physics, and scripts. It doesn't directly
+ *		control these, but it holds pointers to the classes that do.
+ */
+extern "C++" class Engine : public Subsystem
+{
+public:
+	Engine();
+	virtual ~Engine();
+
+	/**	This function is called right when the game is launched.
+	 *	@todo
+	 *		Make virtual when this needs to be overwritten/extended.
 	 */
-	extern "C++" class Engine : public Subsystem
+	virtual void Init();
+
+	/**	Called every frame to update the game and its subsystems
+	 *	@todo
+	 *		Have this call the update of all other objects of the factories.
+	 *		Make this virtual later when/if it needs to be overwritten.
+	 */
+	virtual void Update();
+	virtual void PreUpdate()
 	{
-	public:
-		Engine();
-		virtual ~Engine();
+	}
+	virtual void PostUpdate()
+	{
+	}
 
-		/**	This function is called right when the game is launched.
-		 *	@todo
-		 *		Make virtual when this needs to be overwritten/extended.
-		 */
-		virtual void Init();
+	/**
+	 * Destroys the game instance. Never call manually.
+	 */
+	virtual void Destroy();
 
-		/**	Called every frame to update the game and its subsystems
-		 *	@todo
-		 *		Have this call the update of all other objects of the factories.
-		 *		Make this virtual later when/if it needs to be overwritten.
-		 */
-		virtual void Update();
-		virtual void PreUpdate()
-		{
-		}
-		virtual void PostUpdate()
-		{
-		}
+	/**
+	 *	Schedules the game to be exited at the end of this frame.
+	 */
+	virtual void Exit();
 
-		/**
-		 * Destroys the game instance. Never call manually.
-		 */
-		virtual void Destroy();
+	/**	Loads a scene.
+	 *	@remarks
+	 *		Automatically appends the given scene with an extension. That
+	 *		extension is assigned via the ResourceManager, along with file
+	 *		paths.
+	 *	@param scene The name of the scene to load, without the file extension.
+	 */
+	void LoadScene(string scene);
 
-		/**
-		 *	Schedules the game to be exited at the end of this frame.
-		 */
-		virtual void Exit();
+	/** Adds the given function to a new or existing thread.
+	 *	@param func The function to execute.
+	 */
+	void AddThread(boost::function<void()> func);
 
-		/**	Loads a scene.
-		 *	@remarks
-		 *		Automatically appends the given scene with an extension. That
-		 *		extension is assigned via the ResourceManager, along with file
-		 *		paths.
-		 *	@param scene The name of the scene to load, without the file extension.
-		 */
-		void LoadScene(string scene);
+	// Subsystems
+	Input* input;
+	Renderer* renderer;
+	Time* time;
+	Physics* physics;
+	Scene* scene;
+	Audio* audio;
+	FileManager* fileManager;
+	Console* console;
+	SystemInfo* systemInfo;
+	//boost::scoped_ptr<ParticleManager> 	particleManager;
+	//boost::scoped_ptr<AISystem>			aiSystem;
+	//boost::scoped_ptr<UISystem>			uiSystem;
+	//boost::scoped_ptr<ScriptSystem>		scriptSystem;
+	//boost::scoped_ptr<FGSystem>			flowgraph;
+	//boost::scoped_ptr<Settings> settings;
 
-		/** Adds the given function to a new or existing thread.
-		 *	@param func The function to execute.
-		 */
-		void AddThread(boost::function<void()> func);
+	string gameName = "ShadowFox Engine";
 
-		// Subsystems
-		Input* input;
-		Renderer* renderer;
-		Time* time;
-		Physics* physics;
-		Scene* scene;
-		Audio* audio;
-		FileManager* fileManager;
-		Console* console;
-		SystemInfo* systemInfo;
-		//boost::scoped_ptr<ParticleManager> 	particleManager;
-		//boost::scoped_ptr<AISystem>			aiSystem;
-		//boost::scoped_ptr<UISystem>			uiSystem;
-		//boost::scoped_ptr<ScriptSystem>		scriptSystem;
-		//boost::scoped_ptr<FGSystem>			flowgraph;
-		//boost::scoped_ptr<Settings> settings;
+	bool standAlone;
+	bool destroy = false;
 
-		string gameName = "ShadowFox Engine";
+protected:
 
-		bool standAlone;
-		bool destroy = false;
+private:
+};
 
-	protected:
+extern "C++" Engine* game;
 
-	private:
-	};
-
-	extern "C++" Engine* game;
-
-	/** @} */
-	/** @} */
+/** @} */
+/** @} */
 }

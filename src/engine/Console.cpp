@@ -29,14 +29,12 @@
 
 namespace sfs
 {
-	template<>
-	void Log<const char*>(const char* msg)
-	{
-		game->console->Print(msg);
-	}
-}
 
-using namespace sfs;
+template<>
+void Log<const char*>(const char* msg)
+{
+	game->console->Print(msg);
+}
 
 Console::Console()
 {
@@ -82,7 +80,7 @@ void Console::Input(string line)
 							i = k;
 							break;
 						}
-						args += output[k];
+						args.push_back(output[k]);
 					}
 					cmd->func(args);
 				}
@@ -171,7 +169,7 @@ void Console::RegisterVar(string name, float value, string desc, bool readOnly)
 			var.readOnly = readOnly;
 		}
 	}
-	variables += Variable(name, value, desc, readOnly);
+	variables.push_back(Variable(name, value, desc, readOnly));
 }
 
 void Console::RegisterCommand(string name, CommandFuncRaw func, string desc)
@@ -186,7 +184,7 @@ void Console::RegisterCommand(string name, CommandFuncRaw func, string desc)
 			return;
 		}
 	}
-	commands += Command(name, func, desc);
+	commands.push_back(Command(name, func, desc));
 }
 
 void Console::RegisterCommand(string name, CommandFuncSimpleRaw func, string desc)
@@ -200,7 +198,7 @@ void Console::RegisterCommand(string name, CommandFuncSimpleRaw func, string des
 			return;
 		}
 	}
-	simpleCommands += CommandSimple(name, func, desc);
+	simpleCommands.push_back(CommandSimple(name, func, desc));
 }
 
 bool Console::CallCommand(string name, vector<string> args)
@@ -272,4 +270,6 @@ void Console::SetValue(string name, float value)
 void Console::CmdExit()
 {
 	game->Exit();
+}
+
 }

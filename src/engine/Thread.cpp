@@ -28,17 +28,17 @@ namespace sfs
 
 #if WINDOWS
 
-	void sleep(uint32_t milli)
-	{
-		Sleep(milli);
-	}
+void sleep(uint32_t milli)
+{
+	Sleep(milli);
+}
 
 #elif UNIX
 
-	void sleep(uint32_t milli)
-	{
-		usleep(milli * 1000);
-	}
+void sleep(uint32_t milli)
+{
+	usleep(milli * 1000);
+}
 
 #endif
 }

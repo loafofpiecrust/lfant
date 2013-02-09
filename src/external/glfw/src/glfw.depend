@@ -1,0 +1,125 @@
+# depslib dependency file v1.0
+1358112742 source:/home/taylorsnead/ShadowFox/ShadowFox-Engine/src/external/glfw/src/cocoa/cocoa_thread.c
+	"internal.h"
+	<sys/time.h>
+	<sys/sysctl.h>
+
+1341273230 source:/home/taylorsnead/ShadowFox/ShadowFox-Engine/src/external/glfw/src/enable.c
+	"internal.h"
+
+1304609654 /home/taylorsnead/ShadowFox/ShadowFox-Engine/src/external/glfw/src/internal.h
+	<stdlib.h>
+	<string.h>
+	<stdio.h>
+	"platform.h"
+
+1358112658 /home/taylorsnead/ShadowFox/ShadowFox-Engine/src/external/glfw/src/platform.h
+	"GL/glfw.h"
+	"win32/platform.h"
+	"cocoa/platform.h"
+	"x11/platform.h"
+
+1326740726 /home/taylorsnead/ShadowFox/ShadowFox-Engine/src/external/glfw/src/win32/platform.h
+	<windows.h>
+	<mmsystem.h>
+	"../../include/GL/glfw.h"
+	<w32api.h>
+
+1342361889 /home/taylorsnead/ShadowFox/ShadowFox-Engine/src/external/glfw/include/GL/glfw.h
+	<OpenGL/gl3.h>
+	<OpenGL/gl.h>
+	<OpenGL/glu.h>
+	<GL3/gl3.h>
+	<GL/gl.h>
+	<GL/glu.h>
+
+1346964788 /home/taylorsnead/ShadowFox/ShadowFox-Engine/src/external/glfw/src/cocoa/platform.h
+	<ApplicationServices/ApplicationServices.h>
+	<pthread.h>
+	"../../include/GL/glfw.h"
+
+1342361959 /home/taylorsnead/ShadowFox/ShadowFox-Engine/src/external/glfw/src/x11/platform.h
+	<sys/time.h>
+	<unistd.h>
+	<stdint.h>
+	<signal.h>
+	<X11/Xlib.h>
+	<X11/keysym.h>
+	<X11/Xatom.h>
+	<GL/glx.h>
+	"../../include/GL/glfw.h"
+	<pthread.h>
+	<sched.h>
+	<X11/extensions/xf86vmode.h>
+	<X11/extensions/Xrandr.h>
+	<dlfcn.h>
+	<sys/types.h>
+	<sys/sysctl.h>
+
+1326740726 source:/home/taylorsnead/ShadowFox/ShadowFox-Engine/src/external/glfw/src/fullscreen.c
+	"internal.h"
+
+1332029327 source:/home/taylorsnead/ShadowFox/ShadowFox-Engine/src/external/glfw/src/glext.c
+	"internal.h"
+
+1308570233 source:/home/taylorsnead/ShadowFox/ShadowFox-Engine/src/external/glfw/src/image.c
+	"internal.h"
+
+1308570233 source:/home/taylorsnead/ShadowFox/ShadowFox-Engine/src/external/glfw/src/init.c
+	"internal.h"
+
+1308570233 source:/home/taylorsnead/ShadowFox/ShadowFox-Engine/src/external/glfw/src/input.c
+	"internal.h"
+
+1308570233 source:/home/taylorsnead/ShadowFox/ShadowFox-Engine/src/external/glfw/src/joystick.c
+	"internal.h"
+
+1308917094 source:/home/taylorsnead/ShadowFox/ShadowFox-Engine/src/external/glfw/src/stream.c
+	"internal.h"
+
+1308570233 source:/home/taylorsnead/ShadowFox/ShadowFox-Engine/src/external/glfw/src/tga.c
+	"internal.h"
+
+1308570233 source:/home/taylorsnead/ShadowFox/ShadowFox-Engine/src/external/glfw/src/thread.c
+	"internal.h"
+
+1308570233 source:/home/taylorsnead/ShadowFox/ShadowFox-Engine/src/external/glfw/src/time.c
+	"internal.h"
+
+1326153304 source:/home/taylorsnead/ShadowFox/ShadowFox-Engine/src/external/glfw/src/window.c
+	"internal.h"
+	<limits.h>
+
+1283095429 source:/home/taylorsnead/ShadowFox/ShadowFox-Engine/src/external/glfw/src/x11/x11_enable.c
+	"internal.h"
+
+1317071467 source:/home/taylorsnead/ShadowFox/ShadowFox-Engine/src/external/glfw/src/x11/x11_fullscreen.c
+	"internal.h"
+	<limits.h>
+
+1317823931 source:/home/taylorsnead/ShadowFox/ShadowFox-Engine/src/external/glfw/src/x11/x11_glext.c
+	"internal.h"
+
+1326740726 source:/home/taylorsnead/ShadowFox/ShadowFox-Engine/src/external/glfw/src/x11/x11_init.c
+	"internal.h"
+
+1308573410 source:/home/taylorsnead/ShadowFox/ShadowFox-Engine/src/external/glfw/src/x11/x11_joystick.c
+	"internal.h"
+	<sys/ioctl.h>
+	<fcntl.h>
+	<errno.h>
+
+1308573410 source:/home/taylorsnead/ShadowFox/ShadowFox-Engine/src/external/glfw/src/x11/x11_keysym2unicode.c
+	"internal.h"
+
+1308573410 source:/home/taylorsnead/ShadowFox/ShadowFox-Engine/src/external/glfw/src/x11/x11_thread.c
+	"internal.h"
+
+1332270194 source:/home/taylorsnead/ShadowFox/ShadowFox-Engine/src/external/glfw/src/x11/x11_time.c
+	"internal.h"
+	<time.h>
+
+1347131565 source:/home/taylorsnead/ShadowFox/ShadowFox-Engine/src/external/glfw/src/x11/x11_window.c
+	"internal.h"
+	<limits.h>
+

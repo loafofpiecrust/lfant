@@ -25,4 +25,7 @@
 // Internal
 
 
-using namespace sfs;
+namespace sfs
+{
+	
+}

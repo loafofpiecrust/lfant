@@ -30,88 +30,88 @@ using namespace function_types;
 
 namespace sfs
 {
-	class Entity;
+class Entity;
 
-	/** @addtogroup Engine
-	 *	 @{
-	 */
-	/** @addtogroup Utilities
-	 *	 @{
-	 */
+/** @addtogroup Engine
+ *	 @{
+ */
+/** @addtogroup Utilities
+ *	 @{
+ */
 
-	class Transform : public Object
+class Transform : public Object
+{
+public:
+	Transform() {}
+	Transform(Entity* owner);
+	virtual ~Transform()
 	{
-	public:
-		Transform() {}
-		Transform(Entity* owner);
-		virtual ~Transform()
-		{
-		}
+	}
 
-		void Translate(vec3 pos);
-		void Translate(float x, float y, float z);
-		void Rotate(vec3 rot);
-		void Scale(vec3 scl);
+	void Translate(vec3 pos);
+	void Translate(float x, float y, float z);
+	void Rotate(vec3 rot);
+	void Scale(vec3 scl);
 
-		const Entity* owner;
+	const Entity* owner;
 
-		Transform* parent;
+	Transform* parent;
 
-		vec3 direction;
-		vec3 right;
-		vec3 up;
+	vec3 direction;
+	vec3 right;
+	vec3 up;
 
-	public:
+public:
 
-		// Properties
+	// Properties
 
-		vec3& GetPos();
-		void SetPos(vec3 pos);
-		vec3 _position;
+	vec3& GetPosition();
+	void SetPosition(vec3 pos);
+	vec3 _position;
 
-		quat GetRotQuat();
-		void SetRotQuat(quat rot);
-		quat _rotationQuat;
+	quat GetRotationQuat();
+	void SetRotationQuat(quat rot);
+	quat _rotationQuat;
 
-		vec3& GetRot();
-		void SetRot(vec3 rot);
-		vec3 _rotation;
+	vec3& GetRotation();
+	void SetRotation(vec3 rot);
+	vec3 _rotation;
 
-		vec3 GetScale();
-		void SetScale(vec3 scl);
-		vec3 _scale;
+	vec3 GetScale();
+	void SetScale(vec3 scl);
+	vec3 _scale;
 
-		vec3 GetWorldPos();
-		void SetWorldPos(vec3 pos);
+	vec3 GetWorldPosition();
+	void SetWorldPosition(vec3 pos);
 
-		quat GetWorldRotQuat();
-		void SetWorldRotQuat(quat rot);
+	quat GetWorldRotationQuat();
+	void SetWorldRotationQuat(quat rot);
 
-		vec3 GetWorldRot();
-		void SetWorldRot(vec3 rot);
+	vec3 GetWorldRotation();
+	void SetWorldRotation(vec3 rot);
 
-		vec3 GetWorldScale();
-		void SetWorldScale(vec3 scl);
+	vec3 GetWorldScale();
+	void SetWorldScale(vec3 scl);
 
-		mat4 GetMatrix();
+	mat4 GetMatrix();
 
-		//Property<Transform, boost::function_types::result_type<decltype(&Transform::GetPos)>::type, mpl::at_c<parameter_types<decltype(&Transform::SetPos)>, 1>::type> posir;
+	//Property<Transform, boost::function_types::result_type<decltype(&Transform::GetPos)>::type, mpl::at_c<parameter_types<decltype(&Transform::SetPos)>, 1>::type> posir;
 
-		PROP_RW(Transform, position, GetPos, SetPos)
-		PROP_RW(Transform, rotation, GetRot, SetRot)
-		PROP_RW(Transform, rotationQuat, GetRotQuat, SetRotQuat)
-		PROP_RW(Transform, scale, GetScale, SetScale)
+	PROP_RW(Transform, position, GetPosition, SetPosition)
+	PROP_RW(Transform, rotation, GetRotation, SetRotation)
+	PROP_RW(Transform, rotationQuat, GetRotationQuat, SetRotationQuat)
+	PROP_RW(Transform, scale, GetScale, SetScale)
 
-		PROP_RW(Transform, worldPosition, GetWorldPos, SetWorldPos)
-		PROP_RW(Transform, worldRotation, GetWorldRot, SetWorldRot)
-		PROP_RW(Transform, worldRotationQuat, GetWorldRotQuat, SetWorldRotQuat)
-		PROP_RW(Transform, worldScale, GetWorldScale, SetWorldScale)
+	PROP_RW(Transform, worldPosition, GetWorldPosition, SetWorldPosition)
+	PROP_RW(Transform, worldRotation, GetWorldRotation, SetWorldRotation)
+	PROP_RW(Transform, worldRotationQuat, GetWorldRotationQuat, SetWorldRotationQuat)
+	PROP_RW(Transform, worldScale, GetWorldScale, SetWorldScale)
 
-		PROP_RO(Transform, matrix, GetMatrix)
+	PROP_RO(Transform, matrix, GetMatrix)
 
-		void SetDirection();
-	};
+	void SetDirection();
+};
 
-	/** @} */
-	/** @} */
+/** @} */
+/** @} */
 }

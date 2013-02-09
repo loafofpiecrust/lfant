@@ -25,7 +25,8 @@
 // Internal
 #include "ParticleSystem.hpp"
 
-using namespace sfs;
+namespace sfs
+{
 
 Particle::Particle()
 {
@@ -144,4 +145,6 @@ void Particle::ApplyForce(vec3 force)
 void Particle::ApplyForce(float speed, vec3 dir)
 {
 	velocity += dir * speed;
+}
+
 }
