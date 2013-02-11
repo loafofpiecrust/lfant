@@ -60,7 +60,7 @@ void Console::Init()
 
 void Console::Input(string line)
 {
-	vector<string> output = split(line, " ,", "=();");
+	vector<string> output = Split(line, " ,", "=();");
 	string str = "";
 	for(uint i = 0; i < output.size(); ++i)
 	{

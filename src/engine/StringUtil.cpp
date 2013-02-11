@@ -27,7 +27,7 @@
 namespace sfs
 {
 
-vector<string> split(string str, string dropDelim, string keepDelim)
+vector<string> Split(string str, string dropDelim, string keepDelim)
 {
 	using namespace boost;
 	vector<string> result;
@@ -40,18 +40,19 @@ vector<string> split(string str, string dropDelim, string keepDelim)
 	return result;
 }
 
-vector<string> split(vector<string> str, string dropDelim, string keepDelim)
+vector<string> Split(vector<string> str, string dropDelim, string keepDelim)
 {
 	vector<string> final;
 	vector<string> each;
 	for(uint i = 0; i < str.size(); ++i)
 	{
-		each = split(str[i], dropDelim, keepDelim);
-		for(uint i = 0; i < each.size(); ++i)
+		each = Split(str[i], dropDelim, keepDelim);
+		for(uint k = 0; k < each.size(); ++k)
 		{
-			final += each[i];
+			final += each[k];
 		}
 	}
 	return final;
 }
+
 }

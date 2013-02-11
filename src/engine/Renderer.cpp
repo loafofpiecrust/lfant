@@ -43,6 +43,7 @@
 #include "Scene.hpp"
 #include "Camera.hpp"
 #include "FileManager.hpp"
+#include "Settings.hpp"
 
 #include "ShaderLoader.hpp"
 #include "TextureLoader.hpp"
@@ -88,7 +89,7 @@ void Renderer::Init()
 	HideMouse(hideMouse);
 
 	// Background color
-	glClearColor(0.0f, 0.0f, 0.3f, 0.0f);
+	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
 
 	// Enable depth test
 	glEnable(GL_DEPTH_TEST);
@@ -127,7 +128,7 @@ void Renderer::Init()
 
 void Renderer::PreUpdate()
 {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT /*| GL_DEPTH_BUFFER_BIT*/);
 }
 
 void Renderer::Update()
@@ -161,13 +162,13 @@ bool Renderer::OpenWindow()
 	glfwOpenWindowHint(GLFW_FSAA_SAMPLES, fsaa);
 	glfwOpenWindowHint(GLFW_OPENGL_VERSION_MAJOR, version.major);
 	glfwOpenWindowHint(GLFW_OPENGL_VERSION_MINOR, version.minor);
-	glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
+	glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	// Fullscreen if needed
 	int ret;
 	if(fullscreen)
 	{
-		ret = glfwOpenWindow(resolution().x, resolution().y, 0, 0, 0, 0, 0, 0, GLFW_FULLSCREEN);
+		ret = glfwOpenWindow(resolution().x, resolution().y, 0, 0, 0, 0, 32, 0, GLFW_FULLSCREEN);
 	}
 	ret = glfwOpenWindow(1024, 768, 0, 0, 0, 0, 32, 0, GLFW_WINDOW);
 
@@ -185,9 +186,12 @@ bool Renderer::OpenWindow()
 	}
 
 	// Set the window title to the given GAME_NAME.
-	glfwSetWindowTitle(game->gameName.c_str());
+	glfwSetWindowTitle(((string)game->settings->GetValue("windowtitle")).c_str());
 
-	Log("Context opened in " + string((const char*)glGetString(GL_VERSION)));
+	int minor, major;
+	glfwGetGLVersion(&major, &minor, nullptr);
+
+	Log("Context opened in ", major, ".", minor );
 
 	glfwSetWindowCloseCallback(&Renderer::WindowClosed);
 	return true;
@@ -206,25 +210,21 @@ int Renderer::WindowClosed()
  *
  *******************************************************************************/
 
-void Renderer::IndexArray(vector<Vertex> arr, vector<uint32_t>& idx)
+void Renderer::IndexArray(vector<Vertex>& arr, vector<uint32_t>& idx)
 {
-	uint j = 0;
 	bool added;
-
 	for(uint i = 0; i < arr.size(); ++i)
 	{
 		added = false;
-		for(j = 0; j < idx.size(); ++i)
+		for(uint j = 0; j < idx.size(); ++j)
 		{
 			if(idx.size() == 0)
 			{
 				break;
 			}
-			if(arr[i].vert == arr[j].vert)
+			if(arr[idx[j]].vert == arr[i].vert)
 			{
-				idx.push_back(j);
-				arr.erase(arr.begin() + i);
-				--i;
+				idx.push_back(idx[j]);
 				added = true;
 				break;
 			}
@@ -233,7 +233,6 @@ void Renderer::IndexArray(vector<Vertex> arr, vector<uint32_t>& idx)
 		if(!added)
 		{
 			idx.push_back(i);
-			break;
 		}
 	}
 
@@ -255,6 +254,7 @@ void Renderer::AddMesh(Mesh* mesh)
 	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * mesh->vertices.size(), 0, GL_STATIC_DRAW);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Vertex) * mesh->vertices.size(), &mesh->vertices[0]);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
 
 	IndexArray(mesh->vertices, mesh->indices);
 
@@ -455,7 +455,13 @@ void Renderer::AddSprite(Sprite* sprite)
 	}
 
 	Log("Renderer::AddSprite: About to load texture");
-	sprite->material.texture = LoadTexture(sprite->material.texture.name);
+	sprite->material.texture = LoadTexture(sprite->material.texture.name, GL_TEXTURE_2D);
+
+	sprite->vertices.clear();
+	sprite->vertices.push_back(Vertex(vec3(sprite->material.texture.width, sprite->material.texture.height, 0), vec2(1,1)));
+	sprite->vertices.push_back(Vertex(vec3(sprite->material.texture.width,0,0), vec2(1,0)));
+	sprite->vertices.push_back(Vertex(vec3(0,0,0), vec2(0,0)));
+	sprite->vertices.push_back(Vertex(vec3(0,sprite->material.texture.height,0), vec2(0,1)));
 
 	glGenBuffers(1, &sprite->vertexBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, sprite->vertexBuffer);   // Bind the buffer (vertex array data)
@@ -469,10 +475,13 @@ void Renderer::AddSprite(Sprite* sprite)
 
 	Log("Renderer: Indexed sprite indices");
 
+	/*
 	glGenBuffers(1, &sprite->indexBuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sprite->indexBuffer);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint32_t) * sprite->indices.size(), &sprite->indices[0], GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	*/
+	glGenVertexArrays(1, &sprite->indexBuffer);
 
 	Log("Renderer: Bound sprite indices");
 }
@@ -491,21 +500,23 @@ void Renderer::RenderSprite(Sprite* sprite)
 
 //glPushMatrix();
 	glUseProgram(sprite->material.shader.id);
-	Log("Renderer: Sprite shader loaded");
+
+
+	glBindVertexArray( sprite->indexBuffer );
 
 //	glBindVertexArray( mesh->vertexArray );
 
 	mat4 mvp = game->scene->mainCamera->projection * game->scene->mainCamera->view * sprite->transform->matrix();
-	glUniformMatrix4fv(sprite->matrixId, 1, GL_FALSE, glm::value_ptr(mvp));
+	glUniformMatrix4fv(sprite->matrixId, 1, GL_FALSE, &mvp[0][0]);
 
-	Log("Renderer: Sprite mvp loaded");
+	//Log("Renderer: Sprite mvp loaded");
 
 	// Texture setup
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, sprite->material.texture);
+	glBindTexture(GL_TEXTURE_2D, sprite->material.texture.id);
 	glUniform1i(sprite->material.texture.uniformId, 0);
 
-	Log("Renderer: Sprite texture bound");
+	//Log("Renderer: Sprite texture bound");
 
 	glBindBuffer(GL_ARRAY_BUFFER, sprite->vertexBuffer);
 
@@ -516,11 +527,12 @@ void Renderer::RenderSprite(Sprite* sprite)
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex) - 8, (void*)12);
 
-	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex) - 12, (void*)20);
+	//glEnableVertexAttribArray(2);
+	//glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex) - 12, (void*)20);
 
-	Log("Renderer: Sprite attributes sent");
+	//Log("Renderer: Sprite attributes sent");
 
+	/*
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sprite->indexBuffer);
 
 	glDrawElements(GL_TRIANGLES,	// mode
@@ -528,13 +540,16 @@ void Renderer::RenderSprite(Sprite* sprite)
 				   GL_UNSIGNED_INT,	// type
 				   (void*)0		// element array buffer offset
 				  );
+	*/
+	glDrawArrays(GL_QUADS, 0, 4);
 
 	glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);
-	glDisableVertexAttribArray(2);
+	//glDisableVertexAttribArray(2);
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray( 0 );
 
 //	glBindVertexArray( 0 );
 	glUseProgram(0);

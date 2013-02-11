@@ -25,6 +25,8 @@
 // Internal
 #include "Collider.hpp"
 
+class btBoxShape;
+
 namespace sfs
 {
 /** @addtogroup Engine

@@ -21,11 +21,12 @@
 #include "stdafx.hpp"
 
 // External
-#include <btBulletCollisionCommon.h>
 
 // Internal
 #include "Component.hpp"
 #include "Property.hpp"
+
+class btCollisionShape;
 
 namespace sfs
 {
@@ -61,9 +62,7 @@ protected:
 	{
 	}
 
-	virtual btCollisionShape* GetShape()
-	{
-	}
+	virtual btCollisionShape* GetShape();
 
 	Rigidbody* rigidbody;
 

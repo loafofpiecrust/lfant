@@ -35,8 +35,8 @@ namespace sfs
  *	 @{
  */
 
-vector<string> split(string str, string dropDelim = " ", string keepDelim = "");
-vector<string> split(vector<string> str, string dropDelim = " ", string keepDelim = "");
+vector<string> Split(string str, string dropDelim = " ", string keepDelim = "");
+vector<string> Split(vector<string> str, string dropDelim = " ", string keepDelim = "");
 
 /** @} */
 /** @} */

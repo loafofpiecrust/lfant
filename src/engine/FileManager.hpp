@@ -58,6 +58,7 @@ typedef tinyxml2::XMLAttribute xmlattr;
  */
 class FileManager : public Subsystem
 {
+	friend class Settings;
 public:
 	FileManager();
 	~FileManager();

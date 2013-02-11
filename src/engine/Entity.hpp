@@ -110,17 +110,7 @@ public:
 		return nullptr;
 	}
 
-	Component* GetComponent(string type)
-	{
-		for(auto comp : components)
-		{
-			if(Type(comp) == type || Type(comp) == "sfs::" + type)
-			{
-				return comp;
-			}
-		}
-		return nullptr;
-	}
+	Component* GetComponent(string type);
 
 	template<typename C>
 	vector<C*> GetComponents()
@@ -128,7 +118,7 @@ public:
 		vector<C*> comps;
 		for(auto & comp : components)
 		{
-			if(checkType<C>(comp))
+			if(CheckType<C*>(comp))
 			{
 				comps += dynamic_cast<C*>(comp);
 			}
@@ -137,8 +127,7 @@ public:
 	}
 
 	void AddChild(Entity* ent);
-	Entity* GetChild(string name);
-	Entity* GetChildRecursive(string name);
+	Entity* GetChild(string name, bool recursive = false);
 
 	void SetActiveRecursive(bool active);
 

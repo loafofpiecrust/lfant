@@ -29,6 +29,7 @@
 
 namespace sfs
 {
+
 boost::random::mt19937 randfast;
 boost::random::mt19937_64 randfast64;
 

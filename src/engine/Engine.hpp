@@ -27,10 +27,9 @@
 //
 #include "Subsystem.hpp"
 
-using namespace std;
-
 namespace sfs
 {
+
 class Renderer;
 class Input;
 class Time;
@@ -56,7 +55,7 @@ class SystemInfo;
  *		input, settings, physics, and scripts. It doesn't directly
  *		control these, but it holds pointers to the classes that do.
  */
-extern "C++" class Engine : public Subsystem
+class Engine : public Subsystem
 {
 public:
 	Engine();
@@ -115,12 +114,11 @@ public:
 	FileManager* fileManager;
 	Console* console;
 	SystemInfo* systemInfo;
-	//boost::scoped_ptr<ParticleManager> 	particleManager;
+	Settings* settings;
 	//boost::scoped_ptr<AISystem>			aiSystem;
 	//boost::scoped_ptr<UISystem>			uiSystem;
 	//boost::scoped_ptr<ScriptSystem>		scriptSystem;
 	//boost::scoped_ptr<FGSystem>			flowgraph;
-	//boost::scoped_ptr<Settings> settings;
 
 	string gameName = "ShadowFox Engine";
 
@@ -132,7 +130,7 @@ protected:
 private:
 };
 
-extern "C++" Engine* game;
+extern Engine* game;
 
 /** @} */
 /** @} */

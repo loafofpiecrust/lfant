@@ -40,17 +40,16 @@ Sprite::~Sprite()
 
 void Sprite::Init()
 {
-	push_back(vertices)(Vertex(vec3(1, 1, 0), vec2(1, 1)))(Vertex(vec3(-1, 1, 0), vec2(0, 1)))(
-		Vertex(vec3(-1, -1, 0), vec2(0, 0)))(Vertex(vec3(-1, -1, 0), vec2(0, 0)))(Vertex(vec3(1, -1, 0), vec2(1, 0)))(
-			Vertex(vec3(1, 1, 0), vec2(1, 1)));
+	vertices.push_back(Vertex(vec3(1,1,0), vec2(1,1)));
+	vertices.push_back(Vertex(vec3(1,-1,0), vec2(1,0)));
+	vertices.push_back(Vertex(vec3(-1,-1,0), vec2(0,0)));
+	vertices.push_back(Vertex(vec3(-1,1,0), vec2(0,1)));
 	Log("Sprite: Initialized");
 }
 
 void Sprite::Update()
 {
-	Log("Sprite: About to render");
 	game->renderer->RenderSprite(this);
-	Log("Sprite: Rendered");
 	if(playingAnim)
 	{
 		if(currentAnim)
@@ -139,7 +138,6 @@ void Sprite::Update()
 			}
 		}
 	}
-	Log("Sprite::Update(): Finished");
 }
 
 void Sprite::OnDestroy()

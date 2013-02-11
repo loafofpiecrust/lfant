@@ -212,6 +212,7 @@ void SystemInfo::Init()
 #elif LINUX
 void SystemInfo::Init()
 {
+	/*
 	FILE* cmd;
 	int status;
 	char result[250];
@@ -223,9 +224,10 @@ void SystemInfo::Init()
 	}
 	pclose(cmd);
 
-	vector<string> result_spl = split(string(result), " ");
+	vector<string> result_spl = Split(string(result), " ");
 	OS = result_spl[result_spl.size() - 1] + result_spl[2];
 	computerName = result_spl[1];
+	*/
 }
 #endif
 

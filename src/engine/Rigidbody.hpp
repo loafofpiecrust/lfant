@@ -25,7 +25,6 @@
 
 // Internal
 #include "Component.hpp"
-#include "Collider.hpp"
 
 namespace sfs
 {

@@ -102,7 +102,7 @@ public:
 	void RenderLight(Light* light);
 	void RemoveLight(Light* light);
 
-	void IndexArray(vector<Vertex> arr, vector<uint32_t>& idx);
+	void IndexArray(vector<Vertex>& arr, vector<uint32_t>& idx);
 
 	/// The multiplier for anti-aliasing. 2, 4, 8.
 	int fsaa = 4;

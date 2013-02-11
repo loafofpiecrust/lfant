@@ -37,28 +37,32 @@
 namespace sfs
 {
 
-	Texture LoadTexture( string name )
+	Texture LoadTexture( string name, int buffer )
 	{
+		if(buffer == 0)
+		{
+			buffer = GL_TEXTURE_2D;
+		}
 		Log("Want to load an image file");
-		string ext = split(name, ".", "")[1];
+		string ext = Split(name, ".", "")[1];
 		boost::to_upper(ext);
 		Log("Loading an image file of type " + ext);
 		if (ext == "BMP")
 		{
-			return LoadBMP(name);
+			return LoadBMP(name, buffer);
 		}
 		else if (ext == "JPEG" || ext == "JPG")
 		{
-			return LoadJPEG(name);
+			return LoadJPEG(name, buffer);
 		}
 		else if (ext == "PNG")
 		{
 			Log("About to load a png");
-			return LoadPNG(name);
+			return LoadPNG(name, buffer);
 		}
 	}
 
-	Texture LoadBMP( string name )
+	Texture LoadBMP( string name, int buffer )
 	{
 		byte header[54];
 		uint dataPos;
@@ -103,27 +107,27 @@ namespace sfs
 		// Bind to OpenGL
 		uint32_t id = 0;
 		glGenTextures(1, &id);
-		glBindTexture(GL_TEXTURE_2D, id);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_BGR, GL_UNSIGNED_BYTE, data);
+		glBindTexture(buffer, id);
+		glTexImage2D(buffer, 0, GL_RGB, width, height, 0, GL_BGR, GL_UNSIGNED_BYTE, data);
 
 		Log("Generated image in OpenGL");
 
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(buffer, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(buffer, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
 		Log("Set some tex parameters");
 
-		glBindTexture(GL_TEXTURE_2D, 0);
+		glBindTexture(buffer, 0);
 
 		return Texture(name, width, height, id);
 	}
 
-	Texture LoadJPEG( string name )
+	Texture LoadJPEG( string name, int buffer )
 	{
 
 	}
 
-	Texture LoadPNG( string name )
+	Texture LoadPNG( string name, int buffer )
 	{
 		png_structp png_ptr;
 		png_infop info_ptr;
@@ -204,19 +208,21 @@ namespace sfs
 
 		uint32_t id = 0;
 		glGenTextures(1, &id);
-		glBindTexture(GL_TEXTURE_2D, id);
-		glTexImage2D(GL_TEXTURE_2D, 0, hasAlpha ? GL_RGBA : GL_RGB, width, height, 0, hasAlpha ? GL_RGBA : GL_RGB,
+		glBindTexture(buffer, id);
+		glTexImage2D(buffer, 0, hasAlpha ? GL_RGBA : GL_RGB, width, height, 0, hasAlpha ? GL_RGBA : GL_RGB,
 				GL_UNSIGNED_BYTE, data);
 
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(buffer, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(buffer, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
-		glBindTexture(GL_TEXTURE_2D, 0);
+		glBindTexture(buffer, 0);
+
+		Log("LoadPNG: Finished");
 
 		return Texture(name, width, height, id);
 	}
 
-	Texture LoadTGA( string name )
+	Texture LoadTGA( string name, int buffer )
 	{
 		/// @todo Revise to get image size as well.
 		/*
