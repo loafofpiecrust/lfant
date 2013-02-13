@@ -58,6 +58,7 @@ void Scene::OnDestroy()
 {
 	for(uint i = 0; i < entities.size(); ++i)
 	{
+		Log("Scene::Destroy: Destroying ", entities[i]->name);
 		entities[i]->Destroy();
 	}
 }

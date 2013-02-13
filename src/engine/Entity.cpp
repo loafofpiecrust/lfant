@@ -93,6 +93,7 @@ void Entity::Destroy()
 	{
 		compo->Destroy();
 	}
+	Log("Entity::Destroy: Components destroyed");
 	OnDestroy();
 	delete this;
 }
@@ -108,6 +109,7 @@ Entity* Entity::Spawn(string name, Entity* parent, vec3 pos, vec3 rot, vec3 scal
 	}
 	ent->transform->position = pos;
 	ent->transform->rotation = rot;
+	ent->transform->scale = scale;
 	ent->name = name;
 	game->scene->entities.push_back(ent);
 	ent->Init();

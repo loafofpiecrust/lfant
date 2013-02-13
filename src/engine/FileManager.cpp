@@ -34,7 +34,8 @@ using namespace boost::filesystem;
 namespace sfs
 {
 
-FileManager::FileManager()
+FileManager::FileManager() :
+	gameFolder(absolute(path("../..")).string())
 {
 }
 
@@ -52,9 +53,10 @@ void FileManager::Init()
 	else
 	{
 		// Use default settings
-		gameFolder = absolute(path("../..")).string();
 		Log(gameFolder);
-		userFolder = UserPath + "/My Games/" + game->settings->organization + "/" + game->settings->gameName;
+		userFolder = UserPath + "/My Games/" + string(game->settings->GetValue("general.orgname")) + "/" + string(game->settings->GetValue("general.gamename"));
+		game->settings->LoadSettings();
+		Log(userFolder);
 
 		// Save these to system.cfg
 	}

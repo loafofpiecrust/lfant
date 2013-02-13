@@ -39,9 +39,10 @@ class Item;
 /** @addtogroup Engine
  *	@{
  */
-/** @addtogroup Entities
+/** @addtogroup Core
  *	@{
  */
+
 /**
  *	This class is the basis for all Entities.
  *	@details
@@ -132,7 +133,7 @@ public:
 	void SetActiveRecursive(bool active);
 
 	static Entity* Spawn(string name, Entity* parent = nullptr, vec3 pos = vec3(0), vec3 rot = vec3(0),
-						 vec3 scale = vec3(0));
+						 vec3 scale = vec3(1));
 
 	vector<Component*> components;
 

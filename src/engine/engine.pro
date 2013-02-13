@@ -10,7 +10,7 @@ CONFIG -= qt
 TARGET = sfengine
 
 # Dependency information
-INCLUDEPATH += ../external/fmod/api/inc ../external/glm ../external/boost ../external/glew/include ../external/glfw/include ../external/png ../external/bullet/src ../external/raknet/Source
+INCLUDEPATH += ../external/fmod/api/inc ../external/glm ../external/boost ../external/glew/include ../external/sfml/include ../external/png ../external/bullet/src ../external/raknet/Source
 LIBS += -lbullet -lfmod -lboost -lglew -lglfw -lpng -lz -lsquirrel -lraknet
 
 DEFINES = __GXX_EXPERIMENTAL_CXX0X__
@@ -20,13 +20,11 @@ SOURCES += \
 	tinyxml2.cpp \
 	Time.cpp \
 	Thread.cpp \
-	TextureLoader.cpp \
 	Texture.cpp \
 	SystemInfo.cpp \
 	Subsystem.cpp \
 	StringUtil.cpp \
 	Sprite.cpp \
-	ShaderLoader.cpp \
 	sfRigidBody.cpp \
 	sfDynamicsWorld.cpp \
 	Settings.cpp \
@@ -54,6 +52,9 @@ SOURCES += \
 	AudioSource.cpp \
 	AudioListener.cpp \
 	Audio.cpp \
+	lodepng.cpp \
+	MeshLoader.cpp \
+    Shader.cpp
 
 HEADERS += \
 	Vertex.hpp \
@@ -69,7 +70,6 @@ HEADERS += \
 	StringUtil.hpp \
 	stdafx.hpp \
 	Sprite.hpp \
-	ShaderLoader.hpp \
 	Shader.hpp \
 	sfRigidBody.hpp \
 	sfDynamicsWorld.hpp \
@@ -108,6 +108,8 @@ HEADERS += \
 	AudioListener.hpp \
 	Audio.hpp \
 	Archive.hpp \
+	lodepng.hpp \
+	MeshLoader.hpp
 
 OTHER_FILES += \
 	MainPage.dox \

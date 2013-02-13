@@ -51,7 +51,6 @@ void Camera::Init()
 
 void Camera::Update()
 {
-	transform->SetDirection();
 	UpdateView();
 	UpdateProjection();
 }

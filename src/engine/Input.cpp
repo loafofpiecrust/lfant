@@ -178,7 +178,7 @@ void GLFWCALL Input::MouseMove(int32_t x, int32_t y)
 {
 	if(game->input->lockMouse)
 	{
-		game->input->SetMousePos(game->renderer->resolution / 2);
+		game->input->SetMousePos(game->renderer->GetResolution() / 2);
 	}
 }
 

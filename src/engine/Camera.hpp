@@ -32,7 +32,7 @@ namespace sfs
 /** @addtogroup Engine
  *	@{
  */
-/** @addtogroup Components
+/** @addtogroup Rendering
  *	@{
  */
 
@@ -88,7 +88,7 @@ public:
 	void SetRange(float near, float far);
 
 	/// Field of view, eg. 40.0f
-	float fov = 100.0f;
+	float fov = 45.0f;
 
 	/// Aspect ratio, eg. 16.0f/9.0f
 	float aspectRatio = 16 / 9;

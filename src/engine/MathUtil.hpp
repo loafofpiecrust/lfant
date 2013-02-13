@@ -29,7 +29,7 @@ namespace sfs
 /**	@addtogroup Engine
  *	@{
  */
-/**	@addtogroup Math
+/**	@addtogroup Utilities
  *	@{
  */
 
@@ -51,6 +51,21 @@ template<typename R = float>
 inline R round(R x, int decimal)
 {
 	return floor(x * pow(10, decimal) + 0.5) / pow(10, decimal);
+}
+
+template<typename R = float>
+inline R rollover(R x, R min, R max)
+{
+	int r = x;
+	if(r >= max)
+	{
+		r = min;
+	}
+	else if(r <= min)
+	{
+		r = max;
+	}
+	return r;
 }
 
 const float pi = 3.14159265358979323846f;

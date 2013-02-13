@@ -34,7 +34,7 @@ namespace sfs
 /**	@addtogroup Engine
  *	@{
  */
-/**	@addtogroup Subsystems
+/**	@addtogroup Networking
  *	@{
  */
 

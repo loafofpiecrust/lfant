@@ -33,7 +33,7 @@ class Camera;
 /** @addtogroup Engine
  *	@{
  */
-/** @addtogroup Subsystems
+/** @addtogroup Core
  *	@{
  */
 
@@ -82,7 +82,7 @@ public:
 	 */
 	void Save(string file = "");
 
-	Entity* Spawn(string name, Entity* parent = nullptr, vec3 pos = vec3(0), vec3 rot = vec3(0), vec3 scale = vec3(0));
+	Entity* Spawn(string name, Entity* parent = nullptr, vec3 pos = vec3(0), vec3 rot = vec3(0), vec3 scale = vec3(1));
 
 	vector<Entity*> entities;
 	Camera* mainCamera = nullptr;

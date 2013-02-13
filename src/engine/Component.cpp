@@ -45,7 +45,6 @@ Component::~Component()
 void Component::Destroy()
 {
 	OnDestroy();
-	owner->RemoveComponent(this);
 	delete this;
 }
 

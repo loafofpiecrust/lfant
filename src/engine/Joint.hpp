@@ -33,7 +33,7 @@ class Rigidbody;
 /**	@addtogroup Engine
  *	@{
  */
-/** @addtogroup Components
+/** @addtogroup Physics
  *	@{
  */
 

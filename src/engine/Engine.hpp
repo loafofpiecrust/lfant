@@ -44,7 +44,7 @@ class SystemInfo;
 /** @addtogroup Engine
  *	@{
  */
-/** @addtogroup Subsystems
+/** @addtogroup Core
  *	@{
  */
 

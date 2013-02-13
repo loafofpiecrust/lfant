@@ -32,7 +32,7 @@ namespace sfs
 /** @addtogroup Game
  *	 @{
  */
-/** @addtogroup TypeInfo
+/** @addtogroup Utilities
  *	 @{
  */
 

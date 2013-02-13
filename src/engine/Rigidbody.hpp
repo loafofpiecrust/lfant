@@ -33,7 +33,7 @@ class Collider;
 /** @addtogroup Engine
  *	 @{
  */
-/** @addtogroup Components
+/** @addtogroup Physics
  *	 @{
  */
 

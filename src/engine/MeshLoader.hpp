@@ -2,7 +2,7 @@
  *
  *	ShadowFox Engine Source
  *	Copyright (C) 2012-2013 by ShadowFox Studios
- *	Created: 2012-08-18 by Taylor Snead
+ *	Created: 2013-02-11 by Taylor Snead
  *
  *	Licensed under the Apache License, Version 2.0 (the "License");
  *	you may not use this file except in compliance with the License.
@@ -18,45 +18,27 @@
  *
  ******************************************************************************/
 #pragma once
+#include "stdafx.hpp"
 
 // External
-#include <btBulletDynamicsCommon.h>
-#include <BulletDynamics/Dynamics/btRigidBody.h>
 
 // Internal
+#include "Mesh.hpp"
 
 namespace sfs
 {
-/** @addtogroup Engine
- *	@{
- */
-/** @addtogroup Physics
- *	@{
- */
 
-/**
- *	@details
- *	@todo
- *		Todo
- */
-class sfRigidBody : public btRigidBody
-{
-public:
-	sfRigidBody(const btRigidBodyConstructionInfo& constructionInfo);
-	virtual ~sfRigidBody();
+Mesh LoadMesh(string name);
 
-	void applyPointGravity(btVector3 point, const btScalar force);
+// Specific Types
+Mesh LoadObj(string name);
 
-	void setupRigidBody(const btRigidBodyConstructionInfo& constructionInfo);
+void IndexVBO(std::vector<glm::vec3> & in_vertices,
+			  std::vector<glm::vec2> & in_uvs,
+			  std::vector<glm::vec3> & in_normals,
+			  std::vector<uint32_t> & out_indices,
+			  std::vector<glm::vec3> & out_vertices,
+			  std::vector<glm::vec2> & out_uvs,
+			  std::vector<glm::vec3> & out_normals);
 
-protected:
-	btScalar m_gravityMult;
-
-private:
-
-};
-
-/** @} */
-/** @} */
 }
-

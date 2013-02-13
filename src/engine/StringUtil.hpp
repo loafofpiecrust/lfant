@@ -38,6 +38,8 @@ namespace sfs
 vector<string> Split(string str, string dropDelim = " ", string keepDelim = "");
 vector<string> Split(vector<string> str, string dropDelim = " ", string keepDelim = "");
 
+string Extension(string path);
+
 /** @} */
 /** @} */
 }

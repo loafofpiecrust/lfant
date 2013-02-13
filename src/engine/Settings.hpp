@@ -27,13 +27,14 @@
 #include "Subsystem.hpp"
 #include "StringUtil.hpp"
 #include "Range.hpp"
+#include "Console.hpp"
 
 namespace sfs
 {
 /** @addtogroup Engine
  *	 @{
  */
-/** @addtogroup Subsystems
+/** @addtogroup Core
  *	 @{
  */
 
@@ -53,35 +54,74 @@ class Settings : public Subsystem
 			this->value = value;
 		}
 
-		template<typename T>
-		T cast()
-		{
-			return lexical_cast<T>(value);
-		}
-
 		operator string()
 		{
-			return value;
-		}
-
-		operator int()
-		{
-			return lexical_cast<int>(value);
+			return s();
 		}
 
 		operator float()
 		{
+			return f();
+		}
+
+		operator int()
+		{
+			return i();
+		}
+
+		string s()
+		{
+			Log("Operator string called");
+			return value;
+		}
+
+		const char* c_str()
+		{
+			return value.c_str();
+		}
+
+		int i()
+		{
+			return lexical_cast<int>(value);
+		}
+
+		float f()
+		{
 			return lexical_cast<float>(value);
+		}
+
+		bool b()
+		{
+			if(value == "" || value == "false" || value == "0")
+			{
+				return false;
+			}
+			else if(value == "true" || value == "1")
+			{
+				return true;
+			}
+			else
+			{
+				return true;
+			}
+		}
+
+		Range<int> rng()
+		{
+			vector<string> words = Split(value, " .", "");
+			if(words.size() == 1)
+			{
+				return Range<int>(lexical_cast<int>(words[0]), 0);
+			}
+			else if(words.size() >= 2)
+			{
+				return Range<int>(lexical_cast<int>(words[0]), lexical_cast<int>(words[1]));
+			}
 		}
 
 		operator Range<int>()
 		{
-			vector<string> words = Split(value, " .", "");
-			if(words.size() < 2)
-			{
-				return Range<int>(0,0);
-			}
-			return Range<int>(lexical_cast<int>(words[0]), lexical_cast<int>(words[1]));
+			return rng();
 		}
 
 		Var(string name, string value) : name(name)
@@ -105,17 +145,9 @@ public:
 	void SetValue(string name, string value);
 	Var GetValue(string name);
 
-public:
+protected:
 	string userFile = "settings.cfg";
 	string defaultFile = "settings.cfg";
-
-	// Game Publishing Info
-	string gameName = "ShadowFox Engine";
-	string organization = "ShadowFox Studios";
-
-	// Configuration
-	int glMajor = 3;
-	int glMinor = 3;
 
 	vector<Var> variables;
 

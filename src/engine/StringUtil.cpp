@@ -29,8 +29,12 @@ namespace sfs
 
 vector<string> Split(string str, string dropDelim, string keepDelim)
 {
-	using namespace boost;
 	vector<string> result;
+	if(str == "")
+	{
+		return result;
+	}
+	using namespace boost;
 	char_separator<char> sep(dropDelim.c_str(), keepDelim.c_str(), drop_empty_tokens);
 	tokenizer<char_separator<char>> tok(str, sep);
 	for(tokenizer<char_separator<char>>::iterator i = tok.begin(); i != tok.end(); ++i)
@@ -42,17 +46,26 @@ vector<string> Split(string str, string dropDelim, string keepDelim)
 
 vector<string> Split(vector<string> str, string dropDelim, string keepDelim)
 {
-	vector<string> final;
-	vector<string> each;
+	string combined = "";
 	for(uint i = 0; i < str.size(); ++i)
 	{
-		each = Split(str[i], dropDelim, keepDelim);
-		for(uint k = 0; k < each.size(); ++k)
-		{
-			final += each[k];
-		}
+		combined.append(str[i]);
 	}
-	return final;
+	return Split(combined, dropDelim, keepDelim);
+}
+
+string Extension(string path)
+{
+	vector<string> tokens = Split(path, ".", "");
+	if(tokens.size() > 1)
+	{
+		to_lower(tokens[tokens.size()-1]);
+		return tokens[tokens.size()-1];
+	}
+	else
+	{
+		return "";
+	}
 }
 
 }
