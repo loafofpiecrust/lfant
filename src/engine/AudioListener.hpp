@@ -30,7 +30,7 @@ namespace sfs
 /** @addtogroup Engine
  *	@{
  */
-/** @addtogroup
+/** @addtogroup Audio
  *	@{
  */
 

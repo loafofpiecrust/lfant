@@ -35,7 +35,7 @@ class Entity;
 /** @addtogroup Engine
  *	 @{
  */
-/** @addtogroup Utilities
+/** @addtogroup Core
  *	 @{
  */
 
@@ -67,7 +67,7 @@ public:
 
 	vec3& GetPosition();
 	void SetPosition(vec3 pos);
-	vec3 _position;
+	vec3 _position = vec3(0);
 
 	quat GetRotationQuat();
 	void SetRotationQuat(quat rot);
@@ -75,11 +75,11 @@ public:
 
 	vec3& GetRotation();
 	void SetRotation(vec3 rot);
-	vec3 _rotation;
+	vec3 _rotation = vec3(0);
 
 	vec3 GetScale();
 	void SetScale(vec3 scl);
-	vec3 _scale;
+	vec3 _scale = vec3(1);
 
 	vec3 GetWorldPosition();
 	void SetWorldPosition(vec3 pos);

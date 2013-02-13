@@ -27,6 +27,18 @@
 
 namespace sfs
 {
+/** @addtogroup Engine
+ *	@{
+ */
+/** @addtogroup Physics
+ *	@{
+ */
+
+/**
+ *	@details
+ *	@todo
+ *		Todo
+ */
 class sfRigidBody : public btRigidBody
 {
 public:
@@ -43,5 +55,8 @@ protected:
 private:
 
 };
+
+/** @} */
+/** @} */
 }
 

@@ -67,20 +67,20 @@
 // parameters passed to us by glfwOpenWindowHint
 //------------------------------------------------------------------------
 typedef struct {
-    int         refreshRate;
-    int         accumRedBits;
-    int         accumGreenBits;
-    int         accumBlueBits;
-    int         accumAlphaBits;
-    int         auxBuffers;
-    int         stereo;
-    int         windowNoResize;
-    int         samples;
-    int         glMajor;
-    int         glMinor;
-    int         glForward;
-    int         glDebug;
-    int         glProfile;
+	int         refreshRate;
+	int         accumRedBits;
+	int         accumGreenBits;
+	int         accumBlueBits;
+	int         accumAlphaBits;
+	int         auxBuffers;
+	int         stereo;
+	int         windowNoResize;
+	int         samples;
+	int         glMajor;
+	int         glMinor;
+	int         glForward;
+	int         glDebug;
+	int         glProfile;
 } _GLFWhints;
 
 
@@ -99,16 +99,19 @@ typedef struct {
 // platform independent code to the platform specific code
 //------------------------------------------------------------------------
 typedef struct {
-    int         mode;
-    int         refreshRate;
-    int         windowNoResize;
-    int         glMajor;
-    int         glMinor;
-    int         glForward;
-    int         glDebug;
-    int         glProfile;
+	int         mode;
+	int         refreshRate;
+	int         windowNoResize;
+	int         glMajor;
+	int         glMinor;
+	int         glForward;
+	int         glDebug;
+	int         glProfile;
 } _GLFWwndconfig;
 
+#ifdef __linux
+#include "x11/platform.h"
+#endif
 
 //------------------------------------------------------------------------
 // Framebuffer configuration descriptor, i.e. buffers and their sizes
@@ -118,20 +121,20 @@ typedef struct {
 // available framebuffer configurations
 //------------------------------------------------------------------------
 typedef struct {
-    int         redBits;
-    int         greenBits;
-    int         blueBits;
-    int         alphaBits;
-    int         depthBits;
-    int         stencilBits;
-    int         accumRedBits;
-    int         accumGreenBits;
-    int         accumBlueBits;
-    int         accumAlphaBits;
-    int         auxBuffers;
-    int         stereo;
-    int         samples;
-    GLFWintptr  platformID;
+	int         redBits;
+	int         greenBits;
+	int         blueBits;
+	int         alphaBits;
+	int         depthBits;
+	int         stencilBits;
+	int         accumRedBits;
+	int         accumGreenBits;
+	int         accumBlueBits;
+	int         accumAlphaBits;
+	int         auxBuffers;
+	int         stereo;
+	int         samples;
+	GLFWintptr  platformID;
 } _GLFWfbconfig;
 
 
@@ -151,10 +154,10 @@ GLFWGLOBAL int _glfwInitialized;
 // Abstract data stream (for image I/O)
 //------------------------------------------------------------------------
 typedef struct {
-    FILE*   file;
-    void*   data;
-    long    position;
-    long    size;
+	FILE*   file;
+	void*   data;
+	long    position;
+	long    size;
 } _GLFWstream;
 
 
@@ -259,8 +262,8 @@ int _glfwReadTGA( _GLFWstream *s, GLFWimage *img, int flags );
 
 // Framebuffer configs
 const _GLFWfbconfig *_glfwChooseFBConfig( const _GLFWfbconfig *desired,
-                                          const _GLFWfbconfig *alternatives,
-                                          unsigned int count );
+										  const _GLFWfbconfig *alternatives,
+										  unsigned int count );
 
 
 #endif // _internal_h_

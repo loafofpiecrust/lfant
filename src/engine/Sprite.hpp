@@ -30,7 +30,7 @@ namespace sfs
 /** @addtogroup Engine
  *	 @{
  */
-/** @addtogroup Components
+/** @addtogroup Rendering
  *	 @{
  */
 

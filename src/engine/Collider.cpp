@@ -21,6 +21,7 @@
 #include "Collider.hpp"
 
 // External
+#include <btBulletCollisionCommon.h>
 
 // Internal
 #include "Rigidbody.hpp"
@@ -35,10 +36,14 @@ void Collider::Init()
 
 void Collider::OnAddComponent(Component* comp)
 {
-	if(checkType<Rigidbody*>(comp))
+	if(CheckType<Rigidbody*>(comp))
 	{
 		//	rigidbody = dynamic_cast<Rigidbody*>( comp );
 	}
+}
+
+btCollisionShape* Collider::GetShape()
+{
 }
 
 }

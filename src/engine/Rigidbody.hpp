@@ -25,7 +25,6 @@
 
 // Internal
 #include "Component.hpp"
-#include "Collider.hpp"
 
 namespace sfs
 {
@@ -34,7 +33,7 @@ class Collider;
 /** @addtogroup Engine
  *	 @{
  */
-/** @addtogroup Components
+/** @addtogroup Physics
  *	 @{
  */
 

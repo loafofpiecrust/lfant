@@ -60,7 +60,7 @@ void Rigidbody::Update()
 
 void Rigidbody::OnAddComponent(Component* comp)
 {
-	if(checkType<Collider*>(comp))
+	if(CheckType<Collider*>(comp))
 	{
 		collider = dynamic_cast<Collider*>(comp);
 	}

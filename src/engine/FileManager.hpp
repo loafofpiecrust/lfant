@@ -40,7 +40,7 @@ const string GameName = "ShadowFox";
 /** @addtogroup Engine
  *	 @{
  */
-/** @addtogroup Subsystems
+/** @addtogroup Utilities
  *	 @{
  */
 
@@ -50,7 +50,8 @@ typedef tinyxml2::XMLElement xmlelem;
 typedef tinyxml2::XMLNode xmlnode;
 typedef tinyxml2::XMLAttribute xmlattr;
 
-/**	FileManager
+/**
+ *	FileManager
  *	@details
  *		Description
  *	@todo
@@ -58,6 +59,7 @@ typedef tinyxml2::XMLAttribute xmlattr;
  */
 class FileManager : public Subsystem
 {
+	friend class Settings;
 public:
 	FileManager();
 	~FileManager();

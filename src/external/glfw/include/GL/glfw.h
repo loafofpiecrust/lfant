@@ -388,16 +388,16 @@ extern "C" {
 
 /* The video mode structure used by glfwGetVideoModes() */
 typedef struct {
-    int Width, Height;
-    int RedBits, BlueBits, GreenBits;
+	int Width, Height;
+	int RedBits, BlueBits, GreenBits;
 } GLFWvidmode;
 
 /* Image/texture information */
 typedef struct {
-    int Width, Height;
-    int Format;
-    int BytesPerPixel;
-    unsigned char *Data;
+	int Width, Height;
+	int Format;
+	int BytesPerPixel;
+	unsigned char *Data;
 } GLFWimage;
 
 /* Thread ID */

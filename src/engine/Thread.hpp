@@ -29,7 +29,7 @@ namespace sfs
 /** @addtogroup Engine
  *	 @{
  */
-/** @addtogroup Threads
+/** @addtogroup Utilities
  *	 @{
  */
 

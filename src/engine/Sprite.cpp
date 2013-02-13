@@ -40,29 +40,30 @@ Sprite::~Sprite()
 
 void Sprite::Init()
 {
-	push_back(vertices)(Vertex(vec3(1, 1, 0), vec2(1, 1)))(Vertex(vec3(-1, 1, 0), vec2(0, 1)))(
-		Vertex(vec3(-1, -1, 0), vec2(0, 0)))(Vertex(vec3(-1, -1, 0), vec2(0, 0)))(Vertex(vec3(1, -1, 0), vec2(1, 0)))(
-			Vertex(vec3(1, 1, 0), vec2(1, 1)));
+	/*
+	vertexBuffer.push_back(Vertex(vec3(1,1,0), vec2(1,1)));
+	vertices.push_back(Vertex(vec3(1,-1,0), vec2(1,0)));
+	vertices.push_back(Vertex(vec3(-1,-1,0), vec2(0,0)));
+	vertices.push_back(Vertex(vec3(-1,1,0), vec2(0,1)));
+	*/
 	Log("Sprite: Initialized");
 }
 
 void Sprite::Update()
 {
-	Log("Sprite: About to render");
 	game->renderer->RenderSprite(this);
-	Log("Sprite: Rendered");
 	if(playingAnim)
 	{
 		if(currentAnim)
 		{
 			float x = 1.0f / currentAnim->columns;
 			float y = 1.0f / currentAnim->rows;
-			vertices[0].tex = vec2(currentFrame.x + x, currentFrame.y);
-			vertices[1].tex = vec2(currentFrame.x, currentFrame.y);
-			vertices[2].tex = vec2(currentFrame.x, currentFrame.y + y);
-			vertices[3].tex = vec2(currentFrame.x, currentFrame.y + y);
-			vertices[4].tex = vec2(currentFrame.x + x, currentFrame.y + y);
-			vertices[5].tex = vec2(currentFrame.x + x, currentFrame.y);
+			uvBuffer[0] = vec2(currentFrame.x + x, currentFrame.y);
+			uvBuffer[1] = vec2(currentFrame.x, currentFrame.y);
+			uvBuffer[2] = vec2(currentFrame.x, currentFrame.y + y);
+			uvBuffer[3] = vec2(currentFrame.x, currentFrame.y + y);
+			uvBuffer[4] = vec2(currentFrame.x + x, currentFrame.y + y);
+			uvBuffer[5] = vec2(currentFrame.x + x, currentFrame.y);
 
 			currentTime += game->time->deltaTime;
 			if(currentTime >= currentAnim->frameRate)
@@ -139,7 +140,6 @@ void Sprite::Update()
 			}
 		}
 	}
-	Log("Sprite::Update(): Finished");
 }
 
 void Sprite::OnDestroy()

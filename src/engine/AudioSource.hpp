@@ -34,8 +34,17 @@ class Channel;
 
 namespace sfs
 {
+/** @addtogroup Engine
+ *	@{
+ */
+/** @addtogroup Audio
+ *	@{
+ */
 
 /**
+ *	@details
+ *
+ *	@todo
  *
  */
 class AudioSource : public Component

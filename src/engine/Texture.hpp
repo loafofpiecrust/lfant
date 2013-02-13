@@ -56,41 +56,33 @@ public:
 		TF_COMPRESSED, TF_16BIT, TF_TRUECOLOR
 	};
 
+	void LoadFile(string path, int mode = 0);
+
 	string name = "";
-	WrapMode wrapMode = WM_REPEAT;
-	FilterMode filterMode = FM_BILINEAR;
-	uint16_t anisoLevel = 1;
-	TexFormat format = TF_COMPRESSED;
-	uint16_t width;
-	uint16_t height;
-	uint32_t id;
-	uint32_t uniformId;
-
-	operator uint32_t()
-	{
-		return id;
-	}
-
-	operator string()
-	{
-		return name;
-	}
-
-	void operator=(uint32_t texId)
-	{
-		id = texId;
-	}
-
-	void operator=(string file);
+	//WrapMode wrapMode = WM_REPEAT;
+	//FilterMode filterMode = FM_BILINEAR;
+	//uint16_t anisoLevel = 1;
+	//TexFormat format = TF_COMPRESSED;
+	uint width;
+	uint height;
+	uint32_t id = 0;
+	uint32_t uniformId = 0;
 
 	Texture()
 	{
 	}
 
-	Texture(string file, uint16_t width, uint16_t height, uint32_t id) :
-		name(file), width(width), height(height), id(id)
+	Texture& operator=(string name)
 	{
+		this->name = name;
+		return *this;
 	}
+
+private:
+	void LoadPNG(int mode);
+	void LoadJPEG(int mode);
+	void LoadBMP(int mode);
+	void LoadDDS(int mode);
 };
 
 /** @} */

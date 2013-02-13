@@ -31,7 +31,19 @@
 
 namespace sfs
 {
-	
+/** @addtogroup Engine
+ *	@{
+ */
+/** @addtogroup Utilities
+ *	@{
+ */
+
+/**
+ *	@details
+ *
+ *	@todo
+ *
+ */
 class Console : public Subsystem
 {
 public:
