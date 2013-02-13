@@ -25,6 +25,7 @@
 // Internal
 #include "StringUtil.hpp"
 #include "Console.hpp"
+#include "Renderer.hpp"
 
 namespace sfs
 {
@@ -44,12 +45,12 @@ void Mesh::Init()
 
 void Mesh::Update()
 {
-
+	game->renderer->RenderMesh(this);
 }
 
 void Mesh::OnDestroy()
 {
-
+	game->renderer->RemoveMesh(this);
 }
 
 void Mesh::LoadFile(string path)

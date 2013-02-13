@@ -303,7 +303,7 @@ void Renderer::RenderMesh(Mesh* mesh)
 {
 	if(mesh->material.shader.id == 0 || mesh->material.texture.id == 0)
 	{
-		AddSprite(mesh);
+		AddMesh(mesh);
 	}
 
 	glBindVertexArray(mesh->vertexArray);
@@ -349,12 +349,12 @@ void Renderer::RenderMesh(Mesh* mesh)
 
 void Renderer::RemoveMesh(Mesh* mesh)
 {
-	glDeleteBuffers(1, &sprite->vertexBuffer.id);
-	glDeleteBuffers(1, &sprite->uvBuffer.id);
-	glDeleteBuffers(1, &sprite->normalBuffer.id);
-	glDeleteBuffers(1, &sprite->indexBuffer.id);
-	glDeleteTextures(1, &sprite->material.texture.id);
-	glDeleteVertexArrays(1, &sprite->vertexArray);
+	glDeleteBuffers(1, &mesh->vertexBuffer.id);
+	glDeleteBuffers(1, &mesh->uvBuffer.id);
+	glDeleteBuffers(1, &mesh->normalBuffer.id);
+	glDeleteBuffers(1, &mesh->indexBuffer.id);
+	glDeleteTextures(1, &mesh->material.texture.id);
+	glDeleteVertexArrays(1, &mesh->vertexArray);
 }
 
 /*******************************************************************************
