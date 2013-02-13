@@ -8,13 +8,14 @@ TEMPLATE = lib
 
 TARGET = galaga
 LIBS += -lsfengine
+QMAKE_CXXFLAGS += -ggdb
 
 HEADERS = \
-	Projectile.hpp \
-	Player.hpp \
-	Galaga.hpp
+    Projectile.hpp \
+    Player.hpp \
+    Galaga.hpp
 
 SOURCES = \
-	Projectile.cpp \
-	Player.cpp \
-	Galaga.cpp
+    Projectile.cpp \
+    Player.cpp \
+    Galaga.cpp

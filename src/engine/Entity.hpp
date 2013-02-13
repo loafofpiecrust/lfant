@@ -28,7 +28,7 @@
 #include "Object.hpp"
 #include "Transform.hpp"
 #include "Component.hpp"
-#include "Type.hpp"
+#include "TypeInfo.hpp"
 #include "Engine.hpp"
 
 namespace sfs

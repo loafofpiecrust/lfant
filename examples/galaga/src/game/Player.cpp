@@ -31,12 +31,13 @@
 #include "Entity.hpp"
 #include "Renderer.hpp"
 #include "Settings.hpp"
+#include "Scene.hpp"
 
 using namespace sfs;
 
 void Player::Init()
 {
-//	owner->AddComponent<Sprite>();
+	//	owner->AddComponent<Sprite>();
 	float f = game->settings->GetValue("player.lookspeed").f();
 	if(f != 0.0f)
 	{
@@ -49,14 +50,22 @@ void Player::Init()
 		movementSpeed = f;
 		Log("Moving at ", f);
 	}
+
+	//	Connect(SENDER(game->input, Horizontal), this, &Player::Move);
+	//	Connect(SENDER(game->input, Vertical), this, &Player::Move);
+}
+
+void Player::Move(string axis, float value)
+{
+
 }
 
 void Player::Update()
 {
-	//ivec2 mousePos = game->input->GetMousePos();
-	//ivec2 screenRes = game->renderer->GetResolution();
-	//transform->rotation += degrees(vec3(lookSpeed * float(screenRes.y/2-mousePos.y), 0, lookSpeed * float(screenRes.x/2-mousePos.x))) * (float)game->time->deltaTime;
-	//game->input->SetMousePos(screenRes.x/2, screenRes.y/2);
+	ivec2 mousePos = game->input->GetMousePos();
+	ivec2 screenRes = game->renderer->GetResolution();
+	transform->rotation += radians(vec3(lookSpeed * float(screenRes.y/2-mousePos.y), 0, lookSpeed * float(screenRes.x/2-mousePos.x))) * (float)game->time->deltaTime;
+	game->input->SetMousePos(screenRes.x/2, screenRes.y/2);
 
 	if (game->input->GetButtonDown("ShowLoc"))
 	{
@@ -79,16 +88,26 @@ void Player::Update()
 	float hrot = game->input->GetAxis("HRotation");
 	if (hrot != 0.0f)
 	{
-		transform->rotation += degrees(vec3(0, 0, -hrot*lookSpeed*game->time->deltaTime));
+		transform->rotation += radians(vec3(0, 0, -hrot*lookSpeed*game->time->deltaTime));
 	}
 	float vrot = game->input->GetAxis("VRotation");
 	if (vrot != 0.0f)
 	{
-		transform->rotation += degrees(vec3(vrot * lookSpeed * game->time->deltaTime, 0, 0));
+		transform->rotation += radians(vec3(vrot * lookSpeed * game->time->deltaTime, 0, 0));
 	}
 	if (game->input->GetButtonDown("Fire"))
 	{
-		Log("Player fired!");
+		Log("Player fired");
+		/*
+		Entity* ent = Entity::Spawn("TestMesh"+lexical_cast<string>(meshCount), nullptr, transform->GetPosition());
+		Mesh* mesh = ent->AddComponent<Mesh>();
+		mesh->LoadFile("suzanne.obj");
+		mesh->material.texture.name = "player.png";
+		mesh->material.shader.name = "Diffuse";
+		*/
+		dynamic_cast<Galaga*>(game)->AddMesh("TestMesh"+lexical_cast<string>(meshCount));
+		++meshCount;
+		Log("Added mesh ", meshCount+game->settings->GetValue("galaga.meshcount").i());
 	}
 	if (game->input->GetButtonDown("TesterSetVar"))
 	{

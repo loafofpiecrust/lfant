@@ -59,7 +59,7 @@ void Transform::SetPosition(vec3 pos)
 
 quat Transform::GetRotationQuat()
 {
-	return quat(rotation * degToRad);
+	return quat(rotation);
 }
 
 void Transform::SetRotationQuat(quat rot)
@@ -79,8 +79,9 @@ void Transform::SetRotation(vec3 rot)
 	//rot.x = rollover(rot.x, 0.0f, 360.0f);
 	//rot.y = rollover(rot.y, 0.0f, 360.0f);
 	//rot.z = rollover(rot.z, 0.0f, 360.0f);
+	//_rotation = radians(rot);
 	_rotation = rot;
-	_rotationQuat = quat(_rotation * degToRad);
+	_rotationQuat = quat(_rotation);
 }
 
 vec3 Transform::GetScale()
@@ -113,7 +114,7 @@ void Transform::SetWorldPosition(vec3 pos)
 
 quat Transform::GetWorldRotationQuat()
 {
-	return quat(worldRotation * degToRad);
+	return quat(worldRotation);
 }
 
 void Transform::SetWorldRotationQuat(quat rot)

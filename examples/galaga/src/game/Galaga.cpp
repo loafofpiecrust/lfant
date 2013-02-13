@@ -34,7 +34,7 @@
 #include "Input.hpp"
 #include "Sprite.hpp"
 #include "Camera.hpp"
-#include "Type.hpp"
+#include "TypeInfo.hpp"
 #include "Texture.hpp"
 #include "Shader.hpp"
 #include "Settings.hpp"
@@ -132,6 +132,12 @@ void Galaga::Init()
 	mesh->LoadFile("suzanne.obj");
 	mesh->material.texture.LoadFile("player.png");
 	mesh->material.shader.name = "Diffuse";
+
+	for(uint i = 0; i < game->settings->GetValue("galaga.meshcount").i(); ++i)
+	{
+		AddMesh("TestMesh"+lexical_cast<string>(i));
+		Log("Added mesh ", i);
+	}
 }
 
 void Galaga::Update()
@@ -156,6 +162,15 @@ void Galaga::Destroy()
 	systemInfo->Destroy();
 	settings->Destroy();
 	fileManager->Destroy();
+}
+
+void Galaga::AddMesh(string name)
+{
+	Entity* ent = Entity::Spawn(name, nullptr, vec3(1,1,1));
+	Mesh* mesh = ent->AddComponent<Mesh>();
+	mesh->LoadFile("suzanne.obj");
+	mesh->material.texture.LoadFile("player.png");
+	mesh->material.shader.name = "shaders/Diffuse";
 }
 
 }

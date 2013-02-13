@@ -86,12 +86,16 @@ void Texture::LoadPNG(int mode)
 	if(id == 0)
 	{
 		glGenTextures(1, &this->id);
+		Log("Texture::LoadPNG: GL Texture generated");
 	}
 	glBindTexture(mode, this->id);
+	Log("Texture::LoadPNG: GL Texture bound");
 	glTexImage2D(mode, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, &data[0]);
+	Log("Texture::LoadPNG: texture data sent");
 
 	glTexParameteri(mode, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(mode, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	Log("Texture::LoadPNG: texture filtering set");
 
 	glBindTexture(mode, 0);
 }

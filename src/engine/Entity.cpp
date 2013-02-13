@@ -27,7 +27,7 @@
 #include "Time.hpp"
 #include "Engine.hpp"
 #include "Scene.hpp"
-#include "Type.hpp"
+#include "TypeInfo.hpp"
 #include "Console.hpp"
 
 namespace sfs

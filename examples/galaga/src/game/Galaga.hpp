@@ -50,6 +50,8 @@ namespace sfs
 		virtual void Update();
 		virtual void Destroy();
 
+		void AddMesh(string name);
+
 	protected:
 
 	private:

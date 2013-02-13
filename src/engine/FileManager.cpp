@@ -53,6 +53,7 @@ void FileManager::Init()
 	else
 	{
 		// Use default settings
+		gameFolder = "../..";
 		Log(gameFolder);
 		userFolder = UserPath + "/My Games/" + string(game->settings->GetValue("general.orgname")) + "/" + string(game->settings->GetValue("general.gamename"));
 		game->settings->LoadSettings();

@@ -53,6 +53,12 @@ void Input::Update()
 {
 	for(auto & axis : axes)
 	{
+		if(axis.down || axis.up)
+		{
+			Trigger(axis.name, axis.value);
+			Trigger(axis.name, axis.name, axis.value);
+			Trigger("All", axis.name, axis.value);
+		}
 		if(axis.down)
 		{
 			axis.down = false;

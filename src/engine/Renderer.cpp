@@ -121,17 +121,19 @@ void Renderer::Init()
 	Log("Renderer: Initialized");
 
 	// Load all shaders
+	/*
 	auto shs = game->fileManager->GetGameFiles("shaders", "vert");
 	for(uint i = 0; i < shs.size(); ++i)
 	{
 		Shader shader;
 		shader.LoadFile(shs[i].string());
 		shaders.push_back(shader);
-	}
+	}*/
 }
 
 void Renderer::PreUpdate()
 {
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void Renderer::Update()
@@ -249,22 +251,40 @@ void Renderer::AddMesh(Mesh* mesh)
 	glGenVertexArrays(1, &mesh->vertexArray);
 	glBindVertexArray(mesh->vertexArray);
 
+	Log("About to add mesh");
+
+	bool shaderLoaded = false;
 	if(mesh->material.shader.id == 0)
 	{
 		if(mesh->material.shader.name != "")
 		{
 			for(auto& shader : shaders)
 			{
-				if(shader.name == mesh->material.shader.name)
+				if(shader.name == mesh->material.shader.name && shader.id != 0)
 				{
-					mesh->material.shader.id == shader.id;
+					mesh->material.shader.id = shader.id;
+					shaderLoaded = true;
+					break;
 				}
 			}
 		}
-		if(mesh->material.shader.id == 0)
+		else
 		{
-			mesh->material.shader.LoadFile("../../assets/shaders/Diffuse");
+			for(auto& shader : shaders)
+			{
+				if(shader.name == "shaders/Diffuse" && shader.id != 0)
+				{
+					mesh->material.shader.id = shader.id;
+					shaderLoaded = true;
+				}
+			}
 		}
+	}
+	if(!shaderLoaded)
+	{
+		Log("Loading default shader");
+		mesh->material.shader.LoadFile("shaders/Diffuse");
+		shaders.push_back(mesh->material.shader);
 	}
 
 	Log(mesh->material.texture.id);
@@ -275,12 +295,16 @@ void Renderer::AddMesh(Mesh* mesh)
 		mesh->material.texture.LoadFile(mesh->material.texture.name);
 	}
 
+	Log("Renderer::AddMesh: Texture loaded");
+
 	if(mesh->material.shader.id != 0)
 	{
 		// Get any uniforms here
 		mesh->matrixId = glGetUniformLocation(mesh->material.shader.id, "MVP");
 		mesh->material.texture.uniformId = glGetUniformLocation(mesh->material.shader.id, "textureSampler");
 	}
+
+	Log("Renderer::AddMesh: Uniforms loaded");
 
 	vector<uint32_t> indices;
 	vector<vec3> indexed_vertices;
@@ -293,10 +317,14 @@ void Renderer::AddMesh(Mesh* mesh)
 	mesh->normalBuffer.data = indexed_normals;
 	mesh->indexBuffer.data = indices;
 
+	Log("Renderer::AddMesh: Data indexed");
+
 	mesh->vertexBuffer.id = CreateBuffer(GL_ARRAY_BUFFER, mesh->vertexBuffer.data);
 	mesh->uvBuffer.id = CreateBuffer(GL_ARRAY_BUFFER, mesh->uvBuffer.data);
 	mesh->normalBuffer.id = CreateBuffer(GL_ARRAY_BUFFER, mesh->normalBuffer.data);
 	mesh->indexBuffer.id = CreateBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->indexBuffer.data);
+
+	Log("Renderer::AddMesh: Data buffered");
 }
 
 void Renderer::RenderMesh(Mesh* mesh)
@@ -307,8 +335,6 @@ void Renderer::RenderMesh(Mesh* mesh)
 	}
 
 	glBindVertexArray(mesh->vertexArray);
-
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glUseProgram(mesh->material.shader.id);
 
@@ -322,7 +348,6 @@ void Renderer::RenderMesh(Mesh* mesh)
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, mesh->vertexBuffer.id);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-
 
 	glEnableVertexAttribArray(1);
 	glBindBuffer(GL_ARRAY_BUFFER, mesh->uvBuffer.id);

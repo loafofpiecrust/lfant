@@ -51,10 +51,14 @@ namespace sfs
 		virtual void Init();
 		virtual void Update();
 
+		virtual void Move(string axis, float value);
+
 	protected:
 
 		float movementSpeed = 3.0f;
 		float lookSpeed = 0.01f;
+
+		int meshCount = 0;
 
 	private:
 

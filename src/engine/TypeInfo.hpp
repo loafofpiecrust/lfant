@@ -36,6 +36,8 @@ namespace sfs
  *	 @{
  */
 
+string Type();
+
 template<typename T>
 string Type()
 {
@@ -48,38 +50,10 @@ string Type(T ent)
 	return string(abi::__cxa_demangle(typeid(ent).name(), 0, 0, (int*)0));
 }
 
-template<typename P>
-string ParamType()
-{
-	return "," + Type<P>();
-}
-template<typename P, typename P2, typename ...T>
-string ParamType()
-{
-	return "," + Type<P>() + "," + Type<P2>() + ParamType<T...>();
-}
-
-template<typename P>
-string ParamType(P ent)
-{
-	return "," + Type(ent);
-}
-template<typename P, typename P2, typename ...T>
-string ParamType(P ent, P2 ent2, T ... ents)
-{
-	return "," + Type(ent) + "," + Type(ent2) + ParamType(ents...);
-}
-
-template<typename P, typename P2, typename ... T>
+template<typename P1, typename P2, typename ...P>
 string Type()
 {
-	return Type<P>() + ParamType<P2, T...>();
-}
-
-template<typename P, typename P2, typename ... T>
-string Type(P ent, P2 ent2, T ... ents)
-{
-	return Type(ent) + ParamType(ent2, ents...);
+	return Type<P1>() + "," + Type<P2, P...>();
 }
 
 template<typename T, typename V>

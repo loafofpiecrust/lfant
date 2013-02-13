@@ -101,69 +101,6 @@ enum class Key : uint16_t
 	RSuper = GLFW_KEY_RSUPER
 };
 
-/// The type used for Handlers. A simple function object.
-typedef boost::function<void(int)> HandlerFunc;
-
-struct Binding
-{
-	string action;
-	vector<char> keys;
-	vector<HandlerFunc> funcs;
-	float value;
-};
-
-struct Handler
-{
-	string action;
-	HandlerFunc func;
-	bool held = false;
-
-	Handler(string action, HandlerFunc func) :
-		action(action), func(func)
-	{
-	}
-};
-
-struct Axis
-{
-	string name = "NewAxis";
-	uint16_t positive;
-	uint16_t negative;
-	uint16_t altPositive;
-	uint16_t altNegative;
-	float sensitivity = 3.0f;
-	float dead = 0.001f;
-	bool snap = true;
-	/// @todo Joystick axis
-
-	/// Number of the controller to use. 0 means all.
-	byte joyNum = 0;
-
-	float value = 0.0f;
-	bool posHeld = false;
-	bool negHeld = false;
-	bool down = false;
-	bool up = false;
-
-	Axis(string name, uint16_t positive, uint16_t negative = '\n', float sensitivity = 3.0f, float dead = 0.001f, bool snap =
-			 true, byte joyNum = 0) :
-		name(name), positive(positive), negative(negative), sensitivity(sensitivity), dead(dead), snap(snap), joyNum(
-			joyNum)
-	{
-	}
-
-	Axis(string name, uint16_t positive, uint16_t negative = '\n', uint16_t altpos = '\n', uint16_t altneg = '\n',
-		 float sensitivity = 3.0f, float dead = 0.001f, bool snap = true, byte joyNum = 0) :
-		name(name), positive(positive), negative(negative), altPositive(altpos), altNegative(altneg), sensitivity(
-			sensitivity), dead(dead), snap(snap), joyNum(joyNum)
-	{
-	}
-
-	~Axis()
-	{
-	}
-};
-
 /**	This class controls the input system.
  *	@details
  *		Receives input from GLFW and manages it, allowing the
@@ -174,6 +111,94 @@ struct Axis
 class Input : public Subsystem
 {
 	friend class Engine;
+
+	struct Axis
+	{
+		string name = "NewAxis";
+		uint16_t positive;
+		uint16_t negative;
+		uint16_t altPositive;
+		uint16_t altNegative;
+		float sensitivity = 3.0f;
+		float dead = 0.001f;
+		bool snap = true;
+		/// @todo Joystick axis
+
+		/// Number of the controller to use. 0 means all.
+		byte joyNum = 0;
+
+		float value = 0.0f;
+		bool posHeld = false;
+		bool negHeld = false;
+		bool down = false;
+		bool up = false;
+
+		Axis(string name, uint16_t positive, uint16_t negative = '\n', float sensitivity = 3.0f, float dead = 0.001f, bool snap =
+				 true, byte joyNum = 0) :
+			name(name), positive(positive), negative(negative), sensitivity(sensitivity), dead(dead), snap(snap), joyNum(
+				joyNum)
+		{
+		}
+
+		Axis(string name, uint16_t positive, uint16_t negative = '\n', uint16_t altpos = '\n', uint16_t altneg = '\n',
+			 float sensitivity = 3.0f, float dead = 0.001f, bool snap = true, byte joyNum = 0) :
+			name(name), positive(positive), negative(negative), altPositive(altpos), altNegative(altneg), sensitivity(
+				sensitivity), dead(dead), snap(snap), joyNum(joyNum)
+		{
+		}
+
+		~Axis()
+		{
+		}
+	};
+
+	class Callback
+	{
+	public:
+		virtual void Call(string name, float value) = 0;
+
+		string axis = "";
+
+		Callback(string axis) :
+			axis(axis)
+		{
+		}
+	};
+
+	class CallbackSingle : public Callback
+	{
+	public:
+		virtual void Call(string name, float value)
+		{
+			func(value);
+		}
+
+		typedef boost::function<void(float)> FuncType;
+		FuncType func;
+
+		CallbackSingle(string axis, FuncType func) :
+			Callback(axis), func(func)
+		{
+		}
+	};
+
+	class CallbackAll : public Callback
+	{
+	public:
+		virtual void Call(string name, float value)
+		{
+			func(name, value);
+		}
+
+		typedef boost::function<void(string, float)> FuncType;
+		FuncType func;
+
+		CallbackAll(FuncType func) :
+			Callback("all"), func(func)
+		{
+		}
+	};
+
 public:
 	Input();
 	~Input();
@@ -203,6 +228,18 @@ public:
 	void SetMousePos(ivec2 pos);
 	void SetMousePos(int32_t x, int32_t y);
 
+	template<typename C>
+	void AddCallback(string axis, void (C::*func)(float))
+	{
+		callbacks.push_back(new CallbackSingle(axis, boost::bind<void(float)>(func)));
+	}
+
+	template<typename C>
+	void AddCallback(void (C::*func)(string, float))
+	{
+		callbacks.push_back(new CallbackAll(boost::bind<void(string,float)>(func)));
+	}
+
 	bool lockMouse;
 	float mouseSpeed;
 
@@ -213,6 +250,8 @@ protected:
 	string inputString;
 
 	BitField<byte, byte> keysHeld;
+
+	vector<Callback*> callbacks;
 
 private:
 };

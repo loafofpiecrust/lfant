@@ -7,5 +7,7 @@ CONFIG -= qt
 
 LIBS += -l:libdl.so
 
+QMAKE_CXXFLAGS += -ggdb
+
 SOURCES += \
-	main.cpp
+    main.cpp

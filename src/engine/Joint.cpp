@@ -23,7 +23,7 @@
 // External
 
 // Internal
-#include "Type.hpp"
+#include "TypeInfo.hpp"
 #include "Entity.hpp"
 #include "Rigidbody.hpp"
 
