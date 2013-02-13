@@ -20,9 +20,10 @@
 #include "Time.hpp"
 
 // External
-#include <boost/chrono/chrono.hpp>
+#include <chrono>
 
 // Internal
+#include "Console.hpp"
 
 namespace sfs
 {
@@ -39,14 +40,15 @@ Time::~Time()
 
 double Time::GetTime()
 {
-	using namespace boost::chrono;
-	return duration<double>(sfclock::now() - startTime).count();
+	return chrono::duration<double>(hclock::now() - startTime).count();
 }
 
 void Time::ResetTime()
 {
 	// Figure something out?
-	startTime = sfclock::now();
+	Log("Time::ResetTime: Started");
+	startTime = hclock::now();
+	Log("Time::ResetTime: Finished");
 }
 
 void Time::UpdateTimes()

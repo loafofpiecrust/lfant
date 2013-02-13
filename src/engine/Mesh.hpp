@@ -36,22 +36,53 @@ namespace sfs
  *	@{
  */
 
-/**	The Mesh class that holds a 3D mesh and possibly an animated skeleton.
+/**	The Mesh class holds a 3D mesh and possibly an animated skeleton.
  *	@remarks
  *		This class controls a Mesh as defined by the 3d importing library.
  *		It handles holding a list of vertices, bones, faces, etc. It also
- *		holds a list of animations and things involving that. Keep in mind
- *		that this class isn't used directly for MeshRendering for Entities.
- *		The MeshRenderer class is used for that, and MeshRenderer has functions
- *		to manage changing the model and animset of the Mesh, and for attaching
- *		children mesh to it (possible, not sure yet)
+ *		holds a list of animations and things involving that.
  *	@todo
  *		Be sure this works fully in conjuction with the importers Mesh classes.
- *		Have this display as-is (ONLY for debug purposes; Later, require an Entity with MeshRenderer and SceneNode)
  */
 class Mesh : public Component
 {
 	friend class Renderer;
+
+	template<typename T>
+	class Buffer
+	{
+	public:
+
+		operator uint32_t()
+		{
+			return id;
+		}
+
+		operator vector<T>&()
+		{
+			return data;
+		}
+
+		T& operator [](uint i)
+		{
+			return data[i];
+		}
+
+		typename vector<T>::size_type size()
+		{
+			return data.size();
+		}
+
+		void push_back(T t)
+		{
+			data.push_back(t);
+		}
+
+		vector<T> data;
+		//vector<uint32_t> index;
+		uint32_t id = 0;
+	};
+
 public:
 	Mesh();
 	~Mesh();
@@ -63,16 +94,21 @@ public:
 	void SetInput(string path);
 	void SetTexture(string name);
 
-	vector<Vertex> vertices;
-	vector<uint32_t> indices;
+	void LoadFile(string path);
+
+	Buffer<vec3> vertexBuffer;
+	Buffer<vec2> uvBuffer;
+	Buffer<vec3> normalBuffer;
+	Buffer<uint32_t> indexBuffer;
 
 	Material material;
 
 protected:
 	string file = "";
 
-	uint32_t vertexBuffer = 0;
-	uint32_t indexBuffer = 0;
+	//uint32_t vertexBuffer = 0;
+	//uint32_t indexBuffer = 0;
+	uint32_t vertexArray = 0;
 
 	uint32_t matrixId = 0;
 	bool castShadows = true;
@@ -81,6 +117,8 @@ protected:
 	bool initialized = false;
 
 private:
+
+	void LoadOBJ(string path);
 };
 
 /// @}

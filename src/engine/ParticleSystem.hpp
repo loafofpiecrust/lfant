@@ -34,7 +34,7 @@ class Particle;
 /** @addtogroup Engine
  *	 @{
  */
-/** @addtogroup Components
+/** @addtogroup Particles
  *	 @{
  */
 

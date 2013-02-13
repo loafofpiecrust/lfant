@@ -71,12 +71,14 @@ void Transform::SetRotationQuat(quat rot)
 
 vec3& Transform::GetRotation()
 {
-	Log("Transform::GetRotation(): Getting rot");
 	return _rotation;
 }
 
 void Transform::SetRotation(vec3 rot)
 {
+	//rot.x = rollover(rot.x, 0.0f, 360.0f);
+	//rot.y = rollover(rot.y, 0.0f, 360.0f);
+	//rot.z = rollover(rot.z, 0.0f, 360.0f);
 	_rotation = rot;
 	_rotationQuat = quat(_rotation * degToRad);
 }
@@ -138,7 +140,14 @@ void Transform::SetWorldRotation(vec3 rot)
 
 vec3 Transform::GetWorldScale()
 {
-	return parent->worldScale * scale;
+	if(owner->parent)
+	{
+		return owner->parent->transform->worldScale * scale;
+	}
+	else
+	{
+		return _scale;
+	}
 }
 
 void Transform::SetWorldScale(vec3 scl)
@@ -157,17 +166,20 @@ mat4 Transform::GetMatrix()
 
 void Transform::SetDirection()
 {
-	Log("Transform::SetDirection(): Entered function");
-	vec3 rot = GetWorldRotation();
-	Log("Transform::SetDirection(): Grabbed world rot");
-	rot *= vec3(degToRad);
-	Log("Transform::SetDirection(): Transmute worldRotation to radians");
-	direction = vec3(cos(rot.x) * sin(rot.z), sin(rot.x), cos(rot.x) * cos(rot.z));
-	Log("Transform::SetDirection(): Set direction");
-	right = vec3(sin(rot.x - pi / 2.00f), 0, cos(rot.x - pi / 2.00f));
-	Log("Transform::SetDirection(): Set right");
+	vec3 rot = worldRotation();
+	direction = vec3(
+				cos(rot.x) * sin(rot.z),
+				sin(rot.x),
+				cos(rot.x) * cos(rot.z)
+				);
+
+	right = vec3(
+				sin(rot.z - 3.14f / 2.0f),
+				0,
+				cos(rot.z - 3.14f / 2.0f)
+				);
+
 	up = cross(right, direction);
-	Log("Transform::SetDirection(): Set up");
 }
 
 void Transform::Translate(vec3 pos)

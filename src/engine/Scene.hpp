@@ -33,7 +33,7 @@ class Camera;
 /** @addtogroup Engine
  *	@{
  */
-/** @addtogroup Subsystems
+/** @addtogroup Core
  *	@{
  */
 
@@ -58,7 +58,7 @@ public:
 	/**
 	 *	Gets the first entity with a certain name.
 	 */
-	Entity* GetEntity(string name);
+	Entity* GetEntity(string name, bool recursive = true);
 
 	/**
 	 *	Gets the first entity with a certain tag.
@@ -82,9 +82,11 @@ public:
 	 */
 	void Save(string file = "");
 
+	Entity* Spawn(string name, Entity* parent = nullptr, vec3 pos = vec3(0), vec3 rot = vec3(0), vec3 scale = vec3(1));
+
 	vector<Entity*> entities;
-	Camera* mainCamera;
-	string name;
+	Camera* mainCamera = nullptr;
+	string name = "Scene";
 
 protected:
 

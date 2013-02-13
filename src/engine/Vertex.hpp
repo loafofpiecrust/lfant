@@ -31,7 +31,7 @@ class Entity;
 /** @addtogroup Engine
  *	 @{
  */
-/** @addtogroup Utilities
+/** @addtogroup Rendering
  *	 @{
  */
 
@@ -43,15 +43,17 @@ struct Vertex
 	vec3 vert;
 	vec2 tex;
 	vec3 normal;
-	vec3 tangent;
-	vec3 bitangent;
+	//vec3 tangent;
+	//vec3 bitangent;
 	//byte padding[4];
 
-	Vertex(vec3 vert = vec3(0), vec2 tex = vec2(0), vec3 normal = vec3(0, 0, 1), vec3 tangent = vec3(0), vec3 bitangent =
-			   vec3(0)) :
-		vert(vert), tex(tex), normal(normal), tangent(tangent), bitangent(bitangent)
+	Vertex(vec3 vert = vec3(0), vec2 tex = vec2(0), vec3 normal = vec3(0, 0, 1)) :
+		vert(vert), tex(tex), normal(normal)
 	{
 	}
+	//Vertex(vec3 vert = vec3(0)) : vert(vert)
+	//{
+	//}
 };
 
 /** @} */

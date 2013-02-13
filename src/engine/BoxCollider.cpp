@@ -21,6 +21,7 @@
 #include "BoxCollider.hpp"
 
 // External
+#include <btBulletCollisionCommon.h>
 
 // Internal
 

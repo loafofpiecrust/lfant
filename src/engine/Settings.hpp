@@ -18,17 +18,23 @@
  *
  ******************************************************************************/
 #pragma once
+#include "stdafx.hpp"
 
 // External
+#include <boost/lexical_cast.hpp>
 
 // Internal
+#include "Subsystem.hpp"
+#include "StringUtil.hpp"
+#include "Range.hpp"
+#include "Console.hpp"
 
 namespace sfs
 {
 /** @addtogroup Engine
  *	 @{
  */
-/** @addtogroup Subsystems
+/** @addtogroup Core
  *	 @{
  */
 
@@ -41,9 +47,110 @@ namespace sfs
  */
 class Settings : public Subsystem
 {
+	class Var
+	{
+	public:
+		void Set(string value) {
+			this->value = value;
+		}
+
+		operator string()
+		{
+			return s();
+		}
+
+		operator float()
+		{
+			return f();
+		}
+
+		operator int()
+		{
+			return i();
+		}
+
+		string s()
+		{
+			Log("Operator string called");
+			return value;
+		}
+
+		const char* c_str()
+		{
+			return value.c_str();
+		}
+
+		int i()
+		{
+			return lexical_cast<int>(value);
+		}
+
+		float f()
+		{
+			return lexical_cast<float>(value);
+		}
+
+		bool b()
+		{
+			if(value == "" || value == "false" || value == "0")
+			{
+				return false;
+			}
+			else if(value == "true" || value == "1")
+			{
+				return true;
+			}
+			else
+			{
+				return true;
+			}
+		}
+
+		Range<int> rng()
+		{
+			vector<string> words = Split(value, " .", "");
+			if(words.size() == 1)
+			{
+				return Range<int>(lexical_cast<int>(words[0]), 0);
+			}
+			else if(words.size() >= 2)
+			{
+				return Range<int>(lexical_cast<int>(words[0]), lexical_cast<int>(words[1]));
+			}
+		}
+
+		operator Range<int>()
+		{
+			return rng();
+		}
+
+		Var(string name, string value) : name(name)
+		{
+			to_lower(this->name);
+			Set(value);
+		}
+
+		string name = "";
+		string value = "";
+	};
+
 public:
 	Settings();
 	~Settings();
+
+	virtual void Init();
+
+	virtual void LoadSettings(string input = "");
+
+	void SetValue(string name, string value);
+	Var GetValue(string name);
+
+protected:
+	string userFile = "settings.cfg";
+	string defaultFile = "settings.cfg";
+
+	vector<Var> variables;
+
 };
 
 /** @} */

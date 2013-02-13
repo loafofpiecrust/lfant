@@ -76,11 +76,7 @@ void Entity::Update()
 		}
 	}
 
-	Log("Entity::Update(): Finished lifeTime stuff");
-
 	transform->SetDirection();
-
-	Log("Entity::Update(): Set Transform direction");
 
 	for(auto compo : components)
 	{
@@ -89,7 +85,6 @@ void Entity::Update()
 			compo->Update();
 		}
 	}
-	Log("Entity::Update(): Updated components");
 }
 
 void Entity::Destroy()
@@ -98,6 +93,7 @@ void Entity::Destroy()
 	{
 		compo->Destroy();
 	}
+	Log("Entity::Destroy: Components destroyed");
 	OnDestroy();
 	delete this;
 }
@@ -113,6 +109,7 @@ Entity* Entity::Spawn(string name, Entity* parent, vec3 pos, vec3 rot, vec3 scal
 	}
 	ent->transform->position = pos;
 	ent->transform->rotation = rot;
+	ent->transform->scale = scale;
 	ent->name = name;
 	game->scene->entities.push_back(ent);
 	ent->Init();
@@ -128,6 +125,18 @@ Entity* Entity::Clone(string name, Entity* parent, vec3 pos, vec3 rot)
 	return ent;
 }
 
+Component *Entity::GetComponent(string type)
+{
+	for(auto comp : components)
+	{
+		if(Type(comp) == type || Type(comp) == "sfs::" + type)
+		{
+			return comp;
+		}
+	}
+	return nullptr;
+}
+
 /*******************************************************************************
  *
  *		Component System functions
@@ -138,7 +147,7 @@ void Entity::RemoveComponent(Component* comp)
 {
 	for(uint i = 0; i < components.size(); ++i)
 	{
-		if(checkType(components[i], comp))
+		if(CheckType(components[i], comp))
 		{
 			components.erase(components.begin() + i);
 			comp->Destroy();
@@ -151,7 +160,7 @@ void Entity::RemoveComponent()
 {
 	for(uint i = 0; i < components.size(); ++i)
 	{
-		if(checkType<T>(components[i]))
+		if(CheckType<T*>(components[i]))
 		{
 			components.erase(components.begin() + i);
 			for(uint k = 0; k < components.size(); ++k)
@@ -163,22 +172,18 @@ void Entity::RemoveComponent()
 	}
 }
 
-Entity* Entity::GetChild(string name)
+Entity* Entity::GetChild(string name, bool recursive)
 {
+	Entity* ent = nullptr;
 	for(auto child : children)
 	{
 		if(child->name == name)
 		{
-			return child;
+			ent = child;
 		}
 	}
-	return nullptr;
-}
 
-Entity* Entity::GetChildRecursive(string name)
-{
-	Entity* ent = GetChild(name);
-	if(ent)
+	if(ent || !recursive)
 	{
 		return ent;
 	}
@@ -186,14 +191,13 @@ Entity* Entity::GetChildRecursive(string name)
 	{
 		for(auto child : children)
 		{
-			ent = child->GetChildRecursive(name);
-			if(ent)
+			if(ent = child->GetChild(name, true))
 			{
 				return ent;
 			}
 		}
-		return nullptr;
 	}
+	return nullptr;
 }
 
 /*******************************************************************************

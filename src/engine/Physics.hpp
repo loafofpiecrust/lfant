@@ -39,7 +39,7 @@ class Joint;
 /** @addtogroup Engine
  *	 @{
  */
-/** @addtogroup Subsystems
+/** @addtogroup Physics
  *	 @{
  */
 

@@ -53,7 +53,6 @@ struct CLASSTYPE##NAME : public Property\
 	}\
 	GETTYPE get() const \
 	{\
-		std::cout << "Getting prop: " << Type<GETTYPE>();\
 		return reinterpret_cast<CLASSTYPE*>((MyType*)this - offsetof(CLASSTYPE, NAME))->GETFUNC();\
 	}\
 	GETTYPE operator->() {\

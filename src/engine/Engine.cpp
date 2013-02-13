@@ -45,6 +45,10 @@ extern "C" void Launch()
 	game = new Engine();
 	game->standAlone = true;
 	game->Init();
+	while(!game->destroy)
+	{
+		game->Update();
+	}
 }
 
 Engine::Engine()
@@ -71,6 +75,7 @@ void Engine::Init()
 	Log("ShadowFox Engine launched.");
 
 	systemInfo = new SystemInfo;
+	settings = new Settings;
 	time = new Time;
 	physics = new Physics;
 	scene = new Scene;
@@ -80,6 +85,7 @@ void Engine::Init()
 	Log("Subsystems instantiated.");
 
 	//systemInfo->Init();
+	settings->Init();
 	time->Init();
 	//physics->Init();
 	if(standAlone)

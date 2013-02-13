@@ -21,7 +21,7 @@
 #include "stdafx.hpp"
 
 // External
-#include <boost/chrono.hpp>
+#include <chrono>
 
 // Internal
 #include "Subsystem.hpp"
@@ -31,7 +31,7 @@ namespace sfs
 /** @addtogroup Engine
  *	 @{
  */
-/** @addtogroup Subsystems
+/** @addtogroup Core
  *	 @{
  */
 
@@ -42,7 +42,7 @@ struct STimer
 	boost::function<void()> callback;
 };
 
-typedef boost::chrono::high_resolution_clock sfclock;
+typedef chrono::high_resolution_clock hclock;
 
 /**	Timer
  *	@details
@@ -91,7 +91,7 @@ public:
 private:
 	double lastFrame;
 	vector<STimer> timers;
-	sfclock::time_point startTime;
+	hclock::time_point startTime;
 };
 
 /** @} */

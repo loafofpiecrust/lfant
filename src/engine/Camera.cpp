@@ -51,9 +51,8 @@ void Camera::Init()
 
 void Camera::Update()
 {
-	Log("Camera::Update(): Begin");
 	UpdateView();
-	Log("Camera::Update(): Finished");
+	UpdateProjection();
 }
 
 /*******************************************************************************
@@ -86,10 +85,8 @@ void Camera::UpdateProjection()
 
 void Camera::UpdateView()
 {
-	Log("Camera::UpdateView(): Begin");
-/// @todo Optimize this process? Fix for components
+	/// @todo Optimize this process? Fix for components
 	view = lookAt(transform->worldPosition(), transform->worldPosition() + transform->direction, transform->up);
-	Log("Camera::UpdateView(): Finished");
 }
 
 void Camera::SetFOV(float fov)

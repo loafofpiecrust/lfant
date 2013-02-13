@@ -27,10 +27,10 @@
 
 namespace sfs
 {
-	Texture LoadTexture( string name );
+	Texture LoadTexture( string name, int buffer = 0 );
 
-	Texture LoadBMP( string name );
-	Texture LoadJPEG( string name );
-	Texture LoadPNG( string name );
-	Texture LoadTGA( string name );
+	Texture LoadBMP( string name, int buffer = 0 );
+	Texture LoadJPEG( string name, int buffer = 0 );
+	Texture LoadPNG( string name, int buffer = 0 );
+	Texture LoadTGA( string name, int buffer = 0 );
 }

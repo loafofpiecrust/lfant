@@ -29,7 +29,7 @@ namespace sfs
 /** @addtogroup Engine
  *	@{
  */
-/** @addtogroup
+/** @addtogroup Rendering
  *	@{
  */
 
@@ -42,17 +42,17 @@ namespace sfs
 class Shader
 {
 public:
-	string name = "";
-	uint32_t id = 0;
-
 	Shader()
 	{
 	}
 
-	Shader(string name, uint32_t id) :
-		name(name), id(id)
+	Shader(string name) :
+		name(name)
 	{
+		LoadFile(name);
 	}
+
+	void LoadFile(string file);
 
 	operator string()
 	{
@@ -63,6 +63,9 @@ public:
 	{
 		return id;
 	}
+
+	string name = "";
+	uint32_t id = 0;
 };
 
 /// @}

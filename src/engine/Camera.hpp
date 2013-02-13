@@ -32,7 +32,7 @@ namespace sfs
 /** @addtogroup Engine
  *	@{
  */
-/** @addtogroup Components
+/** @addtogroup Rendering
  *	@{
  */
 
@@ -88,17 +88,13 @@ public:
 	void SetRange(float near, float far);
 
 	/// Field of view, eg. 40.0f
-	float fov = 100.0f;
+	float fov = 45.0f;
 
 	/// Aspect ratio, eg. 16.0f/9.0f
 	float aspectRatio = 16 / 9;
 
 	/// The projection matrix for rendering the projection.
 	mat4 projection = mat4(0);
-
-	vec3 direction;
-	vec3 right;
-	vec3 up;
 	mat4 view = mat4(0);
 
 	/// The viewing range (near and far) of this camera's view, eg. (0.1f, 1000.0f)

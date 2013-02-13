@@ -20,6 +20,8 @@
 #pragma once
 #include "stdafx.hpp"
 
+#define BOOST_BIND_NO_PLACEHOLDERS
+
 // External
 #include <boost/signals2.hpp>
 #include <typeinfo>
@@ -39,7 +41,7 @@ namespace sfs
 /** @addtogroup Engine
  *	@{
  */
-/** @addtogroup Subsystems
+/** @addtogroup Core
  *	@{
  */
 

@@ -25,13 +25,17 @@
 #include <boost/assign/list_of.hpp>
 
 // Internal
+#include "Engine.hpp"
+#include "Settings.hpp"
+#include "Console.hpp"
 
 using namespace boost::filesystem;
 
 namespace sfs
 {
 
-FileManager::FileManager()
+FileManager::FileManager() :
+	gameFolder(absolute(path("../..")).string())
 {
 }
 
@@ -41,7 +45,7 @@ FileManager::~FileManager()
 
 void FileManager::Init()
 {
-	path p("../system.cfg");
+	path p("../../ssystem.cfg");
 	if(exists(p))
 	{
 		// Load settings from system.cfg
@@ -49,8 +53,10 @@ void FileManager::Init()
 	else
 	{
 		// Use default settings
-		gameFolder = "../..";
-		userFolder = UserPath + "/" + GameName;
+		Log(gameFolder);
+		userFolder = UserPath + "/My Games/" + string(game->settings->GetValue("general.orgname")) + "/" + string(game->settings->GetValue("general.gamename"));
+		game->settings->LoadSettings();
+		Log(userFolder);
 
 		// Save these to system.cfg
 	}

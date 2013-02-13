@@ -49,17 +49,16 @@ void Scene::Update()
 	{
 		if(ent->active)
 		{
-			Log("Scene::Update(): Updating " + ent->name);
 			ent->Update();
 		}
 	}
-	Log("Scene::Update(): Finished");
 }
 
 void Scene::OnDestroy()
 {
 	for(uint i = 0; i < entities.size(); ++i)
 	{
+		Log("Scene::Destroy: Destroying ", entities[i]->name);
 		entities[i]->Destroy();
 	}
 }
@@ -69,15 +68,62 @@ void Scene::OnDestroy()
  return entities[idx];
  }*/
 
-Entity* Scene::GetEntity(string name)
+Entity* Scene::GetEntity(string name, bool recursive)
 {
-	for(uint i = 0; i < entities.size(); ++i)
+	for(Entity* ent : entities)
 	{
-		if(entities[i]->name == name)
+		if(ent->name == name)
 		{
-			return entities[i];
+			return ent;
+		}
+		if(recursive)
+		{
+			if(Entity* child = ent->GetChild(name, true))
+			{
+				return child;
+			}
 		}
 	}
+	return nullptr;
+}
+
+void Scene::Save(string file)
+{
+	ofstream io;
+	io.open(file);
+	io << "<Scene name=\"" << "SceneName" << "\">\n";
+	for(Entity* ent : entities)
+	{
+		io << "\t<Entity name=\"" << ent->name << "\">\n";
+		vector<pair<string, string>> vars ;//= ent->Serialize();
+		for(auto& str : vars)
+		{
+			io << "\t\t<Var name=\"" << str.first << "\" value=\"" << str.second << "\"/>\n";
+		}
+		io << "\t</Entity>\n";
+	}
+	io << "</Scene>";
+	io.close();
+}
+
+Entity *Scene::Spawn(string name, Entity *parent, vec3 pos, vec3 rot, vec3 scale)
+{
+	Entity* ent = new Entity;
+	ent->parent = parent;
+	ent->transform->owner = ent;
+	if(parent != nullptr)
+	{
+		ent->transform->parent = parent->transform;
+	}
+	ent->transform->position = pos;
+	ent->transform->rotation = rot;
+	ent->name = name;
+	if(parent == nullptr)
+	{
+		entities.push_back(ent);
+	}
+	ent->Init();
+	return ent;
 }
 
 }

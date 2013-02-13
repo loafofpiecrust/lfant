@@ -28,6 +28,11 @@
 #include "Property.hpp"
 #include "Vertex.hpp"
 
+namespace sf
+{
+class RenderWindow;
+}
+
 namespace sfs
 {
 class Mesh;
@@ -39,7 +44,7 @@ class Material;
 /**	@addtogroup Engine
  *	@{
  */
-/**	@addtogroup Subsystems
+/**	@addtogroup Rendering
  *	@{
  */
 
@@ -67,9 +72,11 @@ public:
 	 */
 	bool OpenWindow();
 	static GLFWCALL int WindowClosed();
+	static GLFWCALL void WindowResized(int x, int y);
 
 	/// Sets the version property
-	void SetVersion(const byte major, const byte minor);
+	void SetVersion(byte major, byte minor);
+	void SetVersion(Range<int> ver);
 
 	void SetRendering(bool render);
 
@@ -102,7 +109,15 @@ public:
 	void RenderLight(Light* light);
 	void RemoveLight(Light* light);
 
-	void IndexArray(vector<Vertex> arr, vector<uint32_t>& idx);
+	void IndexArray(vector<vec3>& arr, vector<uint32_t>& idx);
+
+	// Raw Rendering Functions
+	template<typename T>
+	uint32_t CreateBuffer(int target, vector<T>& data, int mode = 0);
+	uint32_t CreateBuffer(int target, void* data, uint32_t size, int mode = 0);
+
+	void SetResolution(ivec2 res);
+	ivec2 GetResolution();
 
 	/// The multiplier for anti-aliasing. 2, 4, 8.
 	int fsaa = 4;
@@ -121,12 +136,6 @@ public:
 
 protected:
 
-	void SetResolution(const ivec2& res);
-	ivec2 GetResolution();
-
-	/// Resolution of the OpenGL context.
-	ivec2 _resolution { 1138, 640 };
-
 	/// The OpenGL version to use, 0 is Primary, 1 is Secondary (eg. {4, 3} = OpenGL 4.3).
 	Range<int> version = { 3, 2 };
 
@@ -137,8 +146,9 @@ protected:
 
 public:
 
-	// Properties
-	PROP_RW(Renderer, resolution, GetResolution, SetResolution)
+private:
+	sf::RenderWindow* window;
+	ivec2 resolution { 1280, 720 };
 };
 
 /// @}

@@ -32,7 +32,7 @@ namespace sfs
 /** @addtogroup Game
  *	 @{
  */
-/** @addtogroup TypeInfo
+/** @addtogroup Utilities
  *	 @{
  */
 
@@ -83,7 +83,7 @@ string Type(P ent, P2 ent2, T ... ents)
 }
 
 template<typename T, typename V>
-bool checkType(V ent, T p2)
+bool CheckType(V ent, T p2)
 {
 	if(!p2)
 	{
@@ -93,7 +93,7 @@ bool checkType(V ent, T p2)
 }
 
 template<typename T, typename V>
-bool checkType(V ent)
+bool CheckType(V ent)
 {
 	return typeid(ent) == typeid(T);
 }

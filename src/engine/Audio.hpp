@@ -23,6 +23,7 @@
 // External
 
 // Internal
+#include "Subsystem.hpp"
 
 namespace FMOD
 {
@@ -32,8 +33,19 @@ class Sound;
 
 namespace sfs
 {
+/**	@addtogroup Engine
+ *	@{
+ */
+/** @addtogroup Audio
+ *	@{
+ */
 
-class Audio
+/**
+ *
+ *	@details
+ *	@todo
+ */
+class Audio : public Subsystem
 {
 	friend class AudioSource;
 public:
