@@ -1,0 +1,109 @@
+Galaga launched.
+Subsystems instantiated.
+Settings::LoadSettings: User settings not found. Using default settings.
+Settings::LoadSettings: Loading settings from /home/taylorsnead/ShadowFox/ShadowFox-Engine/examples/galaga/bin64/linux/../../settings.cfg
+VALUE: Galaga
+general.gamename=Galaga
+VALUE: ShadowFox Studios
+general.orgname=ShadowFox Studios
+Couldnt find a value!
+Operator string called
+Operator string called
+Getting: Galaga
+Operator string called
+Trying to scope: general.gamename, result: Galaga
+Operator string called
+Operator string called
+VALUE: Galaga
+general.windowtitle=Galaga
+VALUE: 4.2
+gl.version=4.2
+VALUE: 1
+gl.vertexarray=1
+VALUE: 1
+gl.cleardata=1
+VALUE: 0
+gl.usetexture=0
+VALUE: 1
+gl.drawelements=1
+VALUE: 1
+gl.usemvp=1
+VALUE: 1
+gl.loadobj=1
+VALUE: 1
+gl.usenormals=1
+VALUE: 0.03
+player.lookspeed=0.03
+VALUE: 10.0
+player.movementspeed=10.0
+/home/taylorsnead/ShadowFox/ShadowFox-Engine/examples/galaga/bin64/linux/../..
+Getting: Galaga
+Operator string called
+Getting: ShadowFox Studios
+Operator string called
+Settings::LoadSettings: User settings not found. Using default settings.
+Settings::LoadSettings: Loading settings from /home/taylorsnead/ShadowFox/ShadowFox-Engine/examples/galaga/bin64/linux/../../settings.cfg
+VALUE: Galaga
+VALUE: ShadowFox Studios
+Couldnt find a value!
+Operator string called
+Operator string called
+Getting: Galaga
+Operator string called
+Trying to scope: general.gamename, result: Galaga
+Operator string called
+Operator string called
+VALUE: Galaga
+VALUE: 4.2
+VALUE: 1
+VALUE: 1
+VALUE: 0
+VALUE: 1
+VALUE: 1
+VALUE: 1
+VALUE: 1
+VALUE: 0.03
+VALUE: 10.0
+/home/taylorsnead/My Games/ShadowFox Studios/Galaga
+Time::ResetTime: Started
+Time::ResetTime: Finished
+Getting: 4.2
+Getting: Galaga
+Renderer::OpenWindow: Window successfully opened.
+Renderer: Initialized
+Input: Initialized
+Galaga::Init: Subsystems initialised
+Computer name: 
+Username: 
+Running OS: 
+CPU:  with 0 cores
+Getting: 0.03
+Looking at 0.03
+Getting: 10.0
+Moving at 10
+Want to load an image file
+Loading an image file of type png
+About to load a png
+LoadPNG: Image size: 128x128
+Game initialised
+LoadShader: Files opened
+Shader::LoadFile: Shaders created
+Shader::LoadFile: Vertex shader read
+Shader::LoadFile: Fragment shader read
+Shader::LoadFile: Compiling shader : ../../assets/shaders/Diffuse.vert
+Shader::LoadFile: Vertex shader compiled
+Shader::LoadFile: Retrieved compilation info
+Shader::LoadFile: Retrieved compilation log
+Shader::LoadFile: Vertex shader checked
+Shader::LoadFile: Compiling shader : ../../assets/shaders/Diffuse.frag
+Shader::LoadFile: Fragment shader compiled
+Shader::LoadFile: Fragment shader checked
+Shader::LoadFile: Linking shader
+1
+Window closed
+About to destroy game
+Scene::Destroy: Destroying Snead
+Entity::Destroy: Components destroyed
+Scene::Destroy: Destroying TestMesh
+Entity::Destroy: Components destroyed
+Game ending
