@@ -85,11 +85,13 @@ path FileManager::GetGameFile(string name)
 {
 	path result(ConvertPath(gameFolder + "/assets/" + name));
 
-	if(exists(result) && is_regular_file(result))
+	if(exists(result))
 	{
 		return result;
 	}
-	return "";
+	Log("FileManager::GetGameFile: File not found");
+	game->Exit();
+	return result;
 }
 
 path FileManager::GetUserFile(string name)

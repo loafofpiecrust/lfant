@@ -1,3 +1,4 @@
+
 //Bullet Continuous Collision Detection and Physics Library
 //Copyright (c) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
 
@@ -19,18 +20,18 @@
 #include "btAxisSweep3.h"
 
 
-btAxisSweep3::btAxisSweep3( const btVector3& worldAabbMin, const btVector3& worldAabbMax, unsigned short int maxHandles, btOverlappingPairCache* pairCache, bool disableRaycastAccelerator )
-	: btAxisSweep3Internal<unsigned short int>( worldAabbMin, worldAabbMax, 0xfffe, 0xffff, maxHandles, pairCache, disableRaycastAccelerator )
+btAxisSweep3::btAxisSweep3(const btVector3& worldAabbMin,const btVector3& worldAabbMax, unsigned short int maxHandles, btOverlappingPairCache* pairCache, bool disableRaycastAccelerator)
+:btAxisSweep3Internal<unsigned short int>(worldAabbMin,worldAabbMax,0xfffe,0xffff,maxHandles,pairCache,disableRaycastAccelerator)
 {
 	// 1 handle is reserved as sentinel
-	btAssert( maxHandles > 1 && maxHandles < 32767 );
+	btAssert(maxHandles > 1 && maxHandles < 32767);
 
 }
 
 
-bt32BitAxisSweep3::bt32BitAxisSweep3( const btVector3& worldAabbMin, const btVector3& worldAabbMax, unsigned int maxHandles , btOverlappingPairCache* pairCache , bool disableRaycastAccelerator )
-	: btAxisSweep3Internal<unsigned int>( worldAabbMin, worldAabbMax, 0xfffffffe, 0x7fffffff, maxHandles, pairCache, disableRaycastAccelerator )
+bt32BitAxisSweep3::bt32BitAxisSweep3(const btVector3& worldAabbMin,const btVector3& worldAabbMax, unsigned int maxHandles , btOverlappingPairCache* pairCache , bool disableRaycastAccelerator)
+:btAxisSweep3Internal<unsigned int>(worldAabbMin,worldAabbMax,0xfffffffe,0x7fffffff,maxHandles,pairCache,disableRaycastAccelerator)
 {
 	// 1 handle is reserved as sentinel
-	btAssert( maxHandles > 1 && maxHandles < 2147483647 );
+	btAssert(maxHandles > 1 && maxHandles < 2147483647);
 }

@@ -110,7 +110,7 @@ SolveCollisionsAndUpdateVelocitiesKernel(
 	__global float4 *g_vertexPositions GUID_ARG)
 {
 	int nodeID = get_global_id(0);
-	float4 forceOnVertex = float4(0.f, 0.f, 0.f, 0.f);
+	float4 forceOnVertex = (float4)(0.f, 0.f, 0.f, 0.f);
 	
 	if( get_global_id(0) < numNodes )
 	{	

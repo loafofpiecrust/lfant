@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?fileVersion 4.0.0?><cproject storage_type_id="org.eclipse.cdt.core.XmlProjectDescriptionStorage">
+	<storageModule moduleId="org.eclipse.cdt.core.settings">
+		<cconfiguration id="cdt.managedbuild.config.gnu.cross.lib.release.668261355">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.gnu.cross.lib.release.668261355" moduleId="org.eclipse.cdt.core.settings" name="default">
+				<macros>
+					<stringMacro name="Arch" type="VALUE_TEXT" value="64"/>
+					<stringListMacro name="Build_Warnings" type="VALUE_TEXT_LIST">
+						<value name="all"/>
+						<value name="init-self"/>
+					</stringListMacro>
+					<stringListMacro name="Includes" type="VALUE_PATH_DIR_LIST">
+						<value name="../include"/>
+					</stringListMacro>
+					<stringListMacro name="Libs" type="VALUE_PATH_FILE_LIST"/>
+					<stringListMacro name="Build_Options" type="VALUE_TEXT_LIST">
+						<value name="O3"/>
+						<value name="fPIC"/>
+						<value name="std=gnu++11"/>
+					</stringListMacro>
+					<stringListMacro name="Exclude_Folders" type="VALUE_PATH_DIR_LIST"/>
+					<stringListMacro name="Force_Include" type="VALUE_TEXT_LIST"/>
+					<stringListMacro name="Defines" type="VALUE_TEXT_LIST"/>
+					<stringListMacro name="Exclude_Files" type="VALUE_PATH_FILE_LIST"/>
+					<stringMacro name="Lib_Type" type="VALUE_TEXT" value="static"/>
+					<stringMacro name="Output" type="VALUE_TEXT" value="squirrel"/>
+					<stringMacro name="Source_Dir" type="VALUE_TEXT" value="."/>
+					<stringListMacro name="Lib_Dirs" type="VALUE_PATH_DIR_LIST"/>
+				</macros>
+				<externalSettings>
+					<externalSetting>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/Squirrel"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/Squirrel/Release"/>
+						<entry flags="RESOLVED" kind="libraryFile" name="Squirrel" srcPrefixMapping="" srcRootPath=""/>
+					</externalSetting>
+				</externalSettings>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.VCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.MakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactExtension="a" artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.staticLib" buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release,org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.staticLib" cleanCommand="rm -rf" description="" id="cdt.managedbuild.config.gnu.cross.lib.release.668261355" name="default" parent="cdt.managedbuild.config.gnu.cross.lib.release.668261355">
+					<folderInfo id="cdt.managedbuild.config.gnu.cross.lib.release.668261355." name="/" resourcePath="">
+						<toolChain id="cdt.managedbuild.toolchain.gnu.cross.lib.release.479098900" name="Cross GCC">
+							<option id="cdt.managedbuild.option.gnu.cross.path.1566491956" name="Path" superClass="cdt.managedbuild.option.gnu.cross.path" value="/usr/bin" valueType="string"/>
+							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="cdt.managedbuild.targetPlatform.gnu.cross.1671436053" isAbstract="false" osList="all"/>
+							<builder arguments="-f ${makefile}" buildPath="${workspace_loc:/Squirrel}" command="make" id="cdt.managedbuild.builder.gnu.cross.152862640" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder"/>
+						</toolChain>
+					</folderInfo>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+		</cconfiguration>
+	</storageModule>
+	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+		<project id="Squirrel.cdt.managedbuild.target.gnu.cross.lib.112445079" name="Static Library"/>
+	</storageModule>
+	<storageModule moduleId="scannerConfiguration">
+		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.cross.lib.release.668261355;cdt.managedbuild.config.gnu.cross.lib.release.668261355.;cdt.managedbuild.tool.gnu.cross.c.compiler.1010293797;cdt.managedbuild.tool.gnu.c.compiler.input.2074248368">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileC"/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.cross.lib.release.668261355;cdt.managedbuild.config.gnu.cross.lib.release.668261355.;cdt.managedbuild.tool.gnu.cross.cpp.compiler.354728177;cdt.managedbuild.tool.gnu.cpp.compiler.input.1008558696">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileCPP"/>
+		</scannerConfigBuildInfo>
+	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
+	<storageModule moduleId="refreshScope" versionNumber="2">
+		<configuration configurationName="Release">
+			<resource resourceType="PROJECT" workspacePath="/Squirrel"/>
+		</configuration>
+	</storageModule>
+</cproject>

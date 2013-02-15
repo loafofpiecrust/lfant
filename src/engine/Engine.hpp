@@ -40,6 +40,7 @@ class Scene;
 class FileManager;
 class Console;
 class SystemInfo;
+class UserInterface;
 
 /** @addtogroup Engine
  *	@{
@@ -115,6 +116,7 @@ public:
 	Console* console;
 	SystemInfo* systemInfo;
 	Settings* settings;
+	UserInterface* userInterface;
 	//boost::scoped_ptr<AISystem>			aiSystem;
 	//boost::scoped_ptr<UISystem>			uiSystem;
 	//boost::scoped_ptr<ScriptSystem>		scriptSystem;

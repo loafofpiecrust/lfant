@@ -17,7 +17,7 @@ subject to the following restrictions:
 #define BT_SOFTBODY_FLOAT_DATA
 
 #include "BulletCollision/CollisionDispatch/btCollisionObject.h"
-
+#include "BulletDynamics/Dynamics/btRigidBody.h"
 
 
 struct	SoftBodyMaterialData
@@ -30,7 +30,7 @@ struct	SoftBodyMaterialData
 
 struct	SoftBodyNodeData
 {
-	SoftBodyMaterialData*		m_material;
+	SoftBodyMaterialData		*m_material;
 	btVector3FloatData			m_position;
 	btVector3FloatData			m_previousPosition;
 	btVector3FloatData			m_velocity;
@@ -44,25 +44,25 @@ struct	SoftBodyNodeData
 
 struct	SoftBodyLinkData
 {
-	SoftBodyMaterialData*	m_material;
+	SoftBodyMaterialData	*m_material;
 	int						m_nodeIndices[2];			// Node pointers
-	float					m_restLength;			// Rest length
+	float					m_restLength;			// Rest length		
 	int						m_bbending;		// Bending link
 };
 
 struct	SoftBodyFaceData
 {
 	btVector3FloatData		m_normal;		// Normal
-	SoftBodyMaterialData*	m_material;
+	SoftBodyMaterialData	*m_material;
 	int						m_nodeIndices[3];			// Node pointers
 	float					m_restArea;			// Rest area
-};
+};	
 
 struct	SoftBodyTetraData
 {
 	btVector3FloatData		m_c0[4];		// gradients
-	SoftBodyMaterialData*	m_material;
-	int						m_nodeIndices[4];			// Node pointers
+	SoftBodyMaterialData	*m_material;
+	int						m_nodeIndices[4];			// Node pointers		
 	float					m_restVolume;			// Rest volume
 	float					m_c1;			// (4*kVST)/(im0+im1+im2+im3)
 	float					m_c2;			// m_c1/sum(|g0..3|^2)
@@ -74,7 +74,7 @@ struct	SoftRigidAnchorData
 	btMatrix3x3FloatData	m_c0;			// Impulse matrix
 	btVector3FloatData		m_c1;			// Relative anchor
 	btVector3FloatData		m_localFrame;		// Anchor position in body space
-	btRigidBodyData*			m_rigidBody;
+	btRigidBodyData			*m_rigidBody;
 	int						m_nodeIndex;			// Node pointer
 	float					m_c2;			// ima*dt
 };
@@ -91,7 +91,7 @@ struct	SoftBodyConfigData
 	float				m_pressure;			// Pressure coefficient [-inf,+inf]
 	float				m_volume;			// Volume conversation coefficient [0,+inf]
 	float				m_dynamicFriction;			// Dynamic friction coefficient [0,1]
-	float				m_poseMatch;			// Pose matching coefficient [0,1]
+	float				m_poseMatch;			// Pose matching coefficient [0,1]		
 	float				m_rigidContactHardness;			// Rigid contacts hardness [0,1]
 	float				m_kineticContactHardness;			// Kinetic contacts hardness [0,1]
 	float				m_softContactHardness;			// Soft contacts hardness [0,1]
@@ -118,8 +118,8 @@ struct	SoftBodyPoseData
 	btMatrix3x3FloatData	m_aqq;			// Base scaling
 	btVector3FloatData		m_com;			// COM
 
-	btVector3FloatData*		m_positions;			// Reference positions
-	float*					m_weights;	// Weights
+	btVector3FloatData		*m_positions;			// Reference positions
+	float					*m_weights;	// Weights
 	int						m_numPositions;
 	int						m_numWeigts;
 
@@ -131,50 +131,50 @@ struct	SoftBodyPoseData
 
 struct	SoftBodyClusterData
 {
-	btTransformFloatData		m_framexform;
-	btMatrix3x3FloatData		m_locii;
-	btMatrix3x3FloatData		m_invwi;
-	btVector3FloatData			m_com;
-	btVector3FloatData			m_vimpulses[2];
-	btVector3FloatData			m_dimpulses[2];
-	btVector3FloatData			m_lv;
-	btVector3FloatData			m_av;
+		btTransformFloatData		m_framexform;
+		btMatrix3x3FloatData		m_locii;
+		btMatrix3x3FloatData		m_invwi;
+		btVector3FloatData			m_com;
+		btVector3FloatData			m_vimpulses[2];
+		btVector3FloatData			m_dimpulses[2];
+		btVector3FloatData			m_lv;
+		btVector3FloatData			m_av;
+		
+		btVector3FloatData			*m_framerefs;
+		int							*m_nodeIndices;
+		float						*m_masses;
 
-	btVector3FloatData*			m_framerefs;
-	int*							m_nodeIndices;
-	float*						m_masses;
+		int							m_numFrameRefs;
+		int							m_numNodes;
+		int							m_numMasses;
 
-	int							m_numFrameRefs;
-	int							m_numNodes;
-	int							m_numMasses;
-
-	float						m_idmass;
-	float						m_imass;
-	int							m_nvimpulses;
-	int							m_ndimpulses;
-	float						m_ndamping;
-	float						m_ldamping;
-	float						m_adamping;
-	float						m_matching;
-	float						m_maxSelfCollisionImpulse;
-	float						m_selfCollisionImpulseFactor;
-	int							m_containsAnchor;
-	int							m_collide;
-	int							m_clusterIndex;
+		float						m_idmass;
+		float						m_imass;
+		int							m_nvimpulses;
+		int							m_ndimpulses;
+		float						m_ndamping;
+		float						m_ldamping;
+		float						m_adamping;
+		float						m_matching;
+		float						m_maxSelfCollisionImpulse;
+		float						m_selfCollisionImpulseFactor;
+		int							m_containsAnchor;
+		int							m_collide;
+		int							m_clusterIndex;
 };
 
 
 enum	btSoftJointBodyType
 {
-	BT_JOINT_SOFT_BODY_CLUSTER = 1,
+	BT_JOINT_SOFT_BODY_CLUSTER=1,
 	BT_JOINT_RIGID_BODY,
 	BT_JOINT_COLLISION_OBJECT
 };
 
 struct	btSoftBodyJointData
 {
-	void*						m_bodyA;
-	void*						m_bodyB;
+	void						*m_bodyA;
+	void						*m_bodyB;
 	btVector3FloatData			m_refs[2];
 	float						m_cfm;
 	float						m_erp;
@@ -192,15 +192,15 @@ struct	btSoftBodyFloatData
 {
 	btCollisionObjectFloatData	m_collisionObjectData;
 
-	SoftBodyPoseData*		m_pose;
-	SoftBodyMaterialData**	m_materials;
-	SoftBodyNodeData*		m_nodes;
-	SoftBodyLinkData*		m_links;
-	SoftBodyFaceData*		m_faces;
-	SoftBodyTetraData*		m_tetrahedra;
-	SoftRigidAnchorData*		m_anchors;
-	SoftBodyClusterData*		m_clusters;
-	btSoftBodyJointData*		m_joints;
+	SoftBodyPoseData		*m_pose;
+	SoftBodyMaterialData	**m_materials;
+	SoftBodyNodeData		*m_nodes;
+	SoftBodyLinkData		*m_links;
+	SoftBodyFaceData		*m_faces;
+	SoftBodyTetraData		*m_tetrahedra;
+	SoftRigidAnchorData		*m_anchors;
+	SoftBodyClusterData		*m_clusters;
+	btSoftBodyJointData		*m_joints;
 
 	int						m_numMaterials;
 	int						m_numNodes;

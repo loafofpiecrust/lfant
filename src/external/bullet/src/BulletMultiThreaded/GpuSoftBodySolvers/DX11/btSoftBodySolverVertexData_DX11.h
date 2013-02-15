@@ -13,9 +13,6 @@ subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 */
 
-#if !_WIN32
-#define BT_SOFT_BHODY_SOLVER_VERTEX_DATA_DX11_H
-#endif
 
 #include "BulletMultiThreaded/GpuSoftBodySolvers/Shared/btSoftBodySolverData.h"
 #include "btSoftBodySolverBuffer_DX11.h"

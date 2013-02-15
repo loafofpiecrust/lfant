@@ -174,7 +174,6 @@ Settings::Var Settings::GetValue(string name)
 	}
 	if(result.value == "")
 	{
-		Log("Couldnt find a value!");
 		return result;
 	}
 
@@ -186,15 +185,31 @@ Settings::Var Settings::GetValue(string name)
 		{
 			if(tokens[k+1] == "[" && tokens[k+3] == "]")
 			{
-				string temp = GetValue(tokens[k+2]).s();
-				if(temp != "")
+				to_lower(tokens[k+2]);
+				Var var("", "");
+				var = GetValue(tokens[k+2]);
+				if(var.s() != "")
 				{
-					value.append(temp);
+					Log("Scoping complete: "+var.s());
+					value.append("$["+tokens[k+2]+"]");
+					k += 3;
+					continue;
 				}
-				else
+				string temp = "";
+				vector<string> scope = Split(name, ".", "");
+				int idx = scope.size()-1;
+
+				while(var.s() == "")
 				{
-					value.append(tokens[k+2]);
+					for(uint i = 0; i < idx; ++i)
+					{
+						temp.append(scope[i]+".");
+					}
+					temp.append(tokens[k+2]);
+					var = GetValue(temp);
+					Log("Trying to scope: "+temp+", result: "+var.s());
 				}
+				value.append(var.s());
 				k += 3;
 			}
 		}
@@ -205,14 +220,12 @@ Settings::Var Settings::GetValue(string name)
 	}
 	result.value = value;
 
-	Log("Getting: "+value);
-
 	return result;
 }
 
 void Settings::SetValue(string name, string value)
 {
-	vector<string> tokens = Split(value, "", "$()[]");
+	vector<string> tokens = Split(value, "", "$()");
 	value = "";
 	for(uint k = 0; k < tokens.size(); ++k)
 	{
@@ -252,34 +265,9 @@ void Settings::SetValue(string name, string value)
 				value.append(var.s());
 				k += 3;
 			}
-			else if(tokens[k+1] == "[" && tokens[k+3] == "]")
+			else
 			{
-				to_lower(tokens[k+2]);
-				Var var("", "");
-				var = GetValue(tokens[k+2]);
-				if(var.s() != "")
-				{
-					Log("Scoping complete: "+var.s());
-					value.append("$["+tokens[k+2]+"]");
-					k += 3;
-					continue;
-				}
-				string temp = "";
-				vector<string> scope = Split(name, ".", "");
-				int idx = scope.size()-1;
-
-				while(var.s() == "")
-				{
-					for(uint i = 0; i < idx; ++i)
-					{
-						temp.append(scope[i]+".");
-					}
-					temp.append(tokens[k+2]);
-					var = GetValue(temp);
-					Log("Trying to scope: "+temp+", result: "+var.s());
-				}
-				value.append("$["+temp+"]");
-				k += 3;
+				value.append(tokens[k]);
 			}
 		}
 		else

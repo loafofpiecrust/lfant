@@ -275,7 +275,7 @@ namespace detail
 	//// Only valid if (INT_MIN <= x-y <= INT_MAX)
 	//// min(x,y)
 	//r = y + ((x - y) & ((x - y) >> (sizeof(int) *
-	//CHAR_BIT – 1)));
+	//CHAR_BIT - 1)));
 	//// max(x,y)
 	//r = x - ((x - y) & ((x - y) >> (sizeof(int) *
 	//CHAR_BIT - 1)));
@@ -811,6 +811,8 @@ namespace detail
 #			else
 				return std::isnan(x);
 #			endif
+#		elif(GLM_COMPILER & GLM_COMPILER_CUDA)
+            return isnan(x) != 0;
 #       else
 			return std::isnan(x);
 #       endif
@@ -866,6 +868,9 @@ namespace detail
 #			else
 				return std::isinf(x);
 #			endif
+#		elif(GLM_COMPILER & GLM_COMPILER_CUDA)
+            // http://developer.download.nvidia.com/compute/cuda/4_2/rel/toolkit/docs/online/group__CUDA__MATH__DOUBLE_g13431dd2b40b51f9139cbb7f50c18fab.html#g13431dd2b40b51f9139cbb7f50c18fab
+            return isinf(double(x)) != 0;
 #       else
 			return std::isinf(x);
 #       endif

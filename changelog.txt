@@ -1,0 +1,39 @@
+Version 0.01: (July 2012)
+	-Started development, with concept
+	-Started the Entity-Component model
+	-Made a few subsystems
+	-Did some basic rendering code
+	-Use TinyXML2 for XML parsing (most likely won't change)
+	-Use Squirrel for scripting (subject to change)
+	-Setup logger to show in console as well as a log file.
+	-Randomizer using the new C++11 random features
+	-Use GLM for all math, including OpenGL math (most likely won't change)
+	-Use some parts of Boost for stuff, including Boost.Chrono for Time, and Boost.Filesystem for file management.
+	-Use RakNet for networking. (won't change)
+	-Considering part of Boost for FSMs (Finite State Machines).
+	-Decided not to use a "Scene Graph" setup with Nodes, but just a simple parent-child (single parent) setup with Entities (like Unity).
+	
+Version 0.02: (August 2012)
+	-Stuck all subsystems as subclasses of Subsystem
+	-Made a few component subclasses (eg. Health, Energy, etc)
+	-Started working with bullet physics
+	-Switched to MeshRenderer calling the Render function for itself (probably will change, just easy for the moment)
+	-Changed all member variables from using mUpperCamel to lowerCamel.
+	-Moved to preferring variables over getters/setters in most situations.
+	-Made Engine somewhat extensible. For a new game, just extend Engine class.
+	-Considering AngelScript for scripting. Attempting to make a good/easy binding setup.
+	-Made SFEngine.h for easy addition to a project (includes some files commonly used in a project)
+	-Added SystemInfo for mostly hardware information, some software.
+	-Started a property system to access variables through implicit getter and setter functions.
+	-Added BitField type for multiple flag values in a byte. (like multiple booleans in one value)
+	
+Version 0.03: (October 2012)
+	-Moved the start of documentation comments to the 2nd line.
+	-Added more class and member documentation.
+	-Began a sprite system using planes, textures, and UV manipulation.
+	
+Version 0.04: (January 2013)
+	-Changed header extension to .hpp to prevent clashes on case insensitive file systems, eg. NTFS 
+	-Switched to MSYS Make from Mingw32-Make, SFE now compiles on Linux and Windows
+	-Moved project files and cleaned up dependency source folders.
+	-Added platform specific workspaces in the SFE/src/workspaces folder

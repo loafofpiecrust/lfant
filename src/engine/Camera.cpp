@@ -86,7 +86,7 @@ void Camera::UpdateProjection()
 void Camera::UpdateView()
 {
 	/// @todo Optimize this process? Fix for components
-	view = lookAt(transform->worldPosition(), transform->worldPosition() + transform->direction, transform->up);
+	view = lookAt(transform->GetWorldPosition(), transform->GetWorldPosition() + transform->direction, transform->up);
 }
 
 void Camera::SetFOV(float fov)

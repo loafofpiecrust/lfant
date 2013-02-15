@@ -171,7 +171,7 @@ void ParticleSystem::GenerateVelocity(Particle* pt)
 	vec3 pos;
 
 	// Cone emitter
-	pt->transform->position = pos = vec3(random(-radius, radius), 0.0f, random(-radius, radius));
+	pt->transform->SetPosition( pos = vec3(random(-radius, radius), 0.0f, random(-radius, radius)) );
 	dir = vec3(random(-angle / 90, angle / 90), random(0.0f, 1.0f), random(-angle / 90, angle / 90));
 	while(dir == vec3(0.0f))
 	{
@@ -181,19 +181,19 @@ void ParticleSystem::GenerateVelocity(Particle* pt)
 	pt->velocity = dir * speed;
 
 	// Sphere emitter
-	pt->transform->position = vec3(0.0f);
+	pt->transform->SetPosition(vec3(0));
 	dir = vec3(random(-1.0f, 1.0f), random(-1.0f, 1.0f), random(-1.0f, 1.0f));
 	pt->transform->Translate(dir * random(0.0f, radius));
 	pt->velocity = dir * speed;
 
 	// Straight direction emitter
 	// Cube volume, radius being half the side length
-	pt->transform->position = vec3(random(-radius, radius), random(-radius, radius), random(-radius, radius));
+	pt->transform->SetPosition(vec3(random(-radius, radius), random(-radius, radius), random(-radius, radius)));
 	// Square area
-	pt->transform->position = vec3(random(-radius, radius), 0.0f, random(-radius, radius));
+	pt->transform->SetPosition(vec3(random(-radius, radius), 0.0f, random(-radius, radius)));
 	// Point emitter
-	pt->transform->position = vec3(0.0f);
-	dir = vec3(0.0f, 1.0f, 0.0f);
+	pt->transform->SetPosition(vec3(0));
+	dir = vec3(0, 1, 0);
 	pt->velocity = dir * speed;
 
 	// Beginning and ending velocity range, for an interpolating velocity.

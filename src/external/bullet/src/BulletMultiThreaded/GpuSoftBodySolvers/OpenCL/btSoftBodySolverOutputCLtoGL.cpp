@@ -38,11 +38,10 @@ void btSoftBodySolverOutputCLtoGL::copySoftBodyToVertexBuffer( const btSoftBody 
 		if( !vertexBuffer->hasNormals() )
 			outputKernel = outputToVertexArrayWithoutNormalsKernel;
 
-		// @ShadowFox
-		//ciErrNum = clEnqueueAcquireGLObjects(m_cqCommandQue, 1, &clBuffer, 0, 0, NULL);
+		ciErrNum = clEnqueueAcquireGLObjects(m_cqCommandQue, 1, &clBuffer, 0, 0, NULL);
 		if( ciErrNum != CL_SUCCESS )
 		{
-		//	btAssert( 0 &&  "clEnqueueAcquireGLObjects(copySoftBodyToVertexBuffer)");
+			btAssert( 0 &&  "clEnqueueAcquireGLObjects(copySoftBodyToVertexBuffer)");
 		}
 
 		int numVertices = currentCloth->getNumVertices();
@@ -75,11 +74,10 @@ void btSoftBodySolverOutputCLtoGL::copySoftBodyToVertexBuffer( const btSoftBody 
 			btAssert( 0 &&  "enqueueNDRangeKernel(copySoftBodyToVertexBuffer)");
 		}
 
-		// @ShadowFox
-		//ciErrNum = clEnqueueReleaseGLObjects(m_cqCommandQue, 1, &clBuffer, 0, 0, 0);
+		ciErrNum = clEnqueueReleaseGLObjects(m_cqCommandQue, 1, &clBuffer, 0, 0, 0);
 		if( ciErrNum != CL_SUCCESS )
 		{
-		//	btAssert( 0 &&  "clEnqueueReleaseGLObjects(copySoftBodyToVertexBuffer)");
+			btAssert( 0 &&  "clEnqueueReleaseGLObjects(copySoftBodyToVertexBuffer)");
 		}
 	} else {
 		btAssert( "Undefined output for this solver output" == false );

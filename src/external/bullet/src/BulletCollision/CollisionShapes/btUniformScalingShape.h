@@ -4,8 +4,8 @@ Copyright (c) 2003-2009 Erwin Coumans  http://bulletphysics.org
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose,
-including commercial applications, and to alter it and redistribute it freely,
+Permission is granted to anyone to use this software for any purpose, 
+including commercial applications, and to alter it and redistribute it freely, 
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -21,65 +21,67 @@ subject to the following restrictions:
 
 ///The btUniformScalingShape allows to re-use uniform scaled instances of btConvexShape in a memory efficient way.
 ///Istead of using btUniformScalingShape, it is better to use the non-uniform setLocalScaling method on convex shapes that implement it.
-class btUniformScalingShape : public btConvexShape
+ATTRIBUTE_ALIGNED16(class) btUniformScalingShape : public btConvexShape
 {
-		btConvexShape*	m_childConvexShape;
+	btConvexShape*	m_childConvexShape;
 
-		btScalar	m_uniformScalingFactor;
-
+	btScalar	m_uniformScalingFactor;
+	
 	public:
+	
+	BT_DECLARE_ALIGNED_ALLOCATOR();
+	
+	btUniformScalingShape(	btConvexShape* convexChildShape, btScalar uniformScalingFactor);
+	
+	virtual ~btUniformScalingShape();
+	
+	virtual btVector3	localGetSupportingVertexWithoutMargin(const btVector3& vec)const;
 
-		btUniformScalingShape(	btConvexShape* convexChildShape, btScalar uniformScalingFactor );
+	virtual btVector3	localGetSupportingVertex(const btVector3& vec)const;
 
-		virtual ~btUniformScalingShape();
+	virtual void	batchedUnitVectorGetSupportingVertexWithoutMargin(const btVector3* vectors,btVector3* supportVerticesOut,int numVectors) const;
 
-		virtual btVector3	localGetSupportingVertexWithoutMargin( const btVector3& vec )const;
+	virtual void	calculateLocalInertia(btScalar mass,btVector3& inertia) const;
 
-		virtual btVector3	localGetSupportingVertex( const btVector3& vec )const;
+	btScalar	getUniformScalingFactor() const
+	{
+		return m_uniformScalingFactor;
+	}
 
-		virtual void	batchedUnitVectorGetSupportingVertexWithoutMargin( const btVector3* vectors, btVector3* supportVerticesOut, int numVectors ) const;
+	btConvexShape*	getChildShape() 
+	{
+		return m_childConvexShape;
+	}
 
-		virtual void	calculateLocalInertia( btScalar mass, btVector3& inertia ) const;
+	const btConvexShape*	getChildShape() const
+	{
+		return m_childConvexShape;
+	}
 
-		btScalar	getUniformScalingFactor() const
-		{
-			return m_uniformScalingFactor;
-		}
-
-		btConvexShape*	getChildShape()
-		{
-			return m_childConvexShape;
-		}
-
-		const btConvexShape*	getChildShape() const
-		{
-			return m_childConvexShape;
-		}
-
-		virtual const char*	getName()const
-		{
-			return "UniformScalingShape";
-		}
+	virtual const char*	getName()const 
+	{
+		return "UniformScalingShape";
+	}
+	
 
 
+	///////////////////////////
 
-		///////////////////////////
 
+	///getAabb's default implementation is brute force, expected derived classes to implement a fast dedicated version
+	void getAabb(const btTransform& t,btVector3& aabbMin,btVector3& aabbMax) const;
 
-		///getAabb's default implementation is brute force, expected derived classes to implement a fast dedicated version
-		void getAabb( const btTransform& t, btVector3& aabbMin, btVector3& aabbMax ) const;
+	virtual void getAabbSlow(const btTransform& t,btVector3& aabbMin,btVector3& aabbMax) const;
 
-		virtual void getAabbSlow( const btTransform& t, btVector3& aabbMin, btVector3& aabbMax ) const;
+	virtual void	setLocalScaling(const btVector3& scaling) ;
+	virtual const btVector3& getLocalScaling() const ;
 
-		virtual void	setLocalScaling( const btVector3& scaling ) ;
-		virtual const btVector3& getLocalScaling() const ;
+	virtual void	setMargin(btScalar margin);
+	virtual btScalar	getMargin() const;
 
-		virtual void	setMargin( btScalar margin );
-		virtual btScalar	getMargin() const;
-
-		virtual int		getNumPreferredPenetrationDirections() const;
-
-		virtual void	getPreferredPenetrationDirection( int index, btVector3& penetrationVector ) const;
+	virtual int		getNumPreferredPenetrationDirections() const;
+	
+	virtual void	getPreferredPenetrationDirection(int index, btVector3& penetrationVector) const;
 
 
 };

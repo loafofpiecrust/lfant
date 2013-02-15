@@ -4,8 +4,8 @@ Copyright (c) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose,
-including commercial applications, and to alter it and redistribute it freely,
+Permission is granted to anyone to use this software for any purpose, 
+including commercial applications, and to alter it and redistribute it freely, 
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -43,10 +43,10 @@ typedef btAlignedObjectArray<class btCollisionObject*> btCollisionObjectArray;
 #endif
 
 
-/// btCollisionObject can be used to manage collision detection objects.
+/// btCollisionObject can be used to manage collision detection objects. 
 /// btCollisionObject maintains all information that is needed for a collision detection: Shape, Transform and AABB proxy.
 /// They can be added to the btCollisionWorld.
-ATTRIBUTE_ALIGNED16( class )	btCollisionObject
+ATTRIBUTE_ALIGNED16(class)	btCollisionObject
 {
 
 protected:
@@ -56,20 +56,20 @@ protected:
 	///m_interpolationWorldTransform is used for CCD and interpolation
 	///it can be either previous or future (predicted) transform
 	btTransform	m_interpolationWorldTransform;
-	//those two are experimental: just added for bullet time effect, so you can still apply impulses (directly modifying velocities)
+	//those two are experimental: just added for bullet time effect, so you can still apply impulses (directly modifying velocities) 
 	//without destroying the continuous interpolated motion (which uses this interpolation velocities)
 	btVector3	m_interpolationLinearVelocity;
 	btVector3	m_interpolationAngularVelocity;
-
+	
 	btVector3	m_anisotropicFriction;
 	int			m_hasAnisotropicFriction;
-	btScalar	m_contactProcessingThreshold;
+	btScalar	m_contactProcessingThreshold;	
 
 	btBroadphaseProxy*		m_broadphaseHandle;
 	btCollisionShape*		m_collisionShape;
 	///m_extensionPointer is used by some internal low-level Bullet extensions.
 	void*					m_extensionPointer;
-
+	
 	///m_rootCollisionShape is temporarily used to store the original collision shape
 	///The m_collisionShape might be temporarily replaced by a child collision shape during collision detection purposes
 	///If it is NULL, the m_collisionShape is not temporarily replaced.
@@ -80,11 +80,12 @@ protected:
 	int				m_islandTag1;
 	int				m_companionId;
 
-	int				m_activationState1;
-	btScalar			m_deactivationTime;
+	mutable int				m_activationState1;
+	mutable btScalar			m_deactivationTime;
 
 	btScalar		m_friction;
 	btScalar		m_restitution;
+	btScalar		m_rollingFriction;
 
 	///m_internalType is reserved to distinguish Bullet's btCollisionObject, btRigidBody, btSoftBody, btGhostObject etc.
 	///do not assign your own m_internalType unless you write a new dynamics object class.
@@ -94,18 +95,18 @@ protected:
 	void*			m_userObjectPointer;
 
 	///time of impact calculation
-	btScalar		m_hitFraction;
-
+	btScalar		m_hitFraction; 
+	
 	///Swept sphere radius (0.0 by default), see btConvexConvexAlgorithm::
 	btScalar		m_ccdSweptSphereRadius;
 
 	/// Don't do continuous collision detection if the motion (in one step) is less then m_ccdMotionThreshold
 	btScalar		m_ccdMotionThreshold;
-
+	
 	/// If some object should have elaborate collision filtering by sub-classes
 	int			m_checkCollideWith;
 
-	virtual bool	checkCollideWithOverride( btCollisionObject* /* co */ )
+	virtual bool	checkCollideWithOverride(const btCollisionObject* /* co */) const
 	{
 		return true;
 	}
@@ -116,8 +117,8 @@ public:
 
 	enum CollisionFlags
 	{
-		CF_STATIC_OBJECT = 1,
-		CF_KINEMATIC_OBJECT = 2,
+		CF_STATIC_OBJECT= 1,
+		CF_KINEMATIC_OBJECT= 2,
 		CF_NO_CONTACT_RESPONSE = 4,
 		CF_CUSTOM_MATERIAL_CALLBACK = 8,//this allows per-triangle material (friction/restitution)
 		CF_CHARACTER_OBJECT = 16,
@@ -127,39 +128,47 @@ public:
 
 	enum	CollisionObjectTypes
 	{
-		CO_COLLISION_OBJECT = 1,
-		CO_RIGID_BODY = 2,
+		CO_COLLISION_OBJECT =1,
+		CO_RIGID_BODY=2,
 		///CO_GHOST_OBJECT keeps track of all objects overlapping its AABB and that pass its collision filter
 		///It is useful for collision sensors, explosion objects, character controller etc.
-		CO_GHOST_OBJECT = 4,
-		CO_SOFT_BODY = 8,
-		CO_HF_FLUID = 16,
-		CO_USER_TYPE = 32
+		CO_GHOST_OBJECT=4,
+		CO_SOFT_BODY=8,
+		CO_HF_FLUID=16,
+		CO_USER_TYPE=32
+	};
+
+	enum AnisotropicFrictionFlags
+	{
+		CF_ANISOTROPIC_FRICTION_DISABLED=0,
+		CF_ANISOTROPIC_FRICTION = 1,
+		CF_ANISOTROPIC_ROLLING_FRICTION = 2
 	};
 
 	SIMD_FORCE_INLINE bool mergesSimulationIslands() const
 	{
 		///static objects, kinematic and object without contact response don't merge islands
-		return (( m_collisionFlags & ( CF_STATIC_OBJECT | CF_KINEMATIC_OBJECT | CF_NO_CONTACT_RESPONSE ) ) == 0 );
+		return  ((m_collisionFlags & (CF_STATIC_OBJECT | CF_KINEMATIC_OBJECT | CF_NO_CONTACT_RESPONSE) )==0);
 	}
 
 	const btVector3& getAnisotropicFriction() const
 	{
 		return m_anisotropicFriction;
 	}
-	void	setAnisotropicFriction( const btVector3& anisotropicFriction )
+	void	setAnisotropicFriction(const btVector3& anisotropicFriction, int frictionMode = CF_ANISOTROPIC_FRICTION)
 	{
 		m_anisotropicFriction = anisotropicFriction;
-		m_hasAnisotropicFriction = ( anisotropicFriction[0] != 1.f ) || ( anisotropicFriction[1] != 1.f ) || ( anisotropicFriction[2] != 1.f );
+		bool isUnity = (anisotropicFriction[0]!=1.f) || (anisotropicFriction[1]!=1.f) || (anisotropicFriction[2]!=1.f);
+		m_hasAnisotropicFriction = isUnity?frictionMode : 0;
 	}
-	bool	hasAnisotropicFriction() const
+	bool	hasAnisotropicFriction(int frictionMode = CF_ANISOTROPIC_FRICTION) const
 	{
-		return m_hasAnisotropicFriction != 0;
+		return (m_hasAnisotropicFriction&frictionMode)!=0;
 	}
 
 	///the constraint solver can discard solving contacts, if the distance is above this threshold. 0 by default.
 	///Note that using contacts with positive distance can improve stability. It increases, however, the chance of colliding with degerate contacts, such as 'interior' triangle edges
-	void	setContactProcessingThreshold( btScalar contactProcessingThreshold )
+	void	setContactProcessingThreshold( btScalar contactProcessingThreshold)
 	{
 		m_contactProcessingThreshold = contactProcessingThreshold;
 	}
@@ -169,29 +178,29 @@ public:
 	}
 
 	SIMD_FORCE_INLINE bool		isStaticObject() const {
-		return ( m_collisionFlags& CF_STATIC_OBJECT ) != 0;
+		return (m_collisionFlags & CF_STATIC_OBJECT) != 0;
 	}
 
 	SIMD_FORCE_INLINE bool		isKinematicObject() const
 	{
-		return ( m_collisionFlags& CF_KINEMATIC_OBJECT ) != 0;
+		return (m_collisionFlags & CF_KINEMATIC_OBJECT) != 0;
 	}
 
 	SIMD_FORCE_INLINE bool		isStaticOrKinematicObject() const
 	{
-		return ( m_collisionFlags & ( CF_KINEMATIC_OBJECT | CF_STATIC_OBJECT ) ) != 0 ;
+		return (m_collisionFlags & (CF_KINEMATIC_OBJECT | CF_STATIC_OBJECT)) != 0 ;
 	}
 
 	SIMD_FORCE_INLINE bool		hasContactResponse() const {
-		return ( m_collisionFlags& CF_NO_CONTACT_RESPONSE ) == 0;
+		return (m_collisionFlags & CF_NO_CONTACT_RESPONSE)==0;
 	}
 
-
+	
 	btCollisionObject();
 
 	virtual ~btCollisionObject();
 
-	virtual void	setCollisionShape( btCollisionShape* collisionShape )
+	virtual void	setCollisionShape(btCollisionShape* collisionShape)
 	{
 		m_collisionShape = collisionShape;
 		m_rootCollisionShape = collisionShape;
@@ -207,24 +216,11 @@ public:
 		return m_collisionShape;
 	}
 
-	SIMD_FORCE_INLINE const btCollisionShape*	getRootCollisionShape() const
-	{
-		return m_rootCollisionShape;
-	}
+	
 
-	SIMD_FORCE_INLINE btCollisionShape*	getRootCollisionShape()
-	{
-		return m_rootCollisionShape;
-	}
+	
 
-	///Avoid using this internal API call
-	///internalSetTemporaryCollisionShape is used to temporary replace the actual collision shape by a child collision shape.
-	void	internalSetTemporaryCollisionShape( btCollisionShape* collisionShape )
-	{
-		m_collisionShape = collisionShape;
-	}
-
-	///Avoid using this internal API call, the extension pointer is used by some Bullet extensions.
+	///Avoid using this internal API call, the extension pointer is used by some Bullet extensions. 
 	///If you need to store your own user pointer, use 'setUserPointer/getUserPointer' instead.
 	void*		internalGetExtensionPointer() const
 	{
@@ -232,17 +228,16 @@ public:
 	}
 	///Avoid using this internal API call, the extension pointer is used by some Bullet extensions
 	///If you need to store your own user pointer, use 'setUserPointer/getUserPointer' instead.
-	void	internalSetExtensionPointer( void* pointer )
+	void	internalSetExtensionPointer(void* pointer)
 	{
 		m_extensionPointer = pointer;
 	}
 
-	SIMD_FORCE_INLINE	int	getActivationState() const { return m_activationState1;
-	}
+	SIMD_FORCE_INLINE	int	getActivationState() const { return m_activationState1;}
+	
+	void setActivationState(int newState) const;
 
-	void setActivationState( int newState );
-
-	void	setDeactivationTime( btScalar time )
+	void	setDeactivationTime(btScalar time)
 	{
 		m_deactivationTime = time;
 	}
@@ -251,16 +246,16 @@ public:
 		return m_deactivationTime;
 	}
 
-	void forceActivationState( int newState );
+	void forceActivationState(int newState) const;
 
-	void	activate( bool forceActivation = false );
+	void	activate(bool forceActivation = false) const;
 
 	SIMD_FORCE_INLINE bool isActive() const
 	{
-		return (( getActivationState() != ISLAND_SLEEPING ) && ( getActivationState() != DISABLE_SIMULATION ) );
+		return ((getActivationState() != ISLAND_SLEEPING) && (getActivationState() != DISABLE_SIMULATION));
 	}
 
-	void	setRestitution( btScalar rest )
+	void	setRestitution(btScalar rest)
 	{
 		m_restitution = rest;
 	}
@@ -268,7 +263,7 @@ public:
 	{
 		return m_restitution;
 	}
-	void	setFriction( btScalar frict )
+	void	setFriction(btScalar frict)
 	{
 		m_friction = frict;
 	}
@@ -276,6 +271,16 @@ public:
 	{
 		return m_friction;
 	}
+
+	void	setRollingFriction(btScalar frict)
+	{
+		m_rollingFriction = frict;
+	}
+	btScalar	getRollingFriction() const
+	{
+		return m_rollingFriction;
+	}
+
 
 	///reserved for Bullet internal usage
 	int	getInternalType() const
@@ -293,7 +298,7 @@ public:
 		return m_worldTransform;
 	}
 
-	void	setWorldTransform( const btTransform& worldTrans )
+	void	setWorldTransform(const btTransform& worldTrans)
 	{
 		m_worldTransform = worldTrans;
 	}
@@ -309,7 +314,7 @@ public:
 		return m_broadphaseHandle;
 	}
 
-	void	setBroadphaseHandle( btBroadphaseProxy* handle )
+	void	setBroadphaseHandle(btBroadphaseProxy* handle)
 	{
 		m_broadphaseHandle = handle;
 	}
@@ -325,17 +330,17 @@ public:
 		return m_interpolationWorldTransform;
 	}
 
-	void	setInterpolationWorldTransform( const btTransform&	trans )
+	void	setInterpolationWorldTransform(const btTransform&	trans)
 	{
 		m_interpolationWorldTransform = trans;
 	}
 
-	void	setInterpolationLinearVelocity( const btVector3& linvel )
+	void	setInterpolationLinearVelocity(const btVector3& linvel)
 	{
 		m_interpolationLinearVelocity = linvel;
 	}
 
-	void	setInterpolationAngularVelocity( const btVector3& angvel )
+	void	setInterpolationAngularVelocity(const btVector3& angvel)
 	{
 		m_interpolationAngularVelocity = angvel;
 	}
@@ -355,7 +360,7 @@ public:
 		return	m_islandTag1;
 	}
 
-	void	setIslandTag( int tag )
+	void	setIslandTag(int tag)
 	{
 		m_islandTag1 = tag;
 	}
@@ -365,32 +370,32 @@ public:
 		return	m_companionId;
 	}
 
-	void	setCompanionId( int id )
+	void	setCompanionId(int id)
 	{
 		m_companionId = id;
 	}
 
 	SIMD_FORCE_INLINE btScalar			getHitFraction() const
 	{
-		return m_hitFraction;
+		return m_hitFraction; 
 	}
 
-	void	setHitFraction( btScalar hitFraction )
+	void	setHitFraction(btScalar hitFraction)
 	{
 		m_hitFraction = hitFraction;
 	}
 
-
+	
 	SIMD_FORCE_INLINE int	getCollisionFlags() const
 	{
 		return m_collisionFlags;
 	}
 
-	void	setCollisionFlags( int flags )
+	void	setCollisionFlags(int flags)
 	{
 		m_collisionFlags = flags;
 	}
-
+	
 	///Swept sphere radius (0.0 by default), see btConvexConvexAlgorithm::
 	btScalar			getCcdSweptSphereRadius() const
 	{
@@ -398,7 +403,7 @@ public:
 	}
 
 	///Swept sphere radius (0.0 by default), see btConvexConvexAlgorithm::
-	void	setCcdSweptSphereRadius( btScalar radius )
+	void	setCcdSweptSphereRadius(btScalar radius)
 	{
 		m_ccdSweptSphereRadius = radius;
 	}
@@ -410,13 +415,13 @@ public:
 
 	btScalar 	getCcdSquareMotionThreshold() const
 	{
-		return m_ccdMotionThreshold * m_ccdMotionThreshold;
+		return m_ccdMotionThreshold*m_ccdMotionThreshold;
 	}
 
 
 
 	/// Don't do continuous collision detection if the motion (in one step) is less then m_ccdMotionThreshold
-	void	setCcdMotionThreshold( btScalar ccdMotionThreshold )
+	void	setCcdMotionThreshold(btScalar ccdMotionThreshold)
 	{
 		m_ccdMotionThreshold = ccdMotionThreshold;
 	}
@@ -426,18 +431,18 @@ public:
 	{
 		return m_userObjectPointer;
 	}
-
+	
 	///users can point to their objects, userPointer is not used by Bullet
-	void	setUserPointer( void* userPointer )
+	void	setUserPointer(void* userPointer)
 	{
 		m_userObjectPointer = userPointer;
 	}
 
 
-	inline bool checkCollideWith( btCollisionObject* co )
+	inline bool checkCollideWith(const btCollisionObject* co) const
 	{
-		if( m_checkCollideWith )
-			return checkCollideWithOverride( co );
+		if (m_checkCollideWith)
+			return checkCollideWithOverride(co);
 
 		return true;
 	}
@@ -445,30 +450,31 @@ public:
 	virtual	int	calculateSerializeBufferSize()	const;
 
 	///fills the dataBuffer and returns the struct name (and 0 on failure)
-	virtual	const char*	serialize( void* dataBuffer, class btSerializer* serializer ) const;
+	virtual	const char*	serialize(void* dataBuffer, class btSerializer* serializer) const;
 
-	virtual void serializeSingleObject( class btSerializer* serializer ) const;
+	virtual void serializeSingleObject(class btSerializer* serializer) const;
 
 };
 
 ///do not change those serialization structures, it requires an updated sBulletDNAstr/sBulletDNAstr64
 struct	btCollisionObjectDoubleData
 {
-	void*					m_broadphaseHandle;
-	void*					m_collisionShape;
-	btCollisionShapeData*	m_rootCollisionShape;
-	char*					m_name;
+	void					*m_broadphaseHandle;
+	void					*m_collisionShape;
+	btCollisionShapeData	*m_rootCollisionShape;
+	char					*m_name;
 
 	btTransformDoubleData	m_worldTransform;
 	btTransformDoubleData	m_interpolationWorldTransform;
 	btVector3DoubleData		m_interpolationLinearVelocity;
 	btVector3DoubleData		m_interpolationAngularVelocity;
 	btVector3DoubleData		m_anisotropicFriction;
-	double					m_contactProcessingThreshold;
+	double					m_contactProcessingThreshold;	
 	double					m_deactivationTime;
 	double					m_friction;
+	double					m_rollingFriction;
 	double					m_restitution;
-	double					m_hitFraction;
+	double					m_hitFraction; 
 	double					m_ccdSweptSphereRadius;
 	double					m_ccdMotionThreshold;
 
@@ -486,21 +492,23 @@ struct	btCollisionObjectDoubleData
 ///do not change those serialization structures, it requires an updated sBulletDNAstr/sBulletDNAstr64
 struct	btCollisionObjectFloatData
 {
-	void*					m_broadphaseHandle;
-	void*					m_collisionShape;
-	btCollisionShapeData*	m_rootCollisionShape;
-	char*					m_name;
+	void					*m_broadphaseHandle;
+	void					*m_collisionShape;
+	btCollisionShapeData	*m_rootCollisionShape;
+	char					*m_name;
 
 	btTransformFloatData	m_worldTransform;
 	btTransformFloatData	m_interpolationWorldTransform;
 	btVector3FloatData		m_interpolationLinearVelocity;
 	btVector3FloatData		m_interpolationAngularVelocity;
 	btVector3FloatData		m_anisotropicFriction;
-	float					m_contactProcessingThreshold;
+	float					m_contactProcessingThreshold;	
 	float					m_deactivationTime;
 	float					m_friction;
+	float					m_rollingFriction;
+
 	float					m_restitution;
-	float					m_hitFraction;
+	float					m_hitFraction; 
 	float					m_ccdSweptSphereRadius;
 	float					m_ccdMotionThreshold;
 
@@ -511,13 +519,14 @@ struct	btCollisionObjectFloatData
 	int						m_activationState1;
 	int						m_internalType;
 	int						m_checkCollideWith;
+	char					m_padding[4];
 };
 
 
 
 SIMD_FORCE_INLINE	int	btCollisionObject::calculateSerializeBufferSize() const
 {
-	return sizeof( btCollisionObjectData );
+	return sizeof(btCollisionObjectData);
 }
 
 

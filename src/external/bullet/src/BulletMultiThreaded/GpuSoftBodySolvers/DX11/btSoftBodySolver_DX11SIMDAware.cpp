@@ -13,8 +13,6 @@ subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 */
 
-#if _WIN32
-
 #include <cstdio>
 
 
@@ -1051,5 +1049,3 @@ void btSoftBodyLinkDataDX11SIMDAware::generateBatches()
 	}
 
 } // void btSoftBodyLinkDataDX11SIMDAware::generateBatches()
-
-#endif

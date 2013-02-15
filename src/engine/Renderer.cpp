@@ -70,6 +70,7 @@ Renderer::~Renderer()
 
 void Renderer::Init()
 {
+	Log("Renderer::Init: About to start GLFW");
 	if(!glfwInit())
 	{
 		Log("Renderer::Init: GLFW failed to initialise.");
@@ -100,13 +101,13 @@ void Renderer::Init()
 
 	// Backface culling
 	glEnable(GL_CULL_FACE);
-	//glCullFace(GL_BACK);
-	//glFrontFace(GL_CW);
+	glCullFace(GL_BACK);
+	glFrontFace(GL_CCW);
 
 	// Texture and shading
 	glEnable(GL_TEXTURE_2D);
-	//glShadeModel(GL_SMOOTH);
-	//glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+	glShadeModel(GL_SMOOTH);
+	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
 	// Point sprites
 	//glEnable(GL_POINT_SPRITE);
@@ -141,6 +142,11 @@ void Renderer::Update()
 	glfwSwapBuffers();
 }
 
+void Renderer::Destroy()
+{
+	delete this;
+}
+
 /*******************************************************************************
  *
  *		Windowing
@@ -168,16 +174,21 @@ bool Renderer::OpenWindow()
 	}
 	*/
 
+	Log("Renderer::OpenWindow: About to set window hints.");
 	glfwOpenWindowHint(GLFW_FSAA_SAMPLES, fsaa);
 	glfwOpenWindowHint(GLFW_OPENGL_VERSION_MAJOR, version.major);
 	glfwOpenWindowHint(GLFW_OPENGL_VERSION_MINOR, version.minor);
 	glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+	Log("Renderer::OpenWindow: Window hints set.");
 
 	int mode = GLFW_WINDOW;
 	if(fullscreen)
 	{
 		mode = GLFW_FULLSCREEN;
 	}
+
+	Log("Renderer::OpenWindow: Window mode determined.");
 
 	ivec2 res = GetResolution();
 	if( !glfwOpenWindow( res.x, res.y, 0,0,0,0, 32,0, mode ) )
@@ -186,6 +197,7 @@ bool Renderer::OpenWindow()
 		glfwTerminate();
 		return false;
 	}
+	Log("Renderer::OpenWindow: Window opened.");
 
 	glewExperimental = true; // Needed for core profile
 	if (glewInit() != GLEW_OK)
@@ -193,6 +205,7 @@ bool Renderer::OpenWindow()
 		Log("Renderer::OpenWindow: Failed to initialize GLEW.");
 		return false;
 	}
+	Log("Renderer::OpenWindow: GLEW Initialised.");
 
 	glfwSetWindowTitle(game->settings->GetValue("general.windowtitle").c_str());
 
@@ -211,6 +224,7 @@ int Renderer::WindowClosed()
 void Renderer::WindowResized(int x, int y)
 {
 	game->renderer->resolution = ivec2(x,y);
+	glViewport(0, 0, x, y);
 }
 
 /*******************************************************************************
@@ -276,6 +290,7 @@ void Renderer::AddMesh(Mesh* mesh)
 				{
 					mesh->material.shader.id = shader.id;
 					shaderLoaded = true;
+					break;
 				}
 			}
 		}
@@ -338,7 +353,7 @@ void Renderer::RenderMesh(Mesh* mesh)
 
 	glUseProgram(mesh->material.shader.id);
 
-	mat4 mvp = game->scene->mainCamera->projection * game->scene->mainCamera->view * mesh->transform->matrix;
+	mat4 mvp = game->scene->mainCamera->projection * game->scene->mainCamera->view * mesh->transform->GetMatrix();
 	glUniformMatrix4fv(mesh->matrixId, 1, GL_FALSE, &mvp[0][0]);
 
 	glActiveTexture(GL_TEXTURE0);
@@ -409,15 +424,155 @@ void Renderer::RemoveParticles(ParticleSystem* system)
 
 void Renderer::AddSprite(Sprite* sprite)
 {
+	glGenVertexArrays(1, &sprite->vertexArray);
+	glBindVertexArray(sprite->vertexArray);
+
+	Log("About to add sprite");
+
+	bool shaderLoaded = false;
+	if(sprite->material.shader.id == 0)
+	{
+		if(sprite->material.shader.name != "")
+		{
+			for(auto& shader : shaders)
+			{
+				if(shader.name == sprite->material.shader.name && shader.id != 0)
+				{
+					sprite->material.shader.id = shader.id;
+					shaderLoaded = true;
+					break;
+				}
+			}
+		}
+		else
+		{
+			for(auto& shader : shaders)
+			{
+				if(shader.name == "shaders/Diffuse" && shader.id != 0)
+				{
+					sprite->material.shader.id = shader.id;
+					shaderLoaded = true;
+					break;
+				}
+			}
+		}
+	}
+	if(!shaderLoaded)
+	{
+		Log("Loading default shader");
+		sprite->material.shader.LoadFile("shaders/Diffuse");
+		shaders.push_back(sprite->material.shader);
+	}
+
+	Log(sprite->material.texture.id);
+
+	if(sprite->material.texture.id == 0)
+	{
+		Log(sprite->material.texture.name);
+		sprite->material.texture.LoadFile(sprite->material.texture.name);
+	}
+
+	Log("Renderer::AddSprite: Texture loaded");
+
+	if(sprite->material.shader.id != 0)
+	{
+		// Get any uniforms here
+		sprite->matrixId = glGetUniformLocation(sprite->material.shader.id, "MVP");
+		sprite->material.texture.uniformId = glGetUniformLocation(sprite->material.shader.id, "textureSampler");
+	}
+
+	Log("Renderer::AddSprite: Uniforms loaded");
+
+	sprite->vertexBuffer.push_back(vec3(0, 0, 0));
+	sprite->vertexBuffer.push_back(vec3(1, 0, 0));
+	sprite->vertexBuffer.push_back(vec3(1, 1, 0));
+	sprite->vertexBuffer.push_back(vec3(0, 1, 0));
+
+	sprite->uvBuffer.push_back(vec2(0, 0));
+	sprite->uvBuffer.push_back(vec2(1, 0));
+	sprite->uvBuffer.push_back(vec2(1, 1));
+	sprite->uvBuffer.push_back(vec2(0, 1));
+
+	sprite->indexBuffer.push_back(0);
+	sprite->indexBuffer.push_back(1);
+	sprite->indexBuffer.push_back(2);
+	sprite->indexBuffer.push_back(3);
+
+	/*
+	vector<uint32_t> indices;
+	vector<vec3> indexed_vertices;
+	vector<vec2> indexed_uvs;
+	IndexVBO(sprite->vertexBuffer.data, sprite->uvBuffer.data, indices, indexed_vertices, indexed_uvs);
+
+	sprite->vertexBuffer.data = indexed_vertices;
+	sprite->uvBuffer.data = indexed_uvs;
+	sprite->indexBuffer.data = indices;
+	*/
+
+	Log("Renderer::AddSprite: Data indexed");
+
+	sprite->vertexBuffer.id = CreateBuffer(GL_ARRAY_BUFFER, sprite->vertexBuffer.data);
+	sprite->uvBuffer.id = CreateBuffer(GL_ARRAY_BUFFER, sprite->uvBuffer.data);
+	sprite->indexBuffer.id = CreateBuffer(GL_ELEMENT_ARRAY_BUFFER, sprite->indexBuffer.data);
+
+	Log("Renderer::AddSprite: Data buffered");
 
 }
 
 void Renderer::RenderSprite(Sprite* sprite)
 {
+	if(sprite->material.shader.id == 0 || sprite->material.texture.id == 0)
+	{
+		AddSprite(sprite);
+	}
+
+	glBindVertexArray(sprite->vertexArray);
+
+	glUseProgram(sprite->material.shader.id);
+
+	mat4 mvp = game->scene->mainCamera->projection * game->scene->mainCamera->view * sprite->transform->GetMatrix();
+	glUniformMatrix4fv(sprite->matrixId, 1, GL_FALSE, &mvp[0][0]);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, sprite->material.texture.id);
+	glUniform1i(sprite->material.texture.uniformId, 0);
+
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, sprite->vertexBuffer.id);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+	glEnableVertexAttribArray(1);
+	glBindBuffer(GL_ARRAY_BUFFER, sprite->uvBuffer.id);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+	/*
+	glEnableVertexAttribArray(2);
+	glBindBuffer(GL_ARRAY_BUFFER, sprite->normalBuffer.id);
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+	*/
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sprite->indexBuffer.id);
+	glDrawElements(GL_QUADS, sprite->indexBuffer.size(), GL_UNSIGNED_INT, (void*)0);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	//glDisableVertexAttribArray(2);
+	glDisableVertexAttribArray(1);
+	glDisableVertexAttribArray(0);
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	glBindVertexArray(0);
 }
 
 void Renderer::RemoveSprite(Sprite* sprite)
 {
+	glDeleteBuffers(1, &sprite->vertexBuffer.id);
+	glDeleteBuffers(1, &sprite->uvBuffer.id);
+	glDeleteBuffers(1, &sprite->indexBuffer.id);
+	glDeleteTextures(1, &sprite->material.texture.id);
+	glDeleteVertexArrays(1, &sprite->vertexArray);
 }
 
 /*******************************************************************************
@@ -440,6 +595,10 @@ void Renderer::SetResolution(ivec2 res)
 void Renderer::SetVersion(byte major, byte minor)
 {
 	version = {major, minor};
+	if(!OpenWindow())
+	{
+		game->Exit();
+	}
 }
 
 void Renderer::SetRendering(bool render)
@@ -449,6 +608,11 @@ void Renderer::SetRendering(bool render)
 		Update();
 	}
 	this->render = render;
+}
+
+void Renderer::SetPosition(ivec2 pos)
+{
+	glfwSetWindowPos(pos.x, pos.y);
 }
 
 void Renderer::HideMouse(bool hide)

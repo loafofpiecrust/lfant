@@ -80,6 +80,8 @@ public:
 
 	void SetRendering(bool render);
 
+	void SetPosition(ivec2 pos);
+
 	/**
 	 *	Hides, shows, or toggles the mouse cursor.
 	 */
@@ -88,10 +90,7 @@ public:
 	virtual void Init();
 	void PreUpdate();
 	virtual void Update();
-	virtual void Destroy()
-	{
-		delete this;
-	}
+	virtual void Destroy();
 
 	void AddMesh(Mesh* mesh);
 	void RenderMesh(Mesh* mesh);

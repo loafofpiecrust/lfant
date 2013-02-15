@@ -25,6 +25,7 @@
 // Internal
 #include "Engine.hpp"
 #include "Time.hpp"
+#include "Console.hpp"
 
 namespace sfs
 {
@@ -46,14 +47,19 @@ Physics::~Physics()
 void Physics::Init()
 {
 	collisionConfig = new btDefaultCollisionConfiguration();
+	Log("Physics::Init: Collision config created.");
 	dispatcher = new btCollisionDispatcher(collisionConfig);
+	Log("Physics::Init: Collision dispatcher created.");
 	broadphase = new btDbvtBroadphase();
+	Log("Physics::Init: Broadphase created.");
 	solver = new btSequentialImpulseConstraintSolver();
+	Log("Physics::Init: Constraint solver created.");
 //	world = new sfDynamicsWorld( dispatcher, broadphase, solver, collisionConfig );
 
 	gContactAddedCallback = &Physics::OnCollideEnter;
 	gContactProcessedCallback = &Physics::OnCollideStay;
 	gContactDestroyedCallback = &Physics::OnCollideExit;
+	Log("Physics::Init: Contact callbacks set.");
 }
 
 void Physics::Update()
@@ -126,8 +132,8 @@ void Physics::SetGravityPoint(string name, float force)
  *
  *******************************************************************************/
 
-bool Physics::OnCollide(string func, btManifoldPoint& cp, const btCollisionObject* colObj0, int partId0, int index0,
-						const btCollisionObject* colObj1, int partId1, int index1)
+bool Physics::OnCollide(string func, btManifoldPoint& cp, const btCollisionObjectWrapper* colObj0, int partId0, int index0,
+						const btCollisionObjectWrapper* colObj1, int partId1, int index1)
 {
 	/*Rigidbody* body0 = nullptr;
 	 Rigidbody* body1 = nullptr;
@@ -180,8 +186,8 @@ bool Physics::OnCollide(string func, btManifoldPoint& cp, const btCollisionObjec
 	 }*/
 }
 
-bool Physics::OnCollideEnter(btManifoldPoint& cp, const btCollisionObject* colObj0, int partId0, int index0,
-							 const btCollisionObject* colObj1, int partId1, int index1)
+bool Physics::OnCollideEnter(btManifoldPoint& cp, const btCollisionObjectWrapper* colObj0, int partId0, int index0,
+							 const btCollisionObjectWrapper* colObj1, int partId1, int index1)
 {
 	return OnCollide("Enter", cp, colObj0, partId0, index0, colObj1, partId1, index1);
 }

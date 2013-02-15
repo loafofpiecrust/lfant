@@ -115,8 +115,8 @@ Entity *Scene::Spawn(string name, Entity *parent, vec3 pos, vec3 rot, vec3 scale
 	{
 		ent->transform->parent = parent->transform;
 	}
-	ent->transform->position = pos;
-	ent->transform->rotation = rot;
+	ent->transform->SetPosition(pos);
+	ent->transform->SetRotation(rot);
 	ent->name = name;
 	if(parent == nullptr)
 	{

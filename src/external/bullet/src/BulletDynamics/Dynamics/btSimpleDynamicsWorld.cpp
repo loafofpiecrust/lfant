@@ -4,8 +4,8 @@ Copyright (c) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose,
-including commercial applications, and to alter it and redistribute it freely,
+Permission is granted to anyone to use this software for any purpose, 
+including commercial applications, and to alter it and redistribute it freely, 
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -27,20 +27,20 @@ subject to the following restrictions:
   can be used by probes that are checking whether the
   library is actually installed.
 */
-extern "C"
+extern "C" 
 {
-	void btBulletDynamicsProbe();
-	void btBulletDynamicsProbe() {}
+	void btBulletDynamicsProbe ();
+	void btBulletDynamicsProbe () {}
 }
 
 
 
 
-btSimpleDynamicsWorld::btSimpleDynamicsWorld( btDispatcher* dispatcher, btBroadphaseInterface* pairCache, btConstraintSolver* constraintSolver, btCollisionConfiguration* collisionConfiguration )
-	: btDynamicsWorld( dispatcher, pairCache, collisionConfiguration ),
-	m_constraintSolver( constraintSolver ),
-	m_ownsConstraintSolver( false ),
-	m_gravity( 0, 0, -10 )
+btSimpleDynamicsWorld::btSimpleDynamicsWorld(btDispatcher* dispatcher,btBroadphaseInterface* pairCache,btConstraintSolver* constraintSolver,btCollisionConfiguration* collisionConfiguration)
+:btDynamicsWorld(dispatcher,pairCache,collisionConfiguration),
+m_constraintSolver(constraintSolver),
+m_ownsConstraintSolver(false),
+m_gravity(0,0,-10)
 {
 
 }
@@ -48,18 +48,18 @@ btSimpleDynamicsWorld::btSimpleDynamicsWorld( btDispatcher* dispatcher, btBroadp
 
 btSimpleDynamicsWorld::~btSimpleDynamicsWorld()
 {
-	if( m_ownsConstraintSolver )
-		btAlignedFree( m_constraintSolver );
+	if (m_ownsConstraintSolver)
+		btAlignedFree( m_constraintSolver);
 }
 
-int		btSimpleDynamicsWorld::stepSimulation( btScalar timeStep, int maxSubSteps, btScalar fixedTimeStep )
+int		btSimpleDynamicsWorld::stepSimulation( btScalar timeStep,int maxSubSteps, btScalar fixedTimeStep)
 {
-	( void )fixedTimeStep;
-	( void )maxSubSteps;
+	(void)fixedTimeStep;
+	(void)maxSubSteps;
 
 
 	///apply gravity, predict motion
-	predictUnconstraintMotion( timeStep );
+	predictUnconstraintMotion(timeStep);
 
 	btDispatcherInfo&	dispatchInfo = getDispatchInfo();
 	dispatchInfo.m_timeStep = timeStep;
@@ -71,20 +71,20 @@ int		btSimpleDynamicsWorld::stepSimulation( btScalar timeStep, int maxSubSteps, 
 
 	///solve contact constraints
 	int numManifolds = m_dispatcher1->getNumManifolds();
-	if( numManifolds )
+	if (numManifolds)
 	{
-		btPersistentManifold** manifoldPtr = (( btCollisionDispatcher* )m_dispatcher1 )->getInternalManifoldPointer();
-
+		btPersistentManifold** manifoldPtr = ((btCollisionDispatcher*)m_dispatcher1)->getInternalManifoldPointer();
+		
 		btContactSolverInfo infoGlobal;
 		infoGlobal.m_timeStep = timeStep;
-		m_constraintSolver->prepareSolve( 0, numManifolds );
-		m_constraintSolver->solveGroup( &getCollisionObjectArray()[0], getNumCollisionObjects(), manifoldPtr, numManifolds, 0, 0, infoGlobal, m_debugDrawer, m_stackAlloc, m_dispatcher1 );
-		m_constraintSolver->allSolved( infoGlobal, m_debugDrawer, m_stackAlloc );
+		m_constraintSolver->prepareSolve(0,numManifolds);
+		m_constraintSolver->solveGroup(&getCollisionObjectArray()[0],getNumCollisionObjects(),manifoldPtr, numManifolds,0,0,infoGlobal,m_debugDrawer, m_stackAlloc,m_dispatcher1);
+		m_constraintSolver->allSolved(infoGlobal,m_debugDrawer, m_stackAlloc);
 	}
 
 	///integrate transforms
-	integrateTransforms( timeStep );
-
+	integrateTransforms(timeStep);
+		
 	updateAabbs();
 
 	synchronizeMotionStates();
@@ -98,70 +98,70 @@ int		btSimpleDynamicsWorld::stepSimulation( btScalar timeStep, int maxSubSteps, 
 void	btSimpleDynamicsWorld::clearForces()
 {
 	///@todo: iterate over awake simulation islands!
-	for( int i = 0; i < m_collisionObjects.size(); i++ )
+	for ( int i=0;i<m_collisionObjects.size();i++)
 	{
 		btCollisionObject* colObj = m_collisionObjects[i];
-
-		btRigidBody* body = btRigidBody::upcast( colObj );
-		if( body )
+		
+		btRigidBody* body = btRigidBody::upcast(colObj);
+		if (body)
 		{
 			body->clearForces();
 		}
 	}
-}
+}	
 
 
-void	btSimpleDynamicsWorld::setGravity( const btVector3& gravity )
+void	btSimpleDynamicsWorld::setGravity(const btVector3& gravity)
 {
 	m_gravity = gravity;
-	for( int i = 0; i < m_collisionObjects.size(); i++ )
+	for ( int i=0;i<m_collisionObjects.size();i++)
 	{
 		btCollisionObject* colObj = m_collisionObjects[i];
-		btRigidBody* body = btRigidBody::upcast( colObj );
-		if( body )
+		btRigidBody* body = btRigidBody::upcast(colObj);
+		if (body)
 		{
-			body->setGravity( gravity );
+			body->setGravity(gravity);
 		}
 	}
 }
 
-btVector3 btSimpleDynamicsWorld::getGravity() const
+btVector3 btSimpleDynamicsWorld::getGravity () const
 {
 	return m_gravity;
 }
 
-void	btSimpleDynamicsWorld::removeRigidBody( btRigidBody* body )
+void	btSimpleDynamicsWorld::removeRigidBody(btRigidBody* body)
 {
-	btCollisionWorld::removeCollisionObject( body );
+	btCollisionWorld::removeCollisionObject(body);
 }
 
-void	btSimpleDynamicsWorld::removeCollisionObject( btCollisionObject* collisionObject )
+void	btSimpleDynamicsWorld::removeCollisionObject(btCollisionObject* collisionObject)
 {
-	btRigidBody* body = btRigidBody::upcast( collisionObject );
-	if( body )
-		removeRigidBody( body );
+	btRigidBody* body = btRigidBody::upcast(collisionObject);
+	if (body)
+		removeRigidBody(body);
 	else
-		btCollisionWorld::removeCollisionObject( collisionObject );
+		btCollisionWorld::removeCollisionObject(collisionObject);
 }
 
 
-void	btSimpleDynamicsWorld::addRigidBody( btRigidBody* body )
+void	btSimpleDynamicsWorld::addRigidBody(btRigidBody* body)
 {
-	body->setGravity( m_gravity );
+	body->setGravity(m_gravity);
 
-	if( body->getCollisionShape() )
+	if (body->getCollisionShape())
 	{
-		addCollisionObject( body );
+		addCollisionObject(body);
 	}
 }
 
-void	btSimpleDynamicsWorld::addRigidBody( btRigidBody* body, short group, short mask )
+void	btSimpleDynamicsWorld::addRigidBody(btRigidBody* body, short group, short mask)
 {
-	body->setGravity( m_gravity );
+	body->setGravity(m_gravity);
 
-	if( body->getCollisionShape() )
+	if (body->getCollisionShape())
 	{
-		addCollisionObject( body, group, mask );
+		addCollisionObject(body,group,mask);
 	}
 }
 
@@ -170,13 +170,13 @@ void	btSimpleDynamicsWorld::debugDrawWorld()
 {
 
 }
-
-void	btSimpleDynamicsWorld::addAction( btActionInterface* action )
+				
+void	btSimpleDynamicsWorld::addAction(btActionInterface* action)
 {
 
 }
 
-void	btSimpleDynamicsWorld::removeAction( btActionInterface* action )
+void	btSimpleDynamicsWorld::removeAction(btActionInterface* action)
 {
 
 }
@@ -185,36 +185,36 @@ void	btSimpleDynamicsWorld::removeAction( btActionInterface* action )
 void	btSimpleDynamicsWorld::updateAabbs()
 {
 	btTransform predictedTrans;
-	for( int i = 0; i < m_collisionObjects.size(); i++ )
+	for ( int i=0;i<m_collisionObjects.size();i++)
 	{
 		btCollisionObject* colObj = m_collisionObjects[i];
-		btRigidBody* body = btRigidBody::upcast( colObj );
-		if( body )
+		btRigidBody* body = btRigidBody::upcast(colObj);
+		if (body)
 		{
-			if( body->isActive() && ( !body->isStaticObject() ) )
+			if (body->isActive() && (!body->isStaticObject()))
 			{
-				btVector3 minAabb, maxAabb;
-				colObj->getCollisionShape()->getAabb( colObj->getWorldTransform(), minAabb, maxAabb );
+				btVector3 minAabb,maxAabb;
+				colObj->getCollisionShape()->getAabb(colObj->getWorldTransform(), minAabb,maxAabb);
 				btBroadphaseInterface* bp = getBroadphase();
-				bp->setAabb( body->getBroadphaseHandle(), minAabb, maxAabb, m_dispatcher1 );
+				bp->setAabb(body->getBroadphaseHandle(),minAabb,maxAabb, m_dispatcher1);
 			}
 		}
 	}
 }
 
-void	btSimpleDynamicsWorld::integrateTransforms( btScalar timeStep )
+void	btSimpleDynamicsWorld::integrateTransforms(btScalar timeStep)
 {
 	btTransform predictedTrans;
-	for( int i = 0; i < m_collisionObjects.size(); i++ )
+	for ( int i=0;i<m_collisionObjects.size();i++)
 	{
 		btCollisionObject* colObj = m_collisionObjects[i];
-		btRigidBody* body = btRigidBody::upcast( colObj );
-		if( body )
+		btRigidBody* body = btRigidBody::upcast(colObj);
+		if (body)
 		{
-			if( body->isActive() && ( !body->isStaticObject() ) )
+			if (body->isActive() && (!body->isStaticObject()))
 			{
-				body->predictIntegratedTransform( timeStep, predictedTrans );
-				body->proceedToTransform( predictedTrans );
+				body->predictIntegratedTransform(timeStep, predictedTrans);
+				body->proceedToTransform( predictedTrans);
 			}
 		}
 	}
@@ -222,22 +222,22 @@ void	btSimpleDynamicsWorld::integrateTransforms( btScalar timeStep )
 
 
 
-void	btSimpleDynamicsWorld::predictUnconstraintMotion( btScalar timeStep )
+void	btSimpleDynamicsWorld::predictUnconstraintMotion(btScalar timeStep)
 {
-	for( int i = 0; i < m_collisionObjects.size(); i++ )
+	for ( int i=0;i<m_collisionObjects.size();i++)
 	{
 		btCollisionObject* colObj = m_collisionObjects[i];
-		btRigidBody* body = btRigidBody::upcast( colObj );
-		if( body )
+		btRigidBody* body = btRigidBody::upcast(colObj);
+		if (body)
 		{
-			if( !body->isStaticObject() )
+			if (!body->isStaticObject())
 			{
-				if( body->isActive() )
+				if (body->isActive())
 				{
 					body->applyGravity();
-					body->integrateVelocities( timeStep );
-					body->applyDamping( timeStep );
-					body->predictIntegratedTransform( timeStep, body->getInterpolationWorldTransform() );
+					body->integrateVelocities( timeStep);
+					body->applyDamping(timeStep);
+					body->predictIntegratedTransform(timeStep,body->getInterpolationWorldTransform());
 				}
 			}
 		}
@@ -248,15 +248,15 @@ void	btSimpleDynamicsWorld::predictUnconstraintMotion( btScalar timeStep )
 void	btSimpleDynamicsWorld::synchronizeMotionStates()
 {
 	///@todo: iterate over awake simulation islands!
-	for( int i = 0; i < m_collisionObjects.size(); i++ )
+	for ( int i=0;i<m_collisionObjects.size();i++)
 	{
 		btCollisionObject* colObj = m_collisionObjects[i];
-		btRigidBody* body = btRigidBody::upcast( colObj );
-		if( body && body->getMotionState() )
+		btRigidBody* body = btRigidBody::upcast(colObj);
+		if (body && body->getMotionState())
 		{
-			if( body->getActivationState() != ISLAND_SLEEPING )
+			if (body->getActivationState() != ISLAND_SLEEPING)
 			{
-				body->getMotionState()->setWorldTransform( body->getWorldTransform() );
+				body->getMotionState()->setWorldTransform(body->getWorldTransform());
 			}
 		}
 	}
@@ -264,11 +264,11 @@ void	btSimpleDynamicsWorld::synchronizeMotionStates()
 }
 
 
-void	btSimpleDynamicsWorld::setConstraintSolver( btConstraintSolver* solver )
+void	btSimpleDynamicsWorld::setConstraintSolver(btConstraintSolver* solver)
 {
-	if( m_ownsConstraintSolver )
+	if (m_ownsConstraintSolver)
 	{
-		btAlignedFree( m_constraintSolver );
+		btAlignedFree(m_constraintSolver);
 	}
 	m_ownsConstraintSolver = false;
 	m_constraintSolver = solver;
