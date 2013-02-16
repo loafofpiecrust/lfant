@@ -52,10 +52,8 @@ public:
 	Audio();
 	virtual ~Audio();
 
-	/**	Plays a sound at the origin to the global listener at the origin.
-	 *	@details Use for things like music, but if music is to be heard by just
-	 *		a single entity, it's recommended to simply attach an AudioSource to
-	 *		that entity, and play the music only to it's AudioListener.
+	/**
+	 *	Plays a 2D sound at global volume.
 	 *	@param file The audio file to load and play.
 	 */
 	FMOD::Sound* PlaySound(string file, bool loop = false);
