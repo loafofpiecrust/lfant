@@ -22,7 +22,7 @@
 
 // Internal
 #include "MeshLoader.hpp"
-#include "StringUtil.hpp"
+#include "String.hpp"
 
 namespace sfs
 {

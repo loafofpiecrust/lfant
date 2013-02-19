@@ -26,9 +26,11 @@
 #include <PacketLogger.h>
 #include <BitStream.h>
 #include <RakSleep.h>
+#include <RakPeer.h>
 #include <MessageIdentifiers.h>
 
 // Internal
+#include "Console.hpp"
 
 using namespace RakNet;
 
@@ -44,112 +46,35 @@ Network::~Network()
 {
 }
 
+Connection::Connection(string name, string host, uint16_t port, string password, uint16_t maxPeers) :
+	name(name), host(host), password(password), maxPeers(maxPeers)
+{
+	socket.port = port;
+	peer = new RakPeer();
+	Log("Connection::Connection: Created peer instance");
+	peer->AttachPlugin(&fcm);
+	peer->AttachPlugin(&cg);
+	fcm.SetAutoparticipateConnections(true);
+	// Attach any more plugins you want here.
+}
+
 void Network::Init()
 {
-	gamePeer = new Connection(1234);
-	chatPeer = new Connection(60000);
+//	Connect("Game", "10.0.1.22", 1234, "", 64);
+	Connect("Chat", "10.0.1.22", 60000, "", 16);
 }
 
 void Network::Update()
 {
-}
-
-bool Network::Setup(Connection* con)
-{
-	while(SocketLayer::IsPortInUse(con->socket.port, con->socket.hostAddress, con->socket.socketFamily) == true)
-	{
-		con->socket.port++;
-	}
-
-	bool success = con->peer->Startup(con->maxPeers, &con->socket, 1) == RAKNET_STARTED;
-
-	if(!success)
-	{
-		con->ready = false;
-		return false;
-	}
-
-	con->peer->SetMaximumIncomingConnections(64);
-	con->peer->SetTimeoutTime(1000, UNASSIGNED_SYSTEM_ADDRESS);
-	con->peer->SetOccasionalPing(true);
-	con->peer->SetUnreliableTimeout(1000);
-
-	con->ready = true;
-	return true;
-}
-
-bool Network::Connect(Connection* con, string host, string password)
-{
-	if(!con->ready)
-	{
-		for(uint i = 0; i < 5; ++i)
-		{
-			if(Setup(con))
-			{
-				break;
-			}
-		}
-		if(!con->ready)
-		{
-			return false;
-		}
-	}
-
-	if(password != "")
-	{
-		con->peer->SetIncomingPassword(password.c_str(), password.size()*sizeof(char));
-	}
-
-	con->peer->SetOccasionalPing(true);
-	bool b = con->peer->Connect(host.c_str(), con->socket.port, password.c_str(),
-								strlen(password.c_str())) == CONNECTION_ATTEMPT_STARTED;
-	if(!b)
-	{
-		// Something happened, can't connect
-		Disconnect(con);
-	}
-	return b;
-}
-
-bool Network::ConnectFCM(Connection* con, string host,
-						 string password)
-{
-	if(!con->ready)
-	{
-		for(uint i = 0; i < 5; ++i)
-		{
-			if(Setup(con))
-			{
-				break;
-			}
-		}
-		if(!con->ready)
-		{
-			return false;
-		}
-	}
-
-	while(SocketLayer::IsPortInUse(con->socket.port, con->socket.hostAddress, con->socket.socketFamily)
-			== true)
-	{
-		++con->socket.port;
-	}
-	StartupResult sr = con->peer->Startup(con->maxPeers, &con->socket, 1);
-	con->peer->SetMaximumIncomingConnections(con->maxPeers);
-	con->peer->SetTimeoutTime(1000, UNASSIGNED_SYSTEM_ADDRESS);
-	if(sr != RAKNET_STARTED)
-	{
-		Disconnect(con);
-		return false;
-	}
-
-	// Loop to make sure each new client gets interconnected
-	bool quit = false;
 	Packet* packet;
-	//	char ch;
-	while(!quit)
+	for(Connection* con : connections)
 	{
-		for(packet = con->peer->Receive(); packet; con->peer->DeallocatePacket(packet), packet = con->peer->Receive())
+		if(!con->started)
+		{
+			continue;
+		}
+		packet = con->peer->Receive();
+		if(packet)
 		{
 			switch(packet->data[0])
 			{
@@ -160,9 +85,7 @@ bool Network::ConnectFCM(Connection* con, string host,
 
 				case ID_NEW_INCOMING_CONNECTION:
 					// Somebody connected.  We have their IP now
-					printf("ID_NEW_INCOMING_CONNECTION from %s. guid=%s.\n",
-						   packet->systemAddress.ToString(true),
-						   packet->guid.ToString());
+					printf("ID_NEW_INCOMING_CONNECTION from %s. guid=%s.\n", packet->systemAddress.ToString(true), packet->guid.ToString());
 					break;
 
 				case ID_CONNECTION_REQUEST_ACCEPTED:
@@ -208,19 +131,98 @@ bool Network::ConnectFCM(Connection* con, string host,
 					}
 					break;
 			}
+			con->peer->DeallocatePacket(packet);
 		}
 	}
-	return true;
 }
 
-void Network::Disconnect(Connection* con)
+bool Network::Connect(string name, string host, uint16_t port, string password, uint16_t maxPeers)
 {
-//	con->fcm.SetAutoparticipateConnections(false);
-	//Close any existing connection
-	con->peer->CloseConnection(con->peer->GetSystemAddressFromIndex(0), false);
-	// Turn off Raknet
-	con->peer->Shutdown(100);
-	// Revise this function to keep chat connection running?
+	Log("Network::Connect: Begin");
+	Connection* con;
+	bool isnew = false;
+	for(auto pco : connections)
+	{
+		if(pco->name == name)
+		{
+			con = pco;
+			break;
+		}
+	}
+	if(!con)
+	{
+		Log("Network::Connect: About to spawn.");
+		con = new Connection(name, host, port, password, maxPeers);
+		connections.push_back(con);
+		isnew = true;
+	}
+
+	if(!isnew)
+	{
+		if(con->host == host && con->password == password && con->socket.port == port && con->maxPeers == maxPeers)
+		{
+			return true;
+		}
+		con->host = host;
+		con->socket.port = port;
+		con->password = password;
+		con->maxPeers = maxPeers;
+	}
+
+	Log("Network::Connect: New connection, "+con->name+", at "+con->host+" ", con->socket.port, ", max peers: ", con->maxPeers);
+
+	while(SocketLayer::IsPortInUse(con->socket.port, con->socket.hostAddress, con->socket.socketFamily) == true)
+	{
+		con->socket.port++;
+	}
+
+	Log("Network::Connect: Port not in use");
+
+	if(con->started)
+	{
+		Disconnect(name);
+	}
+
+	if(con->peer->Startup(con->maxPeers, &con->socket, 1, 1) != RAKNET_STARTED)
+	{
+		Disconnect(name);
+		return false;
+	}
+	con->started = true;
+	con->peer->SetMaximumIncomingConnections(con->maxPeers);
+	con->peer->SetTimeoutTime(1000, UNASSIGNED_SYSTEM_ADDRESS);
+
+	Log("Network::Connect: Peer connection opened");
+
+	if(password != "")
+	{
+		con->peer->SetIncomingPassword(password.c_str(), password.size()*sizeof(char));
+	}
+
+	Log("Network::Connect: Password set");
+
+	con->peer->SetOccasionalPing(true);
+	bool b = con->peer->Connect(host.c_str(), con->socket.port, password.c_str(), strlen(password.c_str())) == CONNECTION_ATTEMPT_STARTED;
+	if(!b)
+	{
+		// Something happened, can't connect
+		Disconnect(name);
+	}
+	Log("Network::Connect: Connected!");
+	return b;
+}
+
+void Network::Disconnect(string name)
+{
+	for(auto con : connections)
+	{
+		if(con->name == name)
+		{
+			con->peer->CloseConnection(con->peer->GetSystemAddressFromIndex(0), false);
+			con->peer->Shutdown(100);
+			con->started = false;
+		}
+	}
 }
 
 }

@@ -214,6 +214,18 @@ public:
     }
 
     template<class F>
+    Class& GlobalOverload(const SQChar* name, F method) {
+        BindOverload(name, &method, sizeof(method), SqMemberGlobalFunc(method), SqOverloadFunc(method), SqGetArgCount(method));
+        return *this;
+    }
+
+    template<class F>
+    Class& StaticOverload(const SQChar* name, F method) {
+        BindOverload(name, &method, sizeof(method), SqGlobalFunc(method), SqOverloadFunc(method), SqGetArgCount(method));
+        return *this;
+    }
+
+    template<class F>
     Class& SquirrelFunc(const SQChar* name, SQFUNCTION func) {
         sq_pushobject(vm, ClassType<C>::ClassObject(vm));
         sq_pushstring(vm, name, -1);

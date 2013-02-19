@@ -1,4 +1,4 @@
-Galaga launched.
+ShadowFox Engine launched.
 Subsystems instantiated.
 Settings::LoadSettings: User settings not found. Using default settings.
 Settings::LoadSettings: Loading settings from /home/taylorsnead/ShadowFox/ShadowFox-Engine/examples/galaga/bin64/linux/../../settings.cfg
@@ -6,16 +6,8 @@ VALUE: Galaga
 general.gamename=Galaga
 VALUE: ShadowFox Studios
 general.orgname=ShadowFox Studios
-Couldnt find a value!
-Operator string called
-Operator string called
-Getting: Galaga
-Operator string called
-Trying to scope: general.gamename, result: Galaga
-Operator string called
-Operator string called
-VALUE: Galaga
-general.windowtitle=Galaga
+VALUE: $[gamename]
+general.windowtitle=$[gamename]
 VALUE: 4.2
 gl.version=4.2
 VALUE: 1
@@ -32,28 +24,28 @@ VALUE: 1
 gl.loadobj=1
 VALUE: 1
 gl.usenormals=1
-VALUE: 0.03
-player.lookspeed=0.03
+VALUE: 889 x 500
+window.resolution=889 x 500
+VALUE: 1400x200
+window.position=1400x200
+VALUE: 120
+player.lookspeed=120
 VALUE: 10.0
 player.movementspeed=10.0
-/home/taylorsnead/ShadowFox/ShadowFox-Engine/examples/galaga/bin64/linux/../..
-Getting: Galaga
+VALUE: false
+player.mouselook=false
+VALUE: 20
+galaga.meshcount=20
+VALUE: Demo8.layout
+gui.windowlayout=Demo8.layout
+/home/taylorsnead/ShadowFox/ShadowFox-Engine/examples/galaga
 Operator string called
-Getting: ShadowFox Studios
 Operator string called
 Settings::LoadSettings: User settings not found. Using default settings.
-Settings::LoadSettings: Loading settings from /home/taylorsnead/ShadowFox/ShadowFox-Engine/examples/galaga/bin64/linux/../../settings.cfg
+Settings::LoadSettings: Loading settings from /home/taylorsnead/ShadowFox/ShadowFox-Engine/examples/galaga/settings.cfg
 VALUE: Galaga
 VALUE: ShadowFox Studios
-Couldnt find a value!
-Operator string called
-Operator string called
-Getting: Galaga
-Operator string called
-Trying to scope: general.gamename, result: Galaga
-Operator string called
-Operator string called
-VALUE: Galaga
+VALUE: $[gamename]
 VALUE: 4.2
 VALUE: 1
 VALUE: 1
@@ -62,45 +54,80 @@ VALUE: 1
 VALUE: 1
 VALUE: 1
 VALUE: 1
-VALUE: 0.03
+VALUE: 889 x 500
+VALUE: 1400x200
+VALUE: 120
 VALUE: 10.0
+VALUE: false
+VALUE: 20
+VALUE: Demo8.layout
 /home/taylorsnead/My Games/ShadowFox Studios/Galaga
 Time::ResetTime: Started
 Time::ResetTime: Finished
-Getting: 4.2
-Getting: Galaga
+Physics::Init: Collision config created.
+Physics::Init: Collision dispatcher created.
+Physics::Init: Broadphase created.
+Physics::Init: Constraint solver created.
+Physics::Init: Contact callbacks set.
+Renderer::Init: About to start GLFW
+Renderer::OpenWindow: About to set window hints.
+Renderer::OpenWindow: Window hints set.
+Renderer::OpenWindow: Window mode determined.
+Renderer::OpenWindow: Window opened.
+Renderer::OpenWindow: GLEW Initialised.
+Operator string called
+Operator string called
+Operator string called
+Trying to scope: general.gamename, result: Galaga
+Operator string called
+Operator string called
 Renderer::OpenWindow: Window successfully opened.
+Renderer::WindowResized: Touch.
 Renderer: Initialized
+UserInterface::Init: Begin
+Got log single
+UserInterface::Init: Spawned renderer
+UserInterface::Init: Set a resource dir
+UserInterface::Init: Created scheme!
+UserInterface::Init: Root window
+Operator string called
 Input: Initialized
+Window callback set.
+Subsystems initialized
 Galaga::Init: Subsystems initialised
-Computer name: 
+Computer name: ShadowFox-linux
 Username: 
-Running OS: 
+Running OS: GNU/Linux 3.5.0-23-generic
 CPU:  with 0 cores
-Getting: 0.03
-Looking at 0.03
-Getting: 10.0
+Scene::Spawn: Vector capacity: 0
+Looking at 120
 Moving at 10
+Scene::Spawn: Vector capacity: 1
+Scene::Spawn: Had to resrve for Vector capacity: 6
 Want to load an image file
 Loading an image file of type png
 About to load a png
 LoadPNG: Image size: 128x128
+Texture::LoadPNG: GL Texture generated
+Texture::LoadPNG: GL Texture bound
+Texture::LoadPNG: texture data sent
+Texture::LoadPNG: texture filtering set
 Game initialised
-LoadShader: Files opened
-Shader::LoadFile: Shaders created
-Shader::LoadFile: Vertex shader read
-Shader::LoadFile: Fragment shader read
-Shader::LoadFile: Compiling shader : ../../assets/shaders/Diffuse.vert
-Shader::LoadFile: Vertex shader compiled
-Shader::LoadFile: Retrieved compilation info
-Shader::LoadFile: Retrieved compilation log
-Shader::LoadFile: Vertex shader checked
-Shader::LoadFile: Compiling shader : ../../assets/shaders/Diffuse.frag
-Shader::LoadFile: Fragment shader compiled
-Shader::LoadFile: Fragment shader checked
-Shader::LoadFile: Linking shader
-1
-Window closed
+Renderer::WindowResized: Touch.
+Renderer::WindowResized: Touch.
+Renderer::WindowResized: Touch.
+Renderer::WindowResized: Touch.
+Renderer::WindowResized: Touch.
+Renderer::WindowResized: Touch.
+Renderer::WindowResized: Touch.
+Renderer::WindowResized: Touch.
+Renderer::WindowResized: Touch.
+Renderer::WindowResized: Touch.
+Renderer::WindowResized: Touch.
+Renderer::WindowResized: Touch.
+Renderer::WindowResized: Touch.
+Renderer::WindowResized: Touch.
+Renderer::WindowClosed: Touch.
 About to destroy game
 Scene::Destroy: Destroying Snead
 Entity::Destroy: Components destroyed

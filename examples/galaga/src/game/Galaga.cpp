@@ -39,11 +39,14 @@
 #include "Shader.hpp"
 #include "Settings.hpp"
 #include "FileManager.hpp"
+#include "UserInterface.hpp"
+#include "Network.hpp"
 
+namespace sfs
+{
 
 extern "C" void Launch()
 {
-	using namespace sfs;
 	game = new Galaga();
 	game->standAlone = true;
 	game->Init();
@@ -60,18 +63,13 @@ extern "C" void Launch()
 	delete game;
 }
 
-namespace sfs
-{
-
 void Galaga::Init()
 {
-	// Create the console before anything. Gotta log stuff.
 	console = new Console;
 	console->Init();
 
-	Log("Galaga launched.");
+	Log("ShadowFox Engine launched.");
 
-	// Creates all the subsystem instances
 	fileManager = new FileManager;
 	settings = new Settings;
 	systemInfo = new SystemInfo;
@@ -79,24 +77,41 @@ void Galaga::Init()
 	physics = new Physics;
 	scene = new Scene;
 	renderer = new Renderer;
+	userInterface = new UserInterface;
 	input = new Input;
+	network = new Network;
 
 	Log("Subsystems instantiated.");
 
-	// Initializes them all
 	settings->Init();
 	fileManager->Init();
 	systemInfo->Init();
 	time->Init();
-	//physics->Init();
+	physics->Init();
 
-	// Uses OpenGL version from settings, or else the default 3.2 will be used.
-	Range<int> ver = game->settings->GetValue("gl.version");
-	renderer->SetVersion(ver.major, ver.minor);
+
+	//Range<int> ver = game->settings->GetValue("gl.version");
+	//renderer->version = ver;
 
 	renderer->Init();
+
+
+	userInterface->Init();
 	scene->Init();
 	input->Init();
+	network->Init();
+
+	//ivec2 res = game->settings->GetValue("window.resolution").i2();
+	//renderer->SetResolution(res);
+	//ivec2 pos = game->settings->GetValue("window.position").i2();
+	//renderer->SetPosition(pos);
+
+	Log("Window callback set.");
+
+	Log("Subsystems initialized");
+
+	// Uses OpenGL version from settings, or else the default 3.2 will be used.
+
 
 	Log("Galaga::Init: Subsystems initialised");
 
@@ -107,6 +122,7 @@ void Galaga::Init()
 	input->AddAxis("HRotation", Key::Right, Key::Left);
 	input->AddAxis("ShowLoc", Key::E);
 	input->AddAxis("ShowRot", Key::R);
+	input->AddAxis("ShowFPS", Key::Q);
 	input->AddAxis("Fire", Key::Space);
 	input->AddAxis("TesterSetVar", Key::X);
 	input->AddAxis("TesterGetVar", Key::Z);
@@ -122,22 +138,36 @@ void Galaga::Init()
 	// Fairly self-explanitory. Check above input axes for keys to press. Will implement better with GUI.
 	console->RegisterVar("Tester", 5.0f, "This is my variable!");
 
-	Entity* player = Entity::Spawn("Snead", nullptr, vec3(0, 0, 0));
+	player = scene->Spawn("Snead", nullptr, vec3(0, 0, 0));
 	player->AddComponent<Player>();
 	scene->mainCamera = player->AddComponent<Camera>();
 	scene->mainCamera->projectionMode = Camera::PM_PERSPECTIVE;
 
-	Entity* ent = Entity::Spawn("TestMesh", nullptr);
+
+	Entity* ent = scene->Spawn("TestMesh", nullptr);
 	Mesh* mesh = ent->AddComponent<Mesh>();
 	mesh->LoadFile("suzanne.obj");
 	mesh->material.texture.LoadFile("player.png");
 	mesh->material.shader.name = "Diffuse";
 
+	//Log("Mesh parent: "+ent->parent->name);
+
+
+	/*
+	Entity* ent = Entity::Spawn("TestSprite", nullptr);
+	Sprite* sprite = ent->AddComponent<Sprite>();
+	//mesh->LoadFile("suzanne.obj");
+	sprite->material.texture.LoadFile("player.png");
+	sprite->material.shader.name = "Diffuse";
+	*/
+
+	/*
 	for(uint i = 0; i < game->settings->GetValue("galaga.meshcount").i(); ++i)
 	{
 		AddMesh("TestMesh"+lexical_cast<string>(i));
 		Log("Added mesh ", i);
 	}
+	*/
 }
 
 void Galaga::Update()
@@ -145,28 +175,23 @@ void Galaga::Update()
 	PreUpdate();
 	renderer->PreUpdate();
 	time->Update();
-	//physics->Update();
-	scene->Update();
+	physics->Update();
+	//scene->Update();
 	input->Update();
+	userInterface->Update();
+	network->Update();
 	renderer->Update();
 	PostUpdate();
 }
 
 void Galaga::Destroy()
 {
-	input->Destroy();
-	renderer->Destroy();
-	scene->Destroy();
-	physics->Destroy();
-	time->Destroy();
-	systemInfo->Destroy();
-	settings->Destroy();
-	fileManager->Destroy();
+	Engine::Destroy();
 }
 
 void Galaga::AddMesh(string name)
 {
-	Entity* ent = Entity::Spawn(name, nullptr, vec3(1,1,1));
+	Entity* ent = scene->Spawn(name, nullptr, vec3(1,1,1));
 	Mesh* mesh = ent->AddComponent<Mesh>();
 	mesh->LoadFile("suzanne.obj");
 	mesh->material.texture.LoadFile("player.png");

@@ -142,6 +142,8 @@ SCRAT_INTEGER(unsigned long)
 SCRAT_INTEGER(signed long)
 SCRAT_INTEGER(unsigned short)
 SCRAT_INTEGER(signed short)
+SCRAT_INTEGER(unsigned char)
+SCRAT_INTEGER(signed char)
 
 #if defined(__int64)
 SCRAT_INTEGER(unsigned __int64)

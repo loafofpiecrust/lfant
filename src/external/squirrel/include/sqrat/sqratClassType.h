@@ -98,10 +98,14 @@ struct ClassType {
     }
 
     static void PushInstance(HSQUIRRELVM vm, C* ptr) {
-        sq_pushobject(vm, ClassObject(vm));
-        sq_createinstance(vm, -1);
-        sq_remove(vm, -2);
-        sq_setinstanceup(vm, -1, ptr);
+        if (ptr != NULL) {
+            sq_pushobject(vm, ClassObject(vm));
+            sq_createinstance(vm, -1);
+            sq_remove(vm, -2);
+            sq_setinstanceup(vm, -1, ptr);
+        }
+        else 
+            sq_pushnull(vm);
     }
 
     static void PushInstanceCopy(HSQUIRRELVM vm, C& value) {

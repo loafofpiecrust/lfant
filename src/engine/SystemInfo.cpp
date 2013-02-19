@@ -24,7 +24,7 @@
 
 // Internal
 #include "Console.hpp"
-#include "StringUtil.hpp"
+#include "String.hpp"
 
 namespace sfs
 {
@@ -205,9 +205,9 @@ void SystemInfo::Init()
 	pclose(cmd);
 
 	vector<string> result_spl = Split(string(result), " \n");
-	OS = result_spl[result_spl.size() - 1] + result_spl[2];
+	OS = result_spl[result_spl.size() - 1] + " " + result_spl[2];
 	computerName = result_spl[1];
-	
+
 }
 #endif
 

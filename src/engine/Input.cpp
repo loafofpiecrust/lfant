@@ -22,12 +22,14 @@
 
 // External
 #include <iostream>
+#include <GL/glfw.h>
 
 // Internal
 #include "Engine.hpp"
 #include "Time.hpp"
 #include "Renderer.hpp"
 #include "Console.hpp"
+#include "UserInterface.hpp"
 
 namespace sfs
 {
@@ -43,8 +45,10 @@ Input::~Input()
 
 void Input::Init()
 {
-	glfwSetKeyCallback(KeyPress);
-	glfwSetMousePosCallback(MouseMove);
+	glfwSetKeyCallback(OnKeyPress);
+	glfwSetMousePosCallback(OnMouseMove);
+	glfwSetMouseButtonCallback(OnMouseButton);
+	glfwSetCharCallback(OnCharPress);
 
 	Log("Input: Initialized");
 }
@@ -105,8 +109,16 @@ void Input::Update()
  *		@area Callback
  *******************************************************************************/
 
-void GLFWCALL Input::KeyPress(int key, int mode)
+void GLFWCALL Input::OnKeyPress(int key, int mode)
 {
+	if(mode == GLFW_PRESS)
+	{
+		game->userInterface->OnKey(key, true);
+	}
+	else if(mode == GLFW_RELEASE)
+	{
+		game->userInterface->OnKey(key, false);
+	}
 	for(auto & axis : game->input->axes)
 	{
 		if(key == axis.positive || key == axis.altPositive)
@@ -180,11 +192,33 @@ void GLFWCALL Input::KeyPress(int key, int mode)
 	}
 }
 
-void GLFWCALL Input::MouseMove(int32_t x, int32_t y)
+void GLFWCALL Input::OnMouseMove(int32_t x, int32_t y)
 {
 	if(game->input->lockMouse)
 	{
 		game->input->SetMousePos(game->renderer->GetResolution() / 2);
+	}
+	game->userInterface->OnMouseMove((float)x, (float)y);
+}
+
+void GLFWCALL Input::OnMouseButton(int btn, int mode)
+{
+	if(mode == GLFW_PRESS)
+	{
+		game->userInterface->OnMouseButton(btn, true);
+	}
+	else if(mode == GLFW_RELEASE)
+	{
+		game->userInterface->OnMouseButton(btn, false);
+	}
+	OnKeyPress(btn, mode);
+}
+
+void GLFWCALL Input::OnCharPress(int key, int mode)
+{
+	//if(mode == GLFW_PRESS)
+	{
+		game->userInterface->OnChar(key);
 	}
 }
 

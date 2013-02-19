@@ -25,7 +25,7 @@
 #include <fstream>
 
 #include <GL/glew.h>
-#include <GL/gl.h>
+//#include <GL/gl.h>
 //#include <SFML/Graphics.hpp>
 #include <GL/glfw.h>
 
@@ -45,6 +45,7 @@
 #include "Camera.hpp"
 #include "FileManager.hpp"
 #include "Settings.hpp"
+#include "UserInterface.hpp"
 
 #include "TextureLoader.hpp"
 #include "MeshLoader.hpp"
@@ -155,25 +156,6 @@ void Renderer::Destroy()
 
 bool Renderer::OpenWindow()
 {
-	/*
-	int mode = sf::Style::Default;
-	if(fullscreen)
-	{
-		mode = sf::Style::Fullscreen || sf::Style::None;
-	}
-
-	sf::ContextSettings settings;
-	settings.majorVersion = version.major;
-	settings.minorVersion = version.minor;
-	settings.antialiasingLevel = fsaa;
-
-	window = new sf::RenderWindow(sf::VideoMode(resolution().x, resolution().y), game->settings->GetValue("windowtitle").s(), mode, settings);
-	if(window)
-	{
-		return true;
-	}
-	*/
-
 	Log("Renderer::OpenWindow: About to set window hints.");
 	glfwOpenWindowHint(GLFW_FSAA_SAMPLES, fsaa);
 	glfwOpenWindowHint(GLFW_OPENGL_VERSION_MAJOR, version.major);
@@ -191,7 +173,7 @@ bool Renderer::OpenWindow()
 	Log("Renderer::OpenWindow: Window mode determined.");
 
 	ivec2 res = GetResolution();
-	if( !glfwOpenWindow( res.x, res.y, 0,0,0,0, 32,0, mode ) )
+	if( !glfwOpenWindow( res.x, res.y, 0,0,0,0,32,0, mode ) )
 	{
 		Log( "Renderer::OpenWindow: Failed to open GLFW window." );
 		glfwTerminate();
@@ -216,15 +198,17 @@ bool Renderer::OpenWindow()
 
 int Renderer::WindowClosed()
 {
-	Log("Window closed");
+	Log("Renderer::WindowClosed: Touch.");
 	game->Exit();
 	return 1;
 }
 
 void Renderer::WindowResized(int x, int y)
 {
+	Log("Renderer::WindowResized: Touch.");
 	game->renderer->resolution = ivec2(x,y);
 	glViewport(0, 0, x, y);
+	game->userInterface->OnWindowResize((uint)x, (uint)y);
 }
 
 /*******************************************************************************

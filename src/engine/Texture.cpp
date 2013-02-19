@@ -25,7 +25,7 @@
 
 // Internal
 #include "TextureLoader.hpp"
-#include "StringUtil.hpp"
+#include "String.hpp"
 #include "Console.hpp"
 
 namespace sfs

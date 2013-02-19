@@ -64,6 +64,18 @@ enum class Key : uint16_t
 	B = 'B',
 	N = 'N',
 	M = 'M',
+	F1 = GLFW_KEY_F1,
+	F2 = GLFW_KEY_F2,
+	F3 = GLFW_KEY_F3,
+	F4 = GLFW_KEY_F4,
+	F5 = GLFW_KEY_F5,
+	F6 = GLFW_KEY_F6,
+	F7 = GLFW_KEY_F7,
+	F8 = GLFW_KEY_F8,
+	F9 = GLFW_KEY_F9,
+	F10 = GLFW_KEY_F10,
+	F11 = GLFW_KEY_F11,
+	F12 = GLFW_KEY_F12,
 	Comma = ',',
 	Dot = '.',
 	Slash = '/',
@@ -87,6 +99,10 @@ enum class Key : uint16_t
 	Backspace = GLFW_KEY_BACKSPACE,
 	Delete = GLFW_KEY_DEL,
 	Insert = GLFW_KEY_INSERT,
+	Home = GLFW_KEY_HOME,
+	End = GLFW_KEY_END,
+	PageUp = GLFW_KEY_PAGEUP,
+	PageDown = GLFW_KEY_PAGEDOWN,
 	Up = GLFW_KEY_UP,
 	Down = GLFW_KEY_DOWN,
 	Right = GLFW_KEY_RIGHT,
@@ -98,7 +114,11 @@ enum class Key : uint16_t
 	LAlt = GLFW_KEY_LALT,
 	RAlt = GLFW_KEY_RALT,
 	LSuper = GLFW_KEY_LSUPER,
-	RSuper = GLFW_KEY_RSUPER
+	RSuper = GLFW_KEY_RSUPER,
+	NumEnter = GLFW_KEY_KP_ENTER,
+	MouseLeft = GLFW_MOUSE_BUTTON_LEFT,
+	MouseRight = GLFW_MOUSE_BUTTON_RIGHT,
+	MouseMiddle = GLFW_MOUSE_BUTTON_MIDDLE
 };
 
 /**	This class controls the input system.
@@ -210,9 +230,10 @@ public:
 	 *	@param key The key that was used.
 	 *	@param mode The way the key was used. 0 = Release; 1 = Press;
 	 */
-	static void GLFWCALL KeyPress(int key, int mode);
-
-	static void GLFWCALL MouseMove(int32_t x, int32_t y);
+	static void GLFWCALL OnKeyPress(int key, int mode);
+	static void GLFWCALL OnMouseMove(int32_t x, int32_t y);
+	static void GLFWCALL OnMouseButton(int btn, int mode);
+	static void GLFWCALL OnCharPress(int key, int mode);
 
 	void AddAxis(string name, Key positive, Key negative = Key::NewLine, Key altpos = Key::NewLine, Key altneg = Key::NewLine, float sens = 3.0f, float dead = 0.001f, bool snap = true, byte joyNum = 0);
 

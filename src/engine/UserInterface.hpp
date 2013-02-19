@@ -26,8 +26,11 @@
 
 namespace CEGUI
 {
-class OpenGLRenderer;
+class OpenGL3Renderer;
 class Window;
+class WindowManager;
+class System;
+class GUIContext;
 }
 
 namespace sfs
@@ -43,9 +46,24 @@ public:
 	virtual void Update();
 	virtual void OnDestroy();
 
+	virtual void CreateWindow(string layout);
+
+	virtual void OnKey(uint16_t key, bool pressed);
+	virtual void OnChar(char key);
+	virtual void OnMouseButton(uint16_t btn, bool pressed);
+	virtual void OnMouseMove(float x, float y);
+	virtual void OnWindowResize(uint width, uint height);
+
 protected:
-	CEGUI::OpenGLRenderer* renderer;
+	CEGUI::OpenGL3Renderer* renderer;
 	CEGUI::Window* rootWindow;
+	CEGUI::WindowManager* windowManager;
+	vector<CEGUI::Window*> windows;
+	CEGUI::System* system;
+	CEGUI::GUIContext* context;
+
+	bool resized = false;
+	uvec2 size;
 };
 
 }

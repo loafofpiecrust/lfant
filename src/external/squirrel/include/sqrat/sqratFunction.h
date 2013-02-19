@@ -110,7 +110,14 @@ public:
         sq_pushobject(vm, obj);
         sq_pushobject(vm, env);
 
-        sq_call(vm, 1, true, ErrorHandling::IsEnabled());
+        SQRESULT result = sq_call(vm, 1, true, ErrorHandling::IsEnabled());
+
+        //handle an error: only pop a single element and throw the exception
+        if(SQ_FAILED(result)) {
+            sq_pop(vm, 1);
+            throw Exception(LastErrorString(vm));
+        }
+
         R ret = Var<R>(vm, -1).value;
         sq_pop(vm, 2);
         return ret;
@@ -123,7 +130,14 @@ public:
 
         PushVar(vm, a1);
 
-        sq_call(vm, 2, true, ErrorHandling::IsEnabled());
+        SQRESULT result = sq_call(vm, 2, true, ErrorHandling::IsEnabled());
+
+        //handle an error: only pop a single element and throw the exception
+        if(SQ_FAILED(result)) {
+            sq_pop(vm, 1);
+            throw Exception(LastErrorString(vm));
+        }
+
         Var<R> ret(vm, -1);
         sq_pop(vm, 2);
         return ret.value;
@@ -137,7 +151,14 @@ public:
         PushVar(vm, a1);
         PushVar(vm, a2);
 
-        sq_call(vm, 3, true, ErrorHandling::IsEnabled());
+        SQRESULT result = sq_call(vm, 3, true, ErrorHandling::IsEnabled());
+
+        //handle an error: only pop a single element and throw the exception
+        if(SQ_FAILED(result)) {
+            sq_pop(vm, 1);
+            throw Exception(LastErrorString(vm));
+        }
+
         R ret = Var<R>(vm, -1).value;
         sq_pop(vm, 2);
         return ret;
@@ -152,7 +173,14 @@ public:
         PushVar(vm, a2);
         PushVar(vm, a3);
 
-        sq_call(vm, 4, true, ErrorHandling::IsEnabled());
+        SQRESULT result = sq_call(vm, 4, true, ErrorHandling::IsEnabled());
+
+        //handle an error: only pop a single element and throw the exception
+        if(SQ_FAILED(result)) {
+            sq_pop(vm, 1);
+            throw Exception(LastErrorString(vm));
+        }
+
         R ret = Var<R>(vm, -1).value;
         sq_pop(vm, 2);
         return ret;
@@ -168,7 +196,14 @@ public:
         PushVar(vm, a3);
         PushVar(vm, a4);
 
-        sq_call(vm, 5, true, ErrorHandling::IsEnabled());
+        SQRESULT result = sq_call(vm, 5, true, ErrorHandling::IsEnabled());
+
+        //handle an error: only pop a single element and throw the exception
+        if(SQ_FAILED(result)) {
+            sq_pop(vm, 1);
+            throw Exception(LastErrorString(vm));
+        }
+
         R ret = Var<R>(vm, -1).value;
         sq_pop(vm, 2);
         return ret;
@@ -186,7 +221,14 @@ public:
         PushVar(vm, a4);
         PushVar(vm, a5);
 
-        sq_call(vm, 6, true, ErrorHandling::IsEnabled());
+        SQRESULT result = sq_call(vm, 6, true, ErrorHandling::IsEnabled());
+
+        //handle an error: only pop a single element and throw the exception
+        if(SQ_FAILED(result)) {
+            sq_pop(vm, 1);
+            throw Exception(LastErrorString(vm));
+        }
+
         R ret = Var<R>(vm, -1).value;
         sq_pop(vm, 2);
         return ret;
@@ -204,7 +246,14 @@ public:
         PushVar(vm, a5);
         PushVar(vm, a6);
 
-        sq_call(vm, 7, true, ErrorHandling::IsEnabled());
+        SQRESULT result = sq_call(vm, 7, true, ErrorHandling::IsEnabled());
+
+        //handle an error: only pop a single element and throw the exception
+        if(SQ_FAILED(result)) {
+            sq_pop(vm, 1);
+            throw Exception(LastErrorString(vm));
+        }
+
         R ret = Var<R>(vm, -1).value;
         sq_pop(vm, 2);
         return ret;
@@ -223,7 +272,14 @@ public:
         PushVar(vm, a6);
         PushVar(vm, a7);
 
-        sq_call(vm, 8, true, ErrorHandling::IsEnabled());
+        SQRESULT result = sq_call(vm, 8, true, ErrorHandling::IsEnabled());
+
+        //handle an error: only pop a single element and throw the exception
+        if(SQ_FAILED(result)) {
+            sq_pop(vm, 1);
+            throw Exception(LastErrorString(vm));
+        }
+
         R ret = Var<R>(vm, -1).value;
         sq_pop(vm, 2);
         return ret;
@@ -243,7 +299,14 @@ public:
         PushVar(vm, a7);
         PushVar(vm, a8);
 
-        sq_call(vm, 9, true, ErrorHandling::IsEnabled());
+        SQRESULT result = sq_call(vm, 9, true, ErrorHandling::IsEnabled());
+
+        //handle an error: only pop a single element and throw the exception
+        if(SQ_FAILED(result)) {
+            sq_pop(vm, 1);
+            throw Exception(LastErrorString(vm));
+        }
+
         R ret = Var<R>(vm, -1).value;
         sq_pop(vm, 2);
         return ret;
@@ -264,7 +327,14 @@ public:
         PushVar(vm, a8);
         PushVar(vm, a9);
 
-        sq_call(vm, 10, true, ErrorHandling::IsEnabled());
+        SQRESULT result = sq_call(vm, 10, true, ErrorHandling::IsEnabled());
+
+        //handle an error: only pop a single element and throw the exception
+        if(SQ_FAILED(result)) {
+            sq_pop(vm, 1);
+            throw Exception(LastErrorString(vm));
+        }
+
         R ret = Var<R>(vm, -1).value;
         sq_pop(vm, 2);
         return ret;
@@ -286,7 +356,14 @@ public:
         PushVar(vm, a9);
         PushVar(vm, a10);
 
-        sq_call(vm, 11, true, ErrorHandling::IsEnabled());
+        SQRESULT result = sq_call(vm, 11, true, ErrorHandling::IsEnabled());
+
+        //handle an error: only pop a single element and throw the exception
+        if(SQ_FAILED(result)) {
+            sq_pop(vm, 1);
+            throw Exception(LastErrorString(vm));
+        }
+
         R ret = Var<R>(vm, -1).value;
         sq_pop(vm, 2);
         return ret;
@@ -309,7 +386,14 @@ public:
         PushVar(vm, a10);
         PushVar(vm, a11);
 
-        sq_call(vm, 12, true, ErrorHandling::IsEnabled());
+        SQRESULT result = sq_call(vm, 12, true, ErrorHandling::IsEnabled());
+
+        //handle an error: only pop a single element and throw the exception
+        if(SQ_FAILED(result)) {
+            sq_pop(vm, 1);
+            throw Exception(LastErrorString(vm));
+        }
+
         R ret = Var<R>(vm, -1).value;
         sq_pop(vm, 2);
         return ret;
@@ -333,7 +417,14 @@ public:
         PushVar(vm, a11);
         PushVar(vm, a12);
 
-        sq_call(vm, 13, true, ErrorHandling::IsEnabled());
+        SQRESULT result = sq_call(vm, 13, true, ErrorHandling::IsEnabled());
+
+        //handle an error: only pop a single element and throw the exception
+        if(SQ_FAILED(result)) {
+            sq_pop(vm, 1);
+            throw Exception(LastErrorString(vm));
+        }
+        
         R ret = Var<R>(vm, -1).value;
         sq_pop(vm, 2);
         return ret;
@@ -358,7 +449,14 @@ public:
         PushVar(vm, a12);
         PushVar(vm, a13);
 
-        sq_call(vm, 14, true, ErrorHandling::IsEnabled());
+        SQRESULT result = sq_call(vm, 14, true, ErrorHandling::IsEnabled());
+
+        //handle an error: only pop a single element and throw the exception
+        if(SQ_FAILED(result)) {
+            sq_pop(vm, 1);
+            throw Exception(LastErrorString(vm));
+        }
+
         R ret = Var<R>(vm, -1).value;
         sq_pop(vm, 2);
         return ret;
@@ -384,7 +482,14 @@ public:
         PushVar(vm, a13);
         PushVar(vm, a14);
 
-        sq_call(vm, 15, true, ErrorHandling::IsEnabled());
+        SQRESULT result = sq_call(vm, 15, true, ErrorHandling::IsEnabled());
+
+        //handle an error: only pop a single element and throw the exception
+        if(SQ_FAILED(result)) {
+            sq_pop(vm, 1);
+            throw Exception(LastErrorString(vm));
+        }
+
         R ret = Var<R>(vm, -1).value;
         sq_pop(vm, 2);
         return ret;
@@ -398,8 +503,13 @@ public:
         sq_pushobject(vm, obj);
         sq_pushobject(vm, env);
 
-        sq_call(vm, 1, false, ErrorHandling::IsEnabled());
+        SQRESULT result = sq_call(vm, 1, false, ErrorHandling::IsEnabled());
         sq_pop(vm, 1);
+
+        //handle an error: throw the exception
+        if(SQ_FAILED(result)) {
+            throw Exception(LastErrorString(vm));
+        }
     }
 
     template <class A1>
@@ -409,8 +519,13 @@ public:
 
         PushVar(vm, a1);
 
-        sq_call(vm, 2, false, ErrorHandling::IsEnabled());
+        SQRESULT result = sq_call(vm, 2, false, ErrorHandling::IsEnabled());
         sq_pop(vm, 1);
+
+        //handle an error: throw the exception
+        if(SQ_FAILED(result)) {
+            throw Exception(LastErrorString(vm));
+        }
     }
 
     template <class A1, class A2>
@@ -421,8 +536,13 @@ public:
         PushVar(vm, a1);
         PushVar(vm, a2);
 
-        sq_call(vm, 3, false, ErrorHandling::IsEnabled());
+        SQRESULT result = sq_call(vm, 3, false, ErrorHandling::IsEnabled());
         sq_pop(vm, 1);
+
+        //handle an error: throw the exception
+        if(SQ_FAILED(result)) {
+            throw Exception(LastErrorString(vm));
+        }
     }
 
     template <class A1, class A2, class A3>
@@ -434,8 +554,13 @@ public:
         PushVar(vm, a2);
         PushVar(vm, a3);
 
-        sq_call(vm, 4, false, ErrorHandling::IsEnabled());
+        SQRESULT result = sq_call(vm, 4, false, ErrorHandling::IsEnabled());
         sq_pop(vm, 1);
+
+        //handle an error: throw the exception
+        if(SQ_FAILED(result)) {
+            throw Exception(LastErrorString(vm));
+        }
     }
 
     template <class A1, class A2, class A3, class A4>
@@ -448,8 +573,13 @@ public:
         PushVar(vm, a3);
         PushVar(vm, a4);
 
-        sq_call(vm, 5, false, ErrorHandling::IsEnabled());
+        SQRESULT result = sq_call(vm, 5, false, ErrorHandling::IsEnabled());
         sq_pop(vm, 1);
+
+        //handle an error: throw the exception
+        if(SQ_FAILED(result)) {
+            throw Exception(LastErrorString(vm));
+        }
     }
 
 
@@ -464,8 +594,13 @@ public:
         PushVar(vm, a4);
         PushVar(vm, a5);
 
-        sq_call(vm, 6, false, ErrorHandling::IsEnabled());
+        SQRESULT result = sq_call(vm, 6, false, ErrorHandling::IsEnabled());
         sq_pop(vm, 1);
+
+        //handle an error: throw the exception
+        if(SQ_FAILED(result)) {
+            throw Exception(LastErrorString(vm));
+        }
     }
 
     template <class A1, class A2, class A3, class A4, class A5, class A6>
@@ -480,8 +615,13 @@ public:
         PushVar(vm, a5);
         PushVar(vm, a6);
 
-        sq_call(vm, 7, false, ErrorHandling::IsEnabled());
+        SQRESULT result = sq_call(vm, 7, false, ErrorHandling::IsEnabled());
         sq_pop(vm, 1);
+
+        //handle an error: throw the exception
+        if(SQ_FAILED(result)) {
+            throw Exception(LastErrorString(vm));
+        }
     }
 
     template <class A1, class A2, class A3, class A4, class A5, class A6, class A7>
@@ -497,8 +637,13 @@ public:
         PushVar(vm, a6);
         PushVar(vm, a7);
 
-        sq_call(vm, 8, false, ErrorHandling::IsEnabled());
+        SQRESULT result = sq_call(vm, 8, false, ErrorHandling::IsEnabled());
         sq_pop(vm, 1);
+
+        //handle an error: throw the exception
+        if(SQ_FAILED(result)) {
+            throw Exception(LastErrorString(vm));
+        }
     }
 
     template <class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8>
@@ -515,8 +660,13 @@ public:
         PushVar(vm, a7);
         PushVar(vm, a8);
 
-        sq_call(vm, 9, false, ErrorHandling::IsEnabled());
+        SQRESULT result = sq_call(vm, 9, false, ErrorHandling::IsEnabled());
         sq_pop(vm, 1);
+
+        //handle an error: throw the exception
+        if(SQ_FAILED(result)) {
+            throw Exception(LastErrorString(vm));
+        }
     }
 
     template <class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8, class A9>
@@ -534,8 +684,13 @@ public:
         PushVar(vm, a8);
         PushVar(vm, a9);
 
-        sq_call(vm, 10, false, ErrorHandling::IsEnabled());
+        SQRESULT result = sq_call(vm, 10, false, ErrorHandling::IsEnabled());
         sq_pop(vm, 1);
+
+        //handle an error: throw the exception
+        if(SQ_FAILED(result)) {
+            throw Exception(LastErrorString(vm));
+        }
     }
 
     template <class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8, class A9, class A10>
@@ -554,8 +709,13 @@ public:
         PushVar(vm, a9);
         PushVar(vm, a10);
 
-        sq_call(vm, 11, false, ErrorHandling::IsEnabled());
+        SQRESULT result = sq_call(vm, 11, false, ErrorHandling::IsEnabled());
         sq_pop(vm, 1);
+
+        //handle an error: throw the exception
+        if(SQ_FAILED(result)) {
+            throw Exception(LastErrorString(vm));
+        }
     }
 
     template <class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8, class A9, class A10, class A11>
@@ -575,8 +735,13 @@ public:
         PushVar(vm, a10);
         PushVar(vm, a11);
 
-        sq_call(vm, 12, false, ErrorHandling::IsEnabled());
+        SQRESULT result = sq_call(vm, 12, false, ErrorHandling::IsEnabled());
         sq_pop(vm, 1);
+
+        //handle an error: throw the exception
+        if(SQ_FAILED(result)) {
+            throw Exception(LastErrorString(vm));
+        }
     }
 
     template <class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8, class A9, class A10, class A11, class A12>
@@ -597,8 +762,13 @@ public:
         PushVar(vm, a11);
         PushVar(vm, a12);
 
-        sq_call(vm, 13, false, ErrorHandling::IsEnabled());
+        SQRESULT result = sq_call(vm, 13, false, ErrorHandling::IsEnabled());
         sq_pop(vm, 1);
+
+        //handle an error: throw the exception
+        if(SQ_FAILED(result)) {
+            throw Exception(LastErrorString(vm));
+        }
     }
 
     template <class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8, class A9, class A10, class A11, class A12, class A13>
@@ -620,8 +790,13 @@ public:
         PushVar(vm, a12);
         PushVar(vm, a13);
 
-        sq_call(vm, 14, false, ErrorHandling::IsEnabled());
+        SQRESULT result = sq_call(vm, 14, false, ErrorHandling::IsEnabled());
         sq_pop(vm, 1);
+
+        //handle an error: throw the exception
+        if(SQ_FAILED(result)) {
+            throw Exception(LastErrorString(vm));
+        }
     }
 
     template <class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8, class A9, class A10, class A11, class A12, class A13, class A14>
@@ -644,8 +819,13 @@ public:
         PushVar(vm, a13);
         PushVar(vm, a14);
 
-        sq_call(vm, 15, false, ErrorHandling::IsEnabled());
+        SQRESULT result = sq_call(vm, 15, false, ErrorHandling::IsEnabled());
         sq_pop(vm, 1);
+
+        //handle an error: throw the exception
+        if(SQ_FAILED(result)) {
+            throw Exception(LastErrorString(vm));
+        }
     }
 
     //

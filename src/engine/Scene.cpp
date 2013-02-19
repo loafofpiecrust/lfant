@@ -111,15 +111,22 @@ Entity *Scene::Spawn(string name, Entity *parent, vec3 pos, vec3 rot, vec3 scale
 	Entity* ent = new Entity;
 	ent->parent = parent;
 	ent->transform->owner = ent;
-	if(parent != nullptr)
+	if(parent)
 	{
 		ent->transform->parent = parent->transform;
 	}
 	ent->transform->SetPosition(pos);
 	ent->transform->SetRotation(rot);
 	ent->name = name;
-	if(parent == nullptr)
+	ent->active = true;
+	if(!parent)
 	{
+		Log("Scene::Spawn: Vector capacity: ", entities.capacity());
+		if(entities.size() >= entities.capacity()-1)
+		{
+			entities.reserve(entities.size()+5);
+			Log("Scene::Spawn: Had to resrve for Vector capacity: ", entities.capacity());
+		}
 		entities.push_back(ent);
 	}
 	ent->Init();

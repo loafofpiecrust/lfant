@@ -19,23 +19,24 @@ link_directories(
 	)
 
 # Source Info
-aux_source_directory(${SOURCE_DIR} SRC_FILES)
+file(GLOB_RECURSE SRC_FILES "${SOURCE_DIR}/*.cpp")
 file(GLOB_RECURSE HEADER_FILES "${INCLUDE_DIR}/*.hpp")
 
 # Output Library Info
 add_library(${PROJECT_NAME} SHARED ${SRC_FILES} ${HEADER_FILES})
+#add_executable(${PROJECT_NAME} ${SRC_FILES} ${HEADER_FILES})
 
 # Dependencies
-add_dependencies(${PROJECT_NAME} sfexternal)
+add_dependencies(${PROJECT_NAME} ../external)
 
 # Includes Info
 include_directories(
 	"${INCLUDE_DIR}"
-	"../external/fmod/api/inc"
-	"../external/glm"
-	"../external/boost"
+	"${SFE}/src/external/fmod/api/inc"
+	"${SFE}/src/external/glm"
+	"${SFE}/src/external/boost"
 	"../external/bullet/src"
-	"../external/raknet/Source"
+	"${SFE}/src/external/raknet/Source"
 	"../external/glew/include"
 	"../external/glfw/include"
 	"../external/cegui/cegui/include"
@@ -51,7 +52,7 @@ target_link_libraries(${PROJECT_NAME}
 	bullet
 	raknet
 	fmod
-	cegui
+	CEGUI
 	png
 	z
 	squirrel

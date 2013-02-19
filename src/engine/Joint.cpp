@@ -21,6 +21,7 @@
 #include "Joint.hpp"
 
 // External
+#include <btBulletDynamicsCommon.h>
 
 // Internal
 #include "TypeInfo.hpp"

@@ -24,7 +24,7 @@
 
 // Internal
 #include "Transform.hpp"
-#include "MathUtil.hpp"
+#include "Math.hpp"
 #include "Console.hpp"
 
 namespace sfs

@@ -59,10 +59,13 @@ public:
 			name(name), help(help)
 		{
 		}
+
+		virtual ~Command() {}
 	};
 
 	struct CommandSimple : public Command
 	{
+		typedef void (funcTypeRaw)();
 		typedef boost::function<void()> funcType;
 		funcType func;
 
@@ -74,6 +77,7 @@ public:
 
 	struct CommandDefault : public Command
 	{
+		typedef void (funcTypeRaw)(vector<string>);
 		typedef boost::function<void(vector<string>)> funcType;
 		funcType func;
 
@@ -81,17 +85,17 @@ public:
 			Command(name, help), func(func)
 		{
 		}
-	}
+	};
 
 	struct Variable
 	{
 		string name;
 		float value;
-		string desc;
+		string help;
 		bool readOnly;
 
-		Variable(string name, float val, string desc = "", bool readOnly = false) :
-			name(name), value(val), desc(desc), readOnly(readOnly)
+		Variable(string name, float val, string help = "", bool readOnly = false) :
+			name(name), value(val), help(help), readOnly(readOnly)
 		{
 		}
 	};
@@ -135,8 +139,8 @@ public:
 		file.close();
 	}
 
-	void RegisterCommand(CommandDefault::funcType func, string name, string help = "");
-	void RegisterCommand(CommandSimple::funcType func, string name, string help = "");
+	void RegisterCommand(CommandDefault::funcTypeRaw func, string name, string help = "");
+	void RegisterCommand(CommandSimple::funcTypeRaw func, string name, string help = "");
 
 	void RegisterVar(string name, float val, string help = "", bool readOnly = false);
 
@@ -145,6 +149,17 @@ public:
 
 	Variable* GetVar(string name);
 	Command* GetCommand(string name);
+
+	template<typename T>
+	T* GetCommand(string name)
+	{
+		auto cmd = GetCommand(name);
+		if(auto t = dynamic_cast<T*>(cmd))
+		{
+			return t;
+		}
+		return nullptr;
+	}
 
 	float GetValue(string name);
 	void SetValue(string name, float value);

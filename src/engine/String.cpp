@@ -17,7 +17,7 @@
  *	limitations under the License.
  *
  ******************************************************************************/
-#include "StringUtil.hpp"
+#include "String.hpp"
 
 // External
 
@@ -34,7 +34,6 @@ vector<string> Split(string str, string dropDelim, string keepDelim)
 	{
 		return result;
 	}
-	using namespace boost;
 	char_separator<char> sep(dropDelim.c_str(), keepDelim.c_str(), drop_empty_tokens);
 	tokenizer<char_separator<char>> tok(str, sep);
 	for(tokenizer<char_separator<char>>::iterator i = tok.begin(); i != tok.end(); ++i)

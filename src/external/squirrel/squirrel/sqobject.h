@@ -16,26 +16,25 @@
 
 struct SQSharedState;
 
-enum SQMetaMethod
-{
-	MT_ADD = 0,
-	MT_SUB = 1,
-	MT_MUL = 2,
-	MT_DIV = 3,
-	MT_UNM = 4,
-	MT_MODULO = 5,
-	MT_SET = 6,
-	MT_GET = 7,
-	MT_TYPEOF = 8,
-	MT_NEXTI = 9,
-	MT_CMP = 10,
-	MT_CALL = 11,
-	MT_CLONED = 12,
-	MT_NEWSLOT = 13,
-	MT_DELSLOT = 14,
-	MT_TOSTRING = 15,
-	MT_NEWMEMBER = 16,
-	MT_INHERITED = 17,
+enum SQMetaMethod{
+	MT_ADD=0,
+	MT_SUB=1,
+	MT_MUL=2,
+	MT_DIV=3,
+	MT_UNM=4,
+	MT_MODULO=5,
+	MT_SET=6,
+	MT_GET=7,
+	MT_TYPEOF=8,
+	MT_NEXTI=9,
+	MT_CMP=10,
+	MT_CALL=11,
+	MT_CLONED=12,
+	MT_NEWSLOT=13,
+	MT_DELSLOT=14,
+	MT_TOSTRING=15,
+	MT_NEWMEMBER=16,
+	MT_INHERITED=17,
 	MT_LAST = 18
 };
 
@@ -88,16 +87,12 @@ enum SQMetaMethod
 struct SQRefCounted
 {
 	SQUnsignedInteger _uiRef;
-	struct SQWeakRef* _weakref;
-	SQRefCounted()
-	{
-		_uiRef = 0;
-		_weakref = NULL;
-	}
+	struct SQWeakRef *_weakref;
+	SQRefCounted() { _uiRef = 0; _weakref = NULL; }
 	virtual ~SQRefCounted();
-	SQWeakRef* GetWeakRef( SQObjectType type );
-	virtual void Release() = 0;
-
+	SQWeakRef *GetWeakRef(SQObjectType type);
+	virtual void Release()=0;
+	
 };
 
 struct SQWeakRef : SQRefCounted
@@ -113,7 +108,7 @@ struct SQObjectPtr;
 #define __AddRef(type,unval) if(ISREFCOUNTED(type))	\
 		{ \
 			unval.pRefCounted->_uiRef++; \
-		}
+		}  
 
 #define __Release(type,unval) if(ISREFCOUNTED(type) && ((--unval.pRefCounted->_uiRef)==0))	\
 		{	\
@@ -213,81 +208,81 @@ struct SQObjectPtr : public SQObject
 	SQObjectPtr()
 	{
 		SQ_OBJECT_RAWINIT()
-		_type = OT_NULL;
-		_unVal.pUserPointer = NULL;
+		_type=OT_NULL;
+		_unVal.pUserPointer=NULL;
 	}
-	SQObjectPtr( const SQObjectPtr& o )
+	SQObjectPtr(const SQObjectPtr &o)
 	{
 		_type = o._type;
 		_unVal = o._unVal;
-		__AddRef( _type, _unVal );
+		__AddRef(_type,_unVal);
 	}
-	SQObjectPtr( const SQObject& o )
+	SQObjectPtr(const SQObject &o)
 	{
 		_type = o._type;
 		_unVal = o._unVal;
-		__AddRef( _type, _unVal );
+		__AddRef(_type,_unVal);
 	}
-	_REF_TYPE_DECL( OT_TABLE, SQTable, pTable )
-	_REF_TYPE_DECL( OT_CLASS, SQClass, pClass )
-	_REF_TYPE_DECL( OT_INSTANCE, SQInstance, pInstance )
-	_REF_TYPE_DECL( OT_ARRAY, SQArray, pArray )
-	_REF_TYPE_DECL( OT_CLOSURE, SQClosure, pClosure )
-	_REF_TYPE_DECL( OT_NATIVECLOSURE, SQNativeClosure, pNativeClosure )
-	_REF_TYPE_DECL( OT_OUTER, SQOuter, pOuter )
-	_REF_TYPE_DECL( OT_GENERATOR, SQGenerator, pGenerator )
-	_REF_TYPE_DECL( OT_STRING, SQString, pString )
-	_REF_TYPE_DECL( OT_USERDATA, SQUserData, pUserData )
-	_REF_TYPE_DECL( OT_WEAKREF, SQWeakRef, pWeakRef )
-	_REF_TYPE_DECL( OT_THREAD, SQVM, pThread )
-	_REF_TYPE_DECL( OT_FUNCPROTO, SQFunctionProto, pFunctionProto )
+	_REF_TYPE_DECL(OT_TABLE,SQTable,pTable)
+	_REF_TYPE_DECL(OT_CLASS,SQClass,pClass)
+	_REF_TYPE_DECL(OT_INSTANCE,SQInstance,pInstance)
+	_REF_TYPE_DECL(OT_ARRAY,SQArray,pArray)
+	_REF_TYPE_DECL(OT_CLOSURE,SQClosure,pClosure)
+	_REF_TYPE_DECL(OT_NATIVECLOSURE,SQNativeClosure,pNativeClosure)
+	_REF_TYPE_DECL(OT_OUTER,SQOuter,pOuter)
+	_REF_TYPE_DECL(OT_GENERATOR,SQGenerator,pGenerator)
+	_REF_TYPE_DECL(OT_STRING,SQString,pString)
+	_REF_TYPE_DECL(OT_USERDATA,SQUserData,pUserData)
+	_REF_TYPE_DECL(OT_WEAKREF,SQWeakRef,pWeakRef)
+	_REF_TYPE_DECL(OT_THREAD,SQVM,pThread)
+	_REF_TYPE_DECL(OT_FUNCPROTO,SQFunctionProto,pFunctionProto)
+	
+	_SCALAR_TYPE_DECL(OT_INTEGER,SQInteger,nInteger)
+	_SCALAR_TYPE_DECL(OT_FLOAT,SQFloat,fFloat)
+	_SCALAR_TYPE_DECL(OT_USERPOINTER,SQUserPointer,pUserPointer)
 
-	_SCALAR_TYPE_DECL( OT_INTEGER, SQInteger, nInteger )
-	_SCALAR_TYPE_DECL( OT_FLOAT, SQFloat, fFloat )
-	_SCALAR_TYPE_DECL( OT_USERPOINTER, SQUserPointer, pUserPointer )
-
-	SQObjectPtr( bool bBool )
+	SQObjectPtr(bool bBool)
 	{
 		SQ_OBJECT_RAWINIT()
 		_type = OT_BOOL;
-		_unVal.nInteger = bBool ? 1 : 0;
+		_unVal.nInteger = bBool?1:0;
 	}
-	inline SQObjectPtr& operator= ( bool b )
-	{
-		__Release( _type, _unVal );
+	inline SQObjectPtr& operator=(bool b)
+	{ 
+		__Release(_type,_unVal);
 		SQ_OBJECT_RAWINIT()
 		_type = OT_BOOL;
-		_unVal.nInteger = b ? 1 : 0;
+		_unVal.nInteger = b?1:0;
 		return *this;
 	}
 
 	~SQObjectPtr()
 	{
-		__Release( _type, _unVal );
+		__Release(_type,_unVal);
 	}
-
-	inline SQObjectPtr& operator= ( const SQObjectPtr& obj )
-	{
+			
+	inline SQObjectPtr& operator=(const SQObjectPtr& obj)
+	{ 
 		SQObjectType tOldType;
 		SQObjectValue unOldVal;
-		tOldType = _type;
-		unOldVal = _unVal;
+		tOldType=_type;
+		unOldVal=_unVal;
 		_unVal = obj._unVal;
 		_type = obj._type;
-		__AddRef( _type, _unVal );
-		__Release( tOldType, unOldVal );
+		__AddRef(_type,_unVal);
+		__Release(tOldType,unOldVal);
 		return *this;
 	}
-	inline SQObjectPtr& operator= ( const SQObject& obj )
-	{
+	inline SQObjectPtr& operator=(const SQObject& obj)
+	{ 
 		SQObjectType tOldType;
 		SQObjectValue unOldVal;
-		tOldType = _type;
-		unOldVal = _unVal;
+		tOldType=_type;
+		unOldVal=_unVal;
 		_unVal = obj._unVal;
 		_type = obj._type;
-		__AddRef( _type, _unVal );
-		__Release( tOldType, unOldVal );
+		__AddRef(_type,_unVal);
+		__Release(tOldType,unOldVal);
 		return *this;
 	}
 	inline void Null()
@@ -295,15 +290,15 @@ struct SQObjectPtr : public SQObject
 		SQObjectType tOldType = _type;
 		SQObjectValue unOldVal = _unVal;
 		_type = OT_NULL;
-		_unVal.raw = ( SQRawObjectVal ) NULL;
-		__Release( tOldType , unOldVal );
+		_unVal.raw = (SQRawObjectVal)NULL;
+		__Release(tOldType ,unOldVal);
 	}
-private:
-	SQObjectPtr( const SQChar * ) {}  //safety
+	private:
+		SQObjectPtr(const SQChar *){} //safety
 };
 
 
-inline void _Swap( SQObject& a, SQObject& b )
+inline void _Swap(SQObject &a,SQObject &b)
 {
 	SQObjectType tOldType = a._type;
 	SQObjectValue unOldVal = a._unVal;
@@ -316,18 +311,17 @@ inline void _Swap( SQObject& a, SQObject& b )
 /////////////////////////////////////////////////////////////////////////////////////
 #ifndef NO_GARBAGE_COLLECTOR
 #define MARK_FLAG 0x80000000
-struct SQCollectable : public SQRefCounted
-{
-	SQCollectable* _next;
-	SQCollectable* _prev;
-	SQSharedState* _sharedstate;
-	virtual SQObjectType GetType() = 0;
-	virtual void Release() = 0;
-	virtual void Mark( SQCollectable** chain ) = 0;
+struct SQCollectable : public SQRefCounted {
+	SQCollectable *_next;
+	SQCollectable *_prev;
+	SQSharedState *_sharedstate;
+	virtual SQObjectType GetType()=0;
+	virtual void Release()=0;
+	virtual void Mark(SQCollectable **chain)=0;
 	void UnMark();
-	virtual void Finalize() = 0;
-	static void AddToChain( SQCollectable** chain, SQCollectable* c );
-	static void RemoveFromChain( SQCollectable** chain, SQCollectable* c );
+	virtual void Finalize()=0;
+	static void AddToChain(SQCollectable **chain,SQCollectable *c);
+	static void RemoveFromChain(SQCollectable **chain,SQCollectable *c);
 };
 
 
@@ -343,18 +337,17 @@ struct SQCollectable : public SQRefCounted
 #define INIT_CHAIN() ((void)0)
 #endif
 
-struct SQDelegable : public CHAINABLE_OBJ
-{
-	bool SetDelegate( SQTable* m );
-	virtual bool GetMetaMethod( SQVM* v, SQMetaMethod mm, SQObjectPtr& res );
-	SQTable* _delegate;
+struct SQDelegable : public CHAINABLE_OBJ {
+	bool SetDelegate(SQTable *m);
+	virtual bool GetMetaMethod(SQVM *v,SQMetaMethod mm,SQObjectPtr &res);
+	SQTable *_delegate;
 };
 
-SQUnsignedInteger TranslateIndex( const SQObjectPtr& idx );
+SQUnsignedInteger TranslateIndex(const SQObjectPtr &idx);
 typedef sqvector<SQObjectPtr> SQObjectPtrVec;
 typedef sqvector<SQInteger> SQIntVec;
-const SQChar* GetTypeName( const SQObjectPtr& obj1 );
-const SQChar* IdType2Name( SQObjectType type );
+const SQChar *GetTypeName(const SQObjectPtr &obj1);
+const SQChar *IdType2Name(SQObjectType type);
 
 
 

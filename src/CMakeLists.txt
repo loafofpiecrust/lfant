@@ -1,4 +1,4 @@
-project(sfsrc)
+#project(sfsrc)
 
 set(LIBRARY_OUTPUT_PATH "${SFE}/bin${ARCH}/${PLATFORM}")
 

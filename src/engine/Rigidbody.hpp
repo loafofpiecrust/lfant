@@ -20,11 +20,15 @@
 #pragma once
 
 // External
-#include <btBulletDynamicsCommon.h>
-#include <BulletDynamics/Dynamics/btRigidBody.h>
 
 // Internal
 #include "Component.hpp"
+
+class btTypedConstraint;
+class btRigidBody;
+class btMotionState;
+class btTransform;
+class btVector3;
 
 namespace sfs
 {
@@ -145,8 +149,8 @@ private:
 
 	btRigidBody* body;
 	btMotionState* motionState;
-	btTransform initTransform;
-	btVector3 inertia;
+	btTransform* initTransform;
+	btVector3* inertia;
 
 public:
 

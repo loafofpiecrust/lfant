@@ -25,7 +25,7 @@
 #include <boost/format.hpp>
 
 // Internal
-#include "StringUtil.hpp"
+#include "String.hpp"
 
 namespace sfs
 {
@@ -54,7 +54,7 @@ void Console::Init()
 	file.close();
 
 	// Default commands
-	RegisterCommand("Exit", CmdExit, "Exit the game");
+	RegisterCommand(CmdExit, "Exit", "Exit the game");
 }
 
 void Console::Input(string line)
@@ -67,7 +67,7 @@ void Console::Input(string line)
 		if(output.size() > 1)
 		{
 			// If we are calling a function
-			if(auto cmd = GetCommand(str))
+			if(auto cmd = GetCommand<CommandDefault>(str))
 			{
 				vector<string> args;
 				if(output[i + 1] == "(")
@@ -88,7 +88,7 @@ void Console::Input(string line)
 					cmd->func(args);
 				}
 			}
-			else if(auto cmd = GetSimpleCommand(str))
+			else if(auto cmd = GetCommand<CommandSimple>(str))
 			{
 				if(output[i + 1] == "(")
 				{
@@ -108,11 +108,11 @@ void Console::Input(string line)
 			{
 				if(auto var = GetVar(output[i + 1]))
 				{
-					Print(var->name + " (variable): " + var->desc);
+					Print(var->name + " (variable): " + var->help);
 				}
 				if(auto cmd = GetCommand(output[i + 1]))
 				{
-					Print(cmd->name + " (command): " + cmd->desc);
+					Print(cmd->name + " (command): " + cmd->help);
 				}
 				++i;
 			}
@@ -157,21 +157,21 @@ void Console::Input(string line)
 	}
 }
 
-void Console::RegisterVar(string name, float value, string desc, bool readOnly)
+void Console::RegisterVar(string name, float value, string help, bool readOnly)
 {
-	for(auto & var : variables)
+	for(auto& var : variables)
 	{
-		if(var.name == name)
+		if(var->name == name)
 		{
-			var.value = value;
-			var.desc = desc;
-			var.readOnly = readOnly;
+			var->value = value;
+			var->help = help;
+			var->readOnly = readOnly;
 		}
 	}
-	variables.push_back(Variable(name, value, desc, readOnly));
+	variables.push_back(new Variable(name, value, help, readOnly));
 }
 
-void Console::RegisterCommand(CommandDefault::funcType func, string name, string help)
+void Console::RegisterCommand(CommandDefault::funcTypeRaw func, string name, string help)
 {
 	for(auto cmd : commands)
 	{
@@ -183,12 +183,12 @@ void Console::RegisterCommand(CommandDefault::funcType func, string name, string
 			return;
 		}
 	}
-	commands.push_back(new CommandDefault(func, name, desc));
+	commands.push_back(new CommandDefault(func, name, help));
 }
 
-void Console::RegisterCommand(CommandSimple::funcType func, string name, string desc)
+void Console::RegisterCommand(CommandSimple::funcTypeRaw func, string name, string help)
 {
-	for(auto cmd : simpleCommands)
+	for(auto cmd : commands)
 	{
 		CommandSimple* s = dynamic_cast<CommandSimple*>(cmd);
 		if(s && cmd->name == name)
@@ -198,7 +198,7 @@ void Console::RegisterCommand(CommandSimple::funcType func, string name, string 
 			return;
 		}
 	}
-	commands.push_back(new CommandSimple(func, name, desc));
+	commands.push_back(new CommandSimple(func, name, help));
 }
 
 bool Console::CallCommand(string name, vector<string> args)
@@ -220,9 +220,9 @@ bool Console::CallCommand(string name)
 	for(auto cmd : commands)
 	{
 		auto s = dynamic_cast<CommandSimple*>(cmd);
-		if(d && cmd->name == name)
+		if(s && cmd->name == name)
 		{
-			d->func();
+			s->func();
 			return true;
 		}
 	}

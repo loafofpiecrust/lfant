@@ -28,7 +28,7 @@
 // Internal
 #include "Engine.hpp"
 #include "FileManager.hpp"
-#include "StringUtil.hpp"
+#include "String.hpp"
 #include "Console.hpp"
 
 using namespace boost::filesystem;

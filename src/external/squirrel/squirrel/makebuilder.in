@@ -1,2 +1,0 @@
-ID += -IC:/ShadowFox/ShadowFox-Engine/src/external/squirrel/squirrel/./ -IC:/ShadowFox/ShadowFox-Engine/src/external/squirrel/squirrel/../include -IC:/ShadowFox/ShadowFox-Engine/src/external/squirrel/squirrel/./ 
- LBD += -LC:/ShadowFox/ShadowFox-Engine/bin64/windows -LC:/ShadowFox/ShadowFox-Engine/bin64/windows/lib -LC:/ShadowFox/ShadowFox-Engine/bin64/windows -LC:/ShadowFox/ShadowFox-Engine/bin64/windows/lib

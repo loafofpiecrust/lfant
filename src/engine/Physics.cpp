@@ -21,11 +21,14 @@
 #include "Physics.hpp"
 
 // External
+#include <btBulletDynamicsCommon.h>
+#include <btBulletCollisionCommon.h>
 
 // Internal
 #include "Engine.hpp"
 #include "Time.hpp"
 #include "Console.hpp"
+#include "sfDynamicsWorld.hpp"
 
 namespace sfs
 {
@@ -54,7 +57,7 @@ void Physics::Init()
 	Log("Physics::Init: Broadphase created.");
 	solver = new btSequentialImpulseConstraintSolver();
 	Log("Physics::Init: Constraint solver created.");
-//	world = new sfDynamicsWorld( dispatcher, broadphase, solver, collisionConfig );
+	world = new sfDynamicsWorld( dispatcher, broadphase, solver, collisionConfig );
 
 	gContactAddedCallback = &Physics::OnCollideEnter;
 	gContactProcessedCallback = &Physics::OnCollideStay;
@@ -194,12 +197,12 @@ bool Physics::OnCollideEnter(btManifoldPoint& cp, const btCollisionObjectWrapper
 
 bool Physics::OnCollideStay(btManifoldPoint& cp, void* body0, void* body1)
 {
-//	return OnCollide( "Stay", cp, colObj0, partId0, index0, colObj1, partId1, index1 );
+	//	return OnCollide( "Stay", cp, colObj0, partId0, index0, colObj1, partId1, index1 );
 }
 
 bool Physics::OnCollideExit(void* userPersistentData)
 {
-//	return OnCollide( "Exit", cp, colObj0, partId0, index0, colObj1, partId1, index1 );
+	//	return OnCollide( "Exit", cp, colObj0, partId0, index0, colObj1, partId1, index1 );
 }
 
 }

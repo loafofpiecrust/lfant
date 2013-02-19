@@ -60,7 +60,7 @@ class Material;
  */
 class Renderer
 {
-	friend class Game;
+	friend class Engine;
 public:
 
 	Renderer();
@@ -133,10 +133,11 @@ public:
 	/// Whether or not to render.
 	bool render = true;
 
-protected:
-
 	/// The OpenGL version to use, 0 is Primary, 1 is Secondary (eg. {4, 3} = OpenGL 4.3).
 	Range<int> version = { 3, 2 };
+
+protected:
+
 
 	/// Whether or not to hide the mouse cursor.
 	bool hideMouse = false;
@@ -147,7 +148,7 @@ public:
 
 private:
 	sf::RenderWindow* window;
-	ivec2 resolution { 1280, 720 };
+	ivec2 resolution = ivec2(1280, 720);
 };
 
 /// @}

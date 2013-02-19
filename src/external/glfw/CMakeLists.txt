@@ -1,14 +1,43 @@
 project(glfw)
 
-set(INCLUDE_DIR "include")
-set(SOURCE_DIR "src")
-
 # Source Dir
-aux_source_directory(${SOURCE_DIR} SRC_FILES)
-file(GLOB_RECURSE HEADER_FILES "${INCLUDE_DIR}/*.h")
+file(GLOB SRC_FILES
+	"src/*.c"
+	"src/x11/*.c"
+	)
+
+file(GLOB_RECURSE HEADER_FILES
+	"include/*.h"
+	)
+
+# Library Search Paths
+link_directories(
+	"${LIBRARY_OUTPUT_PATH}"
+	)
 
 # Output Library Info
 add_library(${PROJECT_NAME} SHARED ${SRC_FILES} ${HEADER_FILES})
+#add_executable(${PROJECT_NAME} SRC_FILES)
 
 # Includes
-include_directories("${INCLUDE_DIR}")
+include_directories(
+	"include"
+	"src"
+	)
+
+add_definitions(
+	-DGLFW_BUILD_DLL
+	-D_GLFW_HAS_PTHREAD
+	-D_GLFW_HAS_GLXGETPROCADDRESS
+	)
+
+#set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -lXext -lX11")
+
+target_link_libraries(${PROJECT_NAME}
+	GL
+	GLU
+	pthread
+	X11
+	rt
+	Xext
+	)

@@ -20,15 +20,20 @@
 #pragma once
 
 // External
-#include <btBulletDynamicsCommon.h>
-#include <btBulletCollisionCommon.h>
 
 // Internal
-//#include "*.hpp"
 #include "Subsystem.hpp"
 #include "Joint.hpp"
 #include "Vertex.hpp"
 #include "Rigidbody.hpp"
+
+class btManifoldPoint;
+class btCollisionObjectWrapper;
+class btDiscreteDynamicsWorld;
+class btBroadphaseInterface;
+class btCollisionDispatcher;
+class btConstraintSolver;
+class btDefaultCollisionConfiguration;
 
 namespace sfs
 {

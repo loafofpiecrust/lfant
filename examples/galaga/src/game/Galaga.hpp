@@ -27,6 +27,8 @@
 
 namespace sfs
 {
+	class Entity;
+
 	/** @addtogroup Galaga
 	 *	 @{
 	 */
@@ -55,7 +57,7 @@ namespace sfs
 	protected:
 
 	private:
-
+		Entity* player;
 	};
 
 /// @}

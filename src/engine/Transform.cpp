@@ -23,7 +23,7 @@
 
 // Internal
 #include "Entity.hpp"
-#include "MathUtil.hpp"
+#include "Math.hpp"
 #include "Console.hpp"
 
 namespace sfs

@@ -41,6 +41,7 @@ class FileManager;
 class Console;
 class SystemInfo;
 class UserInterface;
+class Network;
 
 /** @addtogroup Engine
  *	@{
@@ -117,6 +118,7 @@ public:
 	SystemInfo* systemInfo;
 	Settings* settings;
 	UserInterface* userInterface;
+	Network* network;
 	//boost::scoped_ptr<AISystem>			aiSystem;
 	//boost::scoped_ptr<UISystem>			uiSystem;
 	//boost::scoped_ptr<ScriptSystem>		scriptSystem;

@@ -21,13 +21,15 @@
 #include "stdafx.hpp"
 
 // External
-#include <btBulletDynamicsCommon.h>
 
 // Internal
 #include "Component.hpp"
 
+class btTypedConstraint;
+
 namespace sfs
 {
+
 class Rigidbody;
 
 /**	@addtogroup Engine

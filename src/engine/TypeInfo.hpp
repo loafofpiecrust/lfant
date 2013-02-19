@@ -45,9 +45,15 @@ string Type()
 }
 
 template<typename T>
-string Type(T ent)
+string Type(T p1)
 {
-	return string(abi::__cxa_demangle(typeid(ent).name(), 0, 0, (int*)0));
+	return string(abi::__cxa_demangle(typeid(p1).name(), 0, 0, (int*)0));
+}
+
+template<typename T>
+string Type(T* p1)
+{
+	return string(abi::__cxa_demangle(typeid(*p1).name(), 0, 0, (int*)0));
 }
 
 template<typename P1, typename P2, typename ...P>
@@ -56,20 +62,20 @@ string Type()
 	return Type<P1>() + "," + Type<P2, P...>();
 }
 
-template<typename T, typename V>
-bool CheckType(V ent, T p2)
+template<typename T2, typename T1>
+bool CheckType(T1 p1, T2 p2)
 {
 	if(!p2)
 	{
-		return typeid(ent) == typeid(T);
+		return typeid(p1) == typeid(T2);
 	}
-	return typeid(ent) == typeid(p2);
+	return typeid(p1) == typeid(p2);
 }
 
-template<typename T, typename V>
-bool CheckType(V ent)
+template<typename T2, typename T1>
+bool CheckType(T1 p1)
 {
-	return typeid(ent) == typeid(T);
+	return typeid(p1) == typeid(T2);
 }
 
 // Type-Casting

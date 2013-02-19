@@ -31,11 +31,12 @@ endif()
 
 #set(CMAKE_CXX_COMPILER "g++")
 set(CMAKE_BUILD_TYPE Release)
-set(CMAKE_CXX_FLAGS "-m${ARCH} -O3 -Wall -std=gnu++11 -Wno-invalid-offsetof -fPIC")
+set(CMAKE_C_FLAGS "-m${ARCH} -fPIC -O3 -Wall")
+set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -std=gnu++11 -Wno-invalid-offsetof")
 
 # RPathing
 set(CMAKE_SKIP_BUILD_RPATH TRUE)
-set(CMAKE_SHARED_LINKER_FLAGS "-Wl,-rpath,$ORIGIN -Wl,-z,origin")
+set(CMAKE_SHARED_LINKER_FLAGS "-Wl,-rpath,$ORIGIN -Wl,-z,origin -Wl,--no-undefined")
 set(CMAKE_EXE_LINKER_FLAGS "-Wl,-rpath,$ORIGIN -Wl,-z,origin")
 
 # Subdirs

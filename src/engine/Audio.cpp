@@ -31,18 +31,18 @@ namespace sfs
 
 Audio::Audio()
 {
- //ctor
+	//ctor
 }
 
 Audio::~Audio()
 {
- //dtor
+	//dtor
 }
 
 void Audio::Init()
 {
- FMOD::System_Create(&soundSystem);
- soundSystem->init(maxChannels, FMOD_INIT_NORMAL, 0);
+	FMOD::System_Create(&soundSystem);
+	soundSystem->init(maxChannels, FMOD_INIT_NORMAL, 0);
 }
 
 void Audio::Update()
@@ -56,13 +56,13 @@ void Audio::OnDestroy()
 
 FMOD::Sound* Audio::PlaySound(string file, bool loop)
 {
- FMOD::Sound* snd;
- soundSystem->createSound(file.c_str(), FMOD_SOFTWARE | FMOD_2D, 0, &snd);
- if(loop)
- {
-  snd->setMode(FMOD_LOOP_NORMAL);
- }
- return snd;
+	FMOD::Sound* snd;
+	soundSystem->createSound(file.c_str(), FMOD_SOFTWARE | FMOD_2D, 0, &snd);
+	if(loop)
+	{
+		snd->setMode(FMOD_LOOP_NORMAL);
+	}
+	return snd;
 }
 
 FMOD::Sound* Audio::PlaySound3d(string file, vec3 position, bool loop)

@@ -85,6 +85,14 @@ void Entity::Update()
 			compo->Update();
 		}
 	}
+
+	for(auto child : children)
+	{
+		if(child->active)
+		{
+			child->Update();
+		}
+	}
 }
 
 void Entity::Destroy()

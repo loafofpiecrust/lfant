@@ -23,7 +23,7 @@
 // External
 
 // Internal
-#include "StringUtil.hpp"
+#include "String.hpp"
 #include "Console.hpp"
 #include "Renderer.hpp"
 

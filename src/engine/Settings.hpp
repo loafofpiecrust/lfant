@@ -25,7 +25,7 @@
 
 // Internal
 #include "Subsystem.hpp"
-#include "StringUtil.hpp"
+#include "String.hpp"
 #include "Range.hpp"
 #include "Console.hpp"
 

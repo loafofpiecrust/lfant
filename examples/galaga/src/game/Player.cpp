@@ -62,38 +62,45 @@ void Player::Move(string axis, float value)
 
 void Player::Update()
 {
-	ivec2 mousePos = game->input->GetMousePos();
-	ivec2 screenRes = game->renderer->GetResolution();
-	transform->rotation += radians(vec3(lookSpeed * float(screenRes.y/2-mousePos.y), 0, lookSpeed * float(screenRes.x/2-mousePos.x))) * (float)game->time->deltaTime;
-	game->input->SetMousePos(screenRes.x/2, screenRes.y/2);
+	if(game->settings->GetValue("player.mouseLook").b())
+	{
+		ivec2 mousePos = game->input->GetMousePos();
+		ivec2 screenRes = game->renderer->GetResolution();
+		transform->Rotate(radians(vec3(lookSpeed * float(screenRes.y/2-mousePos.y), 0, lookSpeed * float(screenRes.x/2-mousePos.x))) * (float)game->time->deltaTime);
+		game->input->SetMousePos(screenRes.x/2, screenRes.y/2);
+	}
 
 	if (game->input->GetButtonDown("ShowLoc"))
 	{
-		Log("Player position: ", transform->position().x, ", ", transform->position().y, ", ", transform->position().z);
+		Log("Player position: ", transform->GetPosition().x, ", ", transform->GetPosition().y, ", ", transform->GetPosition().z);
 	}
 	if (game->input->GetButtonDown("ShowRot"))
 	{
-		Log("Player rotation: ", transform->rotation().x, ", ", transform->rotation().y, ", ", transform->rotation().z);
+		Log("Player rotation: ", transform->GetRotation().x, ", ", transform->GetRotation().y, ", ", transform->GetRotation().z);
+	}
+	if(game->input->GetButtonDown("ShowFPS"))
+	{
+		Log("Game FPS: ", game->time->frameRate);
 	}
 	float hor = game->input->GetAxis("Horizontal");
 	if (hor != 0.0f)
 	{
-		transform->position += transform->right * float(hor * game->time->deltaTime * movementSpeed);
+		transform->Translate(transform->right * float(hor * game->time->deltaTime * movementSpeed));
 	}
 	float ver = game->input->GetAxis("Vertical");
 	if (ver != 0.0f)
 	{
-		transform->position += float(game->time->deltaTime) * transform->direction * float(ver * movementSpeed);
+		transform->Translate(float(game->time->deltaTime) * transform->direction * float(ver * movementSpeed));
 	}
 	float hrot = game->input->GetAxis("HRotation");
 	if (hrot != 0.0f)
 	{
-		transform->rotation += radians(vec3(0, 0, -hrot*lookSpeed*game->time->deltaTime));
+		transform->Rotate(radians(vec3(0, 0, -hrot*lookSpeed*game->time->deltaTime)));
 	}
 	float vrot = game->input->GetAxis("VRotation");
 	if (vrot != 0.0f)
 	{
-		transform->rotation += radians(vec3(vrot * lookSpeed * game->time->deltaTime, 0, 0));
+		transform->Rotate(radians(vec3(vrot * lookSpeed * game->time->deltaTime, 0, 0)));
 	}
 	if (game->input->GetButtonDown("Fire"))
 	{
