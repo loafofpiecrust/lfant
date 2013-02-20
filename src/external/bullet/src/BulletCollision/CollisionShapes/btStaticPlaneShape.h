@@ -4,8 +4,8 @@ Copyright (c) 2003-2009 Erwin Coumans  http://bulletphysics.org
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose,
-including commercial applications, and to alter it and redistribute it freely,
+Permission is granted to anyone to use this software for any purpose, 
+including commercial applications, and to alter it and redistribute it freely, 
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -20,32 +20,33 @@ subject to the following restrictions:
 
 
 ///The btStaticPlaneShape simulates an infinite non-moving (static) collision plane.
-ATTRIBUTE_ALIGNED16( class ) btStaticPlaneShape :
-public btConcaveShape
+ATTRIBUTE_ALIGNED16(class) btStaticPlaneShape : public btConcaveShape
 {
 protected:
 	btVector3	m_localAabbMin;
 	btVector3	m_localAabbMax;
-
+	
 	btVector3	m_planeNormal;
 	btScalar      m_planeConstant;
 	btVector3	m_localScaling;
 
 public:
-	btStaticPlaneShape( const btVector3& planeNormal, btScalar planeConstant );
+	BT_DECLARE_ALIGNED_ALLOCATOR();
+
+	btStaticPlaneShape(const btVector3& planeNormal,btScalar planeConstant);
 
 	virtual ~btStaticPlaneShape();
 
 
-	virtual void getAabb( const btTransform& t, btVector3& aabbMin, btVector3& aabbMax ) const;
+	virtual void getAabb(const btTransform& t,btVector3& aabbMin,btVector3& aabbMax) const;
 
-	virtual void	processAllTriangles( btTriangleCallback* callback, const btVector3& aabbMin, const btVector3& aabbMax ) const;
+	virtual void	processAllTriangles(btTriangleCallback* callback,const btVector3& aabbMin,const btVector3& aabbMax) const;
 
-	virtual void	calculateLocalInertia( btScalar mass, btVector3& inertia ) const;
+	virtual void	calculateLocalInertia(btScalar mass,btVector3& inertia) const;
 
-	virtual void	setLocalScaling( const btVector3& scaling );
+	virtual void	setLocalScaling(const btVector3& scaling);
 	virtual const btVector3& getLocalScaling() const;
-
+	
 	const btVector3&	getPlaneNormal() const
 	{
 		return	m_planeNormal;
@@ -57,13 +58,12 @@ public:
 	}
 
 	//debugging
-	virtual const char*	getName()const {return "STATICPLANE";
-	}
+	virtual const char*	getName()const {return "STATICPLANE";}
 
 	virtual	int	calculateSerializeBufferSize() const;
 
 	///fills the dataBuffer and returns the struct name (and 0 on failure)
-	virtual	const char*	serialize( void* dataBuffer, btSerializer* serializer ) const;
+	virtual	const char*	serialize(void* dataBuffer, btSerializer* serializer) const;
 
 
 };
@@ -82,19 +82,19 @@ struct	btStaticPlaneShapeData
 
 SIMD_FORCE_INLINE	int	btStaticPlaneShape::calculateSerializeBufferSize() const
 {
-	return sizeof( btStaticPlaneShapeData );
+	return sizeof(btStaticPlaneShapeData);
 }
 
 ///fills the dataBuffer and returns the struct name (and 0 on failure)
-SIMD_FORCE_INLINE	const char*	btStaticPlaneShape::serialize( void* dataBuffer, btSerializer* serializer ) const
+SIMD_FORCE_INLINE	const char*	btStaticPlaneShape::serialize(void* dataBuffer, btSerializer* serializer) const
 {
-	btStaticPlaneShapeData* planeData = ( btStaticPlaneShapeData* ) dataBuffer;
-	btCollisionShape::serialize( &planeData->m_collisionShapeData, serializer );
+	btStaticPlaneShapeData* planeData = (btStaticPlaneShapeData*) dataBuffer;
+	btCollisionShape::serialize(&planeData->m_collisionShapeData,serializer);
 
-	m_localScaling.serializeFloat( planeData->m_localScaling );
-	m_planeNormal.serializeFloat( planeData->m_planeNormal );
-	planeData->m_planeConstant = float( m_planeConstant );
-
+	m_localScaling.serializeFloat(planeData->m_localScaling);
+	m_planeNormal.serializeFloat(planeData->m_planeNormal);
+	planeData->m_planeConstant = float(m_planeConstant);
+		
 	return "btStaticPlaneShapeData";
 }
 

@@ -48,29 +48,25 @@ namespace sfs
  */
 class Connection
 {
+	friend class Network;
 public:
-	RakNet::RakPeerInterface* peer;
-	RakNet::FullyConnectedMesh2 fcm;
-	RakNet::ConnectionGraph2 cg;
-	RakNet::SocketDescriptor socket;
-	uint16_t maxPeers = 64;
-
-	Connection(uint16_t port, uint16_t maxPeers = 64) :
-		socket(port, 0), maxPeers(maxPeers)
-	{
-		peer = RakNet::RakPeerInterface::GetInstance();
-		peer->AttachPlugin(&fcm);
-		peer->AttachPlugin(&cg);
-		fcm.SetAutoparticipateConnections(true);
-		// Attach any more plugins you want here.
-	}
+	Connection(string name, string host, uint16_t port, string password, uint16_t maxPeers);
 
 	~Connection()
 	{
 		RakNet::RakPeerInterface::DestroyInstance(peer);
 	}
 
-	bool ready = false;
+	string name = "";
+	string host = "";
+	string password = "";
+	RakNet::RakPeerInterface* peer;
+	RakNet::FullyConnectedMesh2 fcm;
+	RakNet::ConnectionGraph2 cg;
+	RakNet::SocketDescriptor socket;
+	uint16_t maxPeers = 64;
+
+	bool started = false;
 };
 
 /**	This class manages Networking capabilities
@@ -81,7 +77,7 @@ public:
  *	@todo
  *		Todo
  */
-class Network: public Subsystem
+class Network : public Subsystem
 {
 	friend class Engine;
 
@@ -89,16 +85,8 @@ public:
 	Network();
 	virtual ~Network();
 
-	/**	Attempts to host a sole server via IPv6 and/or IPv4
-	 *	@details
-	 *		Hosts a server that allows direct connection, but not FCM. If
-	 *		FCM2 capabilities are desired, \p ConnectFCM will "host" a server
-	 *		if there isn't one on the given IP.
-	 *	@todo
-	 *		Admin controls when host.
-	 *		Differentiate between client and host (commands, and scoreboard).
-	 */
-	bool Setup(Connection* con);
+	virtual void Init();
+	virtual void Update();
 
 	/**	Connects client to a remote host via IP
 	 *	@details
@@ -106,18 +94,7 @@ public:
 	 *		host switching. This type of connection is inflexible
 	 *		and depends on the host server.
 	 */
-	bool Connect(Connection* con, string host, string password = "");
-
-	/**	Connects clients via FCM2.
-	 *	@details
-	 *		FullyConnectedMesh2 Connects a group of clients together.
-	 *		The first to "connect", before the rest of the clients connect,
-	 *		becomes the host. Then, if he disconnects, the next best candidate
-	 *		becomes host.
-	 *	@todo
-	 *		Have a specifier enum to turn off admin controls in FCM mode.
-	 */
-	bool ConnectFCM(Connection* con, string host, string password = "");
+	bool Connect(string name, string host, uint16_t port, string password = "", uint16_t maxPeers = 64);
 
 	/**	Disconnects from the current server.
 	 *	@details
@@ -127,15 +104,12 @@ public:
 	 *		Have different ports for different connection types, so specific connections can be ended.
 	 *		Grab those ports from XML, or config.
 	 */
-	void Disconnect(Connection* con);
+	void Disconnect(string name);
 
 protected:
-	virtual void Init();
-	virtual void Update();
 
 public:
-	Connection* chatPeer;
-	Connection* gamePeer;
+	vector<Connection*> connections;
 };
 
 /** @} */

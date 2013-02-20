@@ -27,7 +27,7 @@
 #include "Time.hpp"
 #include "Engine.hpp"
 #include "Scene.hpp"
-#include "Type.hpp"
+#include "TypeInfo.hpp"
 #include "Console.hpp"
 
 namespace sfs
@@ -85,6 +85,14 @@ void Entity::Update()
 			compo->Update();
 		}
 	}
+
+	for(auto child : children)
+	{
+		if(child->active)
+		{
+			child->Update();
+		}
+	}
 }
 
 void Entity::Destroy()
@@ -98,27 +106,9 @@ void Entity::Destroy()
 	delete this;
 }
 
-Entity* Entity::Spawn(string name, Entity* parent, vec3 pos, vec3 rot, vec3 scale)
-{
-	Entity* ent = new Entity;
-	ent->parent = parent;
-	ent->transform->owner = ent;
-	if(parent != nullptr)
-	{
-		ent->transform->parent = parent->transform;
-	}
-	ent->transform->position = pos;
-	ent->transform->rotation = rot;
-	ent->transform->scale = scale;
-	ent->name = name;
-	game->scene->entities.push_back(ent);
-	ent->Init();
-	return ent;
-}
-
 Entity* Entity::Clone(string name, Entity* parent, vec3 pos, vec3 rot)
 {
-	Entity* ent = Spawn(name, parent, pos, rot);
+	Entity* ent = game->scene->Spawn(name, parent, pos, rot);
 	//ent->components = components;
 	/// @todo clone children here
 	//ent->Init();

@@ -12,11 +12,6 @@ subject to the following restrictions:
 2. Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
 3. This notice may not be removed or altered from any source distribution.
 */
-
-#if !_WIN32
-#define BT_SOFT_BODY_SOLVER_BUFFER_DX11_H
-#endif
-
 #ifndef BT_SOFT_BODY_SOLVER_BUFFER_DX11_H
 #define BT_SOFT_BODY_SOLVER_BUFFER_DX11_H
 

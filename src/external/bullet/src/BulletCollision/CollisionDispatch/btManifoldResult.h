@@ -4,8 +4,8 @@ Copyright (c) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose,
-including commercial applications, and to alter it and redistribute it freely,
+Permission is granted to anyone to use this software for any purpose, 
+including commercial applications, and to alter it and redistribute it freely, 
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -18,14 +18,18 @@ subject to the following restrictions:
 #define BT_MANIFOLD_RESULT_H
 
 class btCollisionObject;
+struct btCollisionObjectWrapper;
+
 #include "BulletCollision/NarrowPhaseCollision/btPersistentManifold.h"
 class btManifoldPoint;
 
 #include "BulletCollision/NarrowPhaseCollision/btDiscreteCollisionDetectorInterface.h"
 
 #include "LinearMath/btTransform.h"
+#include "BulletCollision/CollisionDispatch/btCollisionObjectWrapper.h"
+#include "BulletCollision/CollisionDispatch/btCollisionObject.h"
 
-typedef bool ( *ContactAddedCallback )( btManifoldPoint& cp,	const btCollisionObject* colObj0, int partId0, int index0, const btCollisionObject* colObj1, int partId1, int index1 );
+typedef bool (*ContactAddedCallback)(btManifoldPoint& cp,	const btCollisionObjectWrapper* colObj0Wrap,int partId0,int index0,const btCollisionObjectWrapper* colObj1Wrap,int partId1,int index1);
 extern ContactAddedCallback		gContactAddedCallback;
 
 //#define DEBUG_PART_INDEX 1
@@ -34,96 +38,113 @@ extern ContactAddedCallback		gContactAddedCallback;
 ///btManifoldResult is a helper class to manage  contact results.
 class btManifoldResult : public btDiscreteCollisionDetectorInterface::Result
 {
-	protected:
+protected:
 
-		btPersistentManifold* m_manifoldPtr;
+	btPersistentManifold* m_manifoldPtr;
 
-		//we need this for compounds
-		btTransform	m_rootTransA;
-		btTransform	m_rootTransB;
+	const btCollisionObjectWrapper* m_body0Wrap;
+	const btCollisionObjectWrapper* m_body1Wrap;
+	int	m_partId0;
+	int m_partId1;
+	int m_index0;
+	int m_index1;
+	
 
-		btCollisionObject* m_body0;
-		btCollisionObject* m_body1;
-		int	m_partId0;
-		int m_partId1;
-		int m_index0;
-		int m_index1;
+public:
 
-
-	public:
-
-		btManifoldResult()
+	btManifoldResult()
 #ifdef DEBUG_PART_INDEX
-			:
-			m_partId0( -1 ),
-			m_partId1( -1 ),
-			m_index0( -1 ),
-			m_index1( -1 )
+		:
+	m_partId0(-1),
+	m_partId1(-1),
+	m_index0(-1),
+	m_index1(-1)
 #endif //DEBUG_PART_INDEX
+	{
+	}
+
+	btManifoldResult(const btCollisionObjectWrapper* body0Wrap,const btCollisionObjectWrapper* body1Wrap);
+
+	virtual ~btManifoldResult() {};
+
+	void	setPersistentManifold(btPersistentManifold* manifoldPtr)
+	{
+		m_manifoldPtr = manifoldPtr;
+	}
+
+	const btPersistentManifold*	getPersistentManifold() const
+	{
+		return m_manifoldPtr;
+	}
+	btPersistentManifold*	getPersistentManifold()
+	{
+		return m_manifoldPtr;
+	}
+
+	virtual void setShapeIdentifiersA(int partId0,int index0)
+	{
+		m_partId0=partId0;
+		m_index0=index0;
+	}
+
+	virtual void setShapeIdentifiersB(	int partId1,int index1)
+	{
+		m_partId1=partId1;
+		m_index1=index1;
+	}
+
+
+	virtual void addContactPoint(const btVector3& normalOnBInWorld,const btVector3& pointInWorld,btScalar depth);
+
+	SIMD_FORCE_INLINE	void refreshContactPoints()
+	{
+		btAssert(m_manifoldPtr);
+		if (!m_manifoldPtr->getNumContacts())
+			return;
+
+		bool isSwapped = m_manifoldPtr->getBody0() != m_body0Wrap->getCollisionObject();
+
+		if (isSwapped)
 		{
-		}
-
-		btManifoldResult( btCollisionObject* body0, btCollisionObject* body1 );
-
-		virtual ~btManifoldResult() {};
-
-		void	setPersistentManifold( btPersistentManifold* manifoldPtr )
+			m_manifoldPtr->refreshContactPoints(m_body1Wrap->getCollisionObject()->getWorldTransform(),m_body0Wrap->getCollisionObject()->getWorldTransform());
+		} else
 		{
-			m_manifoldPtr = manifoldPtr;
+			m_manifoldPtr->refreshContactPoints(m_body0Wrap->getCollisionObject()->getWorldTransform(),m_body1Wrap->getCollisionObject()->getWorldTransform());
 		}
+	}
 
-		const btPersistentManifold*	getPersistentManifold() const
-		{
-			return m_manifoldPtr;
-		}
-		btPersistentManifold*	getPersistentManifold()
-		{
-			return m_manifoldPtr;
-		}
+	const btCollisionObjectWrapper* getBody0Wrap() const
+	{
+		return m_body0Wrap;
+	}
+	const btCollisionObjectWrapper* getBody1Wrap() const
+	{
+		return m_body1Wrap;
+	}
 
-		virtual void setShapeIdentifiersA( int partId0, int index0 )
-		{
-			m_partId0 = partId0;
-			m_index0 = index0;
-		}
+	void setBody0Wrap(const btCollisionObjectWrapper* obj0Wrap)
+	{
+		m_body0Wrap = obj0Wrap;
+	}
 
-		virtual void setShapeIdentifiersB(	int partId1, int index1 )
-		{
-			m_partId1 = partId1;
-			m_index1 = index1;
-		}
+	void setBody1Wrap(const btCollisionObjectWrapper* obj1Wrap)
+	{
+		m_body1Wrap = obj1Wrap;
+	}
 
+	const btCollisionObject* getBody0Internal() const
+	{
+		return m_body0Wrap->getCollisionObject();
+	}
 
-		virtual void addContactPoint( const btVector3& normalOnBInWorld, const btVector3& pointInWorld, btScalar depth );
+	const btCollisionObject* getBody1Internal() const
+	{
+		return m_body1Wrap->getCollisionObject();
+	}
 
-		SIMD_FORCE_INLINE	void refreshContactPoints()
-		{
-			btAssert( m_manifoldPtr );
-			if( !m_manifoldPtr->getNumContacts() )
-				return;
-
-			bool isSwapped = m_manifoldPtr->getBody0() != m_body0;
-
-			if( isSwapped )
-			{
-				m_manifoldPtr->refreshContactPoints( m_rootTransB, m_rootTransA );
-			}
-			else
-			{
-				m_manifoldPtr->refreshContactPoints( m_rootTransA, m_rootTransB );
-			}
-		}
-
-		const btCollisionObject* getBody0Internal() const
-		{
-			return m_body0;
-		}
-
-		const btCollisionObject* getBody1Internal() const
-		{
-			return m_body1;
-		}
-
+	/// in the future we can let the user override the methods to combine restitution and friction
+	static btScalar	calculateCombinedRestitution(const btCollisionObject* body0,const btCollisionObject* body1);
+	static btScalar	calculateCombinedFriction(const btCollisionObject* body0,const btCollisionObject* body1);
 };
 
 #endif //BT_MANIFOLD_RESULT_H

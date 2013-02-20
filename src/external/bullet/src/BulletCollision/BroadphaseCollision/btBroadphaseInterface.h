@@ -4,8 +4,8 @@ Copyright (c) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose,
-including commercial applications, and to alter it and redistribute it freely,
+Permission is granted to anyone to use this software for any purpose, 
+including commercial applications, and to alter it and redistribute it freely, 
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -29,7 +29,7 @@ class btOverlappingPairCache;
 struct	btBroadphaseAabbCallback
 {
 	virtual ~btBroadphaseAabbCallback() {}
-	virtual bool	process( const btBroadphaseProxy* proxy ) = 0;
+	virtual bool	process(const btBroadphaseProxy* proxy) = 0;
 };
 
 
@@ -50,35 +50,32 @@ struct	btBroadphaseRayCallback : public btBroadphaseAabbCallback
 ///The actual overlapping pair management, storage, adding and removing of pairs is dealt by the btOverlappingPairCache class.
 class btBroadphaseInterface
 {
-	public:
-		virtual ~btBroadphaseInterface() {}
+public:
+	virtual ~btBroadphaseInterface() {}
 
-		virtual btBroadphaseProxy*	createProxy( const btVector3& aabbMin,  const btVector3& aabbMax, int shapeType, void* userPtr, short int collisionFilterGroup, short int collisionFilterMask, btDispatcher* dispatcher, void* multiSapProxy ) = 0;
-		virtual void	destroyProxy( btBroadphaseProxy* proxy, btDispatcher* dispatcher ) = 0;
-		virtual void	setAabb( btBroadphaseProxy* proxy, const btVector3& aabbMin, const btVector3& aabbMax, btDispatcher* dispatcher ) = 0;
-		virtual void	getAabb( btBroadphaseProxy* proxy, btVector3& aabbMin, btVector3& aabbMax ) const = 0;
+	virtual btBroadphaseProxy*	createProxy(  const btVector3& aabbMin,  const btVector3& aabbMax,int shapeType,void* userPtr, short int collisionFilterGroup,short int collisionFilterMask, btDispatcher* dispatcher,void* multiSapProxy) =0;
+	virtual void	destroyProxy(btBroadphaseProxy* proxy,btDispatcher* dispatcher)=0;
+	virtual void	setAabb(btBroadphaseProxy* proxy,const btVector3& aabbMin,const btVector3& aabbMax, btDispatcher* dispatcher)=0;
+	virtual void	getAabb(btBroadphaseProxy* proxy,btVector3& aabbMin, btVector3& aabbMax ) const =0;
 
-		virtual void	rayTest( const btVector3& rayFrom, const btVector3& rayTo, btBroadphaseRayCallback& rayCallback, const btVector3& aabbMin = btVector3( 0, 0, 0 ), const btVector3& aabbMax = btVector3( 0, 0, 0 ) ) = 0;
+	virtual void	rayTest(const btVector3& rayFrom,const btVector3& rayTo, btBroadphaseRayCallback& rayCallback, const btVector3& aabbMin=btVector3(0,0,0), const btVector3& aabbMax = btVector3(0,0,0)) = 0;
 
-		virtual void	aabbTest( const btVector3& aabbMin, const btVector3& aabbMax, btBroadphaseAabbCallback& callback ) = 0;
+	virtual void	aabbTest(const btVector3& aabbMin, const btVector3& aabbMax, btBroadphaseAabbCallback& callback) = 0;
 
-		///calculateOverlappingPairs is optional: incremental algorithms (sweep and prune) might do it during the set aabb
-		virtual void	calculateOverlappingPairs( btDispatcher* dispatcher ) = 0;
+	///calculateOverlappingPairs is optional: incremental algorithms (sweep and prune) might do it during the set aabb
+	virtual void	calculateOverlappingPairs(btDispatcher* dispatcher)=0;
 
-		virtual	btOverlappingPairCache*	getOverlappingPairCache() = 0;
-		virtual	const btOverlappingPairCache*	getOverlappingPairCache() const = 0;
+	virtual	btOverlappingPairCache*	getOverlappingPairCache()=0;
+	virtual	const btOverlappingPairCache*	getOverlappingPairCache() const =0;
 
-		///getAabb returns the axis aligned bounding box in the 'global' coordinate frame
-		///will add some transform later
-		virtual void getBroadphaseAabb( btVector3& aabbMin, btVector3& aabbMax ) const = 0;
+	///getAabb returns the axis aligned bounding box in the 'global' coordinate frame
+	///will add some transform later
+	virtual void getBroadphaseAabb(btVector3& aabbMin,btVector3& aabbMax) const =0;
 
-		///reset broadphase internal structures, to ensure determinism/reproducability
-		virtual void resetPool( btDispatcher* dispatcher )
-		{
-			( void ) dispatcher;
-		};
+	///reset broadphase internal structures, to ensure determinism/reproducability
+	virtual void resetPool(btDispatcher* dispatcher) { (void) dispatcher; };
 
-		virtual void	printStats() = 0;
+	virtual void	printStats() = 0;
 
 };
 

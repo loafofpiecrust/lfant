@@ -4,8 +4,8 @@ Copyright (c) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose,
-including commercial applications, and to alter it and redistribute it freely,
+Permission is granted to anyone to use this software for any purpose, 
+including commercial applications, and to alter it and redistribute it freely, 
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -19,11 +19,12 @@ subject to the following restrictions:
 #include "BulletCollision/CollisionDispatch/btCollisionObject.h"
 #include "BulletSoftBody/btSoftBodySolvers.h"
 #include "btSoftBody.h"
+#include "BulletCollision/CollisionDispatch/btCollisionObjectWrapper.h"
 
 #define USE_PERSISTENT_CONTACTS 1
 
-btSoftSoftCollisionAlgorithm::btSoftSoftCollisionAlgorithm( btPersistentManifold* /*mf*/, const btCollisionAlgorithmConstructionInfo& ci, btCollisionObject* /*obj0*/, btCollisionObject* /*obj1*/ )
-	: btCollisionAlgorithm( ci )
+btSoftSoftCollisionAlgorithm::btSoftSoftCollisionAlgorithm(btPersistentManifold* /*mf*/,const btCollisionAlgorithmConstructionInfo& ci,const btCollisionObjectWrapper* /*obj0*/,const btCollisionObjectWrapper* /*obj1*/)
+: btCollisionAlgorithm(ci)
 //m_ownManifold(false),
 //m_manifoldPtr(mf)
 {
@@ -33,14 +34,14 @@ btSoftSoftCollisionAlgorithm::~btSoftSoftCollisionAlgorithm()
 {
 }
 
-void btSoftSoftCollisionAlgorithm::processCollision( btCollisionObject* body0, btCollisionObject* body1, const btDispatcherInfo& /*dispatchInfo*/, btManifoldResult* /*resultOut*/ )
+void btSoftSoftCollisionAlgorithm::processCollision (const btCollisionObjectWrapper* body0Wrap,const btCollisionObjectWrapper* body1Wrap,const btDispatcherInfo& /*dispatchInfo*/,btManifoldResult* /*resultOut*/)
 {
-	btSoftBody* soft0 =	( btSoftBody* )body0;
-	btSoftBody* soft1 =	( btSoftBody* )body1;
-	soft0->getSoftBodySolver()->processCollision( soft0, soft1 );
+	btSoftBody* soft0 =	(btSoftBody*)body0Wrap->getCollisionObject();
+	btSoftBody* soft1 =	(btSoftBody*)body1Wrap->getCollisionObject();
+	soft0->getSoftBodySolver()->processCollision(soft0, soft1);
 }
 
-btScalar btSoftSoftCollisionAlgorithm::calculateTimeOfImpact( btCollisionObject* /*body0*/, btCollisionObject* /*body1*/, const btDispatcherInfo& /*dispatchInfo*/, btManifoldResult* /*resultOut*/ )
+btScalar btSoftSoftCollisionAlgorithm::calculateTimeOfImpact(btCollisionObject* /*body0*/,btCollisionObject* /*body1*/,const btDispatcherInfo& /*dispatchInfo*/,btManifoldResult* /*resultOut*/)
 {
 	//not yet
 	return 1.f;

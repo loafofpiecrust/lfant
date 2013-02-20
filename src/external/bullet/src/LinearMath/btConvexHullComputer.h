@@ -3,8 +3,8 @@ Copyright (c) 2011 Ole Kniemeyer, MAXON, www.maxon.net
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose,
-including commercial applications, and to alter it and redistribute it freely,
+Permission is granted to anyone to use this software for any purpose, 
+including commercial applications, and to alter it and redistribute it freely, 
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -24,7 +24,7 @@ subject to the following restrictions:
 class btConvexHullComputer
 {
 	private:
-		btScalar compute( const void* coords, bool doubleCoords, int stride, int count, btScalar shrink, btScalar shrinkClamp );
+		btScalar compute(const void* coords, bool doubleCoords, int stride, int count, btScalar shrink, btScalar shrinkClamp);
 
 	public:
 
@@ -40,7 +40,7 @@ class btConvexHullComputer
 			public:
 				int getSourceVertex() const
 				{
-					return ( this + reverse )->targetVertex;
+					return (this + reverse)->targetVertex;
 				}
 
 				int getTargetVertex() const
@@ -55,7 +55,7 @@ class btConvexHullComputer
 
 				const Edge* getNextEdgeOfFace() const // counter-clockwise list of all edges of a face
 				{
-					return ( this + reverse )->getNextEdgeOfVertex();
+					return (this + reverse)->getNextEdgeOfVertex();
 				}
 
 				const Edge* getReverseEdge() const
@@ -86,15 +86,15 @@ class btConvexHullComputer
 
 		The output convex hull can be found in the member variables "vertices", "edges", "faces".
 		*/
-		btScalar compute( const float* coords, int stride, int count, btScalar shrink, btScalar shrinkClamp )
+		btScalar compute(const float* coords, int stride, int count, btScalar shrink, btScalar shrinkClamp)
 		{
-			return compute( coords, false, stride, count, shrink, shrinkClamp );
+			return compute(coords, false, stride, count, shrink, shrinkClamp);
 		}
 
 		// same as above, but double precision
-		btScalar compute( const double* coords, int stride, int count, btScalar shrink, btScalar shrinkClamp )
+		btScalar compute(const double* coords, int stride, int count, btScalar shrink, btScalar shrinkClamp)
 		{
-			return compute( coords, true, stride, count, shrink, shrinkClamp );
+			return compute(coords, true, stride, count, shrink, shrinkClamp);
 		}
 };
 

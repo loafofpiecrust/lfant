@@ -4,8 +4,8 @@ Copyright (c) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose,
-including commercial applications, and to alter it and redistribute it freely,
+Permission is granted to anyone to use this software for any purpose, 
+including commercial applications, and to alter it and redistribute it freely, 
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -28,23 +28,23 @@ class btStackAlloc;
 /// by taking closestPointInA = closestPointInB + m_distance * m_normalOnSurfaceB
 struct btDiscreteCollisionDetectorInterface
 {
-
+	
 	struct Result
 	{
-
-		virtual ~Result() {}
+	
+		virtual ~Result(){}	
 
 		///setShapeIdentifiersA/B provides experimental support for per-triangle material / custom material combiner
-		virtual void setShapeIdentifiersA( int partId0, int index0 ) = 0;
-		virtual void setShapeIdentifiersB( int partId1, int index1 ) = 0;
-		virtual void addContactPoint( const btVector3& normalOnBInWorld, const btVector3& pointInWorld, btScalar depth ) = 0;
+		virtual void setShapeIdentifiersA(int partId0,int index0)=0;
+		virtual void setShapeIdentifiersB(int partId1,int index1)=0;
+		virtual void addContactPoint(const btVector3& normalOnBInWorld,const btVector3& pointInWorld,btScalar depth)=0;
 	};
 
 	struct ClosestPointInput
 	{
 		ClosestPointInput()
-			: m_maximumDistanceSquared( btScalar( BT_LARGE_FLOAT ) ),
-			m_stackAlloc( 0 )
+			:m_maximumDistanceSquared(btScalar(BT_LARGE_FLOAT)),
+			m_stackAlloc(0)
 		{
 		}
 
@@ -60,31 +60,31 @@ struct btDiscreteCollisionDetectorInterface
 	// give either closest points (distance > 0) or penetration (distance)
 	// the normal always points from B towards A
 	//
-	virtual void	getClosestPoints( const ClosestPointInput& input, Result& output, class btIDebugDraw* debugDraw, bool swapResults = false ) = 0;
+	virtual void	getClosestPoints(const ClosestPointInput& input,Result& output,class btIDebugDraw* debugDraw,bool swapResults=false) = 0;
 
 };
 
 struct btStorageResult : public btDiscreteCollisionDetectorInterface::Result
 {
-	btVector3	m_normalOnSurfaceB;
-	btVector3	m_closestPointInB;
-	btScalar	m_distance; //negative means penetration !
+		btVector3	m_normalOnSurfaceB;
+		btVector3	m_closestPointInB;
+		btScalar	m_distance; //negative means penetration !
 
-	btStorageResult() : m_distance( btScalar( BT_LARGE_FLOAT ) )
-	{
-
-	}
-	virtual ~btStorageResult() {};
-
-	virtual void addContactPoint( const btVector3& normalOnBInWorld, const btVector3& pointInWorld, btScalar depth )
-	{
-		if( depth < m_distance )
+		btStorageResult() : m_distance(btScalar(BT_LARGE_FLOAT))
 		{
-			m_normalOnSurfaceB = normalOnBInWorld;
-			m_closestPointInB = pointInWorld;
-			m_distance = depth;
+
 		}
-	}
+		virtual ~btStorageResult() {};
+
+		virtual void addContactPoint(const btVector3& normalOnBInWorld,const btVector3& pointInWorld,btScalar depth)
+		{
+			if (depth < m_distance)
+			{
+				m_normalOnSurfaceB = normalOnBInWorld;
+				m_closestPointInB = pointInWorld;
+				m_distance = depth;
+			}
+		}
 };
 
 #endif //BT_DISCRETE_COLLISION_DETECTOR1_INTERFACE_H

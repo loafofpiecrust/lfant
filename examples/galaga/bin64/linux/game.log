@@ -1,0 +1,95 @@
+ShadowFox Engine launched.
+Subsystems instantiated.
+Settings::LoadSettings: User settings not found. Using default settings.
+Settings::LoadSettings: Loading settings from /home/taylorsnead/ShadowFox/ShadowFox-Engine/examples/galaga/bin64/linux/../../settings.cfg
+VALUE: Galaga
+general.gamename=Galaga
+VALUE: ShadowFox Studios
+general.orgname=ShadowFox Studios
+VALUE: $[gamename]
+general.windowtitle=$[gamename]
+VALUE: 4.2
+gl.version=4.2
+VALUE: 1
+gl.vertexarray=1
+VALUE: 1
+gl.cleardata=1
+VALUE: 0
+gl.usetexture=0
+VALUE: 1
+gl.drawelements=1
+VALUE: 1
+gl.usemvp=1
+VALUE: 1
+gl.loadobj=1
+VALUE: 1
+gl.usenormals=1
+VALUE: 889 x 500
+window.resolution=889 x 500
+VALUE: 1400x200
+window.position=1400x200
+VALUE: 120
+player.lookspeed=120
+VALUE: 10.0
+player.movementspeed=10.0
+VALUE: false
+player.mouselook=false
+VALUE: 20
+galaga.meshcount=20
+VALUE: Demo8.layout
+gui.windowlayout=Demo8.layout
+/home/taylorsnead/ShadowFox/ShadowFox-Engine/examples/galaga
+Operator string called
+Operator string called
+Settings::LoadSettings: User settings not found. Using default settings.
+Settings::LoadSettings: Loading settings from /home/taylorsnead/ShadowFox/ShadowFox-Engine/examples/galaga/settings.cfg
+VALUE: Galaga
+VALUE: ShadowFox Studios
+VALUE: $[gamename]
+VALUE: 4.2
+VALUE: 1
+VALUE: 1
+VALUE: 0
+VALUE: 1
+VALUE: 1
+VALUE: 1
+VALUE: 1
+VALUE: 889 x 500
+VALUE: 1400x200
+VALUE: 120
+VALUE: 10.0
+VALUE: false
+VALUE: 20
+VALUE: Demo8.layout
+/home/taylorsnead/My Games/ShadowFox Studios/Galaga
+Time::ResetTime: Started
+Time::ResetTime: Finished
+Physics::Init: Collision config created.
+Physics::Init: Collision dispatcher created.
+Physics::Init: Broadphase created.
+Physics::Init: Constraint solver created.
+Physics::Init: Contact callbacks set.
+Renderer::Init: About to start GLFW
+Renderer::OpenWindow: About to set window hints.
+Renderer::OpenWindow: Window hints set.
+Renderer::OpenWindow: Window mode determined.
+Renderer::OpenWindow: Window opened.
+Renderer::OpenWindow: GLEW Initialised.
+Operator string called
+Operator string called
+Operator string called
+Trying to scope: general.gamename, result: Galaga
+Operator string called
+Operator string called
+Renderer::OpenWindow: Window successfully opened.
+Renderer::WindowResized: Touch.
+Renderer: Initialized
+UserInterface::Init: Begin
+Got log single
+UserInterface::Init: Spawned renderer
+UserInterface::Init: Set a resource dir
+UserInterface::Init: Created scheme!
+UserInterface::Init: Root window
+Operator string called
+Input: Initialized
+Network::Connect: Begin

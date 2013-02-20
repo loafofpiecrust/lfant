@@ -93,7 +93,7 @@ public:
 		m_buffer = clCreateFromGLBuffer(m_context, CL_MEM_WRITE_ONLY, openGLVBO, &ciErrNum);
 		if( ciErrNum != CL_SUCCESS )
 		{
-		//	btAssert( 0 &&  "clEnqueueAcquireGLObjects(copySoftBodyToVertexBuffer)");
+			btAssert( 0 &&  "clEnqueueAcquireGLObjects(copySoftBodyToVertexBuffer)");
 		}
 
 		m_hasVertexPositions = true;
@@ -123,7 +123,7 @@ public:
 		m_buffer = clCreateFromGLBuffer(m_context, CL_MEM_WRITE_ONLY, openGLVBO, &ciErrNum);
 		if( ciErrNum != CL_SUCCESS )
 		{
-		//	btAssert( 0 &&  "clEnqueueAcquireGLObjects(copySoftBodyToVertexBuffer)");
+			btAssert( 0 &&  "clEnqueueAcquireGLObjects(copySoftBodyToVertexBuffer)");
 		}
 
 		m_vertexOffset = vertexOffset;

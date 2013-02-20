@@ -4,8 +4,8 @@ Copyright (c) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose,
-including commercial applications, and to alter it and redistribute it freely,
+Permission is granted to anyone to use this software for any purpose, 
+including commercial applications, and to alter it and redistribute it freely, 
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -27,23 +27,23 @@ class btConvexShape;
 /// Objects should not start in overlap, otherwise results are not defined.
 class btSubsimplexConvexCast : public btConvexCast
 {
-		btSimplexSolverInterface* m_simplexSolver;
-		const btConvexShape*	m_convexA;
-		const btConvexShape*	m_convexB;
+	btSimplexSolverInterface* m_simplexSolver;
+	const btConvexShape*	m_convexA;
+	const btConvexShape*	m_convexB;
 
-	public:
+public:
 
-		btSubsimplexConvexCast( const btConvexShape*	shapeA, const btConvexShape*	shapeB, btSimplexSolverInterface* simplexSolver );
+	btSubsimplexConvexCast (const btConvexShape*	shapeA,const btConvexShape*	shapeB,btSimplexSolverInterface* simplexSolver);
 
-		//virtual ~btSubsimplexConvexCast();
-		///SimsimplexConvexCast calculateTimeOfImpact calculates the time of impact+normal for the linear cast (sweep) between two moving objects.
-		///Precondition is that objects should not penetration/overlap at the start from the interval. Overlap can be tested using btGjkPairDetector.
-		virtual bool	calcTimeOfImpact(
+	//virtual ~btSubsimplexConvexCast();
+	///SimsimplexConvexCast calculateTimeOfImpact calculates the time of impact+normal for the linear cast (sweep) between two moving objects.
+	///Precondition is that objects should not penetration/overlap at the start from the interval. Overlap can be tested using btGjkPairDetector.
+	virtual bool	calcTimeOfImpact(
 			const btTransform& fromA,
 			const btTransform& toA,
 			const btTransform& fromB,
 			const btTransform& toB,
-			CastResult& result );
+			CastResult& result);
 
 };
 

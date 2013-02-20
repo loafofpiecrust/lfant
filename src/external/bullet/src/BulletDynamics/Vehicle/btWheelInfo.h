@@ -4,8 +4,8 @@
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
  * provided that the above copyright notice appear in all copies.
- * Erwin Coumans makes no representations about the suitability
- * of this software for any purpose.
+ * Erwin Coumans makes no representations about the suitability 
+ * of this software for any purpose.  
  * It is provided "as is" without express or implied warranty.
 */
 #ifndef BT_WHEEL_INFO_H
@@ -24,14 +24,14 @@ struct btWheelInfoConstructionInfo
 	btScalar	m_suspensionRestLength;
 	btScalar	m_maxSuspensionTravelCm;
 	btScalar	m_wheelRadius;
-
+	
 	btScalar		m_suspensionStiffness;
 	btScalar		m_wheelsDampingCompression;
 	btScalar		m_wheelsDampingRelaxation;
 	btScalar		m_frictionSlip;
 	btScalar		m_maxSuspensionForce;
 	bool m_bIsFrontWheel;
-
+	
 };
 
 /// btWheelInfo contains information per wheel about friction and suspension.
@@ -53,7 +53,7 @@ struct btWheelInfo
 	RaycastInfo	m_raycastInfo;
 
 	btTransform	m_worldTransform;
-
+	
 	btVector3	m_chassisConnectionPointCS; //const
 	btVector3	m_wheelDirectionCS;//const
 	btVector3	m_wheelAxleCS; // const or modified by steering
@@ -74,12 +74,12 @@ struct btWheelInfo
 	btScalar	m_engineForce;
 
 	btScalar	m_brake;
-
+	
 	bool m_bIsFrontWheel;
-
+	
 	void*		m_clientInfo;//can be used to store pointer to sync transforms...
 
-	btWheelInfo( btWheelInfoConstructionInfo& ci )
+	btWheelInfo(btWheelInfoConstructionInfo& ci)
 
 	{
 
@@ -94,18 +94,18 @@ struct btWheelInfo
 		m_wheelDirectionCS = ci.m_wheelDirectionCS;
 		m_wheelAxleCS = ci.m_wheelAxleCS;
 		m_frictionSlip = ci.m_frictionSlip;
-		m_steering = btScalar( 0. );
-		m_engineForce = btScalar( 0. );
-		m_rotation = btScalar( 0. );
-		m_deltaRotation = btScalar( 0. );
-		m_brake = btScalar( 0. );
-		m_rollInfluence = btScalar( 0.1 );
+		m_steering = btScalar(0.);
+		m_engineForce = btScalar(0.);
+		m_rotation = btScalar(0.);
+		m_deltaRotation = btScalar(0.);
+		m_brake = btScalar(0.);
+		m_rollInfluence = btScalar(0.1);
 		m_bIsFrontWheel = ci.m_bIsFrontWheel;
 		m_maxSuspensionForce = ci.m_maxSuspensionForce;
 
 	}
 
-	void	updateWheel( const btRigidBody& chassis, RaycastInfo& raycastInfo );
+	void	updateWheel(const btRigidBody& chassis,RaycastInfo& raycastInfo);
 
 	btScalar	m_clippedInvContactDotSuspension;
 	btScalar	m_suspensionRelativeVelocity;

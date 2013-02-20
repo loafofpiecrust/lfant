@@ -25,7 +25,7 @@ subject to the following restrictions:
 #include "BulletCollision/CollisionShapes/btSphereShape.h"
 #include "LinearMath/btQuickprof.h"
 #include <limits.h>
-
+#include "BulletCollision/CollisionDispatch/btCollisionObjectWrapper.h"
 
 #define BT_SUPPRESS_OPENCL_ASSERTS
 
@@ -49,27 +49,27 @@ subject to the following restrictions:
 
 ////OpenCL 1.0 kernels don't use float3
 #define MSTRINGIFY(A) #A
-static const char* PrepareLinksCLString =
+static const char* PrepareLinksCLString = 
 #include "OpenCLC10/PrepareLinks.cl"
-static const char* UpdatePositionsFromVelocitiesCLString =
+static const char* UpdatePositionsFromVelocitiesCLString = 
 #include "OpenCLC10/UpdatePositionsFromVelocities.cl"
-static const char* SolvePositionsCLString =
+static const char* SolvePositionsCLString = 
 #include "OpenCLC10/SolvePositions.cl"
-static const char* UpdateNodesCLString =
+static const char* UpdateNodesCLString = 
 #include "OpenCLC10/UpdateNodes.cl"
-static const char* UpdatePositionsCLString =
+static const char* UpdatePositionsCLString = 
 #include "OpenCLC10/UpdatePositions.cl"
-static const char* UpdateConstantsCLString =
+static const char* UpdateConstantsCLString = 
 #include "OpenCLC10/UpdateConstants.cl"
-static const char* IntegrateCLString =
+static const char* IntegrateCLString = 
 #include "OpenCLC10/Integrate.cl"
-static const char* ApplyForcesCLString =
+static const char* ApplyForcesCLString = 
 #include "OpenCLC10/ApplyForces.cl"
-static const char* UpdateFixedVertexPositionsCLString =
+static const char* UpdateFixedVertexPositionsCLString = 
 #include "OpenCLC10/UpdateFixedVertexPositions.cl"
-static const char* UpdateNormalsCLString =
+static const char* UpdateNormalsCLString = 
 #include "OpenCLC10/UpdateNormals.cl"
-static const char* VSolveLinksCLString =
+static const char* VSolveLinksCLString = 
 #include "OpenCLC10/VSolveLinks.cl"
 static const char* SolveCollisionsAndUpdateVelocitiesCLString =
 #include "OpenCLC10/SolveCollisionsAndUpdateVelocities.cl"
@@ -770,7 +770,7 @@ void btOpenCLSoftBodySolver::optimize( btAlignedObjectArray< btSoftBody * > &sof
 				desc.setInverseMass(vertexInverseMass);
 				getVertexData().setVertexAt( desc, firstVertex + vertex );
 
-				m_anchorIndex.push_back(-1.0);
+				m_anchorIndex.push_back(-1);
 			}
 
 			// Copy triangles similarly
@@ -793,7 +793,7 @@ void btOpenCLSoftBodySolver::optimize( btAlignedObjectArray< btSoftBody * > &sof
 
 			int firstLink = getLinkData().getNumLinks();
 			int numLinks = softBody->m_links.size();
-			int maxLinks = numLinks;
+//			int maxLinks = numLinks;
 			
 			// Allocate space for the links
 			getLinkData().createLinks( numLinks );
@@ -981,7 +981,7 @@ void btOpenCLSoftBodySolver::updateSoftBodies()
 
 
 	int numVertices = m_vertexData.getNumVertices();
-	int numTriangles = m_triangleData.getNumTriangles();
+//	int numTriangles = m_triangleData.getNumTriangles();
 
 	// Ensure data is on accelerator
 	m_vertexData.moveToAccelerator();
@@ -1240,8 +1240,8 @@ void btOpenCLSoftBodySolver::solveConstraints( float solverdt )
 	using Vectormath::Aos::dot;
 
 	// Prepare links
-	int numLinks = m_linkData.getNumLinks();
-	int numVertices = m_vertexData.getNumVertices();
+//	int numLinks = m_linkData.getNumLinks();
+//	int numVertices = m_vertexData.getNumVertices();
 
 	float kst = 1.f;
 	float ti = 0.f;
@@ -1615,7 +1615,6 @@ cl_kernel CLFunctions::compileCLKernelFromString( const char* kernelSource, cons
             break;
 		default:
 			{
-				break;
 			}
         }
 
@@ -1708,14 +1707,14 @@ void btOpenCLSoftBodySolver::processCollision( btSoftBody*, btSoftBody* )
 }
 
 // Add the collision object to the set to deal with for a particular soft body
-void btOpenCLSoftBodySolver::processCollision( btSoftBody *softBody, btCollisionObject* collisionObject )
+void btOpenCLSoftBodySolver::processCollision( btSoftBody *softBody, const btCollisionObjectWrapper* collisionObject )
 {
  	int softBodyIndex = findSoftBodyIndex( softBody );
 
 	if( softBodyIndex >= 0 )
 	{
-		btCollisionShape *collisionShape = collisionObject->getCollisionShape();
-		float friction = collisionObject->getFriction();
+		const btCollisionShape *collisionShape = collisionObject->getCollisionShape();
+		float friction = collisionObject->getCollisionObject()->getFriction();
 		int shapeType = collisionShape->getShapeType();
 		if( shapeType == CAPSULE_SHAPE_PROXYTYPE )
 		{
@@ -1725,13 +1724,13 @@ void btOpenCLSoftBodySolver::processCollision( btSoftBody *softBody, btCollision
 			newCollisionShapeDescription.collisionShapeType = shapeType;
 			// TODO: May need to transpose this matrix either here or in HLSL
 			newCollisionShapeDescription.shapeTransform = toTransform3(collisionObject->getWorldTransform());
-			btCapsuleShape *capsule = static_cast<btCapsuleShape*>( collisionShape );
+			const btCapsuleShape *capsule = static_cast<const btCapsuleShape*>( collisionShape );
 			newCollisionShapeDescription.radius = capsule->getRadius();
 			newCollisionShapeDescription.halfHeight = capsule->getHalfHeight();
 			newCollisionShapeDescription.margin = capsule->getMargin();
 			newCollisionShapeDescription.upAxis = capsule->getUpAxis();
 			newCollisionShapeDescription.friction = friction;
-			btRigidBody* body = static_cast< btRigidBody* >( collisionObject );
+			const btRigidBody* body = static_cast< const btRigidBody* >( collisionObject->getCollisionObject() );
 			newCollisionShapeDescription.linearVelocity = toVector3(body->getLinearVelocity());
 			newCollisionShapeDescription.angularVelocity = toVector3(body->getAngularVelocity());
 			m_collisionObjectDetails.push_back( newCollisionShapeDescription );

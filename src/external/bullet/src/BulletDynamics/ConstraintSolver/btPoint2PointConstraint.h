@@ -4,8 +4,8 @@ Copyright (c) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose,
-including commercial applications, and to alter it and redistribute it freely,
+Permission is granted to anyone to use this software for any purpose, 
+including commercial applications, and to alter it and redistribute it freely, 
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -34,9 +34,9 @@ class btRigidBody;
 struct	btConstraintSetting
 {
 	btConstraintSetting()	:
-		m_tau( btScalar( 0.3 ) ),
-		m_damping( btScalar( 1. ) ),
-		m_impulseClamp( btScalar( 0. ) )
+		m_tau(btScalar(0.3)),
+		m_damping(btScalar(1.)),
+		m_impulseClamp(btScalar(0.))
 	{
 	}
 	btScalar		m_tau;
@@ -51,51 +51,52 @@ enum btPoint2PointFlags
 };
 
 /// point to point constraint between two rigidbodies each with a pivotpoint that descibes the 'ballsocket' location in local space
-ATTRIBUTE_ALIGNED16( class ) btPoint2PointConstraint :
-public btTypedConstraint
+ATTRIBUTE_ALIGNED16(class) btPoint2PointConstraint : public btTypedConstraint
 {
 #ifdef IN_PARALLELL_SOLVER
 public:
 #endif
 	btJacobianEntry	m_jac[3]; //3 orthogonal linear constraints
-
+	
 	btVector3	m_pivotInA;
 	btVector3	m_pivotInB;
-
+	
 	int			m_flags;
 	btScalar	m_erp;
 	btScalar	m_cfm;
-
+	
 public:
+
+	BT_DECLARE_ALIGNED_ALLOCATOR();
 
 	///for backwards compatibility during the transition to 'getInfo/getInfo2'
 	bool		m_useSolveConstraintObsolete;
 
 	btConstraintSetting	m_setting;
 
-	btPoint2PointConstraint( btRigidBody& rbA, btRigidBody& rbB, const btVector3& pivotInA, const btVector3& pivotInB );
+	btPoint2PointConstraint(btRigidBody& rbA,btRigidBody& rbB, const btVector3& pivotInA,const btVector3& pivotInB);
 
-	btPoint2PointConstraint( btRigidBody& rbA, const btVector3& pivotInA );
+	btPoint2PointConstraint(btRigidBody& rbA,const btVector3& pivotInA);
 
 
 	virtual void	buildJacobian();
 
-	virtual void getInfo1( btConstraintInfo1* info );
+	virtual void getInfo1 (btConstraintInfo1* info);
 
-	void getInfo1NonVirtual( btConstraintInfo1* info );
+	void getInfo1NonVirtual (btConstraintInfo1* info);
 
-	virtual void getInfo2( btConstraintInfo2* info );
+	virtual void getInfo2 (btConstraintInfo2* info);
 
-	void getInfo2NonVirtual( btConstraintInfo2* info, const btTransform& body0_trans, const btTransform& body1_trans );
+	void getInfo2NonVirtual (btConstraintInfo2* info, const btTransform& body0_trans, const btTransform& body1_trans);
 
-	void	updateRHS( btScalar	timeStep );
+	void	updateRHS(btScalar	timeStep);
 
-	void	setPivotA( const btVector3& pivotA )
+	void	setPivotA(const btVector3& pivotA)
 	{
 		m_pivotInA = pivotA;
 	}
 
-	void	setPivotB( const btVector3& pivotB )
+	void	setPivotB(const btVector3& pivotB)
 	{
 		m_pivotInB = pivotB;
 	}
@@ -110,16 +111,16 @@ public:
 		return m_pivotInB;
 	}
 
-	///override the default global value of a parameter (such as ERP or CFM), optionally provide the axis (0..5).
+	///override the default global value of a parameter (such as ERP or CFM), optionally provide the axis (0..5). 
 	///If no axis is provided, it uses the default axis for this constraint.
-	virtual	void	setParam( int num, btScalar value, int axis = -1 );
+	virtual	void	setParam(int num, btScalar value, int axis = -1);
 	///return the local value of parameter
-	virtual	btScalar getParam( int num, int axis = -1 ) const;
+	virtual	btScalar getParam(int num, int axis = -1) const;
 
 	virtual	int	calculateSerializeBufferSize() const;
 
 	///fills the dataBuffer and returns the struct name (and 0 on failure)
-	virtual	const char*	serialize( void* dataBuffer, btSerializer* serializer ) const;
+	virtual	const char*	serialize(void* dataBuffer, btSerializer* serializer) const;
 
 
 };
@@ -143,18 +144,18 @@ struct	btPoint2PointConstraintDoubleData
 
 SIMD_FORCE_INLINE	int	btPoint2PointConstraint::calculateSerializeBufferSize() const
 {
-	return sizeof( btPoint2PointConstraintData );
+	return sizeof(btPoint2PointConstraintData);
 
 }
 
-///fills the dataBuffer and returns the struct name (and 0 on failure)
-SIMD_FORCE_INLINE	const char*	btPoint2PointConstraint::serialize( void* dataBuffer, btSerializer* serializer ) const
+	///fills the dataBuffer and returns the struct name (and 0 on failure)
+SIMD_FORCE_INLINE	const char*	btPoint2PointConstraint::serialize(void* dataBuffer, btSerializer* serializer) const
 {
-	btPoint2PointConstraintData* p2pData = ( btPoint2PointConstraintData* )dataBuffer;
+	btPoint2PointConstraintData* p2pData = (btPoint2PointConstraintData*)dataBuffer;
 
-	btTypedConstraint::serialize( &p2pData->m_typeConstraintData, serializer );
-	m_pivotInA.serialize( p2pData->m_pivotInA );
-	m_pivotInB.serialize( p2pData->m_pivotInB );
+	btTypedConstraint::serialize(&p2pData->m_typeConstraintData,serializer);
+	m_pivotInA.serialize(p2pData->m_pivotInA);
+	m_pivotInB.serialize(p2pData->m_pivotInB);
 
 	return btPoint2PointConstraintDataName;
 }

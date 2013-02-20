@@ -4,8 +4,8 @@ Copyright (c) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose,
-including commercial applications, and to alter it and redistribute it freely,
+Permission is granted to anyone to use this software for any purpose, 
+including commercial applications, and to alter it and redistribute it freely, 
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -29,8 +29,7 @@ subject to the following restrictions:
 #define VORONOI_DEFAULT_EQUAL_VERTEX_THRESHOLD 0.0001f
 
 
-struct btUsageBitfield
-{
+struct btUsageBitfield{
 	btUsageBitfield()
 	{
 		reset();
@@ -58,7 +57,7 @@ struct	btSubSimplexClosestResult
 {
 	btVector3	m_closestPointOnSimplex;
 	//MASK for m_usedVertices
-	//stores the simplex vertex-usage, using the MASK,
+	//stores the simplex vertex-usage, using the MASK, 
 	// if m_usedVertices & MASK then the related vertex is used
 	btUsageBitfield	m_usedVertices;
 	btScalar	m_barycentricCoords[4];
@@ -72,15 +71,15 @@ struct	btSubSimplexClosestResult
 	}
 	bool	isValid()
 	{
-		bool valid = ( m_barycentricCoords[0] >= btScalar( 0. ) ) &&
-					 ( m_barycentricCoords[1] >= btScalar( 0. ) ) &&
-					 ( m_barycentricCoords[2] >= btScalar( 0. ) ) &&
-					 ( m_barycentricCoords[3] >= btScalar( 0. ) );
+		bool valid = (m_barycentricCoords[0] >= btScalar(0.)) &&
+			(m_barycentricCoords[1] >= btScalar(0.)) &&
+			(m_barycentricCoords[2] >= btScalar(0.)) &&
+			(m_barycentricCoords[3] >= btScalar(0.));
 
 
 		return valid;
 	}
-	void	setBarycentricCoordinates( btScalar a = btScalar( 0. ), btScalar b = btScalar( 0. ), btScalar c = btScalar( 0. ), btScalar d = btScalar( 0. ) )
+	void	setBarycentricCoordinates(btScalar a=btScalar(0.),btScalar b=btScalar(0.),btScalar c=btScalar(0.),btScalar d=btScalar(0.))
 	{
 		m_barycentricCoords[0] = a;
 		m_barycentricCoords[1] = b;
@@ -93,85 +92,87 @@ struct	btSubSimplexClosestResult
 /// btVoronoiSimplexSolver is an implementation of the closest point distance algorithm from a 1-4 points simplex to the origin.
 /// Can be used with GJK, as an alternative to Johnson distance algorithm.
 #ifdef NO_VIRTUAL_INTERFACE
-class btVoronoiSimplexSolver
+ATTRIBUTE_ALIGNED16(class) btVoronoiSimplexSolver
 #else
-class btVoronoiSimplexSolver : public btSimplexSolverInterface
+ATTRIBUTE_ALIGNED16(class) btVoronoiSimplexSolver : public btSimplexSolverInterface
 #endif
 {
-	public:
+public:
 
-		int	m_numVertices;
+	BT_DECLARE_ALIGNED_ALLOCATOR();
 
-		btVector3	m_simplexVectorW[VORONOI_SIMPLEX_MAX_VERTS];
-		btVector3	m_simplexPointsP[VORONOI_SIMPLEX_MAX_VERTS];
-		btVector3	m_simplexPointsQ[VORONOI_SIMPLEX_MAX_VERTS];
+	int	m_numVertices;
+
+	btVector3	m_simplexVectorW[VORONOI_SIMPLEX_MAX_VERTS];
+	btVector3	m_simplexPointsP[VORONOI_SIMPLEX_MAX_VERTS];
+	btVector3	m_simplexPointsQ[VORONOI_SIMPLEX_MAX_VERTS];
+
+	
+
+	btVector3	m_cachedP1;
+	btVector3	m_cachedP2;
+	btVector3	m_cachedV;
+	btVector3	m_lastW;
+	
+	btScalar	m_equalVertexThreshold;
+	bool		m_cachedValidClosest;
 
 
+	btSubSimplexClosestResult m_cachedBC;
 
-		btVector3	m_cachedP1;
-		btVector3	m_cachedP2;
-		btVector3	m_cachedV;
-		btVector3	m_lastW;
+	bool	m_needsUpdate;
+	
+	void	removeVertex(int index);
+	void	reduceVertices (const btUsageBitfield& usedVerts);
+	bool	updateClosestVectorAndPoints();
 
-		btScalar	m_equalVertexThreshold;
-		bool		m_cachedValidClosest;
+	bool	closestPtPointTetrahedron(const btVector3& p, const btVector3& a, const btVector3& b, const btVector3& c, const btVector3& d, btSubSimplexClosestResult& finalResult);
+	int		pointOutsideOfPlane(const btVector3& p, const btVector3& a, const btVector3& b, const btVector3& c, const btVector3& d);
+	bool	closestPtPointTriangle(const btVector3& p, const btVector3& a, const btVector3& b, const btVector3& c,btSubSimplexClosestResult& result);
 
+public:
 
-		btSubSimplexClosestResult m_cachedBC;
+	btVoronoiSimplexSolver()
+		:  m_equalVertexThreshold(VORONOI_DEFAULT_EQUAL_VERTEX_THRESHOLD)
+	{
+	}
+	 void reset();
 
-		bool	m_needsUpdate;
+	 void addVertex(const btVector3& w, const btVector3& p, const btVector3& q);
 
-		void	removeVertex( int index );
-		void	reduceVertices( const btUsageBitfield& usedVerts );
-		bool	updateClosestVectorAndPoints();
+	 void	setEqualVertexThreshold(btScalar threshold)
+	 {
+		 m_equalVertexThreshold = threshold;
+	 }
 
-		bool	closestPtPointTetrahedron( const btVector3& p, const btVector3& a, const btVector3& b, const btVector3& c, const btVector3& d, btSubSimplexClosestResult& finalResult );
-		int		pointOutsideOfPlane( const btVector3& p, const btVector3& a, const btVector3& b, const btVector3& c, const btVector3& d );
-		bool	closestPtPointTriangle( const btVector3& p, const btVector3& a, const btVector3& b, const btVector3& c, btSubSimplexClosestResult& result );
+	 btScalar	getEqualVertexThreshold() const
+	 {
+		 return m_equalVertexThreshold;
+	 }
 
-	public:
+	 bool closest(btVector3& v);
 
-		btVoronoiSimplexSolver()
-			:  m_equalVertexThreshold( VORONOI_DEFAULT_EQUAL_VERTEX_THRESHOLD )
-		{
-		}
-		void reset();
+	 btScalar maxVertex();
 
-		void addVertex( const btVector3& w, const btVector3& p, const btVector3& q );
+	 bool fullSimplex() const
+	 {
+		 return (m_numVertices == 4);
+	 }
 
-		void	setEqualVertexThreshold( btScalar threshold )
-		{
-			m_equalVertexThreshold = threshold;
-		}
+	 int getSimplex(btVector3 *pBuf, btVector3 *qBuf, btVector3 *yBuf) const;
 
-		btScalar	getEqualVertexThreshold() const
-		{
-			return m_equalVertexThreshold;
-		}
+	 bool inSimplex(const btVector3& w);
+	
+	 void backup_closest(btVector3& v) ;
 
-		bool closest( btVector3& v );
+	 bool emptySimplex() const ;
 
-		btScalar maxVertex();
+	 void compute_points(btVector3& p1, btVector3& p2) ;
 
-		bool fullSimplex() const
-		{
-			return ( m_numVertices == 4 );
-		}
-
-		int getSimplex( btVector3* pBuf, btVector3* qBuf, btVector3* yBuf ) const;
-
-		bool inSimplex( const btVector3& w );
-
-		void backup_closest( btVector3& v ) ;
-
-		bool emptySimplex() const ;
-
-		void compute_points( btVector3& p1, btVector3& p2 ) ;
-
-		int numVertices() const
-		{
-			return m_numVertices;
-		}
+	 int numVertices() const 
+	 {
+		 return m_numVertices;
+	 }
 
 
 };

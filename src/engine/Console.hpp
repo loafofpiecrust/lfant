@@ -39,39 +39,50 @@ namespace sfs
  */
 
 /**
+ *	Controls a set of variables and commands through text input.
  *	@details
- *
+ *		Supports getting and setting variables, calling callback commands,
+ *		and recreation of a few commands/abilities of a standard linux
+ *		bash terminal.
  *	@todo
- *
+ *		Add a few basic bash commands for filesystem management.
  */
 class Console : public Subsystem
 {
 public:
-	typedef boost::function<void(vector<string>)> CommandFunc;
-	typedef void (CommandFuncRaw)(vector<string>);
-	typedef boost::function<void()> CommandFuncSimple;
-	typedef void (CommandFuncSimpleRaw)();
-
 	struct Command
 	{
 		string name;
-		CommandFunc func;
-		string desc;
+		string help;
 
-		Command(string name, CommandFunc func, string desc) :
-			name(name), func(func), desc(desc)
+		Command(string name, string help) :
+			name(name), help(help)
+		{
+		}
+
+		virtual ~Command() {}
+	};
+
+	struct CommandSimple : public Command
+	{
+		typedef void (funcTypeRaw)();
+		typedef boost::function<void()> funcType;
+		funcType func;
+
+		CommandSimple(funcType func, string name, string help) :
+			Command(name, help), func(func)
 		{
 		}
 	};
 
-	struct CommandSimple
+	struct CommandDefault : public Command
 	{
-		string name;
-		CommandFuncSimple func;
-		string desc;
+		typedef void (funcTypeRaw)(vector<string>);
+		typedef boost::function<void(vector<string>)> funcType;
+		funcType func;
 
-		CommandSimple(string name, CommandFuncSimple func, string desc) :
-			name(name), func(func), desc(desc)
+		CommandDefault(funcType func, string name, string help) :
+			Command(name, help), func(func)
 		{
 		}
 	};
@@ -80,11 +91,11 @@ public:
 	{
 		string name;
 		float value;
-		string desc;
+		string help;
 		bool readOnly;
 
-		Variable(string name, float val, string desc = "", bool readOnly = false) :
-			name(name), value(val), desc(desc), readOnly(readOnly)
+		Variable(string name, float val, string help = "", bool readOnly = false) :
+			name(name), value(val), help(help), readOnly(readOnly)
 		{
 		}
 	};
@@ -128,16 +139,27 @@ public:
 		file.close();
 	}
 
-	void RegisterCommand(string name, CommandFuncRaw func, string desc = "");
-	void RegisterCommand(string name, CommandFuncSimpleRaw func, string desc = "");
+	void RegisterCommand(CommandDefault::funcTypeRaw func, string name, string help = "");
+	void RegisterCommand(CommandSimple::funcTypeRaw func, string name, string help = "");
 
-	void RegisterVar(string name, float val, string desc = "", bool readOnly = false);
+	void RegisterVar(string name, float val, string help = "", bool readOnly = false);
 
 	bool CallCommand(string name, vector<string> args);
+	bool CallCommand(string name);
 
 	Variable* GetVar(string name);
 	Command* GetCommand(string name);
-	CommandSimple* GetSimpleCommand(string name);
+
+	template<typename T>
+	T* GetCommand(string name)
+	{
+		auto cmd = GetCommand(name);
+		if(auto t = dynamic_cast<T*>(cmd))
+		{
+			return t;
+		}
+		return nullptr;
+	}
 
 	float GetValue(string name);
 	void SetValue(string name, float value);
@@ -147,9 +169,8 @@ public:
 protected:
 
 private:
-	vector<Command> commands;
-	vector<CommandSimple> simpleCommands;
-	vector<Variable> variables;
+	vector<Command*> commands;
+	vector<Variable*> variables;
 
 	string logFile = "game.log";
 };
@@ -166,5 +187,8 @@ void Log(T msg, P msg2, A ... args)
 	game->console->LinePrint(msg);
 	Log(msg2, args...);
 }
+
+/// @}
+/// @}
 
 } /* namespace sfs */

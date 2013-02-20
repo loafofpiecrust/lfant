@@ -149,7 +149,6 @@ void PosixThreadSupport::sendRequest(uint32_t uiCommand, ppu_address_t uiArgumen
 		{
 			///not implemented
 			btAssert(0);
-			break;
 		}
 
 	};
@@ -249,6 +248,7 @@ void PosixThreadSupport::stopSPU()
             destroySem(spuStatus.startSemaphore);
             printf("semaphore destroyed\n");
 		checkPThreadFunction(pthread_join(spuStatus.thread,0));
+
         }
 	printf("destroy main semaphore\n");
         destroySem(mainSemaphore);
@@ -396,5 +396,14 @@ btCriticalSection* PosixThreadSupport::createCriticalSection()
 	return new PosixCriticalSection();
 }
 
+void	PosixThreadSupport::deleteBarrier(btBarrier* barrier)
+{
+	delete barrier;
+}
+
+void PosixThreadSupport::deleteCriticalSection(btCriticalSection* cs)
+{
+	delete cs;
+}
 #endif // USE_PTHREADS
 

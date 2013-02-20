@@ -49,37 +49,22 @@ public:
 	}
 
 	void Translate(vec3 pos);
-	void Translate(float x, float y, float z);
 	void Rotate(vec3 rot);
 	void Scale(vec3 scl);
-
-	const Entity* owner;
-
-	Transform* parent;
-
-	vec3 direction;
-	vec3 right;
-	vec3 up;
-
-public:
 
 	// Properties
 
 	vec3& GetPosition();
 	void SetPosition(vec3 pos);
-	vec3 _position = vec3(0);
 
 	quat GetRotationQuat();
 	void SetRotationQuat(quat rot);
-	quat _rotationQuat;
 
 	vec3& GetRotation();
 	void SetRotation(vec3 rot);
-	vec3 _rotation = vec3(0);
 
-	vec3 GetScale();
+	vec3& GetScale();
 	void SetScale(vec3 scl);
-	vec3 _scale = vec3(1);
 
 	vec3 GetWorldPosition();
 	void SetWorldPosition(vec3 pos);
@@ -95,8 +80,25 @@ public:
 
 	mat4 GetMatrix();
 
+	void SetDirection();
+
+	const Entity* owner;
+
+	Transform* parent;
+
+	vec3 direction;
+	vec3 right;
+	vec3 up;
+
+protected:
+	vec3 position = vec3(0);
+	vec3 rotation = vec3(0);
+	quat rotationQuat;
+	vec3 scale = vec3(1);
+
 	//Property<Transform, boost::function_types::result_type<decltype(&Transform::GetPos)>::type, mpl::at_c<parameter_types<decltype(&Transform::SetPos)>, 1>::type> posir;
 
+	/*
 	PROP_RW(Transform, position, GetPosition, SetPosition)
 	PROP_RW(Transform, rotation, GetRotation, SetRotation)
 	PROP_RW(Transform, rotationQuat, GetRotationQuat, SetRotationQuat)
@@ -108,8 +110,7 @@ public:
 	PROP_RW(Transform, worldScale, GetWorldScale, SetWorldScale)
 
 	PROP_RO(Transform, matrix, GetMatrix)
-
-	void SetDirection();
+	*/
 };
 
 /** @} */

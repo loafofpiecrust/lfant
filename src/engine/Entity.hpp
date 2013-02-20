@@ -28,7 +28,7 @@
 #include "Object.hpp"
 #include "Transform.hpp"
 #include "Component.hpp"
-#include "Type.hpp"
+#include "TypeInfo.hpp"
 #include "Engine.hpp"
 
 namespace sfs
@@ -131,9 +131,6 @@ public:
 	Entity* GetChild(string name, bool recursive = false);
 
 	void SetActiveRecursive(bool active);
-
-	static Entity* Spawn(string name, Entity* parent = nullptr, vec3 pos = vec3(0), vec3 rot = vec3(0),
-						 vec3 scale = vec3(1));
 
 	vector<Component*> components;
 
