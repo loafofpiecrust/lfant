@@ -92,45 +92,4 @@ UserInterface::Init: Created scheme!
 UserInterface::Init: Root window
 Operator string called
 Input: Initialized
-Window callback set.
-Subsystems initialized
-Galaga::Init: Subsystems initialised
-Computer name: ShadowFox-linux
-Username: 
-Running OS: GNU/Linux 3.5.0-23-generic
-CPU:  with 0 cores
-Scene::Spawn: Vector capacity: 0
-Looking at 120
-Moving at 10
-Scene::Spawn: Vector capacity: 1
-Scene::Spawn: Had to resrve for Vector capacity: 6
-Want to load an image file
-Loading an image file of type png
-About to load a png
-LoadPNG: Image size: 128x128
-Texture::LoadPNG: GL Texture generated
-Texture::LoadPNG: GL Texture bound
-Texture::LoadPNG: texture data sent
-Texture::LoadPNG: texture filtering set
-Game initialised
-Renderer::WindowResized: Touch.
-Renderer::WindowResized: Touch.
-Renderer::WindowResized: Touch.
-Renderer::WindowResized: Touch.
-Renderer::WindowResized: Touch.
-Renderer::WindowResized: Touch.
-Renderer::WindowResized: Touch.
-Renderer::WindowResized: Touch.
-Renderer::WindowResized: Touch.
-Renderer::WindowResized: Touch.
-Renderer::WindowResized: Touch.
-Renderer::WindowResized: Touch.
-Renderer::WindowResized: Touch.
-Renderer::WindowResized: Touch.
-Renderer::WindowClosed: Touch.
-About to destroy game
-Scene::Destroy: Destroying Snead
-Entity::Destroy: Components destroyed
-Scene::Destroy: Destroying TestMesh
-Entity::Destroy: Components destroyed
-Game ending
+Network::Connect: Begin

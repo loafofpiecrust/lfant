@@ -26,7 +26,6 @@
 #include <PacketLogger.h>
 #include <BitStream.h>
 #include <RakSleep.h>
-#include <RakPeer.h>
 #include <MessageIdentifiers.h>
 
 // Internal
@@ -50,7 +49,8 @@ Connection::Connection(string name, string host, uint16_t port, string password,
 	name(name), host(host), password(password), maxPeers(maxPeers)
 {
 	socket.port = port;
-	peer = new RakPeer();
+	//peer = new RakPeer();
+	peer = RakPeerInterface::GetInstance();
 	Log("Connection::Connection: Created peer instance");
 	peer->AttachPlugin(&fcm);
 	peer->AttachPlugin(&cg);
@@ -66,31 +66,37 @@ void Network::Init()
 
 void Network::Update()
 {
-	Packet* packet;
+	/*
+	Packet* packet = nullptr;
 	for(Connection* con : connections)
 	{
+		Log("Network::Update: About to start packet checking");
 		if(!con->started)
 		{
 			continue;
 		}
 		packet = con->peer->Receive();
-		if(packet)
+		Log("Network::Update: Received packet");
+		if(packet && packet->data)
 		{
-			switch(packet->data[0])
+			Log("Network::Update: Packet data seems valid, size = ", sizeof(packet->data), ", first = ", (int)packet->data[0]);
+			switch((unsigned int)packet->data[0])
 			{
 				case ID_DISCONNECTION_NOTIFICATION:
 					// Connection lost normally
-					printf("ID_DISCONNECTION_NOTIFICATION\n");
+					Log("Network::Update: DISCONNECTION_NOTIFICATION");
 					break;
 
 				case ID_NEW_INCOMING_CONNECTION:
 					// Somebody connected.  We have their IP now
-					printf("ID_NEW_INCOMING_CONNECTION from %s. guid=%s.\n", packet->systemAddress.ToString(true), packet->guid.ToString());
+					Log("Network::Update: NEW_INCOMING_CONNECTION");
+					Log("Network::Update: Its from ", packet->systemAddress.ToString(true), ", guid=", packet->guid.ToString());
 					break;
 
 				case ID_CONNECTION_REQUEST_ACCEPTED:
 					// Somebody connected.  We have their IP now
-					printf("ID_CONNECTION_REQUEST_ACCEPTED from %s. guid=%s.\n", packet->systemAddress.ToString(true), packet->guid.ToString());
+					Log("Network::Update: CONNECTION_ACCEPTED");
+					Log("Network::Update: Its from ", packet->systemAddress.ToString(true), ", guid=", packet->guid.ToString());
 					if(packet->guid != con->peer->GetMyGUID())
 					{
 						con->peer->Connect(packet->systemAddress.ToString(false), packet->systemAddress.GetPort(), 0, 0);
@@ -100,21 +106,23 @@ void Network::Update()
 				case ID_CONNECTION_LOST:
 					// Couldn't deliver a reliable packet - i.e. the other system was abnormally
 					// terminated
-					printf("ID_CONNECTION_LOST\n");
+					Log("Network::Update: CONNECTION_LOST");
 					break;
 
 				case ID_ADVERTISE_SYSTEM:
+					Log("Network::Update: ADVERTISE_SYSTEM");
 					// Do something here?
 					break;
 
 				case ID_FCM2_NEW_HOST:
+					Log("Network::Update: NEW_HOST");
 					if(packet->guid == con->peer->GetMyGUID())
 					{
-						printf("Got new host (ourselves)");	// You're the new host, do something with that
+						Log("Got new host (ourselves)");	// You're the new host, do something with that
 					}
 					else
 					{
-						printf("Got new host %s, GUID=%s", packet->systemAddress.ToString(true), packet->guid.ToString());  // Someone else is host, GUI!
+						Log("Got new host ", packet->systemAddress.ToString(true), ", GUID=", packet->guid.ToString());  // Someone else is host, GUI!
 					}
 					BitStream bs(packet->data, packet->length, false);
 					bs.IgnoreBytes(1);
@@ -123,30 +131,36 @@ void Network::Update()
 					// If oldHost is different then the current host, then we lost connection to the host
 					if(oldHost != UNASSIGNED_RAKNET_GUID)
 					{
-						printf(". Old-host Guid=%s\n", oldHost.ToString());	// Host is diff, this is old
+						Log(". Old-host Guid=", oldHost.ToString());	// Host is diff, this is old
 					}
 					else
 					{
-						printf(". (First reported host)\n");   // The host is the same
+						Log("(First reported host)");   // The host is the same
 					}
 					break;
 			}
+			Log("Network::Update: About to deallocate packet");
 			con->peer->DeallocatePacket(packet);
 		}
+		Log("Network::Update: Next connection!");
 	}
+	*/
 }
 
 bool Network::Connect(string name, string host, uint16_t port, string password, uint16_t maxPeers)
 {
 	Log("Network::Connect: Begin");
-	Connection* con;
+	Connection* con = nullptr;
 	bool isnew = false;
-	for(auto pco : connections)
+	if(connections.size() > 0)
 	{
-		if(pco->name == name)
+		for(auto pco : connections)
 		{
-			con = pco;
-			break;
+			if(pco->name == name)
+			{
+				con = pco;
+				break;
+			}
 		}
 	}
 	if(!con)
@@ -170,8 +184,7 @@ bool Network::Connect(string name, string host, uint16_t port, string password, 
 	}
 
 	Log("Network::Connect: New connection, "+con->name+", at "+con->host+" ", con->socket.port, ", max peers: ", con->maxPeers);
-
-	while(SocketLayer::IsPortInUse(con->socket.port, con->socket.hostAddress, con->socket.socketFamily) == true)
+	while(IRNS2_Berkley::IsPortInUse(con->socket.port, con->socket.hostAddress, con->socket.socketFamily, SOCK_DGRAM) == true)
 	{
 		con->socket.port++;
 	}
