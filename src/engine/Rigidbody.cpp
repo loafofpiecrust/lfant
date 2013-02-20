@@ -21,6 +21,8 @@
 #include "Rigidbody.hpp"
 
 // External
+#include <btBulletDynamicsCommon.h>
+#include <BulletDynamics/Dynamics/btRigidBody.h>
 
 // Internal
 #include "Collider.hpp"
@@ -45,10 +47,12 @@ Rigidbody::~Rigidbody()
 
 void Rigidbody::Init()
 {
-	motionState = new btDefaultMotionState(initTransform);
-	collider->shape->calculateLocalInertia(mass, inertia);
+	inertia = new btVector3();
+	initTransform = new btTransform();
+	motionState = new btDefaultMotionState(*initTransform);
+	collider->shape->calculateLocalInertia(mass, *inertia);
 //	game->physics->SetGravityPoint( inertia );
-	body = new btRigidBody(mass, motionState, collider->shape, inertia);
+	body = new btRigidBody(mass, motionState, collider->shape, *inertia);
 
 //connect( SENDER(&owner->transform, SetPos), RECEIVER(this, OnSetPos) );
 //connect( SENDER(&owner->transform, SetRot), RECEIVER(this, OnSetRot) );
@@ -95,7 +99,7 @@ void Rigidbody::SetMass(float mass)
 {
 	this->mass = mass;
 //	collider->shape->calculateLocalInertia( mass, inertia );
-	body->setMassProps(mass, inertia);
+	body->setMassProps(mass, *inertia);
 }
 
 vec3 Rigidbody::GetWorldGravity()

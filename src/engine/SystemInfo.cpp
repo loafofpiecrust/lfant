@@ -17,13 +17,14 @@
  * limitations under the License.
  *
  ******************************************************************************/
+
 #include "SystemInfo.hpp"
 
 // External
 
 // Internal
 #include "Console.hpp"
-#include "StringUtil.hpp"
+#include "String.hpp"
 
 namespace sfs
 {
@@ -65,28 +66,21 @@ void SystemInfo::Init()
 	monitor.resolution.y = GetSystemMetrics(SM_CYSCREEN);
 
 	// Operating System
-	OSVERSIONINFO verInfo =
-	{ sizeof(OSVERSIONINFO) };
+	OSVERSIONINFO verInfo = { sizeof(OSVERSIONINFO) };
 	GetVersionEx(&verInfo);
 	if(verInfo.dwMajorVersion == 5)
 	{
 		switch(verInfo.dwMinorVersion)
 		{
 			case 0:
-				{
-					OS = "Windows 2000 " + string(verInfo.szCSDVersion);
-					break;
-				}
+				OS = "Windows 2000 " + string(verInfo.szCSDVersion);
+				break;
 			case 1:
-				{
-					OS = "Windows XP " + string(verInfo.szCSDVersion);
-					break;
-				}
+				OS = "Windows XP " + string(verInfo.szCSDVersion);
+				break;
 			case 2:
-				{
-					OS = "Windows 2003 " + string(verInfo.szCSDVersion);
-					break;
-				}
+				OS = "Windows 2003 " + string(verInfo.szCSDVersion);
+				break;
 		}
 	}
 	else if(verInfo.dwMajorVersion == 6)
@@ -94,31 +88,18 @@ void SystemInfo::Init()
 		switch(verInfo.dwMinorVersion)
 		{
 			case 0:
-				{
-					OS = "Windows Vista " + string(verInfo.szCSDVersion);
-					break;
-				}
+				OS = "Windows Vista " + string(verInfo.szCSDVersion);
+				break;
 			case 1:
-				{
-					OS = "Windows 7 " + string(verInfo.szCSDVersion);
-					break;
-				}
+				OS = "Windows 7 " + string(verInfo.szCSDVersion);
+				break;
 			case 2:
-				{
-					OS = "Windows 8 " + string(verInfo.szCSDVersion);
-					break;
-				}
+				OS = "Windows 8 " + string(verInfo.szCSDVersion);
+				break;
 		}
 	}
 
 	// Processor/CPU
-	/*int t = 0;
-
-	 __asm__ (""
-			 "movl 01h,eax;"
-			 "cpuid;"
-			 "movl %ebx,t;"
-			 "");*/
 	{
 		int CPUInfo[4] = { -1};
 		__cpuid(CPUInfo, 0x80000000);
@@ -212,7 +193,6 @@ void SystemInfo::Init()
 #elif LINUX
 void SystemInfo::Init()
 {
-	/*
 	FILE* cmd;
 	int status;
 	char result[250];
@@ -224,10 +204,10 @@ void SystemInfo::Init()
 	}
 	pclose(cmd);
 
-	vector<string> result_spl = Split(string(result), " ");
-	OS = result_spl[result_spl.size() - 1] + result_spl[2];
+	vector<string> result_spl = Split(string(result), " \n");
+	OS = result_spl[result_spl.size() - 1] + " " + result_spl[2];
 	computerName = result_spl[1];
-	*/
+
 }
 #endif
 

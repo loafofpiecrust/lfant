@@ -4,8 +4,8 @@ Copyright (c) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose,
-including commercial applications, and to alter it and redistribute it freely,
+Permission is granted to anyone to use this software for any purpose, 
+including commercial applications, and to alter it and redistribute it freely, 
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -28,46 +28,45 @@ class btSoftBody;
 /// btSoftRigidCollisionAlgorithm  provides collision detection between btSoftBody and btRigidBody
 class btSoftRigidCollisionAlgorithm : public btCollisionAlgorithm
 {
-		//	bool	m_ownManifold;
-		//	btPersistentManifold*	m_manifoldPtr;
+	//	bool	m_ownManifold;
+	//	btPersistentManifold*	m_manifoldPtr;
 
-		btSoftBody*				m_softBody;
-		btCollisionObject*		m_rigidCollisionObject;
+	btSoftBody*				m_softBody;
+	btCollisionObject*		m_rigidCollisionObject;
 
-		///for rigid versus soft (instead of soft versus rigid), we use this swapped boolean
-		bool	m_isSwapped;
+	///for rigid versus soft (instead of soft versus rigid), we use this swapped boolean
+	bool	m_isSwapped;
 
-	public:
+public:
 
-		btSoftRigidCollisionAlgorithm( btPersistentManifold* mf, const btCollisionAlgorithmConstructionInfo& ci, btCollisionObject* col0, btCollisionObject* col1, bool isSwapped );
+	btSoftRigidCollisionAlgorithm(btPersistentManifold* mf,const btCollisionAlgorithmConstructionInfo& ci,const btCollisionObjectWrapper* col0,const btCollisionObjectWrapper* col1Wrap, bool isSwapped);
 
-		virtual ~btSoftRigidCollisionAlgorithm();
+	virtual ~btSoftRigidCollisionAlgorithm();
 
-		virtual void processCollision( btCollisionObject* body0, btCollisionObject* body1, const btDispatcherInfo& dispatchInfo, btManifoldResult* resultOut );
+	virtual void processCollision (const btCollisionObjectWrapper* body0Wrap,const btCollisionObjectWrapper* body1Wrap,const btDispatcherInfo& dispatchInfo,btManifoldResult* resultOut);
 
-		virtual btScalar calculateTimeOfImpact( btCollisionObject* body0, btCollisionObject* body1, const btDispatcherInfo& dispatchInfo, btManifoldResult* resultOut );
+	virtual btScalar calculateTimeOfImpact(btCollisionObject* body0,btCollisionObject* body1,const btDispatcherInfo& dispatchInfo,btManifoldResult* resultOut);
 
-		virtual	void	getAllContactManifolds( btManifoldArray&	manifoldArray )
+	virtual	void	getAllContactManifolds(btManifoldArray&	manifoldArray)
+	{
+		//we don't add any manifolds
+	}
+
+
+	struct CreateFunc :public 	btCollisionAlgorithmCreateFunc
+	{
+		virtual	btCollisionAlgorithm* CreateCollisionAlgorithm(btCollisionAlgorithmConstructionInfo& ci, const btCollisionObjectWrapper* body0Wrap,const btCollisionObjectWrapper* body1Wrap)
 		{
-			//we don't add any manifolds
-		}
-
-
-		struct CreateFunc : public 	btCollisionAlgorithmCreateFunc
-		{
-			virtual	btCollisionAlgorithm* CreateCollisionAlgorithm( btCollisionAlgorithmConstructionInfo& ci, btCollisionObject* body0, btCollisionObject* body1 )
+			void* mem = ci.m_dispatcher1->allocateCollisionAlgorithm(sizeof(btSoftRigidCollisionAlgorithm));
+			if (!m_swapped)
 			{
-				void* mem = ci.m_dispatcher1->allocateCollisionAlgorithm( sizeof( btSoftRigidCollisionAlgorithm ) );
-				if( !m_swapped )
-				{
-					return new( mem ) btSoftRigidCollisionAlgorithm( 0, ci, body0, body1, false );
-				}
-				else
-				{
-					return new( mem ) btSoftRigidCollisionAlgorithm( 0, ci, body0, body1, true );
-				}
+				return new(mem) btSoftRigidCollisionAlgorithm(0,ci,body0Wrap,body1Wrap,false);
+			} else
+			{
+				return new(mem) btSoftRigidCollisionAlgorithm(0,ci,body0Wrap,body1Wrap,true);
 			}
-		};
+		}
+	};
 
 };
 

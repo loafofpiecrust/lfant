@@ -4,8 +4,8 @@ Copyright (c) 2003-2009 Erwin Coumans  http://bulletphysics.org
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose,
-including commercial applications, and to alter it and redistribute it freely,
+Permission is granted to anyone to use this software for any purpose, 
+including commercial applications, and to alter it and redistribute it freely, 
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -26,19 +26,19 @@ subject to the following restrictions:
 ///Performance of btTriangleMesh and btTriangleIndexVertexArray used in a btBvhTriangleMeshShape is the same.
 class btTriangleMesh : public btTriangleIndexVertexArray
 {
-		btAlignedObjectArray<btVector3>	m_4componentVertices;
-		btAlignedObjectArray<float>		m_3componentVertices;
+	btAlignedObjectArray<btVector3>	m_4componentVertices;
+	btAlignedObjectArray<float>		m_3componentVertices;
 
-		btAlignedObjectArray<unsigned int>		m_32bitIndices;
-		btAlignedObjectArray<unsigned short int>		m_16bitIndices;
-		bool	m_use32bitIndices;
-		bool	m_use4componentVertices;
-
+	btAlignedObjectArray<unsigned int>		m_32bitIndices;
+	btAlignedObjectArray<unsigned short int>		m_16bitIndices;
+	bool	m_use32bitIndices;
+	bool	m_use4componentVertices;
+	
 
 	public:
 		btScalar	m_weldingThreshold;
 
-		btTriangleMesh( bool use32bitIndices = true, bool use4componentVertices = true );
+		btTriangleMesh (bool use32bitIndices=true,bool use4componentVertices=true);
 
 		bool	getUse32bitIndices() const
 		{
@@ -51,24 +51,18 @@ class btTriangleMesh : public btTriangleIndexVertexArray
 		}
 		///By default addTriangle won't search for duplicate vertices, because the search is very slow for large triangle meshes.
 		///In general it is better to directly use btTriangleIndexVertexArray instead.
-		void	addTriangle( const btVector3& vertex0, const btVector3& vertex1, const btVector3& vertex2, bool removeDuplicateVertices = false );
-
+		void	addTriangle(const btVector3& vertex0,const btVector3& vertex1,const btVector3& vertex2, bool removeDuplicateVertices=false);
+		
 		int getNumTriangles() const;
 
-		virtual void	preallocateVertices( int numverts )
-		{
-			( void ) numverts;
-		}
-		virtual void	preallocateIndices( int numindices )
-		{
-			( void ) numindices;
-		}
+		virtual void	preallocateVertices(int numverts);
+		virtual void	preallocateIndices(int numindices);
 
 		///findOrAddVertex is an internal method, use addTriangle instead
-		int		findOrAddVertex( const btVector3& vertex, bool removeDuplicateVertices );
+		int		findOrAddVertex(const btVector3& vertex, bool removeDuplicateVertices);
 		///addIndex is an internal method, use addTriangle instead
-		void	addIndex( int index );
-
+		void	addIndex(int index);
+		
 };
 
 #endif //BT_TRIANGLE_MESH_H

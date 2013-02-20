@@ -13,10 +13,6 @@ subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 */
 
-#if !_WIN32
-#define BT_SOFT_BODY_SOLVER_VERTEX_BUFFER_DX11_H
-#endif
-
 #ifndef BT_SOFT_BODY_SOLVER_VERTEX_BUFFER_DX11_H
 #define BT_SOFT_BODY_SOLVER_VERTEX_BUFFER_DX11_H 
 

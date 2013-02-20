@@ -23,7 +23,7 @@
 
 // Internal
 #include "Entity.hpp"
-#include "MathUtil.hpp"
+#include "Math.hpp"
 #include "Console.hpp"
 
 namespace sfs
@@ -48,30 +48,30 @@ Transform::Transform(Entity* owner) :
 
 vec3& Transform::GetPosition()
 {
-	return _position;
+	return position;
 }
 
 void Transform::SetPosition(vec3 pos)
 {
-	_position = pos;
+	position = pos;
 	Trigger("SetPosition", position);
 }
 
 quat Transform::GetRotationQuat()
 {
-	return quat(rotation * degToRad);
+	return quat(rotation);
 }
 
 void Transform::SetRotationQuat(quat rot)
 {
-	_rotationQuat = rot;
+	rotationQuat = rot;
 	rotation = eulerAngles(rot);
 //	Trigger("SetRotation", rotation);
 }
 
 vec3& Transform::GetRotation()
 {
-	return _rotation;
+	return rotation;
 }
 
 void Transform::SetRotation(vec3 rot)
@@ -79,18 +79,19 @@ void Transform::SetRotation(vec3 rot)
 	//rot.x = rollover(rot.x, 0.0f, 360.0f);
 	//rot.y = rollover(rot.y, 0.0f, 360.0f);
 	//rot.z = rollover(rot.z, 0.0f, 360.0f);
-	_rotation = rot;
-	_rotationQuat = quat(_rotation * degToRad);
+	//rotation = radians(rot);
+	rotation = rot;
+	rotationQuat = quat(rotation);
 }
 
-vec3 Transform::GetScale()
+vec3& Transform::GetScale()
 {
-	return _scale;
+	return scale;
 }
 
 void Transform::SetScale(vec3 scl)
 {
-	_scale = scl;
+	scale = scl;
 	Trigger("SetScale", scale);
 }
 
@@ -98,75 +99,75 @@ vec3 Transform::GetWorldPosition()
 {
 	if(owner->parent)
 	{
-		return owner->parent->transform->worldPosition + position;
+		return owner->parent->transform->GetWorldPosition() + GetPosition();
 	}
 	else
 	{
-		return position;
+		return GetPosition();
 	}
 }
 
 void Transform::SetWorldPosition(vec3 pos)
 {
-	position = pos - parent->worldPosition;
+	SetPosition(pos - parent->GetWorldPosition());
 }
 
 quat Transform::GetWorldRotationQuat()
 {
-	return quat(worldRotation * degToRad);
+	return quat(GetWorldRotation());
 }
 
 void Transform::SetWorldRotationQuat(quat rot)
 {
-	rotation = eulerAngles(rot) - parent->worldRotation();
+	SetRotation(eulerAngles(rot) - parent->GetWorldRotation());
 }
 
 vec3 Transform::GetWorldRotation()
 {
 	if(owner->parent)
 	{
-		return owner->parent->transform->worldRotation + _rotation;
+		return owner->parent->transform->GetWorldRotation() + GetRotation();
 	}
 	else
 	{
-		return _rotation;
+		return GetRotation();
 	}
 }
 
 void Transform::SetWorldRotation(vec3 rot)
 {
-	rotation = rot - parent->worldRotation;
+	SetRotation(rot - parent->GetWorldRotation());
 }
 
 vec3 Transform::GetWorldScale()
 {
 	if(owner->parent)
 	{
-		return owner->parent->transform->worldScale * scale;
+		return owner->parent->transform->GetWorldScale() * GetScale();
 	}
 	else
 	{
-		return _scale;
+		return GetScale();
 	}
 }
 
 void Transform::SetWorldScale(vec3 scl)
 {
-	scale = scl - parent->worldScale;
+	SetScale(scl - parent->GetWorldScale());
 }
 
 mat4 Transform::GetMatrix()
 {
 	mat4 matrix;
-	matrix = glm::translate(mat4(1.0f), worldPosition());
-	matrix *= glm::mat4_cast(worldRotationQuat());
-	matrix = glm::scale(matrix, worldScale());
+	matrix = glm::translate(mat4(1.0f), GetWorldPosition());
+	matrix *= glm::mat4_cast(GetWorldRotationQuat());
+	matrix = glm::scale(matrix, GetWorldScale());
 	return matrix;
 }
 
 void Transform::SetDirection()
 {
-	vec3 rot = worldRotation();
+	vec3 rot = GetWorldRotation();
 	direction = vec3(
 				cos(rot.x) * sin(rot.z),
 				sin(rot.x),
@@ -184,17 +185,12 @@ void Transform::SetDirection()
 
 void Transform::Translate(vec3 pos)
 {
-	position += pos;
-}
-
-void Transform::Translate(float x, float y, float z)
-{
-	Translate(vec3(x, y, z));
+	SetPosition(position + pos);
 }
 
 void Transform::Rotate(vec3 rot)
 {
-	rotation += rot;
+	SetRotation(rotation + rot);
 	//rotationQuat = quat(rotation);
 	//_rotationQuat = rotate( _rotationQuat, rot.x, xdir );
 	//_rotationQuat = rotate( _rotationQuat, rot.y, ydir );
@@ -204,7 +200,7 @@ void Transform::Rotate(vec3 rot)
 
 void Transform::Scale(vec3 scl)
 {
-	scale *= scl;
+	SetScale(scale * scl);
 //	Trigger("SetScale", scale);
 }
 

@@ -13,10 +13,6 @@ subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 */
 
-#if !_WIN32
-#define BT_ACCELERATED_SOFT_BODY_LINK_DATA_DX11_SIMDAWARE_H
-#endif
-
 #include "BulletMultiThreaded/GpuSoftBodySolvers/Shared/btSoftBodySolverData.h"
 #include "btSoftBodySolverBuffer_DX11.h"
 

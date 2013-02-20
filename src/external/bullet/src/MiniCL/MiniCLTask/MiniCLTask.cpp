@@ -42,7 +42,7 @@ void processMiniCLTask(void* userPtr, void* lsMemory)
 {
 	//	BT_PROFILE("processSampleTask");
 
-	//MiniCLTask_LocalStoreMemory* localMemory = (MiniCLTask_LocalStoreMemory*)lsMemory;
+	MiniCLTask_LocalStoreMemory* localMemory = (MiniCLTask_LocalStoreMemory*)lsMemory;
 
 	MiniCLTaskDesc* taskDescPtr = (MiniCLTaskDesc*)userPtr;
 	MiniCLTaskDesc& taskDesc = *taskDescPtr;
@@ -69,6 +69,6 @@ void* createMiniCLLocalStoreMemory()
 void* createMiniCLLocalStoreMemory()
 {
 	return new MiniCLTask_LocalStoreMemory;
-}
+};
 
 #endif

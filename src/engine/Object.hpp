@@ -23,17 +23,17 @@
 #define BOOST_BIND_NO_PLACEHOLDERS
 
 // External
-#include <boost/signals2.hpp>
+//#include <boost/signals2.hpp>
 #include <typeinfo>
 
 // Internal
-#include "Type.hpp"
+#include "TypeInfo.hpp"
 #include "Property.hpp"
 
 #define SENDER(obj, sig) obj, "sig"
 #define RECEIVER(obj, slot) obj, &remove_ref<decltype(*obj)>::type::slot
 
-using boost::signals2::signal;
+//using boost::signals2::signal;
 
 namespace sfs
 {
@@ -61,6 +61,7 @@ class Object
 	{
 	public:
 		string name;
+		Object* ptr;
 
 		Event(string name) :
 			name(name)
@@ -75,105 +76,114 @@ class Object
 	class Event0 : public Event
 	{
 	public:
-		signal<void(void)> sig;
+		boost::function<void()> func;
 
 		Event0(string name, boost::function<void()> func) :
-			Event(name)
+			Event(name), func(func)
 		{
-			sig.connect(func);
 		}
 	};
 
-	template<typename ... P>
+	template<typename P1, typename ... P>
 	class EventP : public Event
 	{
 	public:
-		signal<void(P...)> sig;
+		boost::function<void(P1, P...)> func;
 
-		EventP(string name, boost::function<void(P...)> func) :
-			Event(name)
+		EventP(string name, boost::function<void(P1, P...)> func) :
+			Event(name), func(func)
 		{
-			sig.connect(func);
 		}
 	};
 public:
 
+
 	template<typename R>
 	void Connect(Object* sender, string name, R* receiver, void (R::*func)())
 	{
+		erase_all(name, " ");
 		name = Type(sender) + "::" + name + "()";
-		for(auto connection : sender->events)
+		Event0* con = nullptr;
+		for(auto event : sender->events)
 		{
-			if(connection->name == name)
+			if(event->name == name)
 			{
-				Event0* con = dynamic_cast<Event0*>(connection);
+				con = dynamic_cast<Event0*>(event);
 				if(con)
 				{
-					con->sig.connect(boost::bind(func, receiver));
+					con->func = boost::bind(func, receiver);
+					con->ptr = sender;
 				}
 				return;
 			}
 		}
-		Event* con = new Event0(name, boost::bind(func, receiver));
+		con = new Event0(name, boost::bind(func, receiver));
 		sender->events.push_back(con);
 	}
 
-	template<typename R, typename ... P>
-	void Connect(Object* sender, string name, R* receiver, void (R::*func)(P...))
+	template<typename R, typename P1, typename ... P>
+	void Connect(Object* sender, string name, R* receiver, void (R::*func)(P1, P...))
 	{
-		name = Type(sender) + "::" + name + "(" + ParamType<P...>() + ")";
+		erase_all(name, " ");
+		name = Type(sender) + "::" + name + "(" + Type<P1, P...>() + ")";
+		EventP<P1, P...>* con = nullptr;
 		for(auto connection : sender->events)
 		{
 			if(connection->name == name)
 			{
-				EventP<P...>* con = dynamic_cast<EventP<P...>*>(connection);
+				con = dynamic_cast<EventP<P1, P...>*>(connection);
 				if(con)
 				{
-					con->sig.connect(boost::bind(func, receiver));
+					con->func = boost::bind(func, receiver);
+					con->ptr = sender;
 				}
 				return;
 			}
 		}
-		Event* con = new EventP<P...>(name, boost::bind(func, receiver));
+		con = new EventP<P1, P...>(name, boost::bind(func, receiver));
 		sender->events.push_back(con);
 	}
+
 
 	void Trigger(string name)
 	{
+		erase_all(name, " ");
 		name = Type(this) + "::" + name + "()";
 		for(auto event : events)
 		{
-			if(event->name == name)
+			if(event->name == name && event->ptr == this)
 			{
 				Event0* con = dynamic_cast<Event0*>(event);
 				if(con)
 				{
-					con->sig();
+					con->func();
 				}
 			}
 		}
 	}
 
-	template<typename ... P>
-	void Trigger(string name, P ... args)
+	template<typename P1, typename ... P>
+	void Trigger(string name, P1 arg, P ... args)
 	{
-		name = Type(this) + "::" + name + "(" + Type<P...>() + ")";
-		for(auto connection : events)
+		erase_all(name, " ");
+		name = Type(this) + "::" + name + "(" + Type<P1, P...>() + ")";
+		for(auto event : events)
 		{
-			if(connection->name == name)
+			if(event->name == name && event->ptr == this)
 			{
-				EventP<P...>* con = dynamic_cast<EventP<P...>*>(connection);
+				auto con = dynamic_cast<EventP<P1, P...>*>(event);
 				if(con)
 				{
-					con->sig(args...);
+					con->func(arg, args...);
 				}
 			}
 		}
-		Trigger(name);
+		//Trigger(name);
 	}
 
 	bool Connected(string name)
 	{
+		erase_all(name, " ");
 		name = Type(this) + "::" + name;
 		for(uint i = 0; i < events.size(); ++i)
 		{

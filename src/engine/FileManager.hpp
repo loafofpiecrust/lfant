@@ -77,8 +77,8 @@ public:
 
 protected:
 
-private:
-	string gameFolder;
+public:
+	string gameFolder = "../..";
 	string userFolder;
 };
 

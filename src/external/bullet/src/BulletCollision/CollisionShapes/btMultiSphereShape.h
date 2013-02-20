@@ -4,8 +4,8 @@ Copyright (c) 2003-2009 Erwin Coumans  http://bulletphysics.org
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose,
-including commercial applications, and to alter it and redistribute it freely,
+Permission is granted to anyone to use this software for any purpose, 
+including commercial applications, and to alter it and redistribute it freely, 
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -25,48 +25,50 @@ subject to the following restrictions:
 
 ///The btMultiSphereShape represents the convex hull of a collection of spheres. You can create special capsules or other smooth volumes.
 ///It is possible to animate the spheres for deformation, but call 'recalcLocalAabb' after changing any sphere position/radius
-class btMultiSphereShape : public btConvexInternalAabbCachingShape
+ATTRIBUTE_ALIGNED16(class) btMultiSphereShape : public btConvexInternalAabbCachingShape
 {
+	
+	btAlignedObjectArray<btVector3> m_localPositionArray;
+	btAlignedObjectArray<btScalar>  m_radiArray;
+	
+public:
+	BT_DECLARE_ALIGNED_ALLOCATOR();
+	
+	btMultiSphereShape (const btVector3* positions,const btScalar* radi,int numSpheres);
 
-		btAlignedObjectArray<btVector3> m_localPositionArray;
-		btAlignedObjectArray<btScalar>  m_radiArray;
+	///CollisionShape Interface
+	virtual void	calculateLocalInertia(btScalar mass,btVector3& inertia) const;
 
-	public:
-		btMultiSphereShape( const btVector3* positions, const btScalar* radi, int numSpheres );
+	/// btConvexShape Interface
+	virtual btVector3	localGetSupportingVertexWithoutMargin(const btVector3& vec)const;
 
-		///CollisionShape Interface
-		virtual void	calculateLocalInertia( btScalar mass, btVector3& inertia ) const;
+	virtual void	batchedUnitVectorGetSupportingVertexWithoutMargin(const btVector3* vectors,btVector3* supportVerticesOut,int numVectors) const;
+	
+	int	getSphereCount() const
+	{
+		return m_localPositionArray.size();
+	}
 
-		/// btConvexShape Interface
-		virtual btVector3	localGetSupportingVertexWithoutMargin( const btVector3& vec )const;
+	const btVector3&	getSpherePosition(int index) const
+	{
+		return m_localPositionArray[index];
+	}
 
-		virtual void	batchedUnitVectorGetSupportingVertexWithoutMargin( const btVector3* vectors, btVector3* supportVerticesOut, int numVectors ) const;
-
-		int	getSphereCount() const
-		{
-			return m_localPositionArray.size();
-		}
-
-		const btVector3&	getSpherePosition( int index ) const
-		{
-			return m_localPositionArray[index];
-		}
-
-		btScalar	getSphereRadius( int index ) const
-		{
-			return m_radiArray[index];
-		}
+	btScalar	getSphereRadius(int index) const
+	{
+		return m_radiArray[index];
+	}
 
 
-		virtual const char*	getName()const
-		{
-			return "MultiSphere";
-		}
+	virtual const char*	getName()const 
+	{
+		return "MultiSphere";
+	}
 
-		virtual	int	calculateSerializeBufferSize() const;
+	virtual	int	calculateSerializeBufferSize() const;
 
-		///fills the dataBuffer and returns the struct name (and 0 on failure)
-		virtual	const char*	serialize( void* dataBuffer, btSerializer* serializer ) const;
+	///fills the dataBuffer and returns the struct name (and 0 on failure)
+	virtual	const char*	serialize(void* dataBuffer, btSerializer* serializer) const;
 
 
 };
@@ -82,7 +84,7 @@ struct	btMultiSphereShapeData
 {
 	btConvexInternalShapeData	m_convexInternalShapeData;
 
-	btPositionAndRadius*	m_localPositionArrayPtr;
+	btPositionAndRadius	*m_localPositionArrayPtr;
 	int				m_localPositionArraySize;
 	char	m_padding[4];
 };
@@ -91,7 +93,7 @@ struct	btMultiSphereShapeData
 
 SIMD_FORCE_INLINE	int	btMultiSphereShape::calculateSerializeBufferSize() const
 {
-	return sizeof( btMultiSphereShapeData );
+	return sizeof(btMultiSphereShapeData);
 }
 
 

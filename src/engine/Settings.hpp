@@ -25,7 +25,7 @@
 
 // Internal
 #include "Subsystem.hpp"
-#include "StringUtil.hpp"
+#include "String.hpp"
 #include "Range.hpp"
 #include "Console.hpp"
 
@@ -117,6 +117,72 @@ class Settings : public Subsystem
 			{
 				return Range<int>(lexical_cast<int>(words[0]), lexical_cast<int>(words[1]));
 			}
+		}
+
+		vec2 f2()
+		{
+			vector<string> tokens = Split(value, " x.", "");
+			vec2 result(0);
+			if(tokens.size() > 0)
+			{
+				result.x = lexical_cast<float>(tokens[0]);
+				if(tokens.size() > 1)
+				{
+					result.y = lexical_cast<float>(tokens[1]);
+				}
+			}
+			return result;
+		}
+		vec3 f3()
+		{
+			vector<string> tokens = Split(value, " x.", "");
+			vec3 result(0);
+			if(tokens.size() > 0)
+			{
+				result.x = lexical_cast<float>(tokens[0]);
+				if(tokens.size() > 1)
+				{
+					result.y = lexical_cast<float>(tokens[1]);
+					if(tokens.size() > 2)
+					{
+						result.z = lexical_cast<float>(tokens[2]);
+					}
+				}
+			}
+			return result;
+		}
+
+		ivec2 i2()
+		{
+			vector<string> tokens = Split(value, " x.", "");
+			ivec2 result(0);
+			if(tokens.size() > 0)
+			{
+				result.x = lexical_cast<int>(tokens[0]);
+				if(tokens.size() > 1)
+				{
+					result.y = lexical_cast<int>(tokens[1]);
+				}
+			}
+			return result;
+		}
+		ivec3 i3()
+		{
+			vector<string> tokens = Split(value, " x.", "");
+			ivec3 result(0);
+			if(tokens.size() > 0)
+			{
+				result.x = lexical_cast<int>(tokens[0]);
+				if(tokens.size() > 1)
+				{
+					result.y = lexical_cast<int>(tokens[1]);
+					if(tokens.size() > 2)
+					{
+						result.z = lexical_cast<int>(tokens[2]);
+					}
+				}
+			}
+			return result;
 		}
 
 		operator Range<int>()

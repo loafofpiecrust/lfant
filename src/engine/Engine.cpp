@@ -34,6 +34,7 @@
 #include "Console.hpp"
 #include "SystemInfo.hpp"
 #include "Console.hpp"
+#include "UserInterface.hpp"
 
 namespace sfs
 {
@@ -45,10 +46,16 @@ extern "C" void Launch()
 	game = new Engine();
 	game->standAlone = true;
 	game->Init();
-	while(!game->destroy)
+	game->destroy = false;
+	Log("Game initialised");
+	while (!game->destroy)
 	{
 		game->Update();
 	}
+	Log("About to destroy game");
+	game->Destroy();
+	Log("Game ending");
+	delete game;
 }
 
 Engine::Engine()
@@ -67,31 +74,30 @@ Engine::~Engine()
 
 void Engine::Init()
 {
-	standAlone = false;
-
 	console = new Console;
 	console->Init();
 
 	Log("ShadowFox Engine launched.");
 
-	systemInfo = new SystemInfo;
+	fileManager = new FileManager;
 	settings = new Settings;
+	systemInfo = new SystemInfo;
 	time = new Time;
 	physics = new Physics;
 	scene = new Scene;
 	renderer = new Renderer;
+	userInterface = new UserInterface;
 	input = new Input;
 
 	Log("Subsystems instantiated.");
 
-	//systemInfo->Init();
 	settings->Init();
+	fileManager->Init();
+	systemInfo->Init();
 	time->Init();
-	//physics->Init();
-	if(standAlone)
-	{
-		renderer->Init();
-	}
+	physics->Init();
+	renderer->Init();
+	userInterface->Init();
 	scene->Init();
 	input->Init();
 
@@ -102,23 +108,15 @@ void Engine::Init()
 
 void Engine::Update()
 {
-	while(!destroy)
-	{
-		PreUpdate();
-		if(standAlone && renderer->render)
-		{
-			renderer->PreUpdate();
-		}
-		time->Update();
-		//physics->Update();
-		input->Update();
-		if(standAlone && renderer->render)
-		{
-			renderer->Update();
-		}
-		PostUpdate();
-	}
-	Destroy();
+	PreUpdate();
+	renderer->PreUpdate();
+	time->Update();
+	physics->Update();
+	scene->Update();
+	input->Update();
+	renderer->Update();
+	userInterface->Update();
+	PostUpdate();
 }
 
 /*******************************************************************************
@@ -135,10 +133,12 @@ void Engine::Destroy()
 {
 	input->Destroy();
 	renderer->Destroy();
-	input->Destroy();
-	physics->Destroy();
 	scene->Destroy();
-	delete this;
+	physics->Destroy();
+	time->Destroy();
+	systemInfo->Destroy();
+	settings->Destroy();
+	fileManager->Destroy();
 }
 
 void Engine::Exit()

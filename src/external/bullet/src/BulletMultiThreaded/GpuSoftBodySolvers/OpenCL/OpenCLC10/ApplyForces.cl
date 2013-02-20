@@ -88,7 +88,7 @@ ApplyForcesKernel(
 
 				// lift force
 				// Check angle of attack
-				// cos(10ï¿½) = 0.98480
+				// cos(10º) = 0.98480
 				if ( 0 < n_dot_v && n_dot_v < 0.98480f)
 					fLift = 0.5f * liftFactor * mediumDensity * rel_v_len * area * sqrt(1.0f-n_dot_v*n_dot_v) * (cross(cross(nrm, rel_v_nrm), rel_v_nrm));
 				

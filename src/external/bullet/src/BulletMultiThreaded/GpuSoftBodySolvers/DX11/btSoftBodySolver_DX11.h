@@ -13,10 +13,6 @@ subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 */
 
-#if !_WIN32
-#define BT_ACCELERATED_SOFT_BODY_DX11_SOLVER_H
-#endif
-
 #ifndef BT_ACCELERATED_SOFT_BODY_DX11_SOLVER_H
 #define BT_ACCELERATED_SOFT_BODY_DX11_SOLVER_H
 
@@ -618,7 +614,7 @@ public:
 	virtual void predictMotion( float solverdt );
 
 	
-	virtual void processCollision( btSoftBody *, btCollisionObject* );
+	virtual void processCollision( btSoftBody *, const btCollisionObjectWrapper* );
 
 	virtual void processCollision( btSoftBody*, btSoftBody* );
 

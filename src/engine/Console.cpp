@@ -25,7 +25,7 @@
 #include <boost/format.hpp>
 
 // Internal
-#include "StringUtil.hpp"
+#include "String.hpp"
 
 namespace sfs
 {
@@ -39,7 +39,6 @@ void Log<const char*>(const char* msg)
 Console::Console()
 {
 	// TODO Auto-generated constructor stub
-
 }
 
 Console::~Console()
@@ -55,7 +54,7 @@ void Console::Init()
 	file.close();
 
 	// Default commands
-	RegisterCommand("Exit", CmdExit, "Exit the game");
+	RegisterCommand(CmdExit, "Exit", "Exit the game");
 }
 
 void Console::Input(string line)
@@ -68,7 +67,7 @@ void Console::Input(string line)
 		if(output.size() > 1)
 		{
 			// If we are calling a function
-			if(auto cmd = GetCommand(str))
+			if(auto cmd = GetCommand<CommandDefault>(str))
 			{
 				vector<string> args;
 				if(output[i + 1] == "(")
@@ -89,7 +88,7 @@ void Console::Input(string line)
 					cmd->func(args);
 				}
 			}
-			else if(auto cmd = GetSimpleCommand(str))
+			else if(auto cmd = GetCommand<CommandSimple>(str))
 			{
 				if(output[i + 1] == "(")
 				{
@@ -109,11 +108,11 @@ void Console::Input(string line)
 			{
 				if(auto var = GetVar(output[i + 1]))
 				{
-					Print(var->name + " (variable): " + var->desc);
+					Print(var->name + " (variable): " + var->help);
 				}
 				if(auto cmd = GetCommand(output[i + 1]))
 				{
-					Print(cmd->name + " (command): " + cmd->desc);
+					Print(cmd->name + " (command): " + cmd->help);
 				}
 				++i;
 			}
@@ -158,56 +157,72 @@ void Console::Input(string line)
 	}
 }
 
-void Console::RegisterVar(string name, float value, string desc, bool readOnly)
+void Console::RegisterVar(string name, float value, string help, bool readOnly)
 {
-	for(auto & var : variables)
+	for(auto& var : variables)
 	{
-		if(var.name == name)
+		if(var->name == name)
 		{
-			var.value = value;
-			var.desc = desc;
-			var.readOnly = readOnly;
+			var->value = value;
+			var->help = help;
+			var->readOnly = readOnly;
 		}
 	}
-	variables.push_back(Variable(name, value, desc, readOnly));
+	variables.push_back(new Variable(name, value, help, readOnly));
 }
 
-void Console::RegisterCommand(string name, CommandFuncRaw func, string desc)
+void Console::RegisterCommand(CommandDefault::funcTypeRaw func, string name, string help)
 {
-	for(auto & cmd : commands)
+	for(auto cmd : commands)
 	{
-		if(cmd.name == name)
+		CommandDefault* d = dynamic_cast<CommandDefault*>(cmd);
+		if(d && cmd->name == name)
 		{
-			//cmd.func = boost::bind(func);
-			cmd.func = func;
-			cmd.desc = desc;
+			d->func = func;
+			d->help = help;
 			return;
 		}
 	}
-	commands.push_back(Command(name, func, desc));
+	commands.push_back(new CommandDefault(func, name, help));
 }
 
-void Console::RegisterCommand(string name, CommandFuncSimpleRaw func, string desc)
+void Console::RegisterCommand(CommandSimple::funcTypeRaw func, string name, string help)
 {
-	for(auto & cmd : simpleCommands)
+	for(auto cmd : commands)
 	{
-		if(cmd.name == name)
+		CommandSimple* s = dynamic_cast<CommandSimple*>(cmd);
+		if(s && cmd->name == name)
 		{
-			cmd.func = func;
-			cmd.desc = desc;
+			s->func = func;
+			s->help = help;
 			return;
 		}
 	}
-	simpleCommands.push_back(CommandSimple(name, func, desc));
+	commands.push_back(new CommandSimple(func, name, help));
 }
 
 bool Console::CallCommand(string name, vector<string> args)
 {
-	for(auto & cmd : commands)
+	for(auto cmd : commands)
 	{
-		if(cmd.name == name)
+		auto d = dynamic_cast<CommandDefault*>(cmd);
+		if(d && cmd->name == name)
 		{
-			cmd.func(args);
+			d->func(args);
+			return true;
+		}
+	}
+	return false;
+}
+
+bool Console::CallCommand(string name)
+{
+	for(auto cmd : commands)
+	{
+		auto s = dynamic_cast<CommandSimple*>(cmd);
+		if(s && cmd->name == name)
+		{
+			s->func();
 			return true;
 		}
 	}
@@ -216,11 +231,11 @@ bool Console::CallCommand(string name, vector<string> args)
 
 Console::Variable* Console::GetVar(string name)
 {
-	for(auto & var : variables)
+	for(auto var : variables)
 	{
-		if(var.name == name)
+		if(var->name == name)
 		{
-			return &var;
+			return var;
 		}
 	}
 	return nullptr;
@@ -228,23 +243,11 @@ Console::Variable* Console::GetVar(string name)
 
 Console::Command* Console::GetCommand(string name)
 {
-	for(auto & cmd : commands)
+	for(auto cmd : commands)
 	{
-		if(cmd.name == name)
+		if(cmd->name == name)
 		{
-			return &cmd;
-		}
-	}
-	return nullptr;
-}
-
-Console::CommandSimple* Console::GetSimpleCommand(string name)
-{
-	for(auto & cmd : simpleCommands)
-	{
-		if(cmd.name == name)
-		{
-			return &cmd;
+			return cmd;
 		}
 	}
 	return nullptr;

@@ -53,6 +53,7 @@ void FileManager::Init()
 	else
 	{
 		// Use default settings
+		gameFolder = "/home/taylorsnead/ShadowFox/ShadowFox-Engine/examples/galaga";
 		Log(gameFolder);
 		userFolder = UserPath + "/My Games/" + string(game->settings->GetValue("general.orgname")) + "/" + string(game->settings->GetValue("general.gamename"));
 		game->settings->LoadSettings();
@@ -82,13 +83,15 @@ string FileManager::ConvertPath(string curr)
 
 path FileManager::GetGameFile(string name)
 {
-	path result(ConvertPath(gameFolder + "/assets/" + name));
+	path result(gameFolder + "/assets/" + name);
 
-	if(exists(result) && is_regular_file(result))
+	if(exists(result))
 	{
 		return result;
 	}
-	return "";
+	Log("FileManager::GetGameFile: File not found, input: "+result.string());
+	game->Exit();
+	return result;
 }
 
 path FileManager::GetUserFile(string name)
