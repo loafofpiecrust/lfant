@@ -122,7 +122,6 @@ enum class Key : uint16_t
 };
 
 /**	This class controls the input system.
- *	@details
  *		Receives input from GLFW and manages it, allowing the
  *		user to bind certain keys to certain functions.
  *	@todo

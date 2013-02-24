@@ -38,7 +38,6 @@ namespace sfs
  */
 
 /**	The base class for all Entity Components.
- *	@details
  *		Component is the basis for all things to be attached to
  *		Entity instances. These Components can be added or removed
  *		at will to modify the overall capable functionality of the
@@ -50,13 +49,19 @@ namespace sfs
  */
 class Component : public Object
 {
+	friend class Entity;
 public:
 	Component(Entity* owner);
 
 	/**
-	 *	Destroys this Component instance.
+	 *	Returns whether this component is enabled.
 	 */
-	void Destroy();
+	bool IsEnabled();
+
+	/**
+	 *	Enables or disables this component.
+	 */
+	void SetEnabled(bool enable);
 
 	/// The owner of this Component.
 	Entity* owner;
@@ -65,7 +70,6 @@ public:
 	Transform* transform;
 
 protected:
-	friend class Entity;
 	Component()
 	{
 	}
@@ -99,24 +103,19 @@ protected:
 	{
 	}
 
-private:
-	/**
-	 *	Returns whether this component is enabled.
-	 */
-	bool GetEnabled();
+	virtual void Trigger(string name);
 
-	/**
-	 *	Enables or disables this component.
-	 */
-	void SetEnabled(bool enable);
+	template<typename P1, typename ... P>
+	void Trigger(string name, P1 arg, P... args)
+	{
+		owner->Trigger(name, arg, args...);
+		Object::Trigger(name, arg, args...);
+	}
+
+private:
 
 	/// Whether this component should Update or not.
-	bool _enabled = true;
-
-public:
-
-	// Properties
-	PROP_RW(Component, enabled, GetEnabled, SetEnabled)
+	bool enabled = true;
 };
 
 /**	@}*/

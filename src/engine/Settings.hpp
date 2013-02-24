@@ -38,12 +38,10 @@ namespace sfs
  *	 @{
  */
 
-/**	Manages game settings from a config file for individual users.
- *	@details
- *		Description
+/**
+ *	Manages game settings from a config file for individual users.
  *	@todo
- *		Maybe combine with a ResourceManager that handles file paths, as LoadProfile and SaveProfile;
- *			or keep all that stuff inside this class?
+ *		Possibly combine with FileSystem
  */
 class Settings : public Subsystem
 {

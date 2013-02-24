@@ -26,8 +26,6 @@
 
 namespace sfs
 {
-class Entity;
-
 /** @addtogroup Engine
  *	 @{
  */

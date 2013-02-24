@@ -37,7 +37,6 @@ namespace sfs
  */
 
 /**	The Mesh class holds a 3D mesh and possibly an animated skeleton.
- *	@remarks
  *		This class controls a Mesh as defined by the 3d importing library.
  *		It handles holding a list of vertices, bones, faces, etc. It also
  *		holds a list of animations and things involving that.

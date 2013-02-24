@@ -34,9 +34,6 @@ namespace sfs
  */
 
 /**
- *	@details
- *
- *	@todo
  *
  */
 class Subsystem : public Object

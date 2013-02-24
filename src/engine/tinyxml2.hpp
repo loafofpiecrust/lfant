@@ -399,7 +399,7 @@ private:
 
  You should never change the document from a callback.
 
- @sa XMLNode::Accept()
+ \sa XMLNode::Accept()
  */
 class XMLVisitor
 {
@@ -546,7 +546,7 @@ public:
  When the XMLDocument gets deleted, all its Nodes
  will also be deleted.
 
- @verbatim
+ \verbatim
  A Document can contain:	Element	(container or leaf)
  Comment (leaf)
  Unknown (leaf)
@@ -558,7 +558,7 @@ public:
  Comment (leaf)
  Unknown (leaf)
 
- @endverbatim
+ \endverbatim
  */
 class XMLNode
 {
@@ -628,20 +628,20 @@ public:
 	}
 
 	/** The meaning of 'value' changes for the specific type.
-	 @verbatim
+	 \verbatim
 	 Document:	empty
 	 Element:	name of the element
 	 Comment:	the comment text
 	 Unknown:	the tag contents
 	 Text:		the text string
-	 @endverbatim
+	 \endverbatim
 	 */
 	const char* Value() const
 	{
 		return value.GetStr();
 	}
 	/** Set the Value of an XML node.
-	 @sa Value()
+	 \sa Value()
 	 */
 	void SetValue(const char* val, bool staticMem = false);
 
@@ -799,11 +799,11 @@ public:
 	 Which are both good references for "visiting".
 
 	 An example of using Accept():
-	 @verbatim
+	 \verbatim
 	 TiXmlPrinter printer;
 	 tinyxmlDoc.Accept( &printer );
 	 const char* xmlcstr = printer.CStr();
-	 @endverbatim
+	 \endverbatim
 	 */
 	virtual bool Accept(XMLVisitor* visitor) const = 0;
 
@@ -834,9 +834,9 @@ private:
 /** XML text.
 
  Note that a text node can have child element nodes, for example:
- @verbatim
+ \verbatim
  <root>This is <b>bold</b></root>
- @endverbatim
+ \endverbatim
 
  A text node can have 2 ways to output the next. "normal" output
  and CDATA. It will default to the mode it was parsed from the XML file and
@@ -919,9 +919,9 @@ private:
 };
 
 /** In correct XML the declaration is the first entry in the file.
- @verbatim
+ \verbatim
  <?xml version="1.0" standalone="yes"?>
- @endverbatim
+ \endverbatim
 
  TinyXML2 will happily read or write files without a declaration,
  however.
@@ -1019,7 +1019,7 @@ enum
 /** An attribute is a name-value pair. Elements have an arbitrary
  number of attributes, each with a unique name.
 
- @note The attributes are not XMLNodes. You may only query the
+ \note The attributes are not XMLNodes. You may only query the
  Next() attribute in a list.
  */
 class XMLAttribute
@@ -1164,24 +1164,24 @@ public:
 	 for the attribute of that name, or null if none
 	 exists. For example:
 
-	 @verbatim
+	 \verbatim
 	 const char* value = ele->Attribute( "foo" );
-	 @endverbatim
+	 \endverbatim
 
 	 The 'value' parameter is normally null. However, if specified,
 	 the attribute will only be returned if the 'name' and 'value'
 	 match. This allow you to write code:
 
-	 @verbatim
+	 \verbatim
 	 if ( ele->Attribute( "foo", "bar" ) ) callFooIsBar();
-	 @endverbatim
+	 \endverbatim
 
 	 rather than:
-	 @verbatim
+	 \verbatim
 	 if ( ele->Attribute( "foo" ) ) {
 	 if ( strcmp( ele->Attribute( "foo" ), "bar" ) == 0 ) callFooIsBar();
 	 }
-	 @endverbatim
+	 \endverbatim
 	 */
 	const char* Attribute(const char* name, const char* value = 0) const;
 
@@ -1233,10 +1233,10 @@ public:
 	 be written to 'value'. This allows you to provide default
 	 value:
 
-	 @verbatim
+	 \verbatim
 	 int value = 10;
 	 QueryIntAttribute( "foo", &value );		// if "foo" isn't found, value will still be 10
-	 @endverbatim
+	 \endverbatim
 	 */
 	int QueryIntAttribute(const char* name, int* _value) const
 	{
@@ -1340,24 +1340,24 @@ public:
 	 returns the character string of the Text node, else null is returned.
 
 	 This is a convenient method for getting the text of simple contained text:
-	 @verbatim
+	 \verbatim
 	 <foo>This is text</foo>
 	 const char* str = fooElement->GetText();
-	 @endverbatim
+	 \endverbatim
 
 	 'str' will be a pointer to "This is text".
 
 	 Note that this function can be misleading. If the element foo was created from
 	 this XML:
-	 @verbatim
+	 \verbatim
 	 <foo><b>This is text</b></foo>
-	 @endverbatim
+	 \endverbatim
 
 	 then the value of str would be null. The first child node isn't a text node, it is
 	 another element. From this XML:
-	 @verbatim
+	 \verbatim
 	 <foo>This is <b>text</b></foo>
-	 @endverbatim
+	 \endverbatim
 	 GetText() will return "This is ".
 	 */
 	const char* GetText() const;
@@ -1365,26 +1365,26 @@ public:
 	/**
 	 Convenience method to query the value of a child text node. This is probably best
 	 shown by example. Given you have a document is this form:
-	 @verbatim
+	 \verbatim
 	 <point>
 	 <x>1</x>
 	 <y>1.4</y>
 	 </point>
-	 @endverbatim
+	 \endverbatim
 
 	 The QueryIntText() and similar functions provide a safe and easier way to get to the
 	 "value" of x and y.
 
-	 @verbatim
+	 \verbatim
 	 int x = 0;
 	 float y = 0;	// types of x and y are contrived for example
 	 const XMLElement* xElement = pointElement->FirstChildElement( "x" );
 	 const XMLElement* yElement = pointElement->FirstChildElement( "y" );
 	 xElement->QueryIntText( &x );
 	 yElement->QueryFloatText( &y );
-	 @endverbatim
+	 \endverbatim
 
-	 @returns XML_SUCCESS (0) on success, XML_CAN_NOT_CONVERT_TEXT if the text cannot be converted
+	 \returns XML_SUCCESS (0) on success, XML_CAN_NOT_CONVERT_TEXT if the text cannot be converted
 	 to the requested type, and XML_NO_TEXT_NODE if there is no child text to query.
 
 	 */
@@ -1525,17 +1525,17 @@ public:
 
 	/** Print the Document. If the Printer is not provided, it will
 	 print to stdout. If you provide Printer, this can print to a file:
-	 @verbatim
+	 \verbatim
 	 XMLPrinter printer( fp );
 	 doc.Print( &printer );
-	 @endverbatim
+	 \endverbatim
 
 	 Or you can use a printer to print to memory:
-	 @verbatim
+	 \verbatim
 	 XMLPrinter printer;
 	 doc->Print( &printer );
 	 // printer.CStr() has a const char* to the XML
-	 @endverbatim
+	 \endverbatim
 	 */
 	void Print(XMLPrinter* streamer = 0);
 	virtual bool Accept(XMLVisitor* visitor) const;
@@ -1565,9 +1565,9 @@ public:
 
 	 If the 'text' param is null, the standard
 	 declaration is used.:
-	 @verbatim
+	 \verbatim
 	 <?xml version="1.0" encoding="UTF-8"?>
-	 @endverbatim
+	 \endverbatim
 	 */
 	XMLDeclaration* NewDeclaration(const char* text = 0);
 	/**
@@ -1647,19 +1647,19 @@ private:
  DOM structure. It is a separate utility class.
 
  Take an example:
- @verbatim
+ \verbatim
  <Document>
  <Element attributeA = "valueA">
  <Child attributeB = "value1" />
  <Child attributeB = "value2" />
  </Element>
  </Document>
- @endverbatim
+ \endverbatim
 
  Assuming you want the value of "attributeB" in the 2nd "Child" element, it's very
  easy to write a *lot* of code that looks like:
 
- @verbatim
+ \verbatim
  XMLElement* root = document.FirstChildElement( "Document" );
  if ( root )
  {
@@ -1673,26 +1673,26 @@ private:
  if ( child2 )
  {
  // Finally do something useful.
- @endverbatim
+ \endverbatim
 
  And that doesn't even cover "else" cases. XMLHandle addresses the verbosity
  of such code. A XMLHandle checks for null pointers so it is perfectly safe
  and correct to use:
 
- @verbatim
+ \verbatim
  XMLHandle docHandle( &document );
  XMLElement* child2 = docHandle.FirstChild( "Document" ).FirstChild( "Element" ).FirstChild().NextSibling().ToElement();
  if ( child2 )
  {
  // do something useful
- @endverbatim
+ \endverbatim
 
  Which is MUCH more concise and useful.
 
  It is also safe to copy handles - internally they are nothing more than node pointers.
- @verbatim
+ \verbatim
  XMLHandle handleCopy = handle;
- @endverbatim
+ \endverbatim
 
  See also XMLConstHandle, which is the same as XMLHandle, but operates on const objects.
  */
@@ -1887,19 +1887,19 @@ private:
 
  Print to Memory
 
- @verbatim
+ \verbatim
  XMLPrinter printer;
  doc->Print( &printer );
  SomeFunction( printer.CStr() );
- @endverbatim
+ \endverbatim
 
  Print to a File
 
  You provide the file pointer.
- @verbatim
+ \verbatim
  XMLPrinter printer( fp );
  doc.Print( &printer );
- @endverbatim
+ \endverbatim
 
  Print without a XMLDocument
 
@@ -1911,12 +1911,12 @@ private:
  prints out a trivially simple XML file without ever creating
  an XML document.
 
- @verbatim
+ \verbatim
  XMLPrinter printer( fp );
  printer.OpenElement( "foo" );
  printer.PushAttribute( "foo", "bar" );
  printer.CloseElement();
- @endverbatim
+ \endverbatim
  */
 class XMLPrinter: public XMLVisitor
 {

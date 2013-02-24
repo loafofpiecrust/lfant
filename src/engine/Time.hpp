@@ -44,11 +44,8 @@ struct STimer
 
 typedef chrono::high_resolution_clock hclock;
 
-/**	Timer
- *	@details
- *		Description
- *	@todo
- *		Todo
+/**
+ *
  */
 class Time : public Subsystem
 {
@@ -69,7 +66,7 @@ public:
 	 *	@param length The amount of time this timer should wait before finishing.
 	 *	@param callback The function to call when the timer ends. Should be set with boost::bind(&func, &inst);
 	 */
-	STimer& SetTimer(string name, const double length, boost::function<void()> callback /*= nullptr*/);
+	STimer& SetTimer(string name, const double length, boost::function<void()> callback);
 
 	STimer& GetTimer(string name);
 

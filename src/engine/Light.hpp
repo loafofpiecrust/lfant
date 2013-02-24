@@ -33,11 +33,8 @@ namespace sfs
  *	 @{
  */
 
-/**	Physics
- *	@details
- *		Description
- *	@todo
- *		Todo
+/**
+ *
  */
 class Light : public Component
 {

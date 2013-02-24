@@ -29,10 +29,12 @@ class btRigidBody;
 class btMotionState;
 class btTransform;
 class btVector3;
+class btCollisionShape;
 
 namespace sfs
 {
 class Collider;
+class Mesh;
 
 /** @addtogroup Engine
  *	 @{
@@ -42,7 +44,6 @@ class Collider;
  */
 
 /**	This class manages physics functionality through the Physics class.
- *	@details
  *		Adds Rigidbody functionality to the Owner Entity, allowing it to
  *		be affected by gravity, forces, collision, constraints, etc. This
  *		makes it fully physics-interactive. For soft-bodies and cloth, look
@@ -52,7 +53,6 @@ class Collider;
  */
 class Rigidbody : public Component
 {
-protected:
 	friend class Physics;
 
 public:
@@ -61,47 +61,27 @@ public:
 	virtual ~Rigidbody();
 
 	// Nested classes
-	enum PhysicsMode
+	enum class PhysicsMode : byte
 	{
-		Discrete,
-		Continuous,
-		ContinuousDynamic
+		DISCRETE,
+		CONTINUOUS,
+		CONTINUOUS_DYNAMIC
+	};
+
+	enum class ColliderType : byte
+	{
+		MESH,
+		BOX,
+		CYLINDER,
+		CAPSULE
 	};
 
 	// Methods
-	void SetPointGravity(float gravity);
-	void SetWorldGravity(vec3 gravity);
-	vec3 GetWorldGravity();
-	float GetPointGravity();
-
 	btTypedConstraint* GetConstraint(uint16_t idx);
 	void RemoveConstraint(uint16_t idx);
 
 	void AddForce(float force);
 	void AddForceAtPosition(float force, vec3 pos);
-
-	// Variables
-	PhysicsMode physicsMode;
-
-	bool useWorldGravity;
-	bool usePointGravity;
-
-	float drag;
-
-	vec3 _centerOfMass;
-
-	float gravityMult;
-
-	Collider* collider;
-
-protected:
-	virtual void Init();
-	virtual void Update();
-
-	virtual void OnAddComponent(Component* comp);
-
-private:
-	// Properties backstage
 
 	/**
 	 *	Returns the (current) mass of this Rigidbody.
@@ -113,12 +93,9 @@ private:
 	 */
 	void SetMass(float mass);
 
-	/// The current mass of this object.
-	float _mass;
-
 	/**
 	 *	Returns this Rigidbody's density.
-	 *	@return mass / volume
+	 *	\return mass / volume
 	 */
 	float GetDensity();
 
@@ -130,7 +107,7 @@ private:
 	/**
 	 *	Returns the object's current velocity.
 	 */
-	vec3& GetVelocity();
+	vec3 GetVelocity();
 
 	/**
 	 *	Sets the velocity of this object directly.
@@ -142,27 +119,36 @@ private:
 	 */
 	float GetSpeed();
 
+	// Variables
+	PhysicsMode physicsMode;
+
+	bool useWorldGravity;
+	bool usePointGravity;
+
+	float drag = 1.0f;
+
+	vec3 centerOfMass;
+
+	float gravityMult = 1.0f;
+
+protected:
+	virtual void Init();
+	virtual void Update();
+	virtual void OnDestroy();
+
 	// Slots
 	void OnSetPos(vec3 pos);
 	void OnSetRot(vec3 rot);
 	void OnSetScale(vec3 scale);
+	void OnSetMesh(Mesh* mesh);
+
+	/// The current mass of this object, in kg.
+	float mass = 0.0f;
 
 	btRigidBody* body;
 	btMotionState* motionState;
-	btTransform* initTransform;
-	btVector3* inertia;
-
-public:
-
-	// Properties
-	PROP_RW(Rigidbody, mass, GetMass, SetMass)
-	PROP_RW(Rigidbody, density, GetDensity, SetDensity)
-	PROP_RW(Rigidbody, velocity, GetVelocity, SetVelocity)
-
-	PROP_RO(Rigidbody, speed, GetSpeed)
-	//PROP_RW(Rigidbody, centerOfMass, GetCenterOfMass, SetCenterOfMass);
-	//PROP_RW(Rigidbody, useWorldGravity, GetUseWorldGravity, SetUseWorldGravity)
-	//PROP_RW(bool usePointGravity, GetUsePointGravity, SetUsePointGravity)
+	btCollisionShape* collider;
+	vec3 inertia;
 };
 
 /** @} */

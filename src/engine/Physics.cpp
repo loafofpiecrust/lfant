@@ -28,7 +28,6 @@
 #include "Engine.hpp"
 #include "Time.hpp"
 #include "Console.hpp"
-#include "sfDynamicsWorld.hpp"
 
 namespace sfs
 {
@@ -57,7 +56,7 @@ void Physics::Init()
 	Log("Physics::Init: Broadphase created.");
 	solver = new btSequentialImpulseConstraintSolver();
 	Log("Physics::Init: Constraint solver created.");
-	world = new sfDynamicsWorld( dispatcher, broadphase, solver, collisionConfig );
+	world = new btDiscreteDynamicsWorld( dispatcher, broadphase, solver, collisionConfig );
 
 	gContactAddedCallback = &Physics::OnCollideEnter;
 	gContactProcessedCallback = &Physics::OnCollideStay;
@@ -90,13 +89,14 @@ void Physics::OnDestroy()
 
 GravPoint* Physics::GetGravityPoint(string name)
 {
-	for(GravPoint * grav : gravityPoints)
+	for(GravPoint& grav : gravityPoints)
 	{
-		if(grav->name == name)
+		if(grav.name == name)
 		{
-			return grav;
+			return &grav;
 		}
 	}
+	return nullptr;
 }
 
 void Physics::SetGravityPoint(string name, vec3 point, float force)
@@ -107,7 +107,7 @@ void Physics::SetGravityPoint(string name, vec3 point, float force)
 		grav->force = force;
 		return;
 	}
-	gravityPoints.push_back(new GravPoint(name, new vec3(point), force));
+	gravityPoints.push_back(GravPoint(name, new vec3(point), force));
 }
 
 void Physics::SetGravityPoint(string name, vec3& point, float force)
@@ -118,14 +118,15 @@ void Physics::SetGravityPoint(string name, vec3& point, float force)
 		grav->force = force;
 		return;
 	}
-	gravityPoints.push_back(new GravPoint(name, &point, force));
+	gravityPoints.push_back(GravPoint(name, &point, force));
 }
 
 void Physics::SetGravityPoint(string name, float force)
 {
-	if(auto grav = GetGravityPoint(name))
+	if(GravPoint* grav = GetGravityPoint(name))
 	{
 		grav->force = force;
+		return;
 	}
 }
 
@@ -203,6 +204,11 @@ bool Physics::OnCollideStay(btManifoldPoint& cp, void* body0, void* body1)
 bool Physics::OnCollideExit(void* userPersistentData)
 {
 	//	return OnCollide( "Exit", cp, colObj0, partId0, index0, colObj1, partId1, index1 );
+}
+
+void Physics::AddRigidbody(Rigidbody *ent)
+{
+	world->addRigidBody(ent->body);
 }
 
 }

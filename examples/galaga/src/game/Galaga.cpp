@@ -38,7 +38,7 @@
 #include "Texture.hpp"
 #include "Shader.hpp"
 #include "Settings.hpp"
-#include "FileManager.hpp"
+#include "FileSystem.hpp"
 #include "UserInterface.hpp"
 #include "Network.hpp"
 
@@ -63,57 +63,21 @@ extern "C" void Launch()
 	delete game;
 }
 
+Galaga::Galaga()
+{
+}
+
 void Galaga::Init()
 {
-	console = new Console;
-	console->Init();
-
-	Log("ShadowFox Engine launched.");
-
-	fileManager = new FileManager;
-	settings = new Settings;
-	systemInfo = new SystemInfo;
-	time = new Time;
-	physics = new Physics;
-	scene = new Scene;
-	renderer = new Renderer;
-	userInterface = new UserInterface;
-	input = new Input;
-	network = new Network;
-
-	Log("Subsystems instantiated.");
-
-	settings->Init();
-	fileManager->Init();
-	systemInfo->Init();
-	time->Init();
-	physics->Init();
-
+	Engine::Init();
 
 	//Range<int> ver = game->settings->GetValue("gl.version");
 	//renderer->version = ver;
-
-	renderer->Init();
-
-
-	userInterface->Init();
-	scene->Init();
-	input->Init();
-	network->Init();
 
 	//ivec2 res = game->settings->GetValue("window.resolution").i2();
 	//renderer->SetResolution(res);
 	//ivec2 pos = game->settings->GetValue("window.position").i2();
 	//renderer->SetPosition(pos);
-
-	Log("Window callback set.");
-
-	Log("Subsystems initialized");
-
-	// Uses OpenGL version from settings, or else the default 3.2 will be used.
-
-
-	Log("Galaga::Init: Subsystems initialised");
 
 	// Look at Player.cpp
 	input->AddAxis("Horizontal", Key::D, Key::A);
@@ -150,8 +114,9 @@ void Galaga::Init()
 	mesh->material.texture.LoadFile("player.png");
 	mesh->material.shader.name = "Diffuse";
 
-	//Log("Mesh parent: "+ent->parent->name);
+	network->Ping("Chat");
 
+	//Log("Mesh parent: "+ent->parent->name);
 
 	/*
 	Entity* ent = Entity::Spawn("TestSprite", nullptr);

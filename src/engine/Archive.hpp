@@ -35,8 +35,6 @@ namespace sfs
 
 /**
  *
- *	@details
- *	@todo
  */
 class Archive
 {

@@ -42,9 +42,6 @@ namespace sfs
  */
 
 /**
- *	@details
- *
- *	@todo
  *
  */
 class AudioSource : public Component

@@ -50,6 +50,8 @@
 #define GLFW_DLL 1
 #define null(type) *((type*)nullptr)
 #define GLM_FORCE_CXX11
+#define GLM_SWIZZLE
+#define BOOST_EXCEPTION_DISABLE
 
 // Includes
 #include <stdint.h>
@@ -76,6 +78,7 @@
 #include <boost/type_traits.hpp>
 #include <boost/config.hpp>
 #include <boost/algorithm/string.hpp>
+#include <boost/lexical_cast.hpp>
 
 #ifdef major
 #undef major
@@ -85,9 +88,12 @@
 using namespace std;
 using namespace glm;
 using namespace glm::detail;
-using namespace boost;
+//using namespace boost;
 using namespace boost::assign;
 using namespace boost::algorithm;
+
+// Boost usings
+using boost::lexical_cast;
 
 // Typedefs
 typedef uint8_t byte;

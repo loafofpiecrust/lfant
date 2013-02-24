@@ -43,7 +43,7 @@
 #include "Sprite.hpp"
 #include "Scene.hpp"
 #include "Camera.hpp"
-#include "FileManager.hpp"
+#include "FileSystem.hpp"
 #include "Settings.hpp"
 #include "UserInterface.hpp"
 
@@ -124,7 +124,7 @@ void Renderer::Init()
 
 	// Load all shaders
 	/*
-	auto shs = game->fileManager->GetGameFiles("shaders", "vert");
+	auto shs = game->fileSystem->GetGameFiles("shaders", "vert");
 	for(uint i = 0; i < shs.size(); ++i)
 	{
 		Shader shader;
@@ -143,11 +143,6 @@ void Renderer::Update()
 	glfwSwapBuffers();
 }
 
-void Renderer::Destroy()
-{
-	delete this;
-}
-
 /*******************************************************************************
  *
  *		Windowing
@@ -161,6 +156,7 @@ bool Renderer::OpenWindow()
 	glfwOpenWindowHint(GLFW_OPENGL_VERSION_MAJOR, version.major);
 	glfwOpenWindowHint(GLFW_OPENGL_VERSION_MINOR, version.minor);
 	glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	glfwOpenWindowHint(GLFW_WINDOW_NO_RESIZE, !windowResizable);
 
 	Log("Renderer::OpenWindow: Window hints set.");
 

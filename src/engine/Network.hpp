@@ -39,7 +39,6 @@ namespace sfs
  */
 
 /** Each instance of Connection handles a connection to a server.
- *	@details
  *		Also, extension instances are included. For example, I
  *		include FullyConnectedMesh2 and ConnectionGraph2 for new
  *		kinds of connections.
@@ -70,12 +69,9 @@ public:
 };
 
 /**	This class manages Networking capabilities
- *	@details
  *		Uses RakNet for networking, with a p2p basis, but also with
  *		the ability to use FCM. Setup for a game server and chat server,
  *		as separate peer instances. Custom
- *	@todo
- *		Todo
  */
 class Network : public Subsystem
 {
@@ -89,7 +85,6 @@ public:
 	virtual void Update();
 
 	/**	Connects client to a remote host via IP
-	 *	@details
 	 *		Connects the client to a server directly, without
 	 *		host switching. This type of connection is inflexible
 	 *		and depends on the host server.
@@ -97,7 +92,6 @@ public:
 	bool Connect(string name, string host, uint16_t port, string password = "", uint16_t maxPeers = 64);
 
 	/**	Disconnects from the current server.
-	 *	@details
 	 *		Disconnects the client from the server it is currently connected to,
 	 *		whether it is FCM, Direct, or chat.
 	 *	@todo
@@ -106,7 +100,11 @@ public:
 	 */
 	void Disconnect(string name);
 
+	void Ping(string name);
+
 protected:
+	Connection* GetConnection(string name);
+	byte GetPacketId(RakNet::Packet* p);
 
 public:
 	vector<Connection*> connections;

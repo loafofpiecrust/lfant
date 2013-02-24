@@ -37,11 +37,8 @@ class ParticleSystem;
  *	 @{
  */
 
-/**	Particle
- *	@details
- *		Description
- *	@todo
- *		Todo
+/**
+ *	Particle
  */
 class Particle
 {

@@ -30,11 +30,12 @@
 #include "Settings.hpp"
 #include "Audio.hpp"
 #include "Scene.hpp"
-#include "FileManager.hpp"
+#include "FileSystem.hpp"
 #include "Console.hpp"
 #include "SystemInfo.hpp"
 #include "Console.hpp"
 #include "UserInterface.hpp"
+#include "Network.hpp"
 
 namespace sfs
 {
@@ -58,7 +59,19 @@ extern "C" void Launch()
 	delete game;
 }
 
-Engine::Engine()
+Engine::Engine() :
+	console {new Console},
+	fileSystem {new FileSystem},
+	settings {new Settings},
+	systemInfo {new SystemInfo},
+	time {new Time},
+	physics {new Physics},
+	renderer {new Renderer},
+	userInterface {new UserInterface},
+	scene {new Scene},
+	input {new Input},
+	audio {new Audio},
+	network {new Network}
 {
 }
 
@@ -74,25 +87,9 @@ Engine::~Engine()
 
 void Engine::Init()
 {
-	console = new Console;
 	console->Init();
-
-	Log("ShadowFox Engine launched.");
-
-	fileManager = new FileManager;
-	settings = new Settings;
-	systemInfo = new SystemInfo;
-	time = new Time;
-	physics = new Physics;
-	scene = new Scene;
-	renderer = new Renderer;
-	userInterface = new UserInterface;
-	input = new Input;
-
-	Log("Subsystems instantiated.");
-
+	fileSystem->Init();
 	settings->Init();
-	fileManager->Init();
 	systemInfo->Init();
 	time->Init();
 	physics->Init();
@@ -100,6 +97,8 @@ void Engine::Init()
 	userInterface->Init();
 	scene->Init();
 	input->Init();
+	audio->Init();
+	network->Init();
 
 	Log("Window callback set.");
 
@@ -131,14 +130,18 @@ void Engine::LoadScene(string scene)
 
 void Engine::Destroy()
 {
-	input->Destroy();
-	renderer->Destroy();
-	scene->Destroy();
-	physics->Destroy();
-	time->Destroy();
-	systemInfo->Destroy();
+	console->Destroy();
+	fileSystem->Destroy();
 	settings->Destroy();
-	fileManager->Destroy();
+	systemInfo->Destroy();
+	time->Destroy();
+	physics->Destroy();
+	renderer->Destroy();
+	userInterface->Destroy();
+	scene->Destroy();
+	input->Destroy();
+	audio->Destroy();
+	network->Destroy();
 }
 
 void Engine::Exit()

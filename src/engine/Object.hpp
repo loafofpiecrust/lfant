@@ -23,7 +23,7 @@
 #define BOOST_BIND_NO_PLACEHOLDERS
 
 // External
-//#include <boost/signals2.hpp>
+#include <boost/signals2.hpp>
 #include <typeinfo>
 
 // Internal
@@ -33,7 +33,7 @@
 #define SENDER(obj, sig) obj, "sig"
 #define RECEIVER(obj, slot) obj, &remove_ref<decltype(*obj)>::type::slot
 
-//using boost::signals2::signal;
+using boost::signals2::signal;
 
 namespace sfs
 {
@@ -47,10 +47,9 @@ namespace sfs
 
 /**
  *	The base class for any object-oriented classes.
- *	@details
- *		Implements a signals and slots system similar to Qt's. Also contains
- *		a few basic game-loop functions to allow homogeneous pointers to an Object
- *		instance, like in ActionScript.
+ *	Implements a signals and slots system similar to Qt's. Also contains
+ *	a few basic game-loop functions to allow homogeneous pointers to an Object
+ *	instance, like in ActionScript.
  *	@todo
  *		Possibly make the connection naming more efficient.
  *		Be sure that the variadic templating works.
@@ -76,27 +75,30 @@ class Object
 	class Event0 : public Event
 	{
 	public:
-		boost::function<void()> func;
+		typedef boost::signals2::signal<void()> sigType;
+		sigType sig;
 
 		Event0(string name, boost::function<void()> func) :
-			Event(name), func(func)
+			Event(name)
 		{
+			sig.connect(func);
 		}
 	};
 
-	template<typename P1, typename ... P>
+	template<typename P1, typename... P>
 	class EventP : public Event
 	{
 	public:
-		boost::function<void(P1, P...)> func;
+		typedef boost::signals2::signal<void(P1, P...)> sigType;
+		sigType sig;
 
 		EventP(string name, boost::function<void(P1, P...)> func) :
-			Event(name), func(func)
+			Event(name)
 		{
+			sig.connect(func);
 		}
 	};
 public:
-
 
 	template<typename R>
 	void Connect(Object* sender, string name, R* receiver, void (R::*func)())
@@ -111,41 +113,88 @@ public:
 				con = dynamic_cast<Event0*>(event);
 				if(con)
 				{
-					con->func = boost::bind(func, receiver);
+					con->sig.connect(boost::bind(func, receiver));
 					con->ptr = sender;
 				}
 				return;
 			}
 		}
 		con = new Event0(name, boost::bind(func, receiver));
+		con->ptr = sender;
 		sender->events.push_back(con);
 	}
 
-	template<typename R, typename P1, typename ... P>
-	void Connect(Object* sender, string name, R* receiver, void (R::*func)(P1, P...))
+	template<typename R, typename P1>
+	void Connect(Object* sender, string name, R* receiver, void (R::*func)(P1))
 	{
 		erase_all(name, " ");
-		name = Type(sender) + "::" + name + "(" + Type<P1, P...>() + ")";
-		EventP<P1, P...>* con = nullptr;
+		name = Type(sender) + "::" + name + "(" + Type<P1>() + ")";
+		EventP<P1>* con = nullptr;
 		for(auto connection : sender->events)
 		{
 			if(connection->name == name)
 			{
-				con = dynamic_cast<EventP<P1, P...>*>(connection);
+				con = dynamic_cast<EventP<P1>*>(connection);
 				if(con)
 				{
-					con->func = boost::bind(func, receiver);
+					con->sig.connect(boost::bind(func, receiver, _1));
 					con->ptr = sender;
 				}
 				return;
 			}
 		}
-		con = new EventP<P1, P...>(name, boost::bind(func, receiver));
+		con = new EventP<P1>(name, boost::bind(func, receiver, _1));
+		sender->events.push_back(con);
+	}
+
+	template<typename R, typename P1, typename P2>
+	void Connect(Object* sender, string name, R* receiver, void (R::*func)(P1, P2))
+	{
+		erase_all(name, " ");
+		name = Type(sender) + "::" + name + "(" + Type<P1, P2>() + ")";
+		EventP<P1, P2>* con = nullptr;
+		for(auto connection : sender->events)
+		{
+			if(connection->name == name)
+			{
+				con = dynamic_cast<EventP<P1, P2>*>(connection);
+				if(con)
+				{
+					con->sig.connect(boost::bind(func, receiver, _1, _2));
+					con->ptr = sender;
+				}
+				return;
+			}
+		}
+		con = new EventP<P1, P2>(name, boost::bind(func, receiver, _1, _2));
+		sender->events.push_back(con);
+	}
+
+	template<typename R, typename P1, typename P2, typename P3>
+	void Connect(Object* sender, string name, R* receiver, void (R::*func)(P1, P2, P3))
+	{
+		erase_all(name, " ");
+		name = Type(sender) + "::" + name + "(" + Type<P1, P2, P3>() + ")";
+		EventP<P1, P2, P3>* con = nullptr;
+		for(auto connection : sender->events)
+		{
+			if(connection->name == name)
+			{
+				con = dynamic_cast<EventP<P1, P2, P3>*>(connection);
+				if(con)
+				{
+					con->sig.connect(boost::bind(func, receiver, _1, _2, _3));
+					con->ptr = sender;
+				}
+				return;
+			}
+		}
+		con = new EventP<P1, P2, P3>(name, boost::bind(func, receiver, _1, _2, _3));
 		sender->events.push_back(con);
 	}
 
 
-	void Trigger(string name)
+	virtual void Trigger(string name)
 	{
 		erase_all(name, " ");
 		name = Type(this) + "::" + name + "()";
@@ -156,7 +205,7 @@ public:
 				Event0* con = dynamic_cast<Event0*>(event);
 				if(con)
 				{
-					con->func();
+					con->sig();
 				}
 			}
 		}
@@ -174,7 +223,7 @@ public:
 				auto con = dynamic_cast<EventP<P1, P...>*>(event);
 				if(con)
 				{
-					con->func(arg, args...);
+					con->sig(arg, args...);
 				}
 			}
 		}

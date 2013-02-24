@@ -27,9 +27,12 @@
 #include <BitStream.h>
 #include <RakSleep.h>
 #include <MessageIdentifiers.h>
+#include <RakNetTypes.h>
+#include <RakNetStatistics.h>
 
 // Internal
 #include "Console.hpp"
+#include "Thread.hpp"
 
 using namespace RakNet;
 
@@ -46,9 +49,9 @@ Network::~Network()
 }
 
 Connection::Connection(string name, string host, uint16_t port, string password, uint16_t maxPeers) :
-	name(name), host(host), password(password), maxPeers(maxPeers)
+	name(name), host(host), password(password), socket(port, 0), maxPeers(maxPeers)
 {
-	socket.port = port;
+	socket.socketFamily = AF_INET;
 	//peer = new RakPeer();
 	peer = RakPeerInterface::GetInstance();
 	Log("Connection::Connection: Created peer instance");
@@ -60,91 +63,91 @@ Connection::Connection(string name, string host, uint16_t port, string password,
 
 void Network::Init()
 {
-//	Connect("Game", "10.0.1.22", 1234, "", 64);
-	Connect("Chat", "10.0.1.22", 60000, "", 16);
+	//	Connect("Game", "10.0.1.22", 1234, "", 64);
+	Connect("Chat", "174.127.119.2", 1234, "", 16);
+	Ping("Chat");
 }
 
 void Network::Update()
 {
-	/*
+
+	sleep(20);
 	Packet* packet = nullptr;
 	for(Connection* con : connections)
 	{
-		Log("Network::Update: About to start packet checking");
-		if(!con->started)
+		if(con)
+		{
+			continue;
+		}
+		if(!con->started || !con->peer->IsActive())
 		{
 			continue;
 		}
 		packet = con->peer->Receive();
-		Log("Network::Update: Received packet");
-		if(packet && packet->data)
+		auto packetId = GetPacketId(packet);
+		switch(packetId)
 		{
-			Log("Network::Update: Packet data seems valid, size = ", sizeof(packet->data), ", first = ", (int)packet->data[0]);
-			switch((unsigned int)packet->data[0])
-			{
-				case ID_DISCONNECTION_NOTIFICATION:
-					// Connection lost normally
-					Log("Network::Update: DISCONNECTION_NOTIFICATION");
-					break;
+			case ID_DISCONNECTION_NOTIFICATION:
+				// Connection lost normally
+				Log("Network::Update: DISCONNECTION_NOTIFICATION");
+				break;
 
-				case ID_NEW_INCOMING_CONNECTION:
-					// Somebody connected.  We have their IP now
-					Log("Network::Update: NEW_INCOMING_CONNECTION");
-					Log("Network::Update: Its from ", packet->systemAddress.ToString(true), ", guid=", packet->guid.ToString());
-					break;
+			case ID_NEW_INCOMING_CONNECTION:
+				// Somebody connected.  We have their IP now
+				Log("Network::Update: NEW_INCOMING_CONNECTION");
+				Log("Network::Update: Its from ", packet->systemAddress.ToString(true), ", guid=", packet->guid.ToString());
+				break;
 
-				case ID_CONNECTION_REQUEST_ACCEPTED:
-					// Somebody connected.  We have their IP now
-					Log("Network::Update: CONNECTION_ACCEPTED");
-					Log("Network::Update: Its from ", packet->systemAddress.ToString(true), ", guid=", packet->guid.ToString());
-					if(packet->guid != con->peer->GetMyGUID())
-					{
-						con->peer->Connect(packet->systemAddress.ToString(false), packet->systemAddress.GetPort(), 0, 0);
-					}
-					break;
+			case ID_CONNECTION_REQUEST_ACCEPTED:
+				//packet = con->peer->
+				// Somebody connected.  We have their IP now
+				Log("Network::Update: CONNECTION_ACCEPTED");
+				Log("Network::Update: Its from ", packet->systemAddress.ToString(true), ", guid=", packet->guid.ToString());
+				if(packet->guid != con->peer->GetMyGUID())
+				{
+					con->peer->Connect(packet->systemAddress.ToString(false), packet->systemAddress.GetPort(), 0, 0);
+				}
+				break;
 
-				case ID_CONNECTION_LOST:
-					// Couldn't deliver a reliable packet - i.e. the other system was abnormally
-					// terminated
-					Log("Network::Update: CONNECTION_LOST");
-					break;
+			case ID_CONNECTION_LOST:
+				// Couldn't deliver a reliable packet - i.e. the other system was abnormally
+				// terminated
+				Log("Network::Update: CONNECTION_LOST");
+				break;
 
-				case ID_ADVERTISE_SYSTEM:
-					Log("Network::Update: ADVERTISE_SYSTEM");
-					// Do something here?
-					break;
+			case ID_ADVERTISE_SYSTEM:
+				Log("Network::Update: ADVERTISE_SYSTEM");
+				// Do something here?
+				break;
 
-				case ID_FCM2_NEW_HOST:
-					Log("Network::Update: NEW_HOST");
-					if(packet->guid == con->peer->GetMyGUID())
-					{
-						Log("Got new host (ourselves)");	// You're the new host, do something with that
-					}
-					else
-					{
-						Log("Got new host ", packet->systemAddress.ToString(true), ", GUID=", packet->guid.ToString());  // Someone else is host, GUI!
-					}
-					BitStream bs(packet->data, packet->length, false);
-					bs.IgnoreBytes(1);
-					RakNetGUID oldHost;
-					bs.Read(oldHost);
-					// If oldHost is different then the current host, then we lost connection to the host
-					if(oldHost != UNASSIGNED_RAKNET_GUID)
-					{
-						Log(". Old-host Guid=", oldHost.ToString());	// Host is diff, this is old
-					}
-					else
-					{
-						Log("(First reported host)");   // The host is the same
-					}
-					break;
-			}
-			Log("Network::Update: About to deallocate packet");
-			con->peer->DeallocatePacket(packet);
+			case ID_FCM2_NEW_HOST:
+				Log("Network::Update: NEW_HOST");
+				if(packet->guid == con->peer->GetMyGUID())
+				{
+					Log("Got new host (ourselves)");	// You're the new host, do something with that
+				}
+				else
+				{
+					Log("Got new host ", packet->systemAddress.ToString(true), ", GUID=", packet->guid.ToString());  // Someone else is host, GUI!
+				}
+				BitStream bs(packet->data, packet->length, false);
+				bs.IgnoreBytes(1);
+				RakNetGUID oldHost;
+				bs.Read(oldHost);
+				// If oldHost is different then the current host, then we lost connection to the host
+				if(oldHost != UNASSIGNED_RAKNET_GUID)
+				{
+					Log(". Old-host Guid=", oldHost.ToString());	// Host is diff, this is old
+				}
+				else
+				{
+					Log("(First reported host)");   // The host is the same
+				}
+				break;
 		}
-		Log("Network::Update: Next connection!");
+		con->peer->DeallocatePacket(packet);
 	}
-	*/
+
 }
 
 bool Network::Connect(string name, string host, uint16_t port, string password, uint16_t maxPeers)
@@ -152,16 +155,9 @@ bool Network::Connect(string name, string host, uint16_t port, string password, 
 	Log("Network::Connect: Begin");
 	Connection* con = nullptr;
 	bool isnew = false;
-	if(connections.size() > 0)
+	if(auto pco = GetConnection(name))
 	{
-		for(auto pco : connections)
-		{
-			if(pco->name == name)
-			{
-				con = pco;
-				break;
-			}
-		}
+		con = pco;
 	}
 	if(!con)
 	{
@@ -196,46 +192,91 @@ bool Network::Connect(string name, string host, uint16_t port, string password, 
 		Disconnect(name);
 	}
 
-	if(con->peer->Startup(con->maxPeers, &con->socket, 1, 1) != RAKNET_STARTED)
+	if(con->peer->Startup(con->maxPeers, &con->socket, 1) != RAKNET_STARTED)
 	{
 		Disconnect(name);
 		return false;
 	}
 	con->started = true;
+	con->peer->SetOccasionalPing(true);
 	con->peer->SetMaximumIncomingConnections(con->maxPeers);
+
+	Log("Our guid is ", con->peer->GetGuidFromSystemAddress(RakNet::UNASSIGNED_SYSTEM_ADDRESS).ToString());
+	Log("Started on ", con->peer->GetMyBoundAddress().ToString(true));
 	con->peer->SetTimeoutTime(1000, UNASSIGNED_SYSTEM_ADDRESS);
 
 	Log("Network::Connect: Peer connection opened");
 
-	if(password != "")
+	bool b = false;
+	if(password == "")
+	{
+		b = con->peer->Connect(host.c_str(), con->socket.port, 0, 0) == CONNECTION_ATTEMPT_STARTED;
+	}
+	else
 	{
 		con->peer->SetIncomingPassword(password.c_str(), password.size()*sizeof(char));
+		Log("Network::Connect: Password set");
+		b = con->peer->Connect(host.c_str(), con->socket.port, password.c_str(), strlen(password.c_str())) == CONNECTION_ATTEMPT_STARTED;
 	}
-
-	Log("Network::Connect: Password set");
-
-	con->peer->SetOccasionalPing(true);
-	bool b = con->peer->Connect(host.c_str(), con->socket.port, password.c_str(), strlen(password.c_str())) == CONNECTION_ATTEMPT_STARTED;
 	if(!b)
 	{
 		// Something happened, can't connect
+		Log("Network::Connect: Something happened, can't connect");
 		Disconnect(name);
+		return false;
 	}
 	Log("Network::Connect: Connected!");
-	return b;
+	return true;
 }
 
 void Network::Disconnect(string name)
+{
+	if(auto con = GetConnection(name))
+	{
+		con->peer->CloseConnection(con->peer->GetSystemAddressFromIndex(0), false);
+		con->peer->Shutdown(100);
+		con->started = false;
+	}
+}
+
+void Network::Ping(string name)
+{
+	if(Connection* con = GetConnection(name))
+	{
+		Log("About to ping ", con->peer->GetSystemAddressFromIndex(0).ToString());
+		if(con->peer->GetSystemAddressFromIndex(0) != RakNet::UNASSIGNED_SYSTEM_ADDRESS)
+		{
+			Log("PINGED!");
+			con->peer->Ping(con->peer->GetSystemAddressFromIndex(0));
+			Log("Average ping: ", con->peer->GetAveragePing(con->peer->GetSystemAddressFromIndex(0)));
+		}
+	}
+}
+
+Connection* Network::GetConnection(string name)
 {
 	for(auto con : connections)
 	{
 		if(con->name == name)
 		{
-			con->peer->CloseConnection(con->peer->GetSystemAddressFromIndex(0), false);
-			con->peer->Shutdown(100);
-			con->started = false;
+			return con;
 		}
 	}
+	return nullptr;
+}
+
+byte Network::GetPacketId(Packet* p)
+{
+	if (p == nullptr)
+		return 255;
+
+	if ((byte)p->data[0] == ID_TIMESTAMP)
+	{
+		RakAssert(p->length > sizeof(RakNet::MessageID) + sizeof(RakNet::Time));
+		return (byte) p->data[sizeof(RakNet::MessageID) + sizeof(RakNet::Time)];
+	}
+	else
+		return (byte) p->data[0];
 }
 
 }

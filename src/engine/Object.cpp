@@ -43,7 +43,6 @@ void Object::Init()
 void Object::Destroy()
 {
 	OnDestroy();
-	delete this;
 }
 
 void Object::Destroy(Object* obj)

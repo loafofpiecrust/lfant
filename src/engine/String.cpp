@@ -29,6 +29,7 @@ namespace sfs
 
 vector<string> Split(string str, string dropDelim, string keepDelim)
 {
+	using namespace boost;
 	vector<string> result;
 	if(str == "")
 	{

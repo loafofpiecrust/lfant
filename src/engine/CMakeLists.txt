@@ -42,8 +42,6 @@ include_directories(
 	"../external/cegui/cegui/include"
 	)
 
-# Build Options
-
 # Linker Options
 target_link_libraries(${PROJECT_NAME}
 	glew

@@ -36,8 +36,8 @@ VALUE: false
 player.mouselook=false
 VALUE: 20
 galaga.meshcount=20
-VALUE: Demo8.layout
-gui.windowlayout=Demo8.layout
+VALUE: GameMenu.layout
+gui.windowlayout=GameMenu.layout
 /home/taylorsnead/ShadowFox/ShadowFox-Engine/examples/galaga
 Operator string called
 Operator string called
@@ -60,7 +60,7 @@ VALUE: 120
 VALUE: 10.0
 VALUE: false
 VALUE: 20
-VALUE: Demo8.layout
+VALUE: GameMenu.layout
 /home/taylorsnead/My Games/ShadowFox Studios/Galaga
 Time::ResetTime: Started
 Time::ResetTime: Finished
@@ -93,3 +93,41 @@ UserInterface::Init: Root window
 Operator string called
 Input: Initialized
 Network::Connect: Begin
+Network::Connect: About to spawn.
+Connection::Connection: Created peer instance
+Network::Connect: New connection, Chat, at 174.127.119.2 1234, max peers: 16
+Network::Connect: Port not in use
+Our guid is 1361507084133613
+Started on 127.0.0.1|1234
+Network::Connect: Peer connection opened
+Network::Connect: Connected!
+About to ping UNASSIGNED_SYSTEM_ADDRESS
+Window callback set.
+Subsystems initialized
+Galaga::Init: Subsystems initialised
+Computer name: ShadowFox-linux
+Username: 
+Running OS: GNU/Linux 3.5.0-23-generic
+CPU:  with 0 cores
+Scene::Spawn: Vector capacity: 0
+Looking at 120
+Moving at 10
+Scene::Spawn: Vector capacity: 1
+Scene::Spawn: Had to resrve for Vector capacity: 6
+Want to load an image file
+Loading an image file of type png
+About to load a png
+LoadPNG: Image size: 128x128
+Texture::LoadPNG: GL Texture generated
+Texture::LoadPNG: GL Texture bound
+Texture::LoadPNG: texture data sent
+Texture::LoadPNG: texture filtering set
+About to ping UNASSIGNED_SYSTEM_ADDRESS
+Game initialised
+Renderer::WindowClosed: Touch.
+About to destroy game
+Scene::Destroy: Destroying Snead
+Entity::Destroy: Components destroyed
+Scene::Destroy: Destroying TestMesh
+Entity::Destroy: Components destroyed
+Game ending

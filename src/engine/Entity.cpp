@@ -29,6 +29,8 @@
 #include "Scene.hpp"
 #include "TypeInfo.hpp"
 #include "Console.hpp"
+#include "String.hpp"
+#include "Component.hpp"
 
 namespace sfs
 {
@@ -78,21 +80,26 @@ void Entity::Update()
 
 	transform->SetDirection();
 
-	for(auto compo : components)
+	for(auto& compo : components)
 	{
-		if(compo->enabled)
+		if(compo->IsEnabled())
 		{
 			compo->Update();
 		}
 	}
 
-	for(auto child : children)
+	for(auto& child : children)
 	{
 		if(child->active)
 		{
 			child->Update();
 		}
 	}
+}
+
+void Entity::AddChild(Entity* ent)
+{
+	children.push_back(unique_ptr<Entity>(ent));
 }
 
 void Entity::Destroy()
@@ -103,6 +110,7 @@ void Entity::Destroy()
 	}
 	Log("Entity::Destroy: Components destroyed");
 	OnDestroy();
+	game->scene->RemoveEntity(name);
 	delete this;
 }
 
@@ -115,11 +123,12 @@ Entity* Entity::Clone(string name, Entity* parent, vec3 pos, vec3 rot)
 	return ent;
 }
 
-Component *Entity::GetComponent(string type)
+Component* Entity::GetComponent(string type)
 {
-	for(auto comp : components)
+	vector<string> spl = Split(type, ".: ", "");
+	for(auto& comp : components)
 	{
-		if(Type(comp) == type || Type(comp) == "sfs::" + type)
+		if(Type(comp) == type || Type(comp) == spl[spl.size()-1])
 		{
 			return comp;
 		}
@@ -165,11 +174,11 @@ void Entity::RemoveComponent()
 Entity* Entity::GetChild(string name, bool recursive)
 {
 	Entity* ent = nullptr;
-	for(auto child : children)
+	for(auto& child : children)
 	{
 		if(child->name == name)
 		{
-			ent = child;
+			ent = child.get();
 		}
 	}
 
@@ -179,9 +188,9 @@ Entity* Entity::GetChild(string name, bool recursive)
 	}
 	else
 	{
-		for(auto child : children)
+		for(auto& child : children)
 		{
-			if(ent = child->GetChild(name, true))
+			if((ent = child->GetChild(name, true)))
 			{
 				return ent;
 			}
@@ -198,18 +207,19 @@ Entity* Entity::GetChild(string name, bool recursive)
 
 void Entity::Bind()
 {
-	/*SClass<Entity> ent;
-	 ent.Var("name", &Entity::name);
-	 ent.Var("tag", &Entity::tag);
-	 ent.Var("layer", &Entity::layer);
-	 ent.Var("lifeTime", &Entity::lifeTime);
-	 ent.Var("active", &Entity::active);
+	/*
+	SClass<Entity> ent;
+	ent.Var("name", &Entity::name);
+	ent.Var("tag", &Entity::tag);
+	ent.Var("layer", &Entity::layer);
+	ent.Var("lifeTime", &Entity::lifeTime);
+	ent.Var("active", &Entity::active);
 
-	 ent.Prop("parent", &Entity::GetParent, &Entity::SetParent);
+	ent.Prop("parent", &Entity::GetParent, &Entity::SetParent);
 
-	 //	ent.Func( "GetChild", &Entity::GetChild );
-	 //	ent.Func( "GetComponent", &Entity::GetComponent<Component> );
-	 */
+	ent.Func( "GetChild", &Entity::GetChild );
+	ent.Func( "GetComponent", &Entity::GetComponent<Component> );
+	*/
 }
 
 void Entity::SetActiveRecursive(bool active)

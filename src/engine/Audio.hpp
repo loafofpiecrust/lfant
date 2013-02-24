@@ -42,8 +42,6 @@ namespace sfs
 
 /**
  *
- *	@details
- *	@todo
  */
 class Audio : public Subsystem
 {
@@ -51,6 +49,8 @@ class Audio : public Subsystem
 public:
 	Audio();
 	virtual ~Audio();
+
+	virtual void Init();
 
 	/**
 	 *	Plays a 2D sound at global volume.
@@ -63,7 +63,6 @@ public:
 	uint8_t maxChannels = 10;
 
 protected:
-	virtual void Init();
 	virtual void Update();
 	virtual void OnDestroy();
 

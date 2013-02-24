@@ -33,8 +33,8 @@ namespace sfs
  *	 @{
  */
 
-/**	This class adds Magnet capabilities to the Owner.
- *	@details
+/**
+ *	This class adds Magnet capabilities to the Owner.
  *		Allows attraction and repulsion based on the position and rotation
  *		of two magnetic Entities.
  *	@todo

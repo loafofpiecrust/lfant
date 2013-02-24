@@ -418,18 +418,18 @@ void	CProfileIterator::Enter_Parent( void )
 
 /***************************************************************************************************
 **
-** CProfileManager
+** CProfileSystem
 **
 ***************************************************************************************************/
 
-CProfileNode	CProfileManager::Root( "Root", NULL );
-CProfileNode *	CProfileManager::CurrentNode = &CProfileManager::Root;
-int				CProfileManager::FrameCounter = 0;
-unsigned long int			CProfileManager::ResetTime = 0;
+CProfileNode	CProfileSystem::Root( "Root", NULL );
+CProfileNode *	CProfileSystem::CurrentNode = &CProfileSystem::Root;
+int				CProfileSystem::FrameCounter = 0;
+unsigned long int			CProfileSystem::ResetTime = 0;
 
 
 /***********************************************************************************************
- * CProfileManager::Start_Profile -- Begin a named profile                                    *
+ * CProfileSystem::Start_Profile -- Begin a named profile                                    *
  *                                                                                             *
  * Steps one level deeper into the tree, if a child already exists with the specified name     *
  * then it accumulates the profiling; otherwise a new child node is added to the profile tree. *
@@ -441,7 +441,7 @@ unsigned long int			CProfileManager::ResetTime = 0;
  * The string used is assumed to be a static string; pointer compares are used throughout      *
  * the profiling code for efficiency.                                                          *
  *=============================================================================================*/
-void	CProfileManager::Start_Profile( const char * name )
+void	CProfileSystem::Start_Profile( const char * name )
 {
 	if (name != CurrentNode->Get_Name()) {
 		CurrentNode = CurrentNode->Get_Sub_Node( name );
@@ -452,9 +452,9 @@ void	CProfileManager::Start_Profile( const char * name )
 
 
 /***********************************************************************************************
- * CProfileManager::Stop_Profile -- Stop timing and record the results.                       *
+ * CProfileSystem::Stop_Profile -- Stop timing and record the results.                       *
  *=============================================================================================*/
-void	CProfileManager::Stop_Profile( void )
+void	CProfileSystem::Stop_Profile( void )
 {
 	// Return will indicate whether we should back up to our parent (we may
 	// be profiling a recursive function)
@@ -465,11 +465,11 @@ void	CProfileManager::Stop_Profile( void )
 
 
 /***********************************************************************************************
- * CProfileManager::Reset -- Reset the contents of the profiling system                       *
+ * CProfileSystem::Reset -- Reset the contents of the profiling system                       *
  *                                                                                             *
  *    This resets everything except for the tree structure.  All of the timing data is reset.  *
  *=============================================================================================*/
-void	CProfileManager::Reset( void )
+void	CProfileSystem::Reset( void )
 { 
 	gProfileClock.reset();
 	Root.Reset();
@@ -480,18 +480,18 @@ void	CProfileManager::Reset( void )
 
 
 /***********************************************************************************************
- * CProfileManager::Increment_Frame_Counter -- Increment the frame counter                    *
+ * CProfileSystem::Increment_Frame_Counter -- Increment the frame counter                    *
  *=============================================================================================*/
-void CProfileManager::Increment_Frame_Counter( void )
+void CProfileSystem::Increment_Frame_Counter( void )
 {
 	FrameCounter++;
 }
 
 
 /***********************************************************************************************
- * CProfileManager::Get_Time_Since_Reset -- returns the elapsed time since last reset         *
+ * CProfileSystem::Get_Time_Since_Reset -- returns the elapsed time since last reset         *
  *=============================================================================================*/
-float CProfileManager::Get_Time_Since_Reset( void )
+float CProfileSystem::Get_Time_Since_Reset( void )
 {
 	unsigned long int time;
 	Profile_Get_Ticks(&time);
@@ -501,15 +501,15 @@ float CProfileManager::Get_Time_Since_Reset( void )
 
 #include <stdio.h>
 
-void	CProfileManager::dumpRecursive(CProfileIterator* profileIterator, int spacing)
+void	CProfileSystem::dumpRecursive(CProfileIterator* profileIterator, int spacing)
 {
 	profileIterator->First();
 	if (profileIterator->Is_Done())
 		return;
 
-	float accumulated_time=0,parent_time = profileIterator->Is_Root() ? CProfileManager::Get_Time_Since_Reset() : profileIterator->Get_Current_Parent_Total_Time();
+	float accumulated_time=0,parent_time = profileIterator->Is_Root() ? CProfileSystem::Get_Time_Since_Reset() : profileIterator->Get_Current_Parent_Total_Time();
 	int i;
-	int frames_since_reset = CProfileManager::Get_Frame_Count_Since_Reset();
+	int frames_since_reset = CProfileSystem::Get_Frame_Count_Since_Reset();
 	for (i=0;i<spacing;i++)	printf(".");
 	printf("----------------------------------\n");
 	for (i=0;i<spacing;i++)	printf(".");
@@ -550,14 +550,14 @@ void	CProfileManager::dumpRecursive(CProfileIterator* profileIterator, int spaci
 
 
 
-void	CProfileManager::dumpAll()
+void	CProfileSystem::dumpAll()
 {
 	CProfileIterator* profileIterator = 0;
-	profileIterator = CProfileManager::Get_Iterator();
+	profileIterator = CProfileSystem::Get_Iterator();
 
 	dumpRecursive(profileIterator,0);
 
-	CProfileManager::Release_Iterator(profileIterator);
+	CProfileSystem::Release_Iterator(profileIterator);
 }
 
 

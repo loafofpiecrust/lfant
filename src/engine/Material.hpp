@@ -37,8 +37,6 @@ namespace sfs
 
 /**
  *
- *	@details
- *	@todo
  */
 class Material
 {

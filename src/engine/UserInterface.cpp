@@ -30,7 +30,7 @@
 #include "UserInterface.hpp"
 #include "Thread.hpp"
 #include "Engine.hpp"
-#include "FileManager.hpp"
+#include "FileSystem.hpp"
 #include "Console.hpp"
 #include "Input.hpp"
 #include "Scene.hpp"
@@ -62,14 +62,14 @@ void UserInterface::Init()
 	Log("UserInterface::Init: Spawned renderer");
 
 	CEGUI::DefaultResourceProvider* rp = static_cast<CEGUI::DefaultResourceProvider*>(CEGUI::System::getSingleton().getResourceProvider());
-	rp->setResourceGroupDirectory("imagesets", game->fileManager->GetGameFile("gui/imagesets").string());
+	rp->setResourceGroupDirectory("imagesets", game->fileSystem->GetGameFile("gui/imagesets").string());
 	Log("UserInterface::Init: Set a resource dir");
-	rp->setResourceGroupDirectory("schemes", game->fileManager->GetGameFile("gui/schemes").string());
-	rp->setResourceGroupDirectory("xml_schemas", game->fileManager->GetGameFile("gui/xml_schemas").string());
-	rp->setResourceGroupDirectory("styles", game->fileManager->GetGameFile("gui/styles").string());
-	rp->setResourceGroupDirectory("layouts", game->fileManager->GetGameFile("gui/layouts").string());
-	rp->setResourceGroupDirectory("fonts", game->fileManager->GetGameFile("gui/fonts").string());
-	rp->setResourceGroupDirectory("looknfeel", game->fileManager->GetGameFile("gui/looks").string());
+	rp->setResourceGroupDirectory("schemes", game->fileSystem->GetGameFile("gui/schemes").string());
+	rp->setResourceGroupDirectory("xml_schemas", game->fileSystem->GetGameFile("gui/xml_schemas").string());
+	rp->setResourceGroupDirectory("styles", game->fileSystem->GetGameFile("gui/styles").string());
+	rp->setResourceGroupDirectory("layouts", game->fileSystem->GetGameFile("gui/layouts").string());
+	rp->setResourceGroupDirectory("fonts", game->fileSystem->GetGameFile("gui/fonts").string());
+	rp->setResourceGroupDirectory("looknfeel", game->fileSystem->GetGameFile("gui/looks").string());
 	rp->setDefaultResourceGroup("looknfeel");
 
 	CEGUI::ImageManager::setImagesetDefaultResourceGroup("imagesets");

@@ -106,7 +106,7 @@ void Input::Update()
 /*******************************************************************************
  *		Callback Functions
  *			KeyPress();
- *		@area Callback
+ *		\area Callback
  *******************************************************************************/
 
 void GLFWCALL Input::OnKeyPress(int key, int mode)

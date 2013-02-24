@@ -35,8 +35,8 @@
 
 // Internal
 
-#define RETURN_TYPE(func) function_types::result_type<decltype(func)>::type
-#define ARG_TYPE(func, arg) mpl::at_c<function_types::parameter_types<decltype(func)>, arg>::type
+#define RETURN_TYPE(func) boost::function_types::result_type<decltype(func)>::type
+#define ARG_TYPE(func, arg) boost::mpl::at_c<boost::function_types::parameter_types<decltype(func)>, arg>::type
 
 #define PROP_RO(CLASSTYPE, NAME, GETFUNC)\
 struct CLASSTYPE##NAME : public Property\
@@ -232,8 +232,6 @@ namespace sfs
 
 /**
  *
- *	@details
- *	@todo
  */
 /*template<class C, typename G, typename S>
  class Property

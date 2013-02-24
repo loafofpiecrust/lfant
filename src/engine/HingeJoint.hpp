@@ -36,7 +36,7 @@ namespace sfs
 
 /**
  *
- *	@details
+ *	\details
  *	@todo
  */
 class HingeJoint : public Joint

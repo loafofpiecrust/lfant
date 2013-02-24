@@ -39,7 +39,6 @@ class Particle;
  */
 
 /**	This class handles a ParticleSystem Component
- *	@details
  *		Gives functionality for emitting particles from this transform. The
  *		emitted particles die after a certain lifetime, and while alive, follow
  *		the given parameters. The particles can be rendered either as quads

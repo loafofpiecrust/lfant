@@ -27,7 +27,7 @@
 // Internal
 #include "Object.hpp"
 #include "Transform.hpp"
-#include "Component.hpp"
+//#include "Component.hpp"
 #include "TypeInfo.hpp"
 #include "Engine.hpp"
 
@@ -45,8 +45,7 @@ class Item;
 
 /**
  *	This class is the basis for all Entities.
- *	@details
- *		Entity handles basic object and entity duties, like initialization,
+ *		Handles basic object and entity duties, like initialization,
  *		updating every frame, then cleaning up on destruction. Cloning is also
  *		supported by default. Entities can have functionality added to them
  *		by adding Components to their list of Component instances. Those
@@ -103,7 +102,7 @@ public:
 	{
 		for(auto & comp : components)
 		{
-			if(Type(comp) == Type<C>())
+			if(Type(comp) == Type<C*>())
 			{
 				return dynamic_cast<C*>(comp);
 			}
@@ -127,7 +126,6 @@ public:
 		return comps;
 	}
 
-	void AddChild(Entity* ent);
 	Entity* GetChild(string name, bool recursive = false);
 
 	void SetActiveRecursive(bool active);
@@ -160,9 +158,11 @@ protected:
 	{
 	}
 
+	void AddChild(Entity* ent);
+
 private:
 
-	vector<Entity*> children;
+	vector< unique_ptr<Entity> > children;
 	bool useLifeTime = true;
 
 public:

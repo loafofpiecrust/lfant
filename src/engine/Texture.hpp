@@ -33,9 +33,8 @@ namespace sfs
  *	 @{
  */
 
-/**	Base class for texture handling.
- *	@details
- *	@todo
+/**
+ *	Base class for texture handling.
  */
 class Texture
 {

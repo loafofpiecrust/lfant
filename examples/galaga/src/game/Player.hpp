@@ -26,17 +26,17 @@
 
 namespace sfs
 {
-	/** @addtogroup Galaga
-	 *	 @{
+	/** \addtogroup Galaga
+	 *	 \{
 	 */
-	/** @addtogroup Entities
-	 *	 @{
+	/** \addtogroup Entities
+	 *	 \{
 	 */
 
 	/**
 	 *
-	 *	@details
-	 *	@todo
+	 *	\details
+	 *	\todo
 	 */
 	class Player : public Component
 	{
@@ -64,6 +64,6 @@ namespace sfs
 
 	};
 
-/// @}
-/// @}
+/// \}
+/// \}
 }

@@ -35,9 +35,6 @@ namespace sfs
  */
 
 /**
- *	@details
- *
- *	@todo
  *
  */
 class AudioListener: public Component

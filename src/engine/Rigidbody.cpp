@@ -18,7 +18,6 @@
  *
  ******************************************************************************/
 
-#include "Rigidbody.hpp"
 
 // External
 #include <btBulletDynamicsCommon.h>
@@ -28,6 +27,9 @@
 #include "Collider.hpp"
 #include "Physics.hpp"
 #include "Engine.hpp"
+#include "Mesh.hpp"
+
+#include "Rigidbody.hpp"
 
 namespace sfs
 {
@@ -42,79 +44,66 @@ Rigidbody::~Rigidbody()
 
 /*******************************************************************************
  *		General functions
- *		@area General
+ *		\area General
  *******************************************************************************/
 
 void Rigidbody::Init()
 {
-	inertia = new btVector3();
-	initTransform = new btTransform();
-	motionState = new btDefaultMotionState(*initTransform);
-	collider->shape->calculateLocalInertia(mass, *inertia);
-//	game->physics->SetGravityPoint( inertia );
-	body = new btRigidBody(mass, motionState, collider->shape, *inertia);
+	motionState = new btDefaultMotionState();
+	SetMass(mass);
+	body = new btRigidBody(mass, motionState, collider, vec3_cast<btVector3>(inertia));
 
-//connect( SENDER(&owner->transform, SetPos), RECEIVER(this, OnSetPos) );
-//connect( SENDER(&owner->transform, SetRot), RECEIVER(this, OnSetRot) );
+	game->physics->AddRigidbody(this);
+
+	Connect(SENDER(owner, SetMesh), RECEIVER(this, OnSetMesh));
+	Connect(SENDER(owner->transform, SetPosition), RECEIVER(this, OnSetPos));
+	Connect(SENDER(owner->transform, SetRotation), RECEIVER(this, OnSetRot));
 }
 
 void Rigidbody::Update()
 {
 }
 
-void Rigidbody::OnAddComponent(Component* comp)
+void Rigidbody::OnDestroy()
 {
-	if(CheckType<Collider*>(comp))
-	{
-		collider = dynamic_cast<Collider*>(comp);
-	}
+//	game->physics->RemoveRigidbody(this);
 }
 
 /*******************************************************************************
  *		Transform functions
- *		@area Transform
+ *		\area Transform
  *******************************************************************************/
-/*
- void Rigidbody::OnSetPos( vec3 pos )
- {
- body->getWorldTransform().setOrigin(vec3_cast<btVector3>(pos));
- }
+void Rigidbody::OnSetPos( vec3 pos )
+{
+	body->getWorldTransform().setOrigin(vec3_cast<btVector3>(pos));
+}
 
- void Rigidbody::OnSetRot( vec3 rot )
- {
- //	body->getWorldTransform().setRotation( vec3_cast<btVector3>( rot ) );
- }
- */
+void Rigidbody::OnSetRot( vec3 rot )
+{
+//	body->getWorldTransform().setRotation( vec3_cast<btVector3>( rot ) );
+}
+
 /*******************************************************************************
  *		Gravity functions
- *		@area Gravity
+ *		\area Gravity
  *******************************************************************************/
 
 float Rigidbody::GetMass()
 {
-	return this->_mass;
+	return mass;
 }
 
 void Rigidbody::SetMass(float mass)
 {
 	this->mass = mass;
+	Trigger("SetMass", mass, inertia);
 //	collider->shape->calculateLocalInertia( mass, inertia );
-	body->setMassProps(mass, *inertia);
-}
-
-vec3 Rigidbody::GetWorldGravity()
-{
-	return vec3_cast<vec3>(game->physics->world->getGravity());
-}
-
-void Rigidbody::SetWorldGravity(vec3 gravity)
-{
-	body->setGravity(vec3_cast<btVector3>(gravity));
+	body->setMassProps(mass, vec3_cast<btVector3>(inertia));
 }
 
 /*******************************************************************************
  *		Constraints functions
- *		@area Constraints
+ *		\area Constraints
  *******************************************************************************/
 
 btTypedConstraint* Rigidbody::GetConstraint(uint16_t idx)
@@ -124,7 +113,27 @@ btTypedConstraint* Rigidbody::GetConstraint(uint16_t idx)
 
 void Rigidbody::RemoveConstraint(uint16_t idx)
 {
-//	game->physics->RemoveConstraint( GetConstraint( idx ) );
+	//	game->physics->RemoveConstraint( GetConstraint( idx ) );
+}
+
+float Rigidbody::GetSpeed()
+{
+	return length(GetVelocity());
+}
+
+vec3 Rigidbody::GetVelocity()
+{
+	return vec3_cast<vec3>(body->getLinearVelocity());
+}
+
+void Rigidbody::SetVelocity(vec3 vel)
+{
+	btVector3 gg;
+	body->setLinearVelocity(vec3_cast<btVector3>(vel));
+}
+
+void Rigidbody::OnSetMesh(Mesh *mesh)
+{
 }
 
 }

@@ -27,6 +27,7 @@
 #include "Shader.hpp"
 #include "Property.hpp"
 #include "Vertex.hpp"
+#include "Subsystem.hpp"
 
 namespace sf
 {
@@ -49,16 +50,13 @@ class Material;
  */
 
 /**	This class handles the base Rendering, it should be called by the GameStart class.
- *	@details
  *		This class currently handles OpenGL via GLFW and GLEW, but
  *		it can be configured to use DirectX, if one so desires.
  *		The OpenGL version variable is held here, and a settings
  *		class should change them for use, then reload the rendering
  *		system.
- *	@todo
- *
  */
-class Renderer
+class Renderer : public Subsystem
 {
 	friend class Engine;
 public:
@@ -90,7 +88,6 @@ public:
 	virtual void Init();
 	void PreUpdate();
 	virtual void Update();
-	virtual void Destroy();
 
 	void AddMesh(Mesh* mesh);
 	void RenderMesh(Mesh* mesh);
@@ -141,6 +138,7 @@ protected:
 
 	/// Whether or not to hide the mouse cursor.
 	bool hideMouse = false;
+	bool windowResizable = false;
 
 	vector<Shader> shaders;
 

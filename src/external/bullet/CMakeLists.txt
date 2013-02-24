@@ -19,5 +19,6 @@ file(GLOB_RECURSE HEADER_FILES
 add_library(${PROJECT_NAME} SHARED ${SRC_FILES} ${HEADER_FILES})
 
 # Includes
-include_directories("src")
-
+include_directories(
+	"src"
+)

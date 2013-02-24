@@ -40,7 +40,6 @@ namespace sfs
 
 /**
  *	Controls a set of variables and commands through text input.
- *	@details
  *		Supports getting and setting variables, calling callback commands,
  *		and recreation of a few commands/abilities of a standard linux
  *		bash terminal.
@@ -105,9 +104,6 @@ public:
 
 	virtual void Init();
 	virtual void Update()
-	{
-	}
-	virtual void OnDestroy()
 	{
 	}
 

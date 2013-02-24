@@ -35,8 +35,6 @@ namespace sfs
 
 /**
  *
- *	@details
- *	@todo
  */
 template<typename T = uint32_t>
 class Rect

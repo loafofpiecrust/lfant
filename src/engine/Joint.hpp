@@ -41,8 +41,6 @@ class Rigidbody;
 
 /**
  *
- *	@details
- *	@todo
  */
 class Joint : public Component
 {

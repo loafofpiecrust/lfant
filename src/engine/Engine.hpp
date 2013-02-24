@@ -21,7 +21,6 @@
 #include "stdafx.hpp"
 
 // External
-#include <boost/scoped_ptr.hpp>
 
 // Internal
 //
@@ -37,7 +36,7 @@ class Physics;
 class Settings;
 class Audio;
 class Scene;
-class FileManager;
+class FileSystem;
 class Console;
 class SystemInfo;
 class UserInterface;
@@ -50,12 +49,11 @@ class Network;
  *	@{
  */
 
-/**	The main Game class controls the starting and updating of the game->
- *	@details
- *		This class controls the creation of a scene and the base
- *		control of the main game subsystems. This includes networking,
- *		input, settings, physics, and scripts. It doesn't directly
- *		control these, but it holds pointers to the classes that do.
+/**	The main Game class controls the starting and updating of the game.
+ *	Controls the creation of a scene and the base control of the main game
+ *	subsystems. This includes networking, input, settings, physics, and
+ *	scripts. It doesn't directly control these, but it holds pointers to
+ *	the classes that do.
  */
 class Engine : public Subsystem
 {
@@ -92,11 +90,9 @@ public:
 	 */
 	virtual void Exit();
 
-	/**	Loads a scene.
-	 *	@remarks
-	 *		Automatically appends the given scene with an extension. That
-	 *		extension is assigned via the ResourceManager, along with file
-	 *		paths.
+	/**	Loads a scene. Automatically appends the given scene with an
+	 *	extension. That extension is assigned via the ResourceManager,
+	 *	along with file paths.
 	 *	@param scene The name of the scene to load, without the file extension.
 	 */
 	void LoadScene(string scene);
@@ -107,20 +103,19 @@ public:
 	void AddThread(boost::function<void()> func);
 
 	// Subsystems
-	Input* input;
-	Renderer* renderer;
-	Time* time;
-	Physics* physics;
-	Scene* scene;
-	Audio* audio;
-	FileManager* fileManager;
-	Console* console;
-	SystemInfo* systemInfo;
-	Settings* settings;
-	UserInterface* userInterface;
-	Network* network;
+	unique_ptr<Console> console;
+	unique_ptr<FileSystem> fileSystem;
+	unique_ptr<Settings> settings;
+	unique_ptr<SystemInfo> systemInfo;
+	unique_ptr<Time> time;
+	unique_ptr<Physics> physics;
+	unique_ptr<Renderer> renderer;
+	unique_ptr<UserInterface> userInterface;
+	unique_ptr<Scene> scene;
+	unique_ptr<Input> input;
+	unique_ptr<Audio> audio;
+	unique_ptr<Network> network;
 	//boost::scoped_ptr<AISystem>			aiSystem;
-	//boost::scoped_ptr<UISystem>			uiSystem;
 	//boost::scoped_ptr<ScriptSystem>		scriptSystem;
 	//boost::scoped_ptr<FGSystem>			flowgraph;
 

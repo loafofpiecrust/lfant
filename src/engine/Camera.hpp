@@ -37,13 +37,11 @@ namespace sfs
  */
 
 /**	This class handles a Camera Component for the Owner Entity.
- *	@details
  *		This is a Component to allow easy use of Cameras for Players,
  *		and the ability to add/remove a Camera without having to create
  *		and destroy the Entity. It could be an Entity, and allowed to be
  *		a child of the one in need of it, but then I wouldn't be taking
  *		advantage of having a Component-based Entity system.
- *	@todo
  */
 class Camera : public Component
 {

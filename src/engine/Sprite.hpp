@@ -36,7 +36,6 @@ namespace sfs
 
 /**
  *	Sprite renders a textured material on a plane.
- *	@details
  *		Also, it uses SpriteAnimation instances to animate itself. These animations
  *		change the texture to a different part of the sprite-sheet assigned to the
  *		playing animation.
@@ -55,7 +54,7 @@ class Sprite : public Mesh
 
 	/**
 	 *	An animation that consists of a single texture as a sprite-sheet.
-	 *	@details
+	 *	\details
 	 *		A SpriteAnimation has one material of one texture, and for each frame,
 	 *		it moves by frameSize, at frameRate times per second. playMode determines
 	 *		what the animation will do when it reaches its end. It can either stop,
@@ -84,6 +83,7 @@ class Sprite : public Mesh
 					return anims[i];
 				}
 			}
+			return null(SpriteAnimation);
 		}
 
 	private:

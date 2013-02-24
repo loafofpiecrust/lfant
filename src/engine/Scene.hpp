@@ -38,14 +38,12 @@ class Camera;
  */
 
 /**
- *	@details
- *
- *	@todo
  *
  */
 class Scene : public Subsystem
 {
 	friend class Engine;
+	friend class Entity;
 
 public:
 	Scene();
@@ -72,23 +70,53 @@ public:
 
 	/**
 	 *	Gets the first entity in a given layer.
+	 *
+	 *
 	 *	@todo
 	 *		Not sure whether layer should be uint16 or string.
 	 */
 	Entity* GetEntityByLayer(string layer);
 
 	/**
-	 *	Saves the scene to a specific file.
+	 *	Saves the scene to a file.
+	 *
+	 *	@param file File to save to, without extension.
 	 */
 	void Save(string file = "");
 
+	/**
+	 *	Loads the scene from a file.
+	 *
+	 *	@param file File to load from, without extension.
+	 */
+	void Load(string file);
+
+	/**
+	 *	Spawns an entity in this Scene. Use this for any creation
+	 *	of an entity. Never try to use the Entity constructor(s).
+	 *
+	 *	@param name Name of new Entity.
+	 *	@param parent Parent entity, defaults to nullptr.
+	 *	@param pos Position, defaults to the origin.
+	 *	@param rot Rotation, defaults to 0 degrees xyz.
+	 *	@param scale Scale, defaults to x1.
+	 *	@return The new entity.
+	 */
 	Entity* Spawn(string name, Entity* parent = nullptr, vec3 pos = vec3(0), vec3 rot = vec3(0), vec3 scale = vec3(1));
 
-	vector<Entity*> entities;
 	Camera* mainCamera = nullptr;
 	string name = "Scene";
 
 protected:
+
+	/**
+	 *	Removes an Entity from the Scene, only called by that Entity
+	 *	just before destruction.
+	 *	@param name Name of the Entity to remove.
+	 */
+	void RemoveEntity(string name);
+
+	vector< unique_ptr<Entity> > entities;
 
 private:
 

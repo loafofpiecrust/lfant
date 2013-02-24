@@ -26,8 +26,6 @@
 #include "Object.hpp"
 #include "Property.hpp"
 
-using namespace function_types;
-
 namespace sfs
 {
 class Entity;

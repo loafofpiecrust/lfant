@@ -37,26 +37,21 @@ Component::~Component()
 {
 }
 
-/*******************************************************************************
- *		General functions
- *		@area General
- *******************************************************************************/
-
-void Component::Destroy()
+void Component::Trigger(string name)
 {
-	OnDestroy();
-	delete this;
+	owner->Trigger(name);
+	Object::Trigger(name);
 }
 
 /*******************************************************************************
- *		Get/Set Properties functions
- *		@area Properties
+ *		General functions
+ *		\area General
  *******************************************************************************/
 
 void Component::SetEnabled(bool enable)
 {
-	_enabled = enable;
-	if(_enabled)
+	enabled = enable;
+	if(enabled)
 	{
 		OnEnable();
 	}
@@ -66,9 +61,10 @@ void Component::SetEnabled(bool enable)
 	}
 }
 
-bool Component::GetEnabled()
+
+bool Component::IsEnabled()
 {
-	return _enabled;
+	return enabled;
 }
 
 }

@@ -6,14 +6,14 @@
 
 // Internal
 #include "Console.hpp"
-#include "FileManager.hpp"
+#include "FileSystem.hpp"
 
 namespace sfs
 {
 
 void Shader::LoadFile(string path)
 {
-	string folder = game->fileManager->gameFolder + "/assets/";
+	string folder = game->fileSystem->gameFolder + "/assets/";
 	string vert = folder + path + ".vert";
 	string frag = folder + path + ".frag";
 	FILE* vertFile = fopen(vert.c_str(), "rb");

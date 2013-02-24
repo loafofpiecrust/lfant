@@ -47,14 +47,17 @@ string Type()
 template<typename T>
 string Type(T p1)
 {
+	cout << "Type: Gettin type, " << typeid(p1).name();
 	return string(abi::__cxa_demangle(typeid(p1).name(), 0, 0, (int*)0));
 }
 
+/*
 template<typename T>
 string Type(T* p1)
 {
 	return string(abi::__cxa_demangle(typeid(*p1).name(), 0, 0, (int*)0));
 }
+*/
 
 template<typename P1, typename P2, typename ...P>
 string Type()

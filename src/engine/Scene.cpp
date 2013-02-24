@@ -45,7 +45,7 @@ void Scene::Init()
 
 void Scene::Update()
 {
-	for(auto ent : entities)
+	for(auto& ent : entities)
 	{
 		if(ent->active)
 		{
@@ -56,10 +56,22 @@ void Scene::Update()
 
 void Scene::OnDestroy()
 {
+	for(auto& ent : entities)
+	{
+		Log("Scene::Destroy: Destroying ", ent->name);
+		ent->Destroy();
+	}
+	entities.clear();
+}
+
+void Scene::RemoveEntity(string name)
+{
 	for(uint i = 0; i < entities.size(); ++i)
 	{
-		Log("Scene::Destroy: Destroying ", entities[i]->name);
-		entities[i]->Destroy();
+		if(entities[i]->name == name)
+		{
+			entities.erase(entities.begin()+i);
+		}
 	}
 }
 
@@ -70,11 +82,11 @@ void Scene::OnDestroy()
 
 Entity* Scene::GetEntity(string name, bool recursive)
 {
-	for(Entity* ent : entities)
+	for(auto& ent : entities)
 	{
 		if(ent->name == name)
 		{
-			return ent;
+			return ent.get();
 		}
 		if(recursive)
 		{
@@ -89,10 +101,15 @@ Entity* Scene::GetEntity(string name, bool recursive)
 
 void Scene::Save(string file)
 {
+	if(file == "")
+	{
+		file = name;
+	}
+	file.append(".scene");
 	ofstream io;
 	io.open(file);
 	io << "<Scene name=\"" << "SceneName" << "\">\n";
-	for(Entity* ent : entities)
+	for(auto& ent : entities)
 	{
 		io << "\t<Entity name=\"" << ent->name << "\">\n";
 		vector<pair<string, string>> vars ;//= ent->Serialize();
@@ -108,7 +125,7 @@ void Scene::Save(string file)
 
 Entity *Scene::Spawn(string name, Entity *parent, vec3 pos, vec3 rot, vec3 scale)
 {
-	Entity* ent = new Entity;
+	Entity* ent {new Entity};
 	ent->parent = parent;
 	ent->transform->owner = ent;
 	if(parent)
@@ -127,7 +144,12 @@ Entity *Scene::Spawn(string name, Entity *parent, vec3 pos, vec3 rot, vec3 scale
 			entities.reserve(entities.size()+5);
 			Log("Scene::Spawn: Had to resrve for Vector capacity: ", entities.capacity());
 		}
-		entities.push_back(ent);
+		entities.push_back(unique_ptr<Entity>(ent));
+	}
+	else
+	{
+		parent->AddChild(ent);
+
 	}
 	ent->Init();
 	return ent;

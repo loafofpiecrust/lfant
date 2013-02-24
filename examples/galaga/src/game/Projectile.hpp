@@ -31,18 +31,15 @@ namespace sfs
 
 	};
 
-	/** @addtogroup Game
-	 *	 @{
+	/** \addtogroup Game
+	 *	 \{
 	 */
-	/** @addtogroup Entities
-	 *	 @{
+	/** \addtogroup Entities
+	 *	 \{
 	 */
 
-	/**	Projectile
-	 *	@details
-	 *		Description
-	 *	@todo
-	 *		Todo
+	/**
+	 *	Projectile
 	 */
 	class Projectile : public Entity
 	{
@@ -62,6 +59,6 @@ namespace sfs
 	private:
 	};
 
-/** @} */
-/** @} */
+/** \} */
+/** \} */
 }

@@ -60,11 +60,8 @@ struct GravPoint
 	}
 };
 
-/**	Physics
- *	@details
- *		Description
- *	@todo
- *		Todo
+/**
+ *	Physics
  */
 class Physics : public Subsystem
 {
@@ -101,12 +98,12 @@ public:
 
 	/**
 	 *	Adds or sets the gravity point with the given name.
-	 *	@details
+	 *	\details
 	 *		If a gravity point with the given name exists, then its point
 	 *		and force are set according to the other parameters.
 	 *	@param name The name of the gravity point to set.
 	 *	@param point The locational point of gravity.
-	 *	@param force The gravitational force of this gravity point.
+	 *	@param force The gravitational force of this point.
 	 */
 	void SetGravityPoint(string name, vec3 point, float force);
 	void SetGravityPoint(string name, vec3& point, float force);
@@ -150,8 +147,7 @@ private:
 	btConstraintSolver* solver;
 	btDefaultCollisionConfiguration* collisionConfig;
 
-	vector<Rigidbody*> bodies;
-	vector<GravPoint*> gravityPoints;
+	vector<GravPoint> gravityPoints;
 };
 
 /** @} */

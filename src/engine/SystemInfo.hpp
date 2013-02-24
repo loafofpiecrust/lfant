@@ -37,7 +37,7 @@ namespace sfs
 
 /**
  *
- *	@details
+ *	\details
  *	@todo
  */
 class SystemInfo : public Subsystem

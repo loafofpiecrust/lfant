@@ -27,7 +27,7 @@
 
 // Internal
 #include "Engine.hpp"
-#include "FileManager.hpp"
+#include "FileSystem.hpp"
 #include "String.hpp"
 #include "Console.hpp"
 
@@ -50,8 +50,8 @@ void Settings::LoadSettings(string input)
 	{
 		input = userFile;
 	}
-	input = game->fileManager->userFolder+"/"+input;
-	string cfg = game->fileManager->gameFolder+"/"+defaultFile;
+	input = game->fileSystem->userFolder+"/"+input;
+	string cfg = game->fileSystem->gameFolder+"/"+defaultFile;
 	if(exists(cfg.c_str()))
 	{
 		if(exists(input.c_str()))

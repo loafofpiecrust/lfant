@@ -1672,7 +1672,7 @@ Feel free to contact me with suggestions, problems, comments, ... concerning
 LodePNG. If you encounter a PNG image that doesn't work properly with this
 decoder, feel free to send it and I'll use it to find and fix the problem.
 
-My email address is (puzzle the account and domain together with an @ symbol):
+My email address is (puzzle the account and domain together with an \ symbol):
 Domain: gmail dot com.
 Account: lode dot vandevenne.
 

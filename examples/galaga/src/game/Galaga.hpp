@@ -29,21 +29,19 @@ namespace sfs
 {
 	class Entity;
 
-	/** @addtogroup Galaga
-	 *	 @{
+	/** \addtogroup Galaga
+	 *	 \{
 	 */
 
 	/**
 	 *
-	 *	@details
-	 *	@todo
+	 *	\details
+	 *	\todo
 	 */
 	class Galaga : public Engine
 	{
 	public:
-		Galaga()
-		{
-		}
+		Galaga();
 		virtual ~Galaga()
 		{
 		}
@@ -60,5 +58,5 @@ namespace sfs
 		Entity* player;
 	};
 
-/// @}
+/// \}
 }
