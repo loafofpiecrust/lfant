@@ -21,7 +21,7 @@
 #include "stdafx.hpp"
 
 // External
-#include <chrono>
+#include <boost/chrono.hpp>
 
 // Internal
 #include "Subsystem.hpp"
@@ -42,7 +42,7 @@ struct STimer
 	boost::function<void()> callback;
 };
 
-typedef chrono::high_resolution_clock hclock;
+typedef boost::chrono::high_resolution_clock hclock;
 
 /**
  *

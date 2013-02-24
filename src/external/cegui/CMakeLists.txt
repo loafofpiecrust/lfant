@@ -72,11 +72,11 @@ add_library(${PROJECT_NAME} SHARED ${SRC_FILES} ${HEADER_FILES})
 
 # Includes Info
 include_directories(
-	"./cegui/include"
+	"cegui/include"
 	"../boost"
 	"../glm"
 	"../glew/include"
-	"external/freetype/include"
+	"cegui/include/CEGUI/freetype"
 	)
 
 target_link_libraries(${PROJECT_NAME}

@@ -36,6 +36,43 @@ namespace sfs
  *	@{
  */
 
+template<typename T>
+class Buffer
+{
+public:
+
+	/*
+	operator uint32_t()
+	{
+		return id;
+	}
+
+	operator vector<T>&()
+	{
+		return data;
+	}
+	*/
+
+	T& operator [](uint i)
+	{
+		return data[i];
+	}
+
+	uint size()
+	{
+		return data.size();
+	}
+
+	void push_back(T t)
+	{
+		data.push_back(t);
+	}
+
+	vector<T> data;
+	//vector<uint32_t> index;
+	uint32_t id = 0;
+};
+
 /**	The Mesh class holds a 3D mesh and possibly an animated skeleton.
  *		This class controls a Mesh as defined by the 3d importing library.
  *		It handles holding a list of vertices, bones, faces, etc. It also
@@ -46,41 +83,6 @@ namespace sfs
 class Mesh : public Component
 {
 	friend class Renderer;
-
-	template<typename T>
-	class Buffer
-	{
-	public:
-
-		operator uint32_t()
-		{
-			return id;
-		}
-
-		operator vector<T>&()
-		{
-			return data;
-		}
-
-		T& operator [](uint i)
-		{
-			return data[i];
-		}
-
-		typename vector<T>::size_type size()
-		{
-			return data.size();
-		}
-
-		void push_back(T t)
-		{
-			data.push_back(t);
-		}
-
-		vector<T> data;
-		//vector<uint32_t> index;
-		uint32_t id = 0;
-	};
 
 public:
 	Mesh();

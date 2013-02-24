@@ -20,7 +20,7 @@
 #include "Time.hpp"
 
 // External
-#include <chrono>
+#include <boost/chrono.hpp>
 
 // Internal
 #include "Console.hpp"
@@ -40,7 +40,7 @@ Time::~Time()
 
 double Time::GetTime()
 {
-	return chrono::duration<double>(hclock::now() - startTime).count();
+	return boost::chrono::duration<double>(hclock::now() - startTime).count();
 }
 
 void Time::ResetTime()
