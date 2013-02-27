@@ -5,7 +5,7 @@
 // WWW:         http://www.glfw.org/
 //------------------------------------------------------------------------
 // Copyright (c) 2002-2006 Marcus Geelnard
-// Copyright (c) 2006-2010 Camilla Berglund <elmindreda@elmindreda.org>
+// Copyright (c) 2006-2010 Camilla Berglund <elmindreda\elmindreda.org>
 //
 // This software is provided 'as-is', without any express or implied
 // warranty. In no event will the authors be held liable for any damages
@@ -54,10 +54,10 @@
  * UCS codes will ever be assigned by ISO. So to get Unicode character
  * U+ABCD you can directly use keysym 0x0100abcd.
  *
- * Original author: Markus G. Kuhn <mkuhn@acm.org>, University of
+ * Original author: Markus G. Kuhn <mkuhn\acm.org>, University of
  *                  Cambridge, April 2001
  *
- * Special thanks to Richard Verhoeven <river@win.tue.nl> for preparing
+ * Special thanks to Richard Verhoeven <river\win.tue.nl> for preparing
  * an initial draft of the mapping table.
  *
  */

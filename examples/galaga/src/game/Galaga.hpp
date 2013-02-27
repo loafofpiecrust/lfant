@@ -18,32 +18,30 @@
  *
  ******************************************************************************/
 #pragma once
-#include <stdafx.hpp>
+#include <lfant/stdafx.hpp>
 
 // External
 
 // Internal
-#include <Engine.hpp>
+#include <lfant/Engine.hpp>
 
-namespace sfs
+namespace lfant
 {
 	class Entity;
 
-	/** @addtogroup Galaga
-	 *	 @{
+	/** \addtogroup Galaga
+	 *	 \{
 	 */
 
 	/**
 	 *
-	 *	@details
-	 *	@todo
+	 *	\details
+	 *	\todo
 	 */
 	class Galaga : public Engine
 	{
 	public:
-		Galaga()
-		{
-		}
+		Galaga();
 		virtual ~Galaga()
 		{
 		}
@@ -60,5 +58,5 @@ namespace sfs
 		Entity* player;
 	};
 
-/// @}
+/// \}
 }

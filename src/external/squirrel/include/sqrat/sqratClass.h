@@ -41,10 +41,10 @@ namespace Sqrat
 {
 
 /**
-    @tparam    C    class type to expose
-    @tparam A    allocator to use when instantiating and destroying class instances in Squirrel
+    \tparam    C    class type to expose
+    \tparam A    allocator to use when instantiating and destroying class instances in Squirrel
 
-    @remarks
+    \remarks
     DefaultAllocator<C> is used if no allocator is specified. This should be sufficent for most classes
     but if specific behavior is desired it can be overridden. If the class should not be instantiated from
     Squirrel the NoConstructor allocator may be used.
@@ -55,7 +55,7 @@ class Class : public Object
 {
 public:
     /**
-        @param v    Squirrel virtual machine to bind to
+        \param v    Squirrel virtual machine to bind to
     */
     /// Constructor
     Class(HSQUIRRELVM v = DefaultVM::Get(), bool createClass = true) : Object(v, false) {
@@ -96,8 +96,8 @@ public:
     //
 
     /**
-        @param name    name of the static slot
-        @param var    value to assign
+        \param name    name of the static slot
+        \param var    value to assign
     */
     /// Assign a static class slot a value
     template<class V>
@@ -107,8 +107,8 @@ public:
     }
 
     /**
-        @param name    name of the slot
-        @param var    value to assign
+        \param name    name of the slot
+        \param var    value to assign
     */
     /// Assign a class slot a value
     template<class V>
@@ -118,8 +118,8 @@ public:
     }
 
     /**
-        @param name    name of the variable as it will appear in Squirrel
-        @param var    variable to bind
+        \param name    name of the variable as it will appear in Squirrel
+        \param var    variable to bind
     */
     /// Bind a class variable
     template<class V>
@@ -333,16 +333,16 @@ protected:
 };
 
 /**
-    @tparam    C    class type to expose
-    @tparam    B    base class type (must already be bound)
-    @tparam A    allocator to use when instantiating and destroying class instances in Squirrel
+    \tparam    C    class type to expose
+    \tparam    B    base class type (must already be bound)
+    \tparam A    allocator to use when instantiating and destroying class instances in Squirrel
 
-    @remarks
+    \remarks
     DefaultAllocator<C> is used if no allocator is specified. This should be sufficent for most classes
     but if specific behavior is desired it can be overridden. If the class should not be instantiated from
     Squirrel the NoConstructor allocator may be used.
 
-    @remarks
+    \remarks
     Classes in Squirrel are single-inheritance only, and as such Sqrat only allows for single inheritance as well
 */
 /// Exposes a C++ class with a base class to Squirrel

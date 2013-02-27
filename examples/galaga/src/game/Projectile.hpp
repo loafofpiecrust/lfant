@@ -22,27 +22,24 @@
 // External
 
 // Internal
-#include <Entity.hpp>
+#include <lfant/Entity.hpp>
 
-namespace sfs
+namespace lfant
 {
 	struct KillParams
 	{
 
 	};
 
-	/** @addtogroup Game
-	 *	 @{
+	/** \addtogroup Game
+	 *	 \{
 	 */
-	/** @addtogroup Entities
-	 *	 @{
+	/** \addtogroup Entities
+	 *	 \{
 	 */
 
-	/**	Projectile
-	 *	@details
-	 *		Description
-	 *	@todo
-	 *		Todo
+	/**
+	 *	Projectile
 	 */
 	class Projectile : public Entity
 	{
@@ -62,6 +59,6 @@ namespace sfs
 	private:
 	};
 
-/** @} */
-/** @} */
+/** \} */
+/** \} */
 }

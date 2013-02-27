@@ -133,12 +133,12 @@ protected:
 	
 
 	CProfileIterator( CProfileNode * start );
-	friend	class		CProfileManager;
+	friend	class		CProfileSystem;
 };
 
 
 ///The Manager for the Profile system
-class	CProfileManager {
+class	CProfileSystem {
 public:
 	static	void						Start_Profile( const char * name );
 	static	void						Stop_Profile( void );
@@ -178,12 +178,12 @@ class	CProfileSample {
 public:
 	CProfileSample( const char * name )
 	{ 
-		CProfileManager::Start_Profile( name ); 
+		CProfileSystem::Start_Profile( name ); 
 	}
 
 	~CProfileSample( void )					
 	{ 
-		CProfileManager::Stop_Profile(); 
+		CProfileSystem::Stop_Profile(); 
 	}
 };
 
