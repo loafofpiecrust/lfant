@@ -23,26 +23,24 @@
 // External
 
 // Internal
-#include "Renderer.hpp"
-#include "Time.hpp"
-#include "Console.hpp"
-#include "SystemInfo.hpp"
-#include "Physics.hpp"
-#include "Scene.hpp"
-#include "Entity.hpp"
-#include "Player.hpp"
-#include "Input.hpp"
-#include "Sprite.hpp"
-#include "Camera.hpp"
-#include "TypeInfo.hpp"
-#include "Texture.hpp"
-#include "Shader.hpp"
-#include "Settings.hpp"
-#include "FileManager.hpp"
-#include "UserInterface.hpp"
-#include "Network.hpp"
+#include <lfant/Renderer.hpp>
+#include <lfant/Input.hpp>
+#include <lfant/Time.hpp>
+#include <lfant/Physics.hpp>
+#include <lfant/Settings.hpp>
+#include <lfant/Audio.hpp>
+#include <lfant/Scene.hpp>
+#include <lfant/FileSystem.hpp>
+#include <lfant/Console.hpp>
+#include <lfant/SystemInfo.hpp>
+#include <lfant/Console.hpp>
+#include <lfant/UserInterface.hpp>
+#include <lfant/Network.hpp>
+#include <lfant/ChatClient.hpp>
+#include <lfant/Mesh.hpp>
+#include <lfant/Entity.hpp>
 
-namespace sfs
+namespace lfant
 {
 
 extern "C" void Launch()
@@ -63,57 +61,21 @@ extern "C" void Launch()
 	delete game;
 }
 
+Galaga::Galaga()
+{
+}
+
 void Galaga::Init()
 {
-	console = new Console;
-	console->Init();
-
-	Log("ShadowFox Engine launched.");
-
-	fileManager = new FileManager;
-	settings = new Settings;
-	systemInfo = new SystemInfo;
-	time = new Time;
-	physics = new Physics;
-	scene = new Scene;
-	renderer = new Renderer;
-	userInterface = new UserInterface;
-	input = new Input;
-	network = new Network;
-
-	Log("Subsystems instantiated.");
-
-	settings->Init();
-	fileManager->Init();
-	systemInfo->Init();
-	time->Init();
-	physics->Init();
-
+	Engine::Init();
 
 	//Range<int> ver = game->settings->GetValue("gl.version");
 	//renderer->version = ver;
-
-	renderer->Init();
-
-
-	userInterface->Init();
-	scene->Init();
-	input->Init();
-	network->Init();
 
 	//ivec2 res = game->settings->GetValue("window.resolution").i2();
 	//renderer->SetResolution(res);
 	//ivec2 pos = game->settings->GetValue("window.position").i2();
 	//renderer->SetPosition(pos);
-
-	Log("Window callback set.");
-
-	Log("Subsystems initialized");
-
-	// Uses OpenGL version from settings, or else the default 3.2 will be used.
-
-
-	Log("Galaga::Init: Subsystems initialised");
 
 	// Look at Player.cpp
 	input->AddAxis("Horizontal", Key::D, Key::A);
@@ -138,6 +100,7 @@ void Galaga::Init()
 	// Fairly self-explanitory. Check above input axes for keys to press. Will implement better with GUI.
 	console->RegisterVar("Tester", 5.0f, "This is my variable!");
 
+	/*
 	player = scene->Spawn("Snead", nullptr, vec3(0, 0, 0));
 	player->AddComponent<Player>();
 	scene->mainCamera = player->AddComponent<Camera>();
@@ -149,9 +112,12 @@ void Galaga::Init()
 	mesh->LoadFile("suzanne.obj");
 	mesh->material.texture.LoadFile("player.png");
 	mesh->material.shader.name = "Diffuse";
+	*/
+
+	Entity* ent = scene->Spawn("ChatClientObj", nullptr);
+	ent->AddComponent<ChatClient>();
 
 	//Log("Mesh parent: "+ent->parent->name);
-
 
 	/*
 	Entity* ent = Entity::Spawn("TestSprite", nullptr);
@@ -176,9 +142,9 @@ void Galaga::Update()
 	renderer->PreUpdate();
 	time->Update();
 	physics->Update();
-	//scene->Update();
+	scene->Update();
 	input->Update();
-	userInterface->Update();
+//	userInterface->Update();
 	network->Update();
 	renderer->Update();
 	PostUpdate();

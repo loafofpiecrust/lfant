@@ -22,21 +22,21 @@
 // External
 
 // Internal
-#include <Component.hpp>
+#include <lfant/Component.hpp>
 
-namespace sfs
+namespace lfant
 {
-	/** @addtogroup Galaga
-	 *	 @{
+	/** \addtogroup Galaga
+	 *	 \{
 	 */
-	/** @addtogroup Entities
-	 *	 @{
+	/** \addtogroup Entities
+	 *	 \{
 	 */
 
 	/**
 	 *
-	 *	@details
-	 *	@todo
+	 *	\details
+	 *	\todo
 	 */
 	class Player : public Component
 	{
@@ -64,6 +64,6 @@ namespace sfs
 
 	};
 
-/// @}
-/// @}
+/// \}
+/// \}
 }

@@ -173,7 +173,7 @@ setting CMake options and regenerating, rather than editing directly.
 // The MinizipResourceProvider provides the ability to load resource files
 // from locations within .zip files.
 //////////////////////////////////////////////////////////////////////////
-#undef CEGUI_HAS_MINIZIP_RESOURCE_PROVIDER
+#cmakedefine CEGUI_HAS_MINIZIP_RESOURCE_PROVIDER
 
 #endif	// end of guard _CEGUIConfig_h_
 

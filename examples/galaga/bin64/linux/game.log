@@ -1,7 +1,8 @@
-ShadowFox Engine launched.
-Subsystems instantiated.
+/home/taylorsnead/ShadowFox/ShadowFox-Engine/examples/galaga
+Operator string called
+Operator string called
 Settings::LoadSettings: User settings not found. Using default settings.
-Settings::LoadSettings: Loading settings from /home/taylorsnead/ShadowFox/ShadowFox-Engine/examples/galaga/bin64/linux/../../settings.cfg
+Settings::LoadSettings: Loading settings from /home/taylorsnead/ShadowFox/ShadowFox-Engine/examples/galaga/settings.cfg
 VALUE: Galaga
 general.gamename=Galaga
 VALUE: ShadowFox Studios
@@ -36,11 +37,9 @@ VALUE: false
 player.mouselook=false
 VALUE: 20
 galaga.meshcount=20
-VALUE: Demo8.layout
-gui.windowlayout=Demo8.layout
-/home/taylorsnead/ShadowFox/ShadowFox-Engine/examples/galaga
-Operator string called
-Operator string called
+VALUE: GameMenu.layout
+gui.windowlayout=GameMenu.layout
+/home/taylorsnead/My Games//
 Settings::LoadSettings: User settings not found. Using default settings.
 Settings::LoadSettings: Loading settings from /home/taylorsnead/ShadowFox/ShadowFox-Engine/examples/galaga/settings.cfg
 VALUE: Galaga
@@ -60,8 +59,7 @@ VALUE: 120
 VALUE: 10.0
 VALUE: false
 VALUE: 20
-VALUE: Demo8.layout
-/home/taylorsnead/My Games/ShadowFox Studios/Galaga
+VALUE: GameMenu.layout
 Time::ResetTime: Started
 Time::ResetTime: Finished
 Physics::Init: Collision config created.
@@ -84,12 +82,18 @@ Operator string called
 Renderer::OpenWindow: Window successfully opened.
 Renderer::WindowResized: Touch.
 Renderer: Initialized
-UserInterface::Init: Begin
-Got log single
-UserInterface::Init: Spawned renderer
-UserInterface::Init: Set a resource dir
-UserInterface::Init: Created scheme!
-UserInterface::Init: Root window
-Operator string called
+Input::Init: Begin.
 Input: Initialized
-Network::Connect: Begin
+Network::Init: Touch.
+Window callback set.
+Subsystems initialized
+Computer name: ShadowFox-linux
+Username: 
+Running OS: GNU/Linux 3.5.0-23-generic
+CPU:  with 11590 cores
+Game initialised
+Connected!
+Connected! 2
+Client::GetData: Touch.
+Client::OnGetData: Touch.
+End of file
