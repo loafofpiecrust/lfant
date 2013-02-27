@@ -22,7 +22,7 @@ add_dependencies(${PROJECT_NAME} sfengine)
 # Includes
 include_directories(
 	"."
-	"${SFE}/src/engine"
+	"${SFE}/src/sfengine"
 	"${SFE}/src/external/glm"
 	"${SFE}/src/external/boost"
 	"${SFE}/src/external/glfw/include"

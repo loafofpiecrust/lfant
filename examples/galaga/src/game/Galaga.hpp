@@ -25,7 +25,7 @@
 // Internal
 #include <Engine.hpp>
 
-namespace sfs
+namespace lfant
 {
 	class Entity;
 

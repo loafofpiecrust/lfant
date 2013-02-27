@@ -33,7 +33,7 @@
 #include "Settings.hpp"
 #include "Scene.hpp"
 
-using namespace sfs;
+using namespace lfant;
 
 void Player::Init()
 {

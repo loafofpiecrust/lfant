@@ -24,7 +24,7 @@
 // Internal
 #include <Component.hpp>
 
-namespace sfs
+namespace lfant
 {
 	/** \addtogroup Galaga
 	 *	 \{

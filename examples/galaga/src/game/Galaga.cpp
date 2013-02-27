@@ -41,8 +41,9 @@
 #include "FileSystem.hpp"
 #include "UserInterface.hpp"
 #include "Network.hpp"
+#include "ChatClient.hpp"
 
-namespace sfs
+namespace lfant
 {
 
 extern "C" void Launch()
@@ -102,6 +103,7 @@ void Galaga::Init()
 	// Fairly self-explanitory. Check above input axes for keys to press. Will implement better with GUI.
 	console->RegisterVar("Tester", 5.0f, "This is my variable!");
 
+	/*
 	player = scene->Spawn("Snead", nullptr, vec3(0, 0, 0));
 	player->AddComponent<Player>();
 	scene->mainCamera = player->AddComponent<Camera>();
@@ -113,8 +115,10 @@ void Galaga::Init()
 	mesh->LoadFile("suzanne.obj");
 	mesh->material.texture.LoadFile("player.png");
 	mesh->material.shader.name = "Diffuse";
+	*/
 
-	network->Ping("Chat");
+	Entity* ent = scene->Spawn("ChatClientObj", nullptr);
+	ent->AddComponent<ChatClient>();
 
 	//Log("Mesh parent: "+ent->parent->name);
 
@@ -141,9 +145,9 @@ void Galaga::Update()
 	renderer->PreUpdate();
 	time->Update();
 	physics->Update();
-	//scene->Update();
+	scene->Update();
 	input->Update();
-	userInterface->Update();
+//	userInterface->Update();
 	network->Update();
 	renderer->Update();
 	PostUpdate();

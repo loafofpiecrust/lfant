@@ -26,7 +26,7 @@
 #include "Mesh.hpp"
 #include "Sprite.hpp"
 
-using namespace sfs;
+using namespace lfant;
 
 Projectile::Projectile()
 {

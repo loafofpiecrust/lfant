@@ -24,7 +24,7 @@
 // Internal
 #include <Entity.hpp>
 
-namespace sfs
+namespace lfant
 {
 	struct KillParams
 	{
