@@ -24,14 +24,14 @@
 
 // Internal
 #include "Galaga.hpp"
-#include "Input.hpp"
-#include "Console.hpp"
-#include "Time.hpp"
-#include "Sprite.hpp"
-#include "Entity.hpp"
-#include "Renderer.hpp"
-#include "Settings.hpp"
-#include "Scene.hpp"
+#include <lfant/Input.hpp>
+#include <lfant/Console.hpp>
+#include <lfant/Time.hpp>
+#include <lfant/Sprite.hpp>
+#include <lfant/Entity.hpp>
+#include <lfant/Renderer.hpp>
+#include <lfant/Settings.hpp>
+#include <lfant/Scene.hpp>
 
 using namespace lfant;
 

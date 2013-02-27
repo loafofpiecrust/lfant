@@ -22,7 +22,7 @@
 // External
 
 // Internal
-#include <Component.hpp>
+#include <lfant/Component.hpp>
 
 namespace lfant
 {

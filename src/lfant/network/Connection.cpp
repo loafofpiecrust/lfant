@@ -1,5 +1,5 @@
 
-#include "Connection.hpp"
+#include <lfant/network/Connection.hpp>
 
 // External
 

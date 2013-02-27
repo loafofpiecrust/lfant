@@ -23,25 +23,22 @@
 // External
 
 // Internal
-#include "Renderer.hpp"
-#include "Time.hpp"
-#include "Console.hpp"
-#include "SystemInfo.hpp"
-#include "Physics.hpp"
-#include "Scene.hpp"
-#include "Entity.hpp"
-#include "Player.hpp"
-#include "Input.hpp"
-#include "Sprite.hpp"
-#include "Camera.hpp"
-#include "TypeInfo.hpp"
-#include "Texture.hpp"
-#include "Shader.hpp"
-#include "Settings.hpp"
-#include "FileSystem.hpp"
-#include "UserInterface.hpp"
-#include "Network.hpp"
-#include "ChatClient.hpp"
+#include <lfant/Renderer.hpp>
+#include <lfant/Input.hpp>
+#include <lfant/Time.hpp>
+#include <lfant/Physics.hpp>
+#include <lfant/Settings.hpp>
+#include <lfant/Audio.hpp>
+#include <lfant/Scene.hpp>
+#include <lfant/FileSystem.hpp>
+#include <lfant/Console.hpp>
+#include <lfant/SystemInfo.hpp>
+#include <lfant/Console.hpp>
+#include <lfant/UserInterface.hpp>
+#include <lfant/Network.hpp>
+#include <lfant/ChatClient.hpp>
+#include <lfant/Mesh.hpp>
+#include <lfant/Entity.hpp>
 
 namespace lfant
 {

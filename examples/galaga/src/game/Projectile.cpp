@@ -23,8 +23,9 @@
 // External
 
 // Internal
-#include "Mesh.hpp"
-#include "Sprite.hpp"
+#include <lfant/Mesh.hpp>
+#include <lfant/Sprite.hpp>
+#include <lfant/Entity.hpp>
 
 using namespace lfant;
 

@@ -60,6 +60,42 @@ void UserInterface::Init()
 
 }
 
+void UserInterface::Update()
+{
+
+}
+
+void UserInterface::OnDestroy()
+{
+
+}
+
+void UserInterface::CreateWindow(string layout)
+{
+}
+
+void UserInterface::OnKey(uint16_t key, bool pressed)
+{
+}
+
+void UserInterface::OnChar(char key)
+{
+}
+
+void UserInterface::OnMouseButton(uint16_t btn, bool pressed)
+{
+}
+
+void UserInterface::OnMouseMove(float x, float y)
+{
+}
+
+void UserInterface::OnWindowResize(uint width, uint height)
+{
+}
+
+
+
 // CEGUI
 /*
 void UserInterface::Init()

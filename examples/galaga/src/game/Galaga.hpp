@@ -18,12 +18,12 @@
  *
  ******************************************************************************/
 #pragma once
-#include <stdafx.hpp>
+#include <lfant/stdafx.hpp>
 
 // External
 
 // Internal
-#include <Engine.hpp>
+#include <lfant/Engine.hpp>
 
 namespace lfant
 {

@@ -22,7 +22,7 @@ add_dependencies(${PROJECT_NAME} sfengine)
 # Includes
 include_directories(
 	"."
-	"${SFE}/src/sfengine"
+	"${SFE}/include"
 	"${SFE}/src/external/glm"
 	"${SFE}/src/external/boost"
 	"${SFE}/src/external/glfw/include"
@@ -30,5 +30,5 @@ include_directories(
 	)
 
 target_link_libraries(${PROJECT_NAME}
-	sfengine
+	lfant
 	)
