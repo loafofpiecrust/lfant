@@ -57,7 +57,7 @@ void FileSystem::Init()
 		// Use default settings
 		gameFolder = "/home/taylorsnead/ShadowFox/ShadowFox-Engine/examples/galaga";
 		Log(gameFolder);
-		userFolder = UserPath + "/My Games/" + string(game->settings->GetValue("general.orgname")) + "/" + string(game->settings->GetValue("general.gamename"));
+		userFolder = UserPath + "/My Games/" + game->settings->GetValue("general.orgname") + "/" + game->settings->GetValue("general.gamename");
 		game->settings->LoadSettings();
 		Log(userFolder);
 

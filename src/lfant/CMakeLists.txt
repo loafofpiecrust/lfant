@@ -39,7 +39,7 @@ include_directories(
 	"${SFE}/src/external/raknet/Source"
 	"../external/glew/include"
 	"../external/glfw/include"
-	"../external/cegui/cegui/include"
+	"../external/rocket/Include"
 	)
 
 # Linker Options
@@ -48,10 +48,10 @@ target_link_libraries(${PROJECT_NAME}
 	glfw
 	boost
 	bullet
-	raknet
 	fmod
-	CEGUI
+	rocket
 	png
 	z
 	squirrel
+	yaml
 	)
