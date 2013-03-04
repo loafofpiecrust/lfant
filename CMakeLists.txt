@@ -3,7 +3,7 @@ set(CMAKE_C_COMPILER "clang-3.1")
 set(CMAKE_CXX_COMPILER "clang++-3.1")
 
 cmake_minimum_required(VERSION 2.8)
-project(sfroot)
+project(lfroot)
 
 get_filename_component(SFE "./" REALPATH)
 
@@ -25,11 +25,11 @@ if(UNIX)
 	else(APPLE)
 		set(PLATFORM "linux")
 	endif(APPLE)
-else(UNIX)
+else()
 	if(WIN32)
 		set(PLATFORM "windows")
 	endif(WIN32)
-endif(UNIX)
+endif()
 
 if(PLATFORM STREQUAL "")
 	message(FATAL_ERROR "This platform is not supported.")
@@ -39,9 +39,10 @@ set(CMAKE_BUILD_TYPE Release)
 set(CMAKE_C_FLAGS "-m${ARCH} -fPIC -O3 -Wall -Wno-overloaded-virtual -D__STRICT_ANSI__")
 set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -std=gnu++11 -Wno-invalid-offsetof")
 
-#add_definitions(
+add_definitions(
 #	-D__STRICT_ANSI__
-#	)
+	-D__GXX_EXPERIMENTAL_CXX0X__
+	)
 
 # RPathing
 set(CMAKE_SKIP_BUILD_RPATH TRUE)

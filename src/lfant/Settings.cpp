@@ -1,7 +1,7 @@
 /******************************************************************************
  *
- *	ShadowFox Engine Source
- *	Copyright (C) 2012-2013 by ShadowFox Studios
+ *	LFANT Source
+ *	Copyright (C) 2012-2013 by LazyFox Studios
  *	Created: 2012-08-05 by Taylor Snead
  *
  *	Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,20 +18,20 @@
  *
  ******************************************************************************/
 
-#include <lfant/Settings.hpp>
+#include <lfant/Settings.h>
 
 // External
-#include <boost/filesystem.hpp>
+#include <boost/filesystem.h>
 #include <fstream>
 #include <iostream>
 
 // Internal
 
-#include <lfant/Engine.hpp>
-#include <lfant/FileSystem.hpp>
-#include <lfant/String.hpp>
+#include <lfant/Engine.h>
+#include <lfant/FileSystem.h>
+#include <lfant/String.h>
 
-#include <lfant/Console.hpp>
+#include <lfant/Console.h>
 
 using namespace boost::filesystem;
 
@@ -327,8 +327,8 @@ string Settings::GetRef(string name, string value, string ids)
 void Settings::Init()
 {
 	// Registering Variables
-	//SetValue("gameName", "ShadowFox Engine");
-	//SetValue("orgName", "ShadowFox Studios");
+	//SetValue("gameName", "LFANT");
+	//SetValue("orgName", "LazyFox Studios");
 
 	LoadSettings();
 }

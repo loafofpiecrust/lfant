@@ -2,7 +2,7 @@
 // External
 
 // Internal
-#include <lfant/TypeInfo.hpp>
+#include <lfant/TypeInfo.h>
 
 namespace lfant
 {

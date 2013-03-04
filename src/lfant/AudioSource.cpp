@@ -1,7 +1,7 @@
 /******************************************************************************
 *
-*	ShadowFox Engine Source
-*	Copyright (C) 2012-2013 by ShadowFox Studios
+*	LFANT Source
+*	Copyright (C) 2012-2013 by LazyFox Studios
 *	Created: 2013-02-07 by Taylor Snead
 *
 *	Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,14 +18,14 @@
 *
 ******************************************************************************/
 
-#include <lfant/AudioSource.hpp>
+#include <lfant/AudioSource.h>
 
 // External
 #include <fmod.hpp>
 
 // Internal
-
-#include <lfant/Audio.hpp>
+#include <lfant/Transform.h>
+#include <lfant/Audio.h>
 
 namespace lfant
 {
@@ -46,7 +46,7 @@ void AudioSource::Init()
 	{
 		SetSource(inputFile);
 	}
-	Connect(SENDER(owner->transform, SetPosition), RECEIVER(this, OnSetPosition));
+	Connect(SENDER(owner->GetComponent<Transform>(), SetPosition), RECEIVER(this, OnSetPosition));
 }
 
 void AudioSource::SetSource(string file)

@@ -1,7 +1,7 @@
 /******************************************************************************
  *
- *	ShadowFox Engine Source
- *	Copyright (C) 2012-2013 by ShadowFox Studios
+ *	LFANT Source
+ *	Copyright (C) 2012-2013 by LazyFox Studios
  *	Created: 2012-08-08 by Taylor Snead
  *
  *	Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,7 +18,7 @@
  *
  ******************************************************************************/
 
-#include <lfant/FileSystem.hpp>
+#include <lfant/FileSystem.h>
 
 // External
 #include <boost/assign/list_inserter.hpp>
@@ -26,12 +26,10 @@
 
 // Internal
 
-#include <lfant/Engine.hpp>
-#include <lfant/Settings.hpp>
+#include <lfant/Engine.h>
+#include <lfant/Settings.h>
 
-#include <lfant/Console.hpp>
-
-using namespace boost::filesystem;
+#include <lfant/Console.h>
 
 namespace lfant
 {
@@ -55,11 +53,14 @@ void FileSystem::Init()
 	else
 	{
 		// Use default settings
-		gameFolder = "/home/taylorsnead/ShadowFox/ShadowFox-Engine/examples/galaga";
-		Log(gameFolder);
-		userFolder = UserPath + "/My Games/" + game->settings->GetValue("general.orgname") + "/" + game->settings->GetValue("general.gamename");
+		gameFolder = "../..";
+#	if WINDOWS
+		const string home = getenv("USERPROFILE");
+#	elif UNIX
+		const string home = getenv("HOME");
+#	endif
+		userFolder = home + "/Documents/My Games/" + game->settings->GetValue("general.orgname") + "/" + game->settings->GetValue("general.gamename");
 		game->settings->LoadSettings();
-		Log(userFolder);
 
 		// Save these to system.cfg
 	}
@@ -83,7 +84,7 @@ string FileSystem::ConvertPath(string curr)
 	return curr;
 }
 
-path FileSystem::GetGameFile(string name)
+path FileSystem::GetGamePath(string name)
 {
 	path result(gameFolder + "/assets/" + name);
 
@@ -93,21 +94,21 @@ path FileSystem::GetGameFile(string name)
 	}
 	Log("FileSystem::GetGameFile: File not found, input: "+result.string());
 	game->Exit();
-	return result;
+	return "";
 }
 
-path FileSystem::GetUserFile(string name)
+path FileSystem::GetUserPath(string name)
 {
 	path result(ConvertPath(userFolder + "/" + name));
 
-	if(exists(result) && is_regular_file(result))
+	if(exists(result))
 	{
 		return result;
 	}
 	return "";
 }
 
-vector<path> FileSystem::GetGameFiles(string dir, string ext)
+vector<path> FileSystem::GetGameFiles(string dir)
 {
 	vector<path> result;
 	if(exists(dir) && is_directory(dir))

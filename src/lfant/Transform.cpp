@@ -1,7 +1,7 @@
 /******************************************************************************
  *
- *	ShadowFox Engine Source
- *	Copyright (C) 2012-2013 by ShadowFox Studios
+ *	LFANT Source
+ *	Copyright (C) 2012-2013 by LazyFox Studios
  *	Created: 2012-07-26 by Taylor Snead
  *
  *	Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,35 +17,22 @@
  *	limitations under the License.
  *
  ******************************************************************************/
-#include <lfant/Transform.hpp>
+#include <lfant/Transform.h>
 
 // External
 
 // Internal
 
-#include <lfant/Entity.hpp>
-#include <lfant/Math.hpp>
+#include <lfant/Entity.h>
+#include <lfant/Math.h>
 
-#include <lfant/Console.hpp>
+#include <lfant/Console.h>
 
 namespace lfant
 {
 
-Transform::Transform(Entity* owner) :
-	owner(owner)
+Transform::Transform()
 {
-	/*
-	if (owner)
-	{
-		if (owner->parent)
-		{
-			parent = owner->parent->transform;
-		}
-		else
-		{
-			parent = nullptr;
-		}
-	}*/
 }
 
 vec3& Transform::GetPosition()

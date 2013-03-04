@@ -1,7 +1,7 @@
 /******************************************************************************
  *
- *	ShadowFox Engine Source
- *	Copyright (C) 2012-2013 by ShadowFox Studios
+ *	LFANT Source
+ *	Copyright (C) 2012-2013 by LazyFox Studios
  *	Created: 2012-07-17 by Taylor Snead
  *
  *	Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,22 +19,23 @@
  ******************************************************************************/
 
 
-#include <lfant/Entity.hpp>
+#include <lfant/Entity.h>
 
 // External
 #include <stdarg.h>
 
 // Internal
-#include <lfant/Time.hpp>
+#include <lfant/Time.h>
 
-#include <lfant/Engine.hpp>
-#include <lfant/Scene.hpp>
-#include <lfant/TypeInfo.hpp>
+#include <lfant/Engine.h>
+#include <lfant/Scene.h>
+#include <lfant/TypeInfo.h>
 
-#include <lfant/Console.hpp>
-#include <lfant/String.hpp>
+#include <lfant/Console.h>
+#include <lfant/String.h>
+#include <lfant/Transform.h>
 
-#include <lfant/Component.hpp>
+#include <lfant/Component.h>
 
 namespace lfant
 {
@@ -61,7 +62,12 @@ Entity::~Entity()
 
 void Entity::Init()
 {
+	Log("Entity::Init: Touch.");
 	Object::Init();
+
+	Log("Entity::Init: Touch.");
+
+	transform = AddComponent<Transform>();
 
 	if(lifeTime <= 0.0f)
 	{
@@ -84,7 +90,7 @@ void Entity::Update()
 		}
 	}
 
-	transform->SetDirection();
+	GetComponent<Transform>()->SetDirection();
 
 	for(auto& comp : components)
 	{
@@ -105,12 +111,12 @@ void Entity::Update()
 
 void Entity::AddChild(Entity* ent)
 {
-	children.push_front(unique_ptr<Entity>(ent));
+	children.push_front(ptr<Entity>(ent));
 }
 
 void Entity::RemoveChild(Entity *ent)
 {
-	children.remove(unique_ptr<Entity>(ent));
+	children.remove(ptr<Entity>(ent));
 }
 
 void Entity::Destroy()
@@ -121,7 +127,6 @@ void Entity::Destroy()
 	{
 		compo->Destroy();
 	}
-	delete transform;
 	Log("Entity::Destroy: Components destroyed");
 
 	if(!parent)
@@ -134,9 +139,9 @@ void Entity::Destroy()
 	}
 }
 
-Entity* Entity::Clone(string name, Entity* parent, vec3 pos, vec3 rot)
+Entity* Entity::Clone(string name, Entity* parent)
 {
-	Entity* ent = game->scene->Spawn(name, parent, pos, rot);
+	Entity* ent = game->scene->Spawn(name, parent);
 	//ent->components = components;
 	/// @todo clone children here
 	//ent->Init();
@@ -148,9 +153,9 @@ Component* Entity::GetComponent(string type)
 	vector<string> spl = Split(type, ".: ", "");
 	for(auto& comp : components)
 	{
-		if(Type(comp.get()) == type || Type(comp.get()) == spl[spl.size()-1])
+		if(Type(comp) == type || Type(comp) == spl[spl.size()-1])
 		{
-			return comp.get();
+			return comp;
 		}
 	}
 	return nullptr;
@@ -164,7 +169,7 @@ Component* Entity::GetComponent(string type)
 
 void Entity::RemoveComponent(Component* comp)
 {
-	components.remove(unique_ptr<Component>(comp));
+	components.remove(ptr<Component>(comp));
 }
 
 template<class T>
@@ -172,14 +177,14 @@ void Entity::RemoveComponent()
 {
 	for(auto& comp : components)
 	{
-		if(CheckType<T*>(comp.get()))
+		if(CheckType<T>(comp))
 		{
-			components.remove(comp);
 			for(auto& comp2 : components)
 			{
-				comp2->OnRemoveComponent(comp.get());
+				comp2->OnRemoveComponent(comp);
 			}
 			comp->Destroy();
+			components.remove(comp);
 		}
 	}
 }
@@ -191,7 +196,7 @@ Entity* Entity::GetChild(string name, bool recursive)
 	{
 		if(child->name == name)
 		{
-			ent = child.get();
+			ent = child;
 		}
 	}
 

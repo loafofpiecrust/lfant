@@ -1,7 +1,7 @@
 /******************************************************************************
  *
- *	ShadowFox Engine Source
- *	Copyright (C) 2012-2013 by ShadowFox Studios
+ *	LFANT Source
+ *	Copyright (C) 2012-2013 by LazyFox Studios
  *	Created: 2012-07-21 by Taylor Snead
  *
  *	Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,14 +17,14 @@
  *	limitations under the License.
  *
  ******************************************************************************/
-#include <lfant/Time.hpp>
+#include <lfant/Time.h>
 
 // External
 #include <boost/chrono.hpp>
 
 // Internal
 
-#include <lfant/Console.hpp>
+#include <lfant/Console.h>
 
 namespace lfant
 {

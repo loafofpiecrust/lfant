@@ -1,7 +1,7 @@
 /******************************************************************************
  *
- *	ShadowFox Engine Source
- *	Copyright (C) 2012-2013 by ShadowFox Studios
+ *	LFANT Source
+ *	Copyright (C) 2012-2013 by LazyFox Studios
  *	Created: 2012-07-15 by Taylor Snead
  *
  *	Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,27 +19,27 @@
  ******************************************************************************/
 
 
-#include <lfant/Engine.hpp>
+#include <lfant/Engine.h>
 
 // External
 
 // Internal
-#include <lfant/Renderer.hpp>
-#include <lfant/Input.hpp>
-#include <lfant/Time.hpp>
-#include <lfant/Physics.hpp>
-#include <lfant/Settings.hpp>
+#include <lfant/Renderer.h>
+#include <lfant/Input.h>
+#include <lfant/Time.h>
+#include <lfant/Physics.h>
+#include <lfant/Settings.h>
 
-#include <lfant/Audio.hpp>
-#include <lfant/Scene.hpp>
-#include <lfant/FileSystem.hpp>
+#include <lfant/Audio.h>
+#include <lfant/Scene.h>
+#include <lfant/FileSystem.h>
 
-#include <lfant/Console.hpp>
-#include <lfant/SystemInfo.hpp>
+#include <lfant/Console.h>
+#include <lfant/SystemInfo.h>
 
-#include <lfant/Console.hpp>
-#include <lfant/UserInterface.hpp>
-#include <lfant/Network.hpp>
+#include <lfant/Console.h>
+#include <lfant/UserInterface.h>
+#include <lfant/Network.h>
 
 namespace lfant
 {
@@ -72,7 +72,7 @@ Engine::Engine() :
 	physics {new Physics},
 	renderer {new Renderer},
 	userInterface {new UserInterface},
-	scene {new Scene},
+	scene (new Scene),
 	input {new Input},
 	audio {new Audio},
 	network {new Network}
@@ -98,7 +98,7 @@ void Engine::Init()
 	time->Init();
 	physics->Init();
 	renderer->Init();
-//	userInterface->Init();
+	userInterface->Init();
 	scene->Init();
 	input->Init();
 //	audio->Init();

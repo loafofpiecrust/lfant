@@ -1,7 +1,7 @@
 /******************************************************************************
  *
- *	ShadowFox Engine Source
- *	Copyright (C) 2012-2013 by ShadowFox Studios
+ *	LFANT Source
+ *	Copyright (C) 2012-2013 by LazyFox Studios
  *	Created: 2012-07-28 by Taylor Snead
  *
  *	Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,17 +17,20 @@
  *	limitations under the License.
  *
  ******************************************************************************/
-#include <lfant/Sprite.hpp>
+#include <lfant/Sprite.h>
 
 // External
+#include <GL/glew.h>
 
 // Internal
 
-#include <lfant/Engine.hpp>
-#include <lfant/Renderer.hpp>
-#include <lfant/Time.hpp>
-
-#include <lfant/Console.hpp>
+#include <lfant/Engine.h>
+#include <lfant/Renderer.h>
+#include <lfant/Time.h>
+#include <lfant/Scene.h>
+#include <lfant/Camera.h>
+#include <lfant/Transform.h>
+#include <lfant/Console.h>
 
 namespace lfant
 {
@@ -42,18 +45,108 @@ Sprite::~Sprite()
 
 void Sprite::Init()
 {
-	/*
-	vertexBuffer.push_back(Vertex(vec3(1,1,0), vec2(1,1)));
-	vertices.push_back(Vertex(vec3(1,-1,0), vec2(1,0)));
-	vertices.push_back(Vertex(vec3(-1,-1,0), vec2(0,0)));
-	vertices.push_back(Vertex(vec3(-1,1,0), vec2(0,1)));
-	*/
-	Log("Sprite: Initialized");
+	glGenVertexArrays(1, &vertexArray);
+	glBindVertexArray(vertexArray);
+
+	bool shaderLoaded = false;
+	if(material.shader.id == 0)
+	{
+		if(auto shader = game->renderer->GetShader(material.shader.name))
+		{
+			material.shader.id = shader.id;
+			shaderLoaded = true;
+		}
+		else if(auto shader = game->renderer->GetShader("shaders/Diffuse"))
+		{
+			material.shader.id = shader.id;
+			shaderLoaded = true;
+		}
+	}
+	if(!shaderLoaded)
+	{
+		Log("Sprite::Init: Loading default shader");
+		material.shader.LoadFile("shaders/Diffuse");
+		game->renderer->AddShader(material.shader);
+	}
+
+	if(material.texture.id == 0)
+	{
+		material.texture.LoadFile(material.texture.name);
+	}
+
+	if(material.shader.id != 0)
+	{
+		// Get any uniforms here
+		matrixId = glGetUniformLocation(material.shader.id, "MVP");
+		material.texture.uniformId = glGetUniformLocation(material.shader.id, "textureSampler");
+	}
+
+	vertexBuffer.push_back(vec3(0, 0, 0));
+	vertexBuffer.push_back(vec3(1, 0, 0));
+	vertexBuffer.push_back(vec3(1, 1, 0));
+	vertexBuffer.push_back(vec3(0, 1, 0));
+
+	uvBuffer.push_back(vec2(0, 0));
+	uvBuffer.push_back(vec2(1, 0));
+	uvBuffer.push_back(vec2(1, 1));
+	uvBuffer.push_back(vec2(0, 1));
+
+	indexBuffer.push_back(0);
+	indexBuffer.push_back(1);
+	indexBuffer.push_back(2);
+	indexBuffer.push_back(3);
+
+	vertexBuffer.id = CreateBuffer(GL_ARRAY_BUFFER, vertexBuffer.data);
+	uvBuffer.id = CreateBuffer(GL_ARRAY_BUFFER, uvBuffer.data);
+	indexBuffer.id = CreateBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer.data);
 }
 
 void Sprite::Update()
 {
-	game->renderer->RenderSprite(this);
+	if(material.shader.id == 0 || material.texture.id == 0)
+	{
+		Init();
+	}
+
+	glBindVertexArray(vertexArray);
+
+	glUseProgram(material.shader.id);
+
+	mat4 mvp = game->scene->mainCamera->projection * game->scene->mainCamera->view * owner->GetComponent<Transform>()->GetMatrix();
+	glUniformMatrix4fv(matrixId, 1, GL_FALSE, &mvp[0][0]);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, material.texture.id);
+	glUniform1i(material.texture.uniformId, 0);
+
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer.id);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+	glEnableVertexAttribArray(1);
+	glBindBuffer(GL_ARRAY_BUFFER, uvBuffer.id);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+	/*
+	glEnableVertexAttribArray(2);
+	glBindBuffer(GL_ARRAY_BUFFER, normalBuffer.id);
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+	*/
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer.id);
+	glDrawElements(GL_QUADS, indexBuffer.size(), GL_UNSIGNED_INT, (void*)0);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	//glDisableVertexAttribArray(2);
+	glDisableVertexAttribArray(1);
+	glDisableVertexAttribArray(0);
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	glBindVertexArray(0);
+
 	if(playingAnim)
 	{
 		if(currentAnim)
@@ -146,7 +239,11 @@ void Sprite::Update()
 
 void Sprite::OnDestroy()
 {
-	game->renderer->RemoveSprite(this);
+	glDeleteBuffers(1, &vertexBuffer.id);
+	glDeleteBuffers(1, &uvBuffer.id);
+	glDeleteBuffers(1, &indexBuffer.id);
+	glDeleteTextures(1, &material.texture.id);
+	glDeleteVertexArrays(1, &vertexArray);
 }
 
 void Sprite::PlayAnim(string name, AnimPlayMode mode, bool reverse)

@@ -1,7 +1,7 @@
 /******************************************************************************
  *
- *	ShadowFox Engine Source
- *	Copyright (C) 2012-2013 by ShadowFox Studios
+ *	LFANT Source
+ *	Copyright (C) 2012-2013 by LazyFox Studios
  *	Created: 2012-07-17 by Taylor Snead
  *
  *	Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,7 +18,7 @@
  *
  ******************************************************************************/
 
-#include <lfant/Renderer.hpp>
+#include <lfant/Renderer.h>
 
 // External
 #include <iostream>
@@ -33,25 +33,25 @@
 
 // Internal
 
-#include <lfant/Entity.hpp>
-#include <lfant/Shader.hpp>
+#include <lfant/Entity.h>
+#include <lfant/Shader.h>
 
-#include <lfant/Engine.hpp>
-#include <lfant/SystemInfo.hpp>
-#include <lfant/Mesh.hpp>
+#include <lfant/Engine.h>
+#include <lfant/SystemInfo.h>
+#include <lfant/Mesh.h>
 
-#include <lfant/Console.hpp>
-#include <lfant/Mesh.hpp>
-#include <lfant/ParticleSystem.hpp>
-#include <lfant/Sprite.hpp>
-#include <lfant/Scene.hpp>
-#include <lfant/Camera.hpp>
-#include <lfant/FileSystem.hpp>
-#include <lfant/Settings.hpp>
-#include <lfant/UserInterface.hpp>
+#include <lfant/Console.h>
+#include <lfant/Mesh.h>
+#include <lfant/ParticleSystem.h>
+#include <lfant/Sprite.h>
+#include <lfant/Scene.h>
+#include <lfant/Camera.h>
+#include <lfant/FileSystem.h>
+#include <lfant/Settings.h>
+#include <lfant/UserInterface.h>
 
-#include <lfant/TextureLoader.hpp>
-#include <lfant/MeshLoader.hpp>
+#include <lfant/TextureLoader.h>
+#include <lfant/MeshLoader.h>
 
 #define OFFSET(i) ((byte*)0 + (i))
 
@@ -212,354 +212,6 @@ void Renderer::WindowResized(int x, int y)
 
 /*******************************************************************************
  *
- *		General Mesh Rendering
- *
- *******************************************************************************/
-
-template<typename T>
-uint32_t Renderer::CreateBuffer(int target, vector<T>& data, int mode)
-{
-	if(mode == 0)
-	{
-		mode = GL_STATIC_DRAW;
-	}
-	uint32_t id;
-	glGenBuffers(1, &id);
-	glBindBuffer(target, id);
-	glBufferData(target, data.size() * sizeof(T), &data[0], mode);
-	return id;
-}
-
-uint32_t Renderer::CreateBuffer(int target, void* data, uint32_t size, int mode)
-{
-	if(mode == 0)
-	{
-		mode = GL_STATIC_DRAW;
-	}
-	uint32_t id;
-	glGenBuffers(1, &id);
-	glBindBuffer(target, id);
-	glBufferData(target, size, data, mode);
-	return id;
-}
-
-void Renderer::AddMesh(Mesh* mesh)
-{
-	glGenVertexArrays(1, &mesh->vertexArray);
-	glBindVertexArray(mesh->vertexArray);
-
-	Log("About to add mesh");
-
-	bool shaderLoaded = false;
-	if(mesh->material.shader.id == 0)
-	{
-		if(mesh->material.shader.name != "")
-		{
-			for(auto& shader : shaders)
-			{
-				if(shader.name == mesh->material.shader.name && shader.id != 0)
-				{
-					mesh->material.shader.id = shader.id;
-					shaderLoaded = true;
-					break;
-				}
-			}
-		}
-		else
-		{
-			for(auto& shader : shaders)
-			{
-				if(shader.name == "shaders/Diffuse" && shader.id != 0)
-				{
-					mesh->material.shader.id = shader.id;
-					shaderLoaded = true;
-					break;
-				}
-			}
-		}
-	}
-	if(!shaderLoaded)
-	{
-		Log("Loading default shader");
-		mesh->material.shader.LoadFile("shaders/Diffuse");
-		shaders.push_back(mesh->material.shader);
-	}
-
-	Log(mesh->material.texture.id);
-
-	if(mesh->material.texture.id == 0)
-	{
-		Log(mesh->material.texture.name);
-		mesh->material.texture.LoadFile(mesh->material.texture.name);
-	}
-
-	Log("Renderer::AddMesh: Texture loaded");
-
-	if(mesh->material.shader.id != 0)
-	{
-		// Get any uniforms here
-		mesh->matrixId = glGetUniformLocation(mesh->material.shader.id, "MVP");
-		mesh->material.texture.uniformId = glGetUniformLocation(mesh->material.shader.id, "textureSampler");
-	}
-
-	Log("Renderer::AddMesh: Uniforms loaded");
-
-	vector<uint32_t> indices;
-	vector<vec3> indexed_vertices;
-	vector<vec2> indexed_uvs;
-	vector<vec3> indexed_normals;
-	IndexVBO(mesh->vertexBuffer.data, mesh->uvBuffer.data, mesh->normalBuffer.data, indices, indexed_vertices, indexed_uvs, indexed_normals);
-
-	mesh->vertexBuffer.data = indexed_vertices;
-	mesh->uvBuffer.data = indexed_uvs;
-	mesh->normalBuffer.data = indexed_normals;
-	mesh->indexBuffer.data = indices;
-
-	Log("Renderer::AddMesh: Data indexed");
-
-	mesh->vertexBuffer.id = CreateBuffer(GL_ARRAY_BUFFER, mesh->vertexBuffer.data);
-	mesh->uvBuffer.id = CreateBuffer(GL_ARRAY_BUFFER, mesh->uvBuffer.data);
-	mesh->normalBuffer.id = CreateBuffer(GL_ARRAY_BUFFER, mesh->normalBuffer.data);
-	mesh->indexBuffer.id = CreateBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->indexBuffer.data);
-
-	Log("Renderer::AddMesh: Data buffered");
-}
-
-void Renderer::RenderMesh(Mesh* mesh)
-{
-	if(mesh->material.shader.id == 0 || mesh->material.texture.id == 0)
-	{
-		AddMesh(mesh);
-	}
-
-	glBindVertexArray(mesh->vertexArray);
-
-	glUseProgram(mesh->material.shader.id);
-
-	mat4 mvp = game->scene->mainCamera->projection * game->scene->mainCamera->view * mesh->transform->GetMatrix();
-	glUniformMatrix4fv(mesh->matrixId, 1, GL_FALSE, &mvp[0][0]);
-
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, mesh->material.texture.id);
-	glUniform1i(mesh->material.texture.uniformId, 0);
-
-	glEnableVertexAttribArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, mesh->vertexBuffer.id);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-
-	glEnableVertexAttribArray(1);
-	glBindBuffer(GL_ARRAY_BUFFER, mesh->uvBuffer.id);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
-
-	glEnableVertexAttribArray(2);
-	glBindBuffer(GL_ARRAY_BUFFER, mesh->normalBuffer.id);
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->indexBuffer.id);
-	glDrawElements(GL_TRIANGLES, mesh->indexBuffer.size(), GL_UNSIGNED_INT, (void*)0);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	glDisableVertexAttribArray(2);
-	glDisableVertexAttribArray(1);
-	glDisableVertexAttribArray(0);
-
-	glBindTexture(GL_TEXTURE_2D, 0);
-
-	glBindVertexArray(0);
-}
-
-void Renderer::RemoveMesh(Mesh* mesh)
-{
-	glDeleteBuffers(1, &mesh->vertexBuffer.id);
-	glDeleteBuffers(1, &mesh->uvBuffer.id);
-	glDeleteBuffers(1, &mesh->normalBuffer.id);
-	glDeleteBuffers(1, &mesh->indexBuffer.id);
-	glDeleteTextures(1, &mesh->material.texture.id);
-	glDeleteVertexArrays(1, &mesh->vertexArray);
-}
-
-/*******************************************************************************
- *
- *		Particle System Rendering
- *
- *******************************************************************************/
-
-void Renderer::AddParticles(ParticleSystem* system)
-{
-}
-
-void Renderer::RenderParticles(ParticleSystem* system)
-{
-}
-
-void Renderer::RemoveParticles(ParticleSystem* system)
-{
-
-}
-
-/*******************************************************************************
- *
- *		Sprite Rendering
- *
- *******************************************************************************/
-
-void Renderer::AddSprite(Sprite* sprite)
-{
-	glGenVertexArrays(1, &sprite->vertexArray);
-	glBindVertexArray(sprite->vertexArray);
-
-	Log("About to add sprite");
-
-	bool shaderLoaded = false;
-	if(sprite->material.shader.id == 0)
-	{
-		if(sprite->material.shader.name != "")
-		{
-			for(auto& shader : shaders)
-			{
-				if(shader.name == sprite->material.shader.name && shader.id != 0)
-				{
-					sprite->material.shader.id = shader.id;
-					shaderLoaded = true;
-					break;
-				}
-			}
-		}
-		else
-		{
-			for(auto& shader : shaders)
-			{
-				if(shader.name == "shaders/Diffuse" && shader.id != 0)
-				{
-					sprite->material.shader.id = shader.id;
-					shaderLoaded = true;
-					break;
-				}
-			}
-		}
-	}
-	if(!shaderLoaded)
-	{
-		Log("Loading default shader");
-		sprite->material.shader.LoadFile("shaders/Diffuse");
-		shaders.push_back(sprite->material.shader);
-	}
-
-	Log(sprite->material.texture.id);
-
-	if(sprite->material.texture.id == 0)
-	{
-		Log(sprite->material.texture.name);
-		sprite->material.texture.LoadFile(sprite->material.texture.name);
-	}
-
-	Log("Renderer::AddSprite: Texture loaded");
-
-	if(sprite->material.shader.id != 0)
-	{
-		// Get any uniforms here
-		sprite->matrixId = glGetUniformLocation(sprite->material.shader.id, "MVP");
-		sprite->material.texture.uniformId = glGetUniformLocation(sprite->material.shader.id, "textureSampler");
-	}
-
-	Log("Renderer::AddSprite: Uniforms loaded");
-
-	sprite->vertexBuffer.push_back(vec3(0, 0, 0));
-	sprite->vertexBuffer.push_back(vec3(1, 0, 0));
-	sprite->vertexBuffer.push_back(vec3(1, 1, 0));
-	sprite->vertexBuffer.push_back(vec3(0, 1, 0));
-
-	sprite->uvBuffer.push_back(vec2(0, 0));
-	sprite->uvBuffer.push_back(vec2(1, 0));
-	sprite->uvBuffer.push_back(vec2(1, 1));
-	sprite->uvBuffer.push_back(vec2(0, 1));
-
-	sprite->indexBuffer.push_back(0);
-	sprite->indexBuffer.push_back(1);
-	sprite->indexBuffer.push_back(2);
-	sprite->indexBuffer.push_back(3);
-
-	/*
-	vector<uint32_t> indices;
-	vector<vec3> indexed_vertices;
-	vector<vec2> indexed_uvs;
-	IndexVBO(sprite->vertexBuffer.data, sprite->uvBuffer.data, indices, indexed_vertices, indexed_uvs);
-
-	sprite->vertexBuffer.data = indexed_vertices;
-	sprite->uvBuffer.data = indexed_uvs;
-	sprite->indexBuffer.data = indices;
-	*/
-
-	Log("Renderer::AddSprite: Data indexed");
-
-	sprite->vertexBuffer.id = CreateBuffer(GL_ARRAY_BUFFER, sprite->vertexBuffer.data);
-	sprite->uvBuffer.id = CreateBuffer(GL_ARRAY_BUFFER, sprite->uvBuffer.data);
-	sprite->indexBuffer.id = CreateBuffer(GL_ELEMENT_ARRAY_BUFFER, sprite->indexBuffer.data);
-
-	Log("Renderer::AddSprite: Data buffered");
-
-}
-
-void Renderer::RenderSprite(Sprite* sprite)
-{
-	if(sprite->material.shader.id == 0 || sprite->material.texture.id == 0)
-	{
-		AddSprite(sprite);
-	}
-
-	glBindVertexArray(sprite->vertexArray);
-
-	glUseProgram(sprite->material.shader.id);
-
-	mat4 mvp = game->scene->mainCamera->projection * game->scene->mainCamera->view * sprite->transform->GetMatrix();
-	glUniformMatrix4fv(sprite->matrixId, 1, GL_FALSE, &mvp[0][0]);
-
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, sprite->material.texture.id);
-	glUniform1i(sprite->material.texture.uniformId, 0);
-
-	glEnableVertexAttribArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, sprite->vertexBuffer.id);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-
-	glEnableVertexAttribArray(1);
-	glBindBuffer(GL_ARRAY_BUFFER, sprite->uvBuffer.id);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
-
-	/*
-	glEnableVertexAttribArray(2);
-	glBindBuffer(GL_ARRAY_BUFFER, sprite->normalBuffer.id);
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-	*/
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sprite->indexBuffer.id);
-	glDrawElements(GL_QUADS, sprite->indexBuffer.size(), GL_UNSIGNED_INT, (void*)0);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	//glDisableVertexAttribArray(2);
-	glDisableVertexAttribArray(1);
-	glDisableVertexAttribArray(0);
-
-	glBindTexture(GL_TEXTURE_2D, 0);
-
-	glBindVertexArray(0);
-}
-
-void Renderer::RemoveSprite(Sprite* sprite)
-{
-	glDeleteBuffers(1, &sprite->vertexBuffer.id);
-	glDeleteBuffers(1, &sprite->uvBuffer.id);
-	glDeleteBuffers(1, &sprite->indexBuffer.id);
-	glDeleteTextures(1, &sprite->material.texture.id);
-	glDeleteVertexArrays(1, &sprite->vertexArray);
-}
-
-/*******************************************************************************
- *
  *		Gets/Sets/Shaders
  *
  *******************************************************************************/
@@ -596,6 +248,27 @@ void Renderer::SetRendering(bool render)
 void Renderer::SetPosition(ivec2 pos)
 {
 	glfwSetWindowPos(pos.x, pos.y);
+}
+
+Shader& Renderer::GetShader(string name)
+{
+	for(auto& shader : shaders)
+	{
+		if(shader.name == name)
+		{
+			return shader;
+		}
+	}
+}
+
+void Renderer::AddShader(Shader& shader)
+{
+	if(Shader* s = &GetShader(shader.name))
+	{
+		s->id = shader.id;
+		return;
+	}
+	shaders.push_back(shader);
 }
 
 void Renderer::HideMouse(bool hide)

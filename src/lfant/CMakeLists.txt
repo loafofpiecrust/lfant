@@ -4,7 +4,7 @@ project(lfant)
 set(VERSION_MAJOR 0)
 set(VERSION_MINOR 1)
 
-set(INCLUDE_DIR "${SFE}/include")
+set(INCLUDE_DIR "${SFE}/src")
 set(SOURCE_DIR ".")
 
 # Configured Header for Macro'd settings, like versioning
@@ -50,7 +50,7 @@ target_link_libraries(${PROJECT_NAME}
 	bullet
 	fmod
 	rocket
-	png
+	:libpng.a
 	z
 	squirrel
 	yaml
