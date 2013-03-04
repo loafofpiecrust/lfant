@@ -6,7 +6,7 @@ file(GLOB SRC_FILES
 	)
 
 file(GLOB HEADER_FILES
-	"./*.hpp"
+	"./*.h"
 	)
 
 # Library Search Paths
@@ -21,8 +21,8 @@ add_dependencies(${PROJECT_NAME} sfengine)
 
 # Includes
 include_directories(
-	"."
-	"${SFE}/include"
+	"../"
+	"${SFE}/src"
 	"${SFE}/src/external/glm"
 	"${SFE}/src/external/boost"
 	"${SFE}/src/external/glfw/include"

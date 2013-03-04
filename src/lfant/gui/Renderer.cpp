@@ -1,5 +1,5 @@
 
-#include <lfant/gui/Renderer.hpp>
+#include <lfant/gui/Renderer.h>
 
 // External
 #include <GL/glew.h>

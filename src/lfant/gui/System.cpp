@@ -1,11 +1,11 @@
 
-#include "lfant/gui/System.hpp"
+#include "lfant/gui/System.h"
 
 // External
 
 // Internal
-#include <lfant/Engine.hpp>
-#include <lfant/Time.hpp>
+#include <lfant/Engine.h>
+#include <lfant/Time.h>
 
 namespace lfant
 {

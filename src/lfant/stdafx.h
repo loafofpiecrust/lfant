@@ -19,42 +19,7 @@
  ******************************************************************************/
 #pragma once
 
-// Detect platform if not specified
-#if !WINDOWS && !LINUX && !OSX
-#	ifdef _WIN32
-#		define WINDOWS 1
-#	elif __linux
-#		define LINUX 1
-#	elif _APPLE_
-#		define OSX 1
-#	endif
-#endif
-
-// Platform Preprocessor
-#if OSX || LINUX
-#	define UNIX 1
-#endif
-
-#if WINDOWS
-#	define WIN32_LEAN_AND_MEAN
-#	include <windows.h>
-#	include <conio.h>
-#	define GLFWCALL __stdcall
-#elif UNIX
-#	define SFEXP extern "C++"
-#	define GLFWCALL
-#	include <unistd.h>
-#endif
-
-// General Preprocessor
-#define GLFW_DLL 1
-#define null(type) *((type*)nullptr)
-#define GLM_FORCE_CXX11
-#define GLM_SWIZZLE
-#define BOOST_EXCEPTION_DISABLE
-#ifndef __GXX_EXPERIMENTAL_CXX0X__
-#	define __GXX_EXPERIMENTAL_CXX0X__ 1
-#endif
+#include "Config.h"
 
 // Includes
 #include <stdint.h>
@@ -84,7 +49,7 @@
 #include <boost/lexical_cast.hpp>
 
 #ifdef major
-#undef major
+#	undef major
 #endif
 
 // Namespaces

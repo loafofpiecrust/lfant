@@ -21,7 +21,7 @@
 #include <lfant/Settings.h>
 
 // External
-#include <boost/filesystem.h>
+#include <boost/filesystem.hpp>
 #include <fstream>
 #include <iostream>
 

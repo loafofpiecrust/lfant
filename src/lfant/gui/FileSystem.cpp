@@ -1,12 +1,12 @@
 
-#include <lfant/gui/FileSystem.hpp>
+#include <lfant/gui/FileSystem.h>
 
 // External
 
 // Internal
-#include <lfant/Engine.hpp>
-#include <lfant/Time.hpp>
-#include <lfant/FileSystem.hpp>
+#include <lfant/Engine.h>
+#include <lfant/Time.h>
+#include <lfant/FileSystem.h>
 
 namespace lfant
 {

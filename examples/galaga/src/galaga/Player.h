@@ -1,8 +1,8 @@
 /******************************************************************************
  *
- *	ShadowFox Engine Source
- *	Copyright (C) 2012-2013 by ShadowFox Studios
- *	Created: 2013-01-10 by Taylor Snead
+ *	LFANT Source
+ *	Copyright (C) 2012-2013 by LazyFox Studios
+ *	Created: 2012-12-19 by Taylor Snead
  *
  *	Licensed under the Apache License, Version 2.0 (the "License");
  *	you may not use this file except in compliance with the License.
@@ -18,45 +18,50 @@
  *
  ******************************************************************************/
 #pragma once
-#include <lfant/stdafx.hpp>
 
 // External
 
 // Internal
-#include <lfant/Engine.hpp>
+#include <lfant/Component.h>
 
 namespace lfant
 {
-	class Entity;
-
 	/** \addtogroup Galaga
+	 *	 \{
+	 */
+	/** \addtogroup Entities
 	 *	 \{
 	 */
 
 	/**
 	 *
-	 *	\details
-	 *	\todo
 	 */
-	class Galaga : public Engine
+	class Player : public Component
 	{
 	public:
-		Galaga();
-		virtual ~Galaga()
+		Player()
+		{
+		}
+		virtual ~Player()
 		{
 		}
 
 		virtual void Init();
 		virtual void Update();
-		virtual void Destroy();
 
-		void AddMesh(string name);
+		virtual void Move(string axis, float value);
 
 	protected:
 
+		float movementSpeed = 3.0f;
+		float lookSpeed = 0.01f;
+
+		int meshCount = 0;
+
 	private:
-		Entity* player;
+
 	};
 
+/// \}
 /// \}
 }

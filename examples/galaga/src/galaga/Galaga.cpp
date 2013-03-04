@@ -1,7 +1,7 @@
 /******************************************************************************
  *
- *	ShadowFox Engine Source
- *	Copyright (C) 2012-2013 by ShadowFox Studios
+ *	LFANT Source
+ *	Copyright (C) 2012-2013 by LazyFox Studios
  *	Created: 2013-01-10 by Taylor Snead
  *
  *	Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,27 +18,28 @@
  *
  ******************************************************************************/
 
-#include "Galaga.hpp"
+#include <galaga/Galaga.h>
 
 // External
 
 // Internal
-#include <lfant/Renderer.hpp>
-#include <lfant/Input.hpp>
-#include <lfant/Time.hpp>
-#include <lfant/Physics.hpp>
-#include <lfant/Settings.hpp>
-#include <lfant/Audio.hpp>
-#include <lfant/Scene.hpp>
-#include <lfant/FileSystem.hpp>
-#include <lfant/Console.hpp>
-#include <lfant/SystemInfo.hpp>
-#include <lfant/Console.hpp>
-#include <lfant/UserInterface.hpp>
-#include <lfant/Network.hpp>
-#include <lfant/ChatClient.hpp>
-#include <lfant/Mesh.hpp>
-#include <lfant/Entity.hpp>
+#include <lfant/Renderer.h>
+#include <lfant/Input.h>
+#include <lfant/Time.h>
+#include <lfant/Physics.h>
+#include <lfant/Settings.h>
+#include <lfant/Audio.h>
+#include <lfant/Scene.h>
+#include <lfant/FileSystem.h>
+#include <lfant/Console.h>
+#include <lfant/SystemInfo.h>
+#include <lfant/Console.h>
+#include <lfant/UserInterface.h>
+#include <lfant/Network.h>
+#include <lfant/ChatClient.h>
+#include <lfant/Mesh.h>
+#include <lfant/Entity.h>
+#include <lfant/Transform.h>
 
 namespace lfant
 {
@@ -100,40 +101,18 @@ void Galaga::Init()
 	// Fairly self-explanitory. Check above input axes for keys to press. Will implement better with GUI.
 	console->RegisterVar("Tester", 5.0f, "This is my variable!");
 
-	/*
-	player = scene->Spawn("Snead", nullptr, vec3(0, 0, 0));
-	player->AddComponent<Player>();
-	scene->mainCamera = player->AddComponent<Camera>();
-	scene->mainCamera->projectionMode = Camera::PM_PERSPECTIVE;
+	Log("Galaga::Init: Registered test var");
+
+	Entity* ent = nullptr;
+	Log("Galaga::Init: Allocated Entity pointer");
+
+	ent = scene->Spawn("Player");
+
+	Log("Galaga::Init: Spawned player");
 
 
-	Entity* ent = scene->Spawn("TestMesh", nullptr);
-	Mesh* mesh = ent->AddComponent<Mesh>();
-	mesh->LoadFile("suzanne.obj");
-	mesh->material.texture.LoadFile("player.png");
-	mesh->material.shader.name = "Diffuse";
-	*/
-
-	Entity* ent = scene->Spawn("ChatClientObj", nullptr);
+	ent = scene->Spawn("ChatClientObj", nullptr);
 	ent->AddComponent<ChatClient>();
-
-	//Log("Mesh parent: "+ent->parent->name);
-
-	/*
-	Entity* ent = Entity::Spawn("TestSprite", nullptr);
-	Sprite* sprite = ent->AddComponent<Sprite>();
-	//mesh->LoadFile("suzanne.obj");
-	sprite->material.texture.LoadFile("player.png");
-	sprite->material.shader.name = "Diffuse";
-	*/
-
-	/*
-	for(uint i = 0; i < game->settings->GetValue("galaga.meshcount").i(); ++i)
-	{
-		AddMesh("TestMesh"+lexical_cast<string>(i));
-		Log("Added mesh ", i);
-	}
-	*/
 }
 
 void Galaga::Update()
@@ -144,7 +123,7 @@ void Galaga::Update()
 	physics->Update();
 	scene->Update();
 	input->Update();
-//	userInterface->Update();
+	userInterface->Update();
 	network->Update();
 	renderer->Update();
 	PostUpdate();
@@ -157,7 +136,8 @@ void Galaga::Destroy()
 
 void Galaga::AddMesh(string name)
 {
-	Entity* ent = scene->Spawn(name, nullptr, vec3(1,1,1));
+	Entity* ent = scene->Spawn(name, nullptr);
+	ent->GetComponent<Transform>()->SetPosition(vec3(1, 1, 1));
 	Mesh* mesh = ent->AddComponent<Mesh>();
 	mesh->LoadFile("suzanne.obj");
 	mesh->material.texture.LoadFile("player.png");

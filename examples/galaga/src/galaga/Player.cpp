@@ -1,7 +1,7 @@
 /******************************************************************************
  *
- *	ShadowFox Engine Source
- *	Copyright (C) 2012-2013 by ShadowFox Studios
+ *	LFANT Source
+ *	Copyright (C) 2012-2013 by LazyFox Studios
  *	Created: 2013-01-11 by Taylor Snead
  *
  *	Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,33 +18,34 @@
  *
  ******************************************************************************/
 
-#include "Player.hpp"
+#include <galaga/Player.h>
 
 // External
 
 // Internal
-#include "Galaga.hpp"
-#include <lfant/Input.hpp>
-#include <lfant/Console.hpp>
-#include <lfant/Time.hpp>
-#include <lfant/Sprite.hpp>
-#include <lfant/Entity.hpp>
-#include <lfant/Renderer.hpp>
-#include <lfant/Settings.hpp>
-#include <lfant/Scene.hpp>
+#include <galaga/Galaga.h>
+#include <lfant/Input.h>
+#include <lfant/Console.h>
+#include <lfant/Time.h>
+#include <lfant/Sprite.h>
+#include <lfant/Entity.h>
+#include <lfant/Renderer.h>
+#include <lfant/Settings.h>
+#include <lfant/Scene.h>
+#include <lfant/Transform.h>
 
 using namespace lfant;
 
 void Player::Init()
 {
 	//	owner->AddComponent<Sprite>();
-	float f = game->settings->GetValue("player.lookspeed").f();
+	float f = game->settings->GetValue<float>("player.lookspeed");
 	if(f != 0.0f)
 	{
 		lookSpeed = f;
 		Log("Looking at ", f);
 	}
-	f = game->settings->GetValue("player.movementSpeed").f();
+	f = game->settings->GetValue<float>("player.movementSpeed");
 	if(f != 0.0f)
 	{
 		movementSpeed = f;
@@ -62,21 +63,21 @@ void Player::Move(string axis, float value)
 
 void Player::Update()
 {
-	if(game->settings->GetValue("player.mouseLook").b())
+	if(game->settings->GetValue<bool>("player.mouseLook"))
 	{
 		ivec2 mousePos = game->input->GetMousePos();
 		ivec2 screenRes = game->renderer->GetResolution();
-		transform->Rotate(radians(vec3(lookSpeed * float(screenRes.y/2-mousePos.y), 0, lookSpeed * float(screenRes.x/2-mousePos.x))) * (float)game->time->deltaTime);
+		owner->transform->Rotate(radians(vec3(lookSpeed * float(screenRes.y/2-mousePos.y), 0, lookSpeed * float(screenRes.x/2-mousePos.x))) * (float)game->time->deltaTime);
 		game->input->SetMousePos(screenRes.x/2, screenRes.y/2);
 	}
 
 	if (game->input->GetButtonDown("ShowLoc"))
 	{
-		Log("Player position: ", transform->GetPosition().x, ", ", transform->GetPosition().y, ", ", transform->GetPosition().z);
+		Log("Player position: ", owner->transform->GetPosition().x, ", ", owner->transform->GetPosition().y, ", ", owner->transform->GetPosition().z);
 	}
 	if (game->input->GetButtonDown("ShowRot"))
 	{
-		Log("Player rotation: ", transform->GetRotation().x, ", ", transform->GetRotation().y, ", ", transform->GetRotation().z);
+		Log("Player rotation: ", owner->transform->GetRotation().x, ", ", owner->transform->GetRotation().y, ", ", owner->transform->GetRotation().z);
 	}
 	if(game->input->GetButtonDown("ShowFPS"))
 	{
@@ -85,22 +86,22 @@ void Player::Update()
 	float hor = game->input->GetAxis("Horizontal");
 	if (hor != 0.0f)
 	{
-		transform->Translate(transform->right * float(hor * game->time->deltaTime * movementSpeed));
+		owner->transform->Translate(owner->transform->right * float(hor * game->time->deltaTime * movementSpeed));
 	}
 	float ver = game->input->GetAxis("Vertical");
 	if (ver != 0.0f)
 	{
-		transform->Translate(float(game->time->deltaTime) * transform->direction * float(ver * movementSpeed));
+		owner->transform->Translate(float(game->time->deltaTime) * owner->transform->direction * float(ver * movementSpeed));
 	}
 	float hrot = game->input->GetAxis("HRotation");
 	if (hrot != 0.0f)
 	{
-		transform->Rotate(radians(vec3(0, 0, -hrot*lookSpeed*game->time->deltaTime)));
+		owner->transform->Rotate(radians(vec3(0, 0, -hrot*lookSpeed*game->time->deltaTime)));
 	}
 	float vrot = game->input->GetAxis("VRotation");
 	if (vrot != 0.0f)
 	{
-		transform->Rotate(radians(vec3(vrot * lookSpeed * game->time->deltaTime, 0, 0)));
+		owner->transform->Rotate(radians(vec3(vrot * lookSpeed * game->time->deltaTime, 0, 0)));
 	}
 	if (game->input->GetButtonDown("Fire"))
 	{
@@ -114,7 +115,7 @@ void Player::Update()
 		*/
 		dynamic_cast<Galaga*>(game)->AddMesh("TestMesh"+lexical_cast<string>(meshCount));
 		++meshCount;
-		Log("Added mesh ", meshCount+game->settings->GetValue("galaga.meshcount").i());
+		Log("Added mesh ", meshCount+game->settings->GetValue<int>("galaga.meshcount"));
 	}
 	if (game->input->GetButtonDown("TesterSetVar"))
 	{

@@ -9,8 +9,8 @@ set(SOURCE_DIR ".")
 
 # Configured Header for Macro'd settings, like versioning
 configure_file(
-	"${PROJECT_SOURCE_DIR}/Config.hpp.in"
-	"${PROJECT_SOURCE_DIR}/Config.hpp"
+	"${PROJECT_SOURCE_DIR}/Config.h.in"
+	"${PROJECT_SOURCE_DIR}/Config.h"
 	)
 
 # Library Search Paths

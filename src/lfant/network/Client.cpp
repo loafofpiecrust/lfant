@@ -1,10 +1,10 @@
 
-#include <lfant/network/Client.hpp>
+#include <lfant/network/Client.h>
 
 // External
 
 // Internal
-#include <lfant/Console.hpp>
+#include <lfant/Console.h>
 
 namespace lfant
 {

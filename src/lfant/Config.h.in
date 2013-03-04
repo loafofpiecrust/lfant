@@ -1,9 +1,9 @@
 /**
  *	Game versioning
  */
-#define VERSION_MAJOR 0
-#define VERSION_MINOR 1
-//#define VERSION_PATCH 
+#define VERSION_MAJOR @VERSION_MAJOR@
+#define VERSION_MINOR @VERSION_MINOR@
+//#define VERSION_PATCH @VERSION_PATCH@
 #define VERSION #VERSION_MAJOR "." #VERSION_MINOR
 
 #define HAVE_VERSION(major,minor) (VERSION_MINOR >= minor && VERSION_MAJOR == major) || (VERSION_MAJOR > major)

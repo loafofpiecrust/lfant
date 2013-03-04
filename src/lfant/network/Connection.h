@@ -1,12 +1,12 @@
 
 #pragma once
-#include <lfant/stdafx.hpp>
+#include <lfant/stdafx.h>
 
 // External
 #include <boost/asio.hpp>
 
 // Internal
-#include <lfant/Object.hpp>
+#include <lfant/Object.h>
 
 namespace lfant
 {

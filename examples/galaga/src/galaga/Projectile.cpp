@@ -1,7 +1,7 @@
 /******************************************************************************
  *
- * ShadowFox Engine Source
- * Copyright (C) 2012-2013 by ShadowFox Studios
+ * LFANT Source
+ * Copyright (C) 2012-2013 by LazyFox Studios
  * Created: 2012-09-09 by Taylor Snead
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,14 +18,14 @@
  *
  ******************************************************************************/
 
-#include "Projectile.hpp"
+#include <galaga/Projectile.h>
 
 // External
 
 // Internal
-#include <lfant/Mesh.hpp>
-#include <lfant/Sprite.hpp>
-#include <lfant/Entity.hpp>
+#include <lfant/Mesh.h>
+#include <lfant/Sprite.h>
+#include <lfant/Entity.h>
 
 using namespace lfant;
 

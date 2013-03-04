@@ -22,7 +22,7 @@
 #include <lfant/stdafx.h>
 
 // External
-#include <boost/lexical_cast.h>
+#include <boost/lexical_cast.hpp>
 
 // Internal
 
