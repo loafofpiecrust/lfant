@@ -30,7 +30,7 @@
 
 namespace lfant
 {
-/** @addtogroup Engine
+/** @addtogroup Game
  *	 @{
  */
 /** @addtogroup Core
@@ -80,6 +80,8 @@ protected:
 	virtual void Update()
 	{
 	}
+
+	virtual void PostUpdate() {}
 
 	virtual void Destroy();
 

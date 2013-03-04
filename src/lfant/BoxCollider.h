@@ -30,7 +30,7 @@ class btBoxShape;
 
 namespace lfant
 {
-/** @addtogroup Engine
+/** @addtogroup Game
  *	@{
  */
 /** @addtogroup Physics

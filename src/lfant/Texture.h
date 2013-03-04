@@ -27,7 +27,7 @@
 
 namespace lfant
 {
-/** @addtogroup Engine
+/** @addtogroup Game
  *	 @{
  */
 /** @addtogroup Rendering
@@ -56,7 +56,7 @@ public:
 		TF_COMPRESSED, TF_16BIT, TF_TRUECOLOR
 	};
 
-	void LoadFile(string path, int mode = 0);
+	void LoadFile(string path = "", int mode = 0);
 
 	string name = "";
 	//WrapMode wrapMode = WM_REPEAT;

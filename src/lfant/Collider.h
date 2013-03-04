@@ -34,7 +34,7 @@ namespace lfant
 {
 class Rigidbody;
 
-/** @addtogroup Engine
+/** @addtogroup Game
  *	 @{
  */
 /** @addtogroup Physics

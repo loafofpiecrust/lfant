@@ -26,7 +26,7 @@
 #include <lfant/Particle.h>
 #include <lfant/Random.h>
 
-#include <lfant/Engine.h>
+#include <lfant/Game.h>
 #include <lfant/Time.h>
 #include <lfant/Renderer.h>
 

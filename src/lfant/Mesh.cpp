@@ -45,6 +45,26 @@ Mesh::~Mesh()
 
 void Mesh::Init()
 {
+	Renderable::Init();
+}
+
+void Mesh::Update()
+{
+	Renderable::Update();
+}
+
+void Mesh::OnDestroy()
+{
+	Renderable::OnDestroy();
+}
+
+void Mesh::BeginRender()
+{
+	if(loaded)
+	{
+		EndRender();
+	}
+
 	glGenVertexArrays(1, &vertexArray);
 	glBindVertexArray(vertexArray);
 
@@ -96,13 +116,15 @@ void Mesh::Init()
 	uvBuffer.id = CreateBuffer(GL_ARRAY_BUFFER, uvBuffer.data);
 	normalBuffer.id = CreateBuffer(GL_ARRAY_BUFFER, normalBuffer.data);
 	indexBuffer.id = CreateBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer.data);
+
+	loaded = true;
 }
 
-void Mesh::Update()
+void Mesh::Render()
 {
 	if(material.shader.id == 0 || material.texture.id == 0)
 	{
-		Init();
+		return;
 	}
 
 	glBindVertexArray(vertexArray);
@@ -143,7 +165,7 @@ void Mesh::Update()
 	glBindVertexArray(0);
 }
 
-void Mesh::OnDestroy()
+void Mesh::EndRender()
 {
 	glDeleteBuffers(1, &vertexBuffer.id);
 	glDeleteBuffers(1, &uvBuffer.id);
@@ -151,6 +173,7 @@ void Mesh::OnDestroy()
 	glDeleteBuffers(1, &indexBuffer.id);
 	glDeleteTextures(1, &material.texture.id);
 	glDeleteVertexArrays(1, &vertexArray);
+	loaded = false;
 }
 
 uint32_t Mesh::CreateBuffer(int target, void* data, uint32_t size, int mode)
@@ -173,6 +196,12 @@ void Mesh::LoadFile(string path)
 	{
 		LoadOBJ(path);
 	}
+	else
+	{
+		Log("Mesh::LoadFile: File type not supported.");
+		return;
+	}
+	BeginRender();
 }
 
 void Mesh::LoadOBJ(string path)

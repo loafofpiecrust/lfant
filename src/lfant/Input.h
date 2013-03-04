@@ -31,7 +31,7 @@
 
 namespace lfant
 {
-/** @addtogroup Engine
+/** @addtogroup Game
  *	 @{
  */
 /** @addtogroup Core
@@ -131,7 +131,7 @@ enum class Key : uint16_t
  */
 class Input : public Subsystem
 {
-	friend class Engine;
+	friend class Game;
 
 	struct Axis
 	{

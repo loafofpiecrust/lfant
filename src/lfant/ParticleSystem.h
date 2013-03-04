@@ -32,7 +32,7 @@ namespace lfant
 {
 class Particle;
 
-/** @addtogroup Engine
+/** @addtogroup Game
  *	 @{
  */
 /** @addtogroup Particles

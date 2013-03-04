@@ -26,7 +26,7 @@
 
 // Internal
 
-#include <lfant/Engine.h>
+#include <lfant/Game.h>
 #include <lfant/Time.h>
 #include <lfant/Renderer.h>
 

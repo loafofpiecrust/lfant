@@ -34,6 +34,10 @@ namespace lfant
 
 void Texture::LoadFile(string path, int mode)
 {
+	if(path == "")
+	{
+		path = name;
+	}
 	if(mode == 0)
 	{
 		mode = GL_TEXTURE_2D;

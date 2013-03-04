@@ -24,7 +24,7 @@
 
 // Internal
 
-#include <lfant/Engine.h>
+#include <lfant/Game.h>
 #include <lfant/Renderer.h>
 #include <lfant/Time.h>
 #include <lfant/Scene.h>
@@ -43,35 +43,19 @@ Sprite::~Sprite()
 {
 }
 
-void Sprite::Init()
+void Sprite::BeginRender()
 {
 	glGenVertexArrays(1, &vertexArray);
 	glBindVertexArray(vertexArray);
 
-	bool shaderLoaded = false;
 	if(material.shader.id == 0)
 	{
-		if(auto shader = game->renderer->GetShader(material.shader.name))
-		{
-			material.shader.id = shader.id;
-			shaderLoaded = true;
-		}
-		else if(auto shader = game->renderer->GetShader("shaders/Diffuse"))
-		{
-			material.shader.id = shader.id;
-			shaderLoaded = true;
-		}
-	}
-	if(!shaderLoaded)
-	{
-		Log("Sprite::Init: Loading default shader");
-		material.shader.LoadFile("shaders/Diffuse");
-		game->renderer->AddShader(material.shader);
+		material.shader.LoadFile();
 	}
 
 	if(material.texture.id == 0)
 	{
-		material.texture.LoadFile(material.texture.name);
+		material.texture.LoadFile();
 	}
 
 	if(material.shader.id != 0)
@@ -99,13 +83,15 @@ void Sprite::Init()
 	vertexBuffer.id = CreateBuffer(GL_ARRAY_BUFFER, vertexBuffer.data);
 	uvBuffer.id = CreateBuffer(GL_ARRAY_BUFFER, uvBuffer.data);
 	indexBuffer.id = CreateBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer.data);
+
+	Renderable::BeginRender();
 }
 
-void Sprite::Update()
+void Sprite::Render()
 {
 	if(material.shader.id == 0 || material.texture.id == 0)
 	{
-		Init();
+		return;
 	}
 
 	glBindVertexArray(vertexArray);
@@ -146,7 +132,10 @@ void Sprite::Update()
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	glBindVertexArray(0);
+}
 
+void Sprite::Update()
+{
 	if(playingAnim)
 	{
 		if(currentAnim)
@@ -235,15 +224,18 @@ void Sprite::Update()
 			}
 		}
 	}
+	Renderable::Update();
 }
 
-void Sprite::OnDestroy()
+void Sprite::EndRender()
 {
 	glDeleteBuffers(1, &vertexBuffer.id);
 	glDeleteBuffers(1, &uvBuffer.id);
 	glDeleteBuffers(1, &indexBuffer.id);
 	glDeleteTextures(1, &material.texture.id);
 	glDeleteVertexArrays(1, &vertexArray);
+
+	Renderable::EndRender();
 }
 
 void Sprite::PlayAnim(string name, AnimPlayMode mode, bool reverse)

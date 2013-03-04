@@ -35,7 +35,7 @@ class Channel;
 
 namespace lfant
 {
-/** @addtogroup Engine
+/** @addtogroup Game
  *	@{
  */
 /** @addtogroup Audio

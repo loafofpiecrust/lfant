@@ -30,11 +30,11 @@
 
 #include <lfant/Subsystem.h>
 
-#include <lfant/Engine.h>
+#include <lfant/Game.h>
 
 namespace lfant
 {
-/** @addtogroup Engine
+/** @addtogroup Game
  *	@{
  */
 /** @addtogroup Utilities

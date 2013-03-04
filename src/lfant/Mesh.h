@@ -26,12 +26,12 @@
 // Internal
 #include <lfant/Material.h>
 #include <lfant/Vertex.h>
-
+#include <lfant/Renderable.h>
 #include <lfant/Component.h>
 
 namespace lfant
 {
-/** @addtogroup Engine
+/** @addtogroup Game
  *	@{
  */
 /** @addtogroup Rendering
@@ -85,7 +85,7 @@ public:
  *	@todo
  *		Be sure this works fully in conjuction with the importers Mesh classes.
  */
-class Mesh : public Component
+class Mesh : public Renderable
 {
 	friend class Renderer;
 
@@ -96,6 +96,10 @@ public:
 	virtual void Init();
 	virtual void Update();
 	virtual void OnDestroy();
+
+	virtual void BeginRender();
+	virtual void Render();
+	virtual void EndRender();
 
 	void SetInput(string path);
 	void SetTexture(string name);

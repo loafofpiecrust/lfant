@@ -26,7 +26,7 @@
 
 namespace lfant
 {
-/** @addtogroup Engine
+/** @addtogroup Game
  *	@{
  */
 /** @addtogroup Core

@@ -31,7 +31,7 @@ namespace lfant
 {
 class Entity;
 
-/** @addtogroup Engine
+/** @addtogroup Game
  *	 @{
  */
 /** @addtogroup Core

@@ -45,7 +45,7 @@ class Light;
 class ParticleSystem;
 class Material;
 
-/**	@addtogroup Engine
+/**	@addtogroup Game
  *	@{
  */
 /**	@addtogroup Rendering
@@ -61,7 +61,7 @@ class Material;
  */
 class Renderer : public Subsystem
 {
-	friend class Engine;
+	friend class Game;
 public:
 
 	Renderer();
@@ -93,7 +93,6 @@ public:
 	void HideMouse(bool hide = true);
 
 	virtual void Init();
-	void PreUpdate();
 	virtual void Update();
 
 	void AddLight(Light* light);

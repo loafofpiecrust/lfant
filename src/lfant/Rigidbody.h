@@ -37,7 +37,7 @@ namespace lfant
 class Collider;
 class Mesh;
 
-/** @addtogroup Engine
+/** @addtogroup Game
  *	 @{
  */
 /** @addtogroup Physics

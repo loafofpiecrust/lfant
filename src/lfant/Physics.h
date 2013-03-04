@@ -42,7 +42,7 @@ class Entity;
 class Rigidbody;
 class Joint;
 
-/** @addtogroup Engine
+/** @addtogroup Game
  *	 @{
  */
 /** @addtogroup Physics

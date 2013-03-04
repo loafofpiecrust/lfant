@@ -7,7 +7,7 @@
 // Internal
 #include <lfant/Console.h>
 #include <lfant/FileSystem.h>
-#include <lfant/Engine.h>
+#include <lfant/Game.h>
 #include <lfant/Renderer.h>
 #include <lfant/FileSystem.h>
 
@@ -16,6 +16,10 @@ namespace lfant
 
 void Shader::LoadFile(string path)
 {
+	if(path == "")
+	{
+		path = name;
+	}
 	if(Shader* s = &game->renderer->GetShader(path))
 	{
 		*this = *s;

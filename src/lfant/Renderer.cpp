@@ -36,7 +36,7 @@
 #include <lfant/Entity.h>
 #include <lfant/Shader.h>
 
-#include <lfant/Engine.h>
+#include <lfant/Game.h>
 #include <lfant/SystemInfo.h>
 #include <lfant/Mesh.h>
 
@@ -136,14 +136,10 @@ void Renderer::Init()
 	}*/
 }
 
-void Renderer::PreUpdate()
-{
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-}
-
 void Renderer::Update()
 {
 	glfwSwapBuffers();
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 /*******************************************************************************

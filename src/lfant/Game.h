@@ -44,7 +44,7 @@ class SystemInfo;
 class UserInterface;
 class Network;
 
-/** @addtogroup Engine
+/** @addtogroup Game
  *	@{
  */
 /** @addtogroup Core
@@ -57,22 +57,17 @@ class Network;
  *	scripts. It doesn't directly control these, but it holds pointers to
  *	the classes that do.
  */
-class Engine : public Subsystem
+class Game : public Subsystem
 {
 public:
-	Engine();
-	virtual ~Engine();
+	Game();
+	virtual ~Game();
 
 	/**	This function is called right when the game is launched.
-	 *	@todo
-	 *		Make virtual when this needs to be overwritten/extended.
 	 */
 	virtual void Init();
 
 	/**	Called every frame to update the game and its subsystems
-	 *	@todo
-	 *		Have this call the update of all other objects of the factories.
-	 *		Make this virtual later when/if it needs to be overwritten.
 	 */
 	virtual void Update();
 	virtual void PreUpdate()
@@ -121,8 +116,6 @@ public:
 	//boost::scoped_ptr<ScriptSystem>		scriptSystem;
 	//boost::scoped_ptr<FGSystem>			flowgraph;
 
-	string gameName = "LFANT";
-
 	bool standAlone;
 	bool destroy = false;
 
@@ -131,7 +124,7 @@ protected:
 private:
 };
 
-extern Engine* game;
+extern Game* game;
 
 /** @} */
 /** @} */

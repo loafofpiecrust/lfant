@@ -30,7 +30,7 @@
 #include <lfant/Object.h>
 //#include <lfant/Component.h>
 #include <lfant/TypeInfo.h>
-#include <lfant/Engine.h>
+#include <lfant/Game.h>
 #include <lfant/ptr.h>
 
 namespace lfant
@@ -39,7 +39,7 @@ class Component;
 class Item;
 class Transform;
 
-/** @addtogroup Engine
+/** @addtogroup Game
  *	@{
  */
 /** @addtogroup Core

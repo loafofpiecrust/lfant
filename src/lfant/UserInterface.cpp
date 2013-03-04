@@ -33,7 +33,7 @@
 #include <lfant/UserInterface.h>
 #include <lfant/Thread.h>
 
-#include <lfant/Engine.h>
+#include <lfant/Game.h>
 #include <lfant/FileSystem.h>
 #include <lfant/Console.h>
 #include <lfant/Input.h>

@@ -27,7 +27,7 @@
 
 namespace lfant
 {
-/** @addtogroup Engine
+/** @addtogroup Game
  *	@{
  */
 /** @addtogroup Rendering
@@ -50,7 +50,7 @@ public:
 		LoadFile(name);
 	}
 
-	void LoadFile(string file);
+	void LoadFile(string file = "");
 
 	operator string()
 	{

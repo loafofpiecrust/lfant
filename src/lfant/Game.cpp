@@ -19,7 +19,7 @@
  ******************************************************************************/
 
 
-#include <lfant/Engine.h>
+#include <lfant/Game.h>
 
 // External
 
@@ -44,11 +44,11 @@
 namespace lfant
 {
 
-Engine* game;
+Game* game;
 
 extern "C" void Launch()
 {
-	game = new Engine();
+	game = new Game();
 	game->standAlone = true;
 	game->Init();
 	game->destroy = false;
@@ -63,7 +63,7 @@ extern "C" void Launch()
 	delete game;
 }
 
-Engine::Engine() :
+Game::Game() :
 	console {new Console},
 	fileSystem {new FileSystem},
 	settings {new Settings},
@@ -79,7 +79,7 @@ Engine::Engine() :
 {
 }
 
-Engine::~Engine()
+Game::~Game()
 {
 }
 
@@ -89,7 +89,7 @@ Engine::~Engine()
  *
  *******************************************************************************/
 
-void Engine::Init()
+void Game::Init()
 {
 	console->Init();
 	fileSystem->Init();
@@ -109,10 +109,9 @@ void Engine::Init()
 	Log("Subsystems initialized");
 }
 
-void Engine::Update()
+void Game::Update()
 {
 	PreUpdate();
-	renderer->PreUpdate();
 	time->Update();
 	physics->Update();
 	scene->Update();
@@ -129,11 +128,11 @@ void Engine::Update()
  *
  *******************************************************************************/
 
-void Engine::LoadScene(string scene)
+void Game::LoadScene(string scene)
 {
 }
 
-void Engine::Destroy()
+void Game::Destroy()
 {
 	console->Destroy();
 	fileSystem->Destroy();
@@ -149,7 +148,7 @@ void Engine::Destroy()
 	network->Destroy();
 }
 
-void Engine::Exit()
+void Game::Exit()
 {
 	destroy = true;
 }

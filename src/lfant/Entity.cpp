@@ -27,7 +27,7 @@
 // Internal
 #include <lfant/Time.h>
 
-#include <lfant/Engine.h>
+#include <lfant/Game.h>
 #include <lfant/Scene.h>
 #include <lfant/TypeInfo.h>
 
@@ -97,6 +97,14 @@ void Entity::Update()
 		if(comp->IsEnabled())
 		{
 			comp->Update();
+		}
+	}
+
+	for(auto& comp : components)
+	{
+		if(comp->IsEnabled())
+		{
+			comp->PostUpdate();
 		}
 	}
 

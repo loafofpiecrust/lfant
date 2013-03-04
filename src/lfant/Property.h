@@ -207,7 +207,7 @@ PROP_COMPOUND_OP( %= , %)
 
 namespace lfant
 {
-/** @addtogroup Engine
+/** @addtogroup Game
  *	 @{
  */
 /** @addtogroup Utilities

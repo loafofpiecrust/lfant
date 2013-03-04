@@ -35,7 +35,7 @@ namespace lfant
 {
 const string GameName = "ShadowFox";
 
-/** @addtogroup Engine
+/** @addtogroup Game
  *	 @{
  */
 /** @addtogroup Utilities

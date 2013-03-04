@@ -34,7 +34,7 @@ namespace lfant
 class Entity;
 class Camera;
 
-/** @addtogroup Engine
+/** @addtogroup Game
  *	@{
  */
 /** @addtogroup Core
@@ -46,7 +46,7 @@ class Camera;
  */
 class Scene : public Subsystem
 {
-	friend class Engine;
+	friend class Game;
 	friend class Entity;
 
 public:

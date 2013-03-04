@@ -30,7 +30,7 @@
 
 namespace lfant
 {
-/** @addtogroup Engine
+/** @addtogroup Game
  *	 @{
  */
 /** @addtogroup Core
@@ -58,7 +58,7 @@ public:
 	virtual void Init();
 	virtual void Update();
 
-	/// Gets the amount of seconds since Engine::Init was called.
+	/// Gets the amount of seconds since Game::Init was called.
 	double GetTime();
 	void ResetTime();
 	void UpdateTimes();

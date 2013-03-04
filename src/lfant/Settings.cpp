@@ -27,7 +27,7 @@
 
 // Internal
 
-#include <lfant/Engine.h>
+#include <lfant/Game.h>
 #include <lfant/FileSystem.h>
 #include <lfant/String.h>
 

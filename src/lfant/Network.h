@@ -34,7 +34,7 @@ namespace lfant
 
 class Connection;
 
-/**	@addtogroup Engine
+/**	@addtogroup Game
  *	@{
  */
 /**	@addtogroup Networking
@@ -48,7 +48,7 @@ class Connection;
  */
 class Network : public Subsystem
 {
-	friend class Engine;
+	friend class Game;
 
 public:
 	Network();

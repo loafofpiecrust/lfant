@@ -27,7 +27,7 @@
 
 namespace lfant
 {
-/** @addtogroup Engine
+/** @addtogroup Game
  *	 @{
  */
 /** @addtogroup Rendering
@@ -96,9 +96,13 @@ public:
 	virtual ~Sprite();
 
 	// Loop functions
-	virtual void Init();
+//	virtual void Init();
 	virtual void Update();
-	virtual void OnDestroy();
+//	virtual void OnDestroy();
+
+	void BeginRender();
+	void Render();
+	void EndRender();
 
 	void PlayAnim(string name, AnimPlayMode mode = Default, bool reverse = false);
 	void PlayLastAnim();

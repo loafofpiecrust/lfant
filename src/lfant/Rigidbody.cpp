@@ -27,7 +27,7 @@
 #include <lfant/Collider.h>
 #include <lfant/Physics.h>
 #include <lfant/Transform.h>
-#include <lfant/Engine.h>
+#include <lfant/Game.h>
 #include <lfant/Mesh.h>
 
 #include <lfant/Rigidbody.h>
