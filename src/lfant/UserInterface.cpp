@@ -1,7 +1,7 @@
 /******************************************************************************
  *
- *	ShadowFox Engine Source
- *	Copyright (C) 2012-2013 by ShadowFox Studios
+ *	LFANT Source
+ *	Copyright (C) 2012-2013 by LazyFox Studios
  *	Created: 2013-02-13 by Taylor Snead
  *
  *	Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,6 +19,7 @@
  ******************************************************************************/
 
 // External
+//#include <Rocket/Core.h>
 /*
 #include <CEGUI/CEGUI.h>
 #include <CEGUI/RendererModules/OpenGL3/Renderer.h>
@@ -29,18 +30,21 @@
 */
 
 // Internal
-#include <lfant/UserInterface.hpp>
-#include <lfant/Thread.hpp>
+#include <lfant/UserInterface.h>
+#include <lfant/Thread.h>
 
-#include <lfant/Engine.hpp>
-#include <lfant/FileSystem.hpp>
-
-#include <lfant/Console.hpp>
-#include <lfant/Input.hpp>
-#include <lfant/Scene.hpp>
-#include <lfant/Camera.hpp>
-#include <lfant/Settings.hpp>
-#include <lfant/Time.hpp>
+#include <lfant/Game.h>
+#include <lfant/FileSystem.h>
+#include <lfant/Console.h>
+#include <lfant/Input.h>
+#include <lfant/Scene.h>
+#include <lfant/Camera.h>
+#include <lfant/Settings.h>
+#include <lfant/Time.h>
+#include <lfant/Thread.h>
+#include <lfant/gui/Renderer.h>
+#include <lfant/gui/System.h>
+#include <lfant/gui/FileSystem.h>
 
 namespace lfant
 {
@@ -58,36 +62,60 @@ UserInterface::~UserInterface()
 void UserInterface::Init()
 {
 
+	Connect(SENDER(game->input, KeyPress), RECEIVER(this, OnKey));
+	Connect(SENDER(game->input, CharPress), RECEIVER(this, OnChar));
+	Connect(SENDER(game->input, MouseButton), RECEIVER(this, OnMouseButton));
+	Connect(SENDER(game->input, MouseMove), RECEIVER(this, OnMouseMove));
 }
 
 void UserInterface::Update()
 {
-
 }
 
 void UserInterface::OnDestroy()
 {
-
 }
 
-void UserInterface::CreateWindow(string layout)
+void UserInterface::CreateWindow(string fileName)
 {
 }
 
-void UserInterface::OnKey(uint16_t key, bool pressed)
+void UserInterface::RemoveWindow(string fileName)
 {
+}
+
+void UserInterface::OnKey(int key, int mode)
+{
+	if(mode == 1)
+	{
+		//	context->ProcessKeyDown();
+	}
+	else
+	{
+		//	context->ProcessKeyUp();
+	}
 }
 
 void UserInterface::OnChar(char key)
 {
+//	context->ProcessTextInput(key);
 }
 
-void UserInterface::OnMouseButton(uint16_t btn, bool pressed)
+void UserInterface::OnMouseButton(int btn, int mode)
 {
+	if(mode == 1)
+	{
+	//	context->ProcessMouseButtonDown(btn, 0);
+	}
+	else
+	{
+	//	context->ProcessMouseButtonUp(btn, 0);
+	}
 }
 
-void UserInterface::OnMouseMove(float x, float y)
+void UserInterface::OnMouseMove(int x, int y)
 {
+//	context->ProcessMouseMove(x, y, 0);
 }
 
 void UserInterface::OnWindowResize(uint width, uint height)

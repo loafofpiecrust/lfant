@@ -1,7 +1,7 @@
 /******************************************************************************
  *
- * ShadowFox Engine Source
- * Copyright (C) 2012-2013 by ShadowFox Studios
+ * LFANT Source
+ * Copyright (C) 2012-2013 by LazyFox Studios
  * Created: 2012-09-02 by Taylor Snead
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,16 +17,16 @@
  * limitations under the License.
  *
  ******************************************************************************/
-#include <lfant/Scene.hpp>
+#include <lfant/Scene.h>
 
 // External
 
 // Internal
 
-#include <lfant/Entity.hpp>
+#include <lfant/Entity.h>
 
-#include <lfant/Console.hpp>
-#include <lfant/Camera.hpp>
+#include <lfant/Console.h>
+#include <lfant/Camera.h>
 
 namespace lfant
 {
@@ -68,7 +68,7 @@ void Scene::OnDestroy()
 
 void Scene::RemoveEntity(Entity* ent)
 {
-	entities.remove(unique_ptr<Entity>(ent));
+	entities.remove(ptr<Entity>(ent));
 }
 
 /*Entity* Scene::GetEntity( uint32_t idx )
@@ -82,7 +82,7 @@ Entity* Scene::GetEntity(string name, bool recursive)
 	{
 		if(ent->name == name)
 		{
-			return ent.get();
+			return ent;
 		}
 		if(recursive)
 		{
@@ -119,29 +119,30 @@ void Scene::Save(string file)
 	io.close();
 }
 
-Entity *Scene::Spawn(string name, Entity *parent, vec3 pos, vec3 rot, vec3 scale)
+Entity* Scene::Spawn(string name, Entity *parent)
 {
-	Entity* ent {new Entity};
+	Entity* ent = new Entity;
+	Log("Scene::Spawn: Allocated Entity pointer.");
 	ent->parent = parent;
-	ent->transform->owner = ent;
-	if(parent)
-	{
-		ent->transform->parent = parent->transform;
-	}
-	ent->transform->SetPosition(pos);
-	ent->transform->SetRotation(rot);
+	Log("Scene::Spawn: Set parent.");
 	ent->name = name;
+	Log("Scene::Spawn: Set name.");
 	ent->active = true;
+	Log("Scene::Spawn: Set active.");
+	Log("Scene::Spawn: About to Init, ", ent->name);
+
+	ent->Init();
+	Log("Scene::Spawn: Initialised, ", ent);
 	if(!parent)
 	{
-		entities.push_front(unique_ptr<Entity>(ent));
+		entities.push_front(ptr<Entity>(ent));
+		Log("Scene::Spawn: pushed in.");
 	}
 	else
 	{
 		parent->AddChild(ent);
 
 	}
-	ent->Init();
 	return ent;
 }
 

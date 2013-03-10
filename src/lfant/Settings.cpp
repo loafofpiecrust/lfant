@@ -1,7 +1,7 @@
 /******************************************************************************
  *
- *	ShadowFox Engine Source
- *	Copyright (C) 2012-2013 by ShadowFox Studios
+ *	LFANT Source
+ *	Copyright (C) 2012-2013 by LazyFox Studios
  *	Created: 2012-08-05 by Taylor Snead
  *
  *	Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,7 +18,7 @@
  *
  ******************************************************************************/
 
-#include <lfant/Settings.hpp>
+#include <lfant/Settings.h>
 
 // External
 #include <boost/filesystem.hpp>
@@ -27,16 +27,102 @@
 
 // Internal
 
-#include <lfant/Engine.hpp>
-#include <lfant/FileSystem.hpp>
-#include <lfant/String.hpp>
+#include <lfant/Game.h>
+#include <lfant/FileSystem.h>
+#include <lfant/String.h>
 
-#include <lfant/Console.hpp>
+#include <lfant/Console.h>
 
 using namespace boost::filesystem;
 
 namespace lfant
 {
+
+template<>
+Range<int> Settings::Var::Get< Range<int> >()
+{
+	vector<string> words = Split(value, " .", "");
+	if(words.size() == 1)
+	{
+		return Range<int>(lexical_cast<int>(words[0]), 0);
+	}
+	else if(words.size() >= 2)
+	{
+		return Range<int>(lexical_cast<int>(words[0]), lexical_cast<int>(words[1]));
+	}
+}
+
+template<>
+vec2 Settings::Var::Get<vec2>()
+{
+	vector<string> tokens = Split(value, " x.", "");
+	vec2 result(0);
+	if(tokens.size() > 0)
+	{
+		result.x = lexical_cast<float>(tokens[0]);
+		if(tokens.size() > 1)
+		{
+			result.y = lexical_cast<float>(tokens[1]);
+		}
+	}
+	return result;
+}
+
+template<>
+vec3 Settings::Var::Get<vec3>()
+{
+	vector<string> tokens = Split(value, " x.", "");
+	vec3 result(0);
+	if(tokens.size() > 0)
+	{
+		result.x = lexical_cast<float>(tokens[0]);
+		if(tokens.size() > 1)
+		{
+			result.y = lexical_cast<float>(tokens[1]);
+			if(tokens.size() > 2)
+			{
+				result.z = lexical_cast<float>(tokens[2]);
+			}
+		}
+	}
+	return result;
+}
+
+template<>
+ivec2 Settings::Var::Get<ivec2>()
+{
+	vector<string> tokens = Split(value, " x.", "");
+	ivec2 result(0);
+	if(tokens.size() > 0)
+	{
+		result.x = lexical_cast<int>(tokens[0]);
+		if(tokens.size() > 1)
+		{
+			result.y = lexical_cast<int>(tokens[1]);
+		}
+	}
+	return result;
+}
+
+template<>
+ivec3 Settings::Var::Get<ivec3>()
+{
+	vector<string> tokens = Split(value, " x.", "");
+	ivec3 result(0);
+	if(tokens.size() > 0)
+	{
+		result.x = lexical_cast<int>(tokens[0]);
+		if(tokens.size() > 1)
+		{
+			result.y = lexical_cast<int>(tokens[1]);
+			if(tokens.size() > 2)
+			{
+				result.z = lexical_cast<int>(tokens[2]);
+			}
+		}
+	}
+	return result;
+}
 
 Settings::Settings()
 {
@@ -76,6 +162,7 @@ void Settings::LoadSettings(string input)
 			string line = "";
 			vector<string> words;
 			vector<string> prefix;
+			string lastWord;
 			while(file.good())
 			{
 				if(!getline(file, line))
@@ -87,7 +174,7 @@ void Settings::LoadSettings(string input)
 					continue;
 				}
 				words = Split(line, " \t", "#=:;{}");
-				if(words[0] == "=" || words[0] == "#")
+				if(words[0] == "=" || words[0] == "#" || words[0] == ":" || words.size() < 1)
 				{
 					continue;
 				}
@@ -100,6 +187,7 @@ void Settings::LoadSettings(string input)
 				{
 					if(words[i] == "#")
 					{
+						lastWord = "";
 						break;
 					}
 					else if(words[i] == ";")
@@ -124,7 +212,7 @@ void Settings::LoadSettings(string input)
 
 						for(uint g = 0; g < prefix.size(); ++g)
 						{
-							name.append(prefix[g]);
+							name.append(prefix[g]+".");
 						}
 						name.append(words[i-1]);
 						to_lower(name);
@@ -144,10 +232,14 @@ void Settings::LoadSettings(string input)
 					{
 						if(i == 0 || words.size() < i+1)
 						{
+							if(lastWord != "")
+							{
+								prefix.push_back(lastWord);
+							}
 							continue;
 						}
 						// beginning namespace
-						prefix.push_back(words[i-1]+".");
+						prefix.push_back(words[i-1]);
 					}
 					else if(words[i] == "}")
 					{
@@ -155,6 +247,8 @@ void Settings::LoadSettings(string input)
 						prefix.pop_back();
 					}
 				}
+
+				lastWord = words[words.size()-1];
 			}
 			return;
 		}
@@ -163,37 +257,53 @@ void Settings::LoadSettings(string input)
 
 }
 
-Settings::Var Settings::GetValue(string name)
+void Settings::SetValue(string name, string value, string help)
 {
-	to_lower(name);
-	Var result("", "");
+	value = GetRef(name, value, "$()");
+
 	for(auto& var : variables)
 	{
 		if(var.name == name)
 		{
-			result = var;
+			var.Set(value);
+			var.help = help;
+			return;
 		}
 	}
-	if(result.value == "")
-	{
-		return result;
-	}
+	Log(name+"="+value);
+	variables.push_back(Var(name, value, help));
+}
 
-	vector<string> tokens = Split(result.value, "", "$[]");
-	string value = "";
+string Settings::GetHelp(string name)
+{
+	for(auto& var : variables)
+	{
+		if(var.name == name)
+		{
+			return var.help;
+		}
+	}
+}
+
+string Settings::GetRef(string name, string value, string ids)
+{
+	vector<string> tokens = Split(value, "", ids);
+	string f = "", s = "", t = "";
+	f.push_back(ids[0]);
+	s.push_back(ids[1]);
+	t.push_back(ids[2]);
+	value = "";
 	for(uint k = 0; k < tokens.size(); ++k)
 	{
-		if(tokens[k] == "$" && tokens.size() >= k+3)
+		if(tokens[k] == f && tokens.size() >= k+3)
 		{
-			if(tokens[k+1] == "[" && tokens[k+3] == "]")
+			if(tokens[k+1] == s && tokens[k+3] == t)
 			{
 				to_lower(tokens[k+2]);
-				Var var("", "");
-				var = GetValue(tokens[k+2]);
-				if(var.s() != "")
+				auto var = GetValue(tokens[k+2]);
+				if(var != "")
 				{
-					Log("Scoping complete: "+var.s());
-					value.append("$["+tokens[k+2]+"]");
+					value.append(f+s+tokens[k+2]+t);
 					k += 3;
 					continue;
 				}
@@ -201,7 +311,7 @@ Settings::Var Settings::GetValue(string name)
 				vector<string> scope = Split(name, ".", "");
 				int idx = scope.size()-1;
 
-				while(var.s() == "")
+				while(var == "")
 				{
 					for(uint i = 0; i < idx; ++i)
 					{
@@ -209,62 +319,8 @@ Settings::Var Settings::GetValue(string name)
 					}
 					temp.append(tokens[k+2]);
 					var = GetValue(temp);
-					Log("Trying to scope: "+temp+", result: "+var.s());
 				}
-				value.append(var.s());
-				k += 3;
-			}
-		}
-		else
-		{
-			value.append(tokens[k]);
-		}
-	}
-	result.value = value;
-
-	return result;
-}
-
-void Settings::SetValue(string name, string value)
-{
-	vector<string> tokens = Split(value, "", "$()");
-	value = "";
-	for(uint k = 0; k < tokens.size(); ++k)
-	{
-		if(tokens[k] == "$" && tokens.size() >= k+3)
-		{
-			if(tokens[k+1] == "(" && tokens[k+3] == ")")
-			{
-				to_lower(tokens[k+2]);
-				Var var("", "");
-				var = GetValue(tokens[k+2]);
-				if(var.s() != "")
-				{
-					Log("Scoping complete: "+var.s());
-					value.append(var.s());
-					k += 3;
-					continue;
-				}
-				string temp = "";
-				vector<string> scope = Split(name, ".", "");
-				int idx = 0;
-
-				while(var.s() == "")
-				{
-					for(uint i = 0; i < scope.size()-1; ++i)
-					{
-						temp.append(scope[i]+".");
-					}
-					temp.append(tokens[k+2]);
-					var = GetValue(temp);
-					Log("Trying to scope: "+temp+", result: "+var.s());
-					++idx;
-					if(idx >= 10)
-					{
-						var.Set(tokens[k+2]);
-					}
-				}
-				value.append(var.s());
+				value.append(var);
 				k += 3;
 			}
 			else
@@ -277,25 +333,14 @@ void Settings::SetValue(string name, string value)
 			value.append(tokens[k]);
 		}
 	}
-	Log("VALUE: "+value);
-
-	for(auto& var : variables)
-	{
-		if(var.name == name)
-		{
-			var.Set(value);
-			return;
-		}
-	}
-	Log(name+"="+value);
-	variables.push_back(Var(name, value));
+	return value;
 }
 
 void Settings::Init()
 {
 	// Registering Variables
-	//SetValue("gameName", "ShadowFox Engine");
-	//SetValue("orgName", "ShadowFox Studios");
+	//SetValue("gameName", "LFANT");
+	//SetValue("orgName", "LazyFox Studios");
 
 	LoadSettings();
 }

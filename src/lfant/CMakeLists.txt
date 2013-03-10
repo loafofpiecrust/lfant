@@ -4,23 +4,25 @@ project(lfant)
 set(VERSION_MAJOR 0)
 set(VERSION_MINOR 1)
 
-set(INCLUDE_DIR "${SFE}/include")
+set(INCLUDE_DIR "${SFE}/src")
 set(SOURCE_DIR ".")
 
 # Configured Header for Macro'd settings, like versioning
 configure_file(
-	"${PROJECT_SOURCE_DIR}/Config.hpp.in"
-	"${PROJECT_SOURCE_DIR}/Config.hpp"
+	"${PROJECT_SOURCE_DIR}/Config.h.in"
+	"${PROJECT_SOURCE_DIR}/Config.h"
 	)
 
 # Library Search Paths
 link_directories(
 	"${LIBRARY_OUTPUT_PATH}"
+	# System
+	"/usr/lib/x86_64-linux-gnu/mesa"
 	)
 
 # Source Info
 file(GLOB_RECURSE SRC_FILES "${SOURCE_DIR}/*.cpp")
-file(GLOB_RECURSE HEADER_FILES "${INCLUDE_DIR}/lfant/*.hpp")
+file(GLOB_RECURSE HEADER_FILES "${INCLUDE_DIR}/lfant/*.h")
 
 # Output Library Info
 add_library(${PROJECT_NAME} SHARED ${SRC_FILES} ${HEADER_FILES})
@@ -39,7 +41,9 @@ include_directories(
 	"${SFE}/src/external/raknet/Source"
 	"../external/glew/include"
 	"../external/glfw/include"
-	"../external/cegui/cegui/include"
+	"../external/rocket/Include"
+	"../external/angelscript/include"
+	"../external/angelscript/add_on"
 	)
 
 # Linker Options
@@ -48,10 +52,10 @@ target_link_libraries(${PROJECT_NAME}
 	glfw
 	boost
 	bullet
-	raknet
 	fmod
-	CEGUI
-	png
+	rocket
+	:libpng.a
 	z
-	squirrel
+	angelscript
+	yaml
 	)

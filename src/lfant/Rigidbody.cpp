@@ -1,7 +1,7 @@
 /******************************************************************************
  *
- *	ShadowFox Engine Source
- *	Copyright (C) 2012-2013 by ShadowFox Studios
+ *	LFANT Source
+ *	Copyright (C) 2012-2013 by LazyFox Studios
  *	Created: 2012-07-29 by Taylor Snead
  *
  *	Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,13 +24,13 @@
 #include <BulletDynamics/Dynamics/btRigidBody.h>
 
 // Internal
-#include <lfant/Collider.hpp>
-#include <lfant/Physics.hpp>
+#include <lfant/Collider.h>
+#include <lfant/Physics.h>
+#include <lfant/Transform.h>
+#include <lfant/Game.h>
+#include <lfant/Mesh.h>
 
-#include <lfant/Engine.hpp>
-#include <lfant/Mesh.hpp>
-
-#include <lfant/Rigidbody.hpp>
+#include <lfant/Rigidbody.h>
 
 namespace lfant
 {
@@ -57,8 +57,8 @@ void Rigidbody::Init()
 	game->physics->AddRigidbody(this);
 
 	Connect(SENDER(owner, SetMesh), RECEIVER(this, OnSetMesh));
-	Connect(SENDER(owner->transform, SetPosition), RECEIVER(this, OnSetPos));
-	Connect(SENDER(owner->transform, SetRotation), RECEIVER(this, OnSetRot));
+	Connect(SENDER(owner->GetComponent<Transform>(), SetPosition), RECEIVER(this, OnSetPos));
+	Connect(SENDER(owner->GetComponent<Transform>(), SetRotation), RECEIVER(this, OnSetRot));
 }
 
 void Rigidbody::Update()

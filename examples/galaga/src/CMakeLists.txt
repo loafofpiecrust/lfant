@@ -1,3 +1,3 @@
 # Subdirs
-add_subdirectory(game)
+add_subdirectory(galaga)
 add_subdirectory(launcher)

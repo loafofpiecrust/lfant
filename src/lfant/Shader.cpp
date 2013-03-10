@@ -1,28 +1,39 @@
 
-#include <lfant/Shader.hpp>
+#include <lfant/Shader.h>
 
 // External
 #include <GL/glew.h>
 
 // Internal
-
-#include <lfant/Console.hpp>
-#include <lfant/FileSystem.hpp>
+#include <lfant/Console.h>
+#include <lfant/FileSystem.h>
+#include <lfant/Game.h>
+#include <lfant/Renderer.h>
+#include <lfant/FileSystem.h>
 
 namespace lfant
 {
 
-void Shader::LoadFile(string path)
+void Shader::LoadFile(string file)
 {
-	string folder = game->fileSystem->gameFolder + "/assets/";
-	string vert = folder + path + ".vert";
-	string frag = folder + path + ".frag";
+	if(file == "")
+	{
+		file = path;
+	}
+	if(Shader* s = &game->renderer->GetShader(file))
+	{
+		*this = *s;
+		return;
+	}
+
+	string vert = game->fileSystem->GetGamePath(file+".vert").string();
+	string frag = game->fileSystem->GetGamePath(file+".frag").string();
 	FILE* vertFile = fopen(vert.c_str(), "rb");
 	FILE* fragFile = fopen(frag.c_str(), "rb");
 	Log("LoadShader: Files opened");
 	if (!vertFile || !fragFile)
 	{
-		Log("Shader::LoadFile: " + path + " could not be loaded");
+		Log("Shader::LoadFile: " + file + " could not be loaded");
 		return;
 	}
 
@@ -126,8 +137,15 @@ void Shader::LoadFile(string path)
 
 	glDeleteShader(VertexShaderID);
 	glDeleteShader(FragmentShaderID);
-	name = path;
+	path = file;
 	id = ProgramID;
+
+	game->renderer->AddShader(*this);
+}
+
+uint32_t Shader::GetUniform(string name)
+{
+	glGetUniformLocation(id, name.c_str());
 }
 
 }
