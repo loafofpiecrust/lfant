@@ -37,13 +37,6 @@ namespace lfant
  *	 @{
  */
 
-struct STimer
-{
-	string name;
-	double length;
-	boost::function<void()> callback;
-};
-
 typedef boost::chrono::high_resolution_clock hclock;
 
 /**
@@ -68,28 +61,23 @@ public:
 	 *	@param length The amount of time this timer should wait before finishing.
 	 *	@param callback The function to call when the timer ends. Should be set with boost::bind(&func, &inst);
 	 */
-	STimer& SetTimer(string name, const double length, boost::function<void()> callback);
+	void SetTimer(string name, float length);
 
-	STimer& GetTimer(string name);
+	float GetTimer(string name);
 
-	void CallTimer(STimer& timer);
 	void CallTimer(string name);
-	void CallTimer(int idx);
-
-	/// This function is called on a new thread to handle a timer efficiently.
-	void TimerThread(STimer& tmr);
 
 	// Properties
 
 	/// Deltatime in seconds
-	double deltaTime;
-	double deltaTimeFixed;
-	double frameRate;
-	double timeScale;
+	float deltaTime = 0.016666667f;
+	float deltaTimeFixed = 0.016666667f;
+	float frameRate = 60.0f;
+	float timeScale = 1.0f;
 	double lastFrame;
 
 private:
-	vector<STimer> timers;
+	map<string, float> timers;
 	hclock::time_point startTime;
 };
 

@@ -137,7 +137,7 @@ public:
 	bool active = true;
 
 	/// 9-digit scene-unique identifier.
-	boost::uuids::uuid id = boost::uuids::random_generator()();
+	const boost::uuids::uuid id = boost::uuids::random_generator()();
 
 	string name = "Entity";
 

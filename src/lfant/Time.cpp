@@ -60,6 +60,16 @@ void Time::UpdateTimes()
 	frameRate = 1 / deltaTimeFixed;
 }
 
+void Time::SetTimer(string name, float length)
+{
+	timers[name] = length;
+}
+
+float Time::GetTimer(string name)
+{
+	return timers[name];
+}
+
 void Time::Init()
 {
 	ResetTime();
@@ -69,6 +79,19 @@ void Time::Init()
 void Time::Update()
 {
 	UpdateTimes();
+
+	for(auto& t : timers)
+	{
+		if(t.second > 0.0f)
+		{
+			t.second -= deltaTime;
+		}
+		else
+		{
+			Trigger(t.first);
+			timers.erase(t.first);
+		}
+	}
 }
 
 }
