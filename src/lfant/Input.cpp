@@ -1,22 +1,22 @@
 /******************************************************************************
- *
- *	LFANT Source
- *	Copyright (C) 2012-2013 by LazyFox Studios
- *	Created: 2012-07-16 by Taylor Snead
- *
- *	Licensed under the Apache License, Version 2.0 (the "License");
- *	you may not use this file except in compliance with the License.
- *	You may obtain a copy of the License at
- *
- *	http://www.apache.org/licenses/LICENSE-2.0
- *
- *	Unless required by applicable law or agreed to in writing, software
- *	distributed under the License is distributed on an "AS IS" BASIS,
- *	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *	See the License for the specific language governing permissions and
- *	limitations under the License.
- *
- ******************************************************************************/
+*
+*	LFANT Source
+*	Copyright (C) 2012-2013 by LazyFox Studios
+*	Created: 2012-07-16 by Taylor Snead
+*
+*	Licensed under the Apache License, Version 2.0 (the "License");
+*	you may not use this file except in compliance with the License.
+*	You may obtain a copy of the License at
+*
+*	http://www.apache.org/licenses/LICENSE-2.0
+*
+*	Unless required by applicable law or agreed to in writing, software
+*	distributed under the License is distributed on an "AS IS" BASIS,
+*	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+*	See the License for the specific language governing permissions and
+*	limitations under the License.
+*
+******************************************************************************/
 
 #include <lfant/Input.h>
 
@@ -58,7 +58,7 @@ void Input::Init()
 
 void Input::Update()
 {
-	for(auto & axis : axes)
+	for(auto& axis : axes)
 	{
 		if(axis.down || axis.up)
 		{
@@ -107,15 +107,15 @@ void Input::Update()
 }
 
 /*******************************************************************************
- *		Callback Functions
- *			KeyPress();
- *		\area Callback
- *******************************************************************************/
+*		Callback Functions
+*			KeyPress();
+*		\area Callback
+*******************************************************************************/
 
 void GLFWCALL Input::OnKeyPress(int key, int mode)
 {
 	game->input->Trigger("KeyPress", (uint16_t)key, mode);
-	for(auto & axis : game->input->axes)
+	for(auto& axis : game->input->axes)
 	{
 		if(key == axis.positive || key == axis.altPositive)
 		{
@@ -210,28 +210,28 @@ void GLFWCALL Input::OnCharPress(int key, int mode)
 }
 
 /*******************************************************************************
- *
- *		Return functions
- *
- *******************************************************************************/
+*
+*		Return functions
+*
+*******************************************************************************/
 
 void Input::AddAxis(string name, Key positive, Key negative, Key altpos, Key altneg, float sens, float dead, bool snap,
-					byte joyNum)
+                    byte joyNum)
 {
 	axes.push_back(
-		Axis(name, (uint16_t)positive, (uint16_t)negative, (uint16_t)altpos, (uint16_t)altneg, sens, dead, snap, joyNum));
+	    Axis(name, (uint16_t)positive, (uint16_t)negative, (uint16_t)altpos, (uint16_t)altneg, sens, dead, snap, joyNum));
 }
 
 float Input::GetAxis(string name)
 {
-	for(auto & axis : axes)
+	for(auto& axis : axes)
 	{
 		if(axis.name == name)
 		{
 			/*if (abs(axis.value) <= axis.dead)
-			 {
-			 return 0.0f;
-			 }*/
+			   {
+			   return 0.0f;
+			   }*/
 			return axis.value;
 		}
 	}
@@ -265,7 +265,7 @@ bool Input::GetButton(string name, bool positive)
 
 bool Input::GetButtonDown(string name, bool positive)
 {
-	for(auto & axis : axes)
+	for(auto& axis : axes)
 	{
 		if(axis.name == name)
 		{
@@ -301,10 +301,10 @@ bool Input::GetButtonUp(string name, bool positive)
 }
 
 /*******************************************************************************
- *
- *		Mouse Functions
- *
- *******************************************************************************/
+*
+*		Mouse Functions
+*
+*******************************************************************************/
 
 ivec2 Input::GetMousePos()
 {

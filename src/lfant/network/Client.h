@@ -29,7 +29,7 @@ public:
 	void GetData(uint size);
 
 	// Asio Callbacks
-	void OnConnect(const boost::system::error_code &error);
+	void OnConnect(const boost::system::error_code& error);
 	void OnGetData(const boost::system::error_code& error);
 
 	boost::asio::ip::tcp::socket socket {io};

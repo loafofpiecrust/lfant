@@ -1,22 +1,22 @@
 /******************************************************************************
- *
- *	LFANT Source
- *	Copyright (C) 2012-2013 by LazyFox Studios
- *	Created: 2012-08-08 by Taylor Snead
- *
- *	Licensed under the Apache License, Version 2.0 (the "License");
- *	you may not use this file except in compliance with the License.
- *	You may obtain a copy of the License at
- *
- *	http://www.apache.org/licenses/LICENSE-2.0
- *
- *	Unless required by applicable law or agreed to in writing, software
- *	distributed under the License is distributed on an "AS IS" BASIS,
- *	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *	See the License for the specific language governing permissions and
- *	limitations under the License.
- *
- ******************************************************************************/
+*
+*	LFANT Source
+*	Copyright (C) 2012-2013 by LazyFox Studios
+*	Created: 2012-08-08 by Taylor Snead
+*
+*	Licensed under the Apache License, Version 2.0 (the "License");
+*	you may not use this file except in compliance with the License.
+*	You may obtain a copy of the License at
+*
+*	http://www.apache.org/licenses/LICENSE-2.0
+*
+*	Unless required by applicable law or agreed to in writing, software
+*	distributed under the License is distributed on an "AS IS" BASIS,
+*	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+*	See the License for the specific language governing permissions and
+*	limitations under the License.
+*
+******************************************************************************/
 
 #include <lfant/FileSystem.h>
 
@@ -54,11 +54,11 @@ void FileSystem::Init()
 	{
 		// Use default settings
 		gameFolder = "../..";
-#	if WINDOWS
+#		if WINDOWS
 		const string home = getenv("USERPROFILE");
-#	elif UNIX
+#		elif UNIX
 		const string home = getenv("HOME");
-#	endif
+#		endif
 		userFolder = home + "/Documents/My Games/" + game->settings->GetValue("general.orgname") + "/" + game->settings->GetValue("general.gamename");
 		game->settings->LoadSettings();
 
@@ -74,11 +74,11 @@ string FileSystem::ConvertPath(string curr)
 		if(chr == '\\' || chr == ':' || chr == '/')
 		{
 			// Convert all grouping chars to forward slashes for directory management.
-#		if UNIX
+#				if UNIX
 			chr = '/';
-#		elif WINDOWS
+#				elif WINDOWS
 			chr = '\\';
-#		endif
+#				endif
 		}
 	}
 	return curr;
@@ -86,26 +86,36 @@ string FileSystem::ConvertPath(string curr)
 
 path FileSystem::GetGamePath(string name)
 {
-	path result(gameFolder + "/assets/" + name);
-
+	path result(ConvertPath(name));
 	if(exists(result))
 	{
 		return result;
 	}
-	Log("FileSystem::GetGameFile: File not found \'"+result.string()+"\'.");
+
+	result = path(ConvertPath(gameFolder + "/assets/" + name));
+	if(exists(result))
+	{
+		return result;
+	}
+	Log("FileSystem::GetGamePath: File not found \'"+result.string()+"\'.");
 //	game->Exit();
 	return "";
 }
 
 path FileSystem::GetUserPath(string name)
 {
-	path result(ConvertPath(userFolder + "/" + name));
-
+	path result(ConvertPath(name));
 	if(exists(result))
 	{
 		return result;
 	}
-	Log("FileSystem::GetGameFile: File not found \'"+result.string()+"\'.");
+
+	result = path(ConvertPath(userFolder + "/" + name));
+	if(exists(result))
+	{
+		return result;
+	}
+	Log("FileSystem::GetUserPath: File not found \'"+result.string()+"\'.");
 	return "";
 }
 

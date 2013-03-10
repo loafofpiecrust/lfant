@@ -1,22 +1,22 @@
 /******************************************************************************
- *
- *	LFANT Source
- *	Copyright (C) 2012-2013 by LazyFox Studios
- *	Created: 2012-07-17 by Taylor Snead
- *
- *	Licensed under the Apache License, Version 2.0 (the "License");
- *	you may not use this file except in compliance with the License.
- *	You may obtain a copy of the License at
- *
- *	http://www.apache.org/licenses/LICENSE-2.0
- *
- *	Unless required by applicable law or agreed to in writing, software
- *	distributed under the License is distributed on an "AS IS" BASIS,
- *	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *	See the License for the specific language governing permissions and
- *	limitations under the License.
- *
- ******************************************************************************/
+*
+*	LFANT Source
+*	Copyright (C) 2012-2013 by LazyFox Studios
+*	Created: 2012-07-17 by Taylor Snead
+*
+*	Licensed under the Apache License, Version 2.0 (the "License");
+*	you may not use this file except in compliance with the License.
+*	You may obtain a copy of the License at
+*
+*	http://www.apache.org/licenses/LICENSE-2.0
+*
+*	Unless required by applicable law or agreed to in writing, software
+*	distributed under the License is distributed on an "AS IS" BASIS,
+*	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+*	See the License for the specific language governing permissions and
+*	limitations under the License.
+*
+******************************************************************************/
 
 #include <lfant/Renderer.h>
 
@@ -67,10 +67,10 @@ Renderer::~Renderer()
 }
 
 /*******************************************************************************
- *
- *		Game Loop
- *
- *******************************************************************************/
+*
+*		Game Loop
+*
+*******************************************************************************/
 
 void Renderer::Init()
 {
@@ -127,13 +127,13 @@ void Renderer::Init()
 
 	// Load all shaders
 	/*
-	auto shs = game->fileSystem->GetGameFiles("shaders", "vert");
-	for(uint i = 0; i < shs.size(); ++i)
-	{
-		Shader shader;
-		shader.LoadFile(shs[i].string());
-		shaders.push_back(shader);
-	}*/
+	   auto shs = game->fileSystem->GetGameFiles("shaders", "vert");
+	   for(uint i = 0; i < shs.size(); ++i)
+	   {
+	        Shader shader;
+	        shader.LoadFile(shs[i].string());
+	        shaders.push_back(shader);
+	   }*/
 }
 
 void Renderer::Update()
@@ -143,10 +143,10 @@ void Renderer::Update()
 }
 
 /*******************************************************************************
- *
- *		Windowing
- *
- *******************************************************************************/
+*
+*		Windowing
+*
+*******************************************************************************/
 
 bool Renderer::OpenWindow()
 {
@@ -168,7 +168,7 @@ bool Renderer::OpenWindow()
 	Log("Renderer::OpenWindow: Window mode determined.");
 
 	ivec2 res = GetResolution();
-	if( !glfwOpenWindow( res.x, res.y, 0,0,0,0,32,0, mode ) )
+	if( !glfwOpenWindow( res.x, res.y, 0, 0, 0, 0, 32, 0, mode ) )
 	{
 		Log( "Renderer::OpenWindow: Failed to open GLFW window." );
 		glfwTerminate();
@@ -176,7 +176,7 @@ bool Renderer::OpenWindow()
 	}
 	Log("Renderer::OpenWindow: Window opened.");
 
-	glewExperimental = true; // Needed for core profile
+	glewExperimental = true;     // Needed for core profile
 	if (glewInit() != GLEW_OK)
 	{
 		Log("Renderer::OpenWindow: Failed to initialize GLEW.");
@@ -201,16 +201,16 @@ int Renderer::WindowClosed()
 void Renderer::WindowResized(int x, int y)
 {
 	Log("Renderer::WindowResized: Touch.");
-	game->renderer->resolution = ivec2(x,y);
+	game->renderer->resolution = ivec2(x, y);
 	glViewport(0, 0, x, y);
 	game->userInterface->OnWindowResize((uint)x, (uint)y);
 }
 
 /*******************************************************************************
- *
- *		Gets/Sets/Shaders
- *
- *******************************************************************************/
+*
+*		Gets/Sets/Shaders
+*
+*******************************************************************************/
 
 ivec2 Renderer::GetResolution()
 {

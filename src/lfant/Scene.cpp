@@ -1,22 +1,22 @@
 /******************************************************************************
- *
- * LFANT Source
- * Copyright (C) 2012-2013 by LazyFox Studios
- * Created: 2012-09-02 by Taylor Snead
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *	http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- ******************************************************************************/
+*
+* LFANT Source
+* Copyright (C) 2012-2013 by LazyFox Studios
+* Created: 2012-09-02 by Taylor Snead
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*	http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*
+******************************************************************************/
 #include <lfant/Scene.h>
 
 // External
@@ -72,9 +72,9 @@ void Scene::RemoveEntity(Entity* ent)
 }
 
 /*Entity* Scene::GetEntity( uint32_t idx )
- {
- return entities[idx];
- }*/
+   {
+   return entities[idx];
+   }*/
 
 Entity* Scene::GetEntity(string name, bool recursive)
 {
@@ -108,7 +108,7 @@ void Scene::Save(string file)
 	for(auto& ent : entities)
 	{
 		io << "\t<Entity name=\"" << ent->name << "\">\n";
-		vector<pair<string, string>> vars ;//= ent->Serialize();
+		vector<pair<string, string> > vars;        //= ent->Serialize();
 		for(auto& str : vars)
 		{
 			io << "\t\t<Var name=\"" << str.first << "\" value=\"" << str.second << "\"/>\n";
@@ -119,7 +119,7 @@ void Scene::Save(string file)
 	io.close();
 }
 
-Entity* Scene::Spawn(string name, Entity *parent)
+Entity* Scene::Spawn(string name, Entity* parent)
 {
 	Entity* ent = new Entity;
 	Log("Scene::Spawn: Allocated Entity pointer.");

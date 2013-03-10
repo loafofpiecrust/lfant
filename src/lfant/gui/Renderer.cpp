@@ -20,7 +20,7 @@ Renderer::~Renderer()
 {
 }
 
-void Renderer::RenderGeometry(Rocket::Core::Vertex *vertices, int num_vertices, int *indices, int num_indices, Rocket::Core::TextureHandle texture, const Rocket::Core::Vector2f &translation)
+void Renderer::RenderGeometry(Rocket::Core::Vertex* vertices, int num_vertices, int* indices, int num_indices, Rocket::Core::TextureHandle texture, const Rocket::Core::Vector2f& translation)
 {
 	glPushMatrix();
 	glTranslatef(translation.x, translation.y, 0);
@@ -66,18 +66,18 @@ void Renderer::SetScissorRegion(int x, int y, int width, int height)
 #pragma pack(1)
 struct TGAHeader
 {
-	char  idLength;
-	char  colourMapType;
-	char  dataType;
+	char idLength;
+	char colourMapType;
+	char dataType;
 	short int colourMapOrigin;
 	short int colourMapLength;
-	char  colourMapDepth;
+	char colourMapDepth;
 	short int xOrigin;
 	short int yOrigin;
 	short int width;
 	short int height;
-	char  bitsPerPixel;
-	char  imageDescriptor;
+	char bitsPerPixel;
+	char imageDescriptor;
 };
 // Restore packing
 #pragma pack()
@@ -104,7 +104,7 @@ bool Renderer::LoadTexture(Rocket::Core::TextureHandle& texture_handle, Rocket::
 	memcpy(&header, buffer, sizeof(TGAHeader));
 
 	int color_mode = header.bitsPerPixel / 8;
-	int image_size = header.width * header.height * 4; // We always make 32bit textures
+	int image_size = header.width * header.height * 4;     // We always make 32bit textures
 
 	if (header.dataType != 2)
 	{

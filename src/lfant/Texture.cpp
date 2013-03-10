@@ -1,22 +1,22 @@
 /******************************************************************************
- *
- *	LFANT Source
- *	Copyright (C) 2012-2013 by LazyFox Studios
- *	Created: 2013-01-15 by Taylor Snead
- *
- *	Licensed under the Apache License, Version 2.0 (the "License");
- *	you may not use this file except in compliance with the License.
- *	You may obtain a copy of the License at
- *
- *	http://www.apache.org/licenses/LICENSE-2.0
- *
- *	Unless required by applicable law or agreed to in writing, software
- *	distributed under the License is distributed on an "AS IS" BASIS,
- *	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *	See the License for the specific language governing permissions and
- *	limitations under the License.
- *
- ******************************************************************************/
+*
+*	LFANT Source
+*	Copyright (C) 2012-2013 by LazyFox Studios
+*	Created: 2013-01-15 by Taylor Snead
+*
+*	Licensed under the Apache License, Version 2.0 (the "License");
+*	you may not use this file except in compliance with the License.
+*	You may obtain a copy of the License at
+*
+*	http://www.apache.org/licenses/LICENSE-2.0
+*
+*	Unless required by applicable law or agreed to in writing, software
+*	distributed under the License is distributed on an "AS IS" BASIS,
+*	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+*	See the License for the specific language governing permissions and
+*	limitations under the License.
+*
+******************************************************************************/
 #include <lfant/Texture.h>
 
 // External
@@ -172,7 +172,7 @@ void Texture::LoadDDS(int mode)
 {
 	unsigned char header[124];
 
-	FILE *fp;
+	FILE* fp;
 
 	/* try to open the file */
 	fp = fopen(name.c_str(), "rb");
@@ -191,13 +191,13 @@ void Texture::LoadDDS(int mode)
 	fread(&header, 124, 1, fp);
 
 	height      = *(unsigned int*)&(header[8 ]);
-	width	     = *(unsigned int*)&(header[12]);
-	unsigned int linearSize	 = *(unsigned int*)&(header[16]);
+	width        = *(unsigned int*)&(header[12]);
+	unsigned int linearSize  = *(unsigned int*)&(header[16]);
 	unsigned int mipMapCount = *(unsigned int*)&(header[24]);
 	unsigned int fourCC      = *(unsigned int*)&(header[80]);
 
 
-	unsigned char * buffer;
+	unsigned char* buffer;
 	unsigned int bufsize;
 	/* how big is it going to be including all mipmaps? */
 	bufsize = mipMapCount > 1 ? linearSize * 2 : linearSize;
@@ -230,7 +230,7 @@ void Texture::LoadDDS(int mode)
 
 	// "Bind" the newly created texture : all future texture functions will modify this texture
 	glBindTexture(mode, textureID);
-	glPixelStorei(GL_UNPACK_ALIGNMENT,1);
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
 	unsigned int blockSize = (format == GL_COMPRESSED_RGBA_S3TC_DXT1_EXT) ? 8 : 16;
 	unsigned int offset = 0;
@@ -240,7 +240,7 @@ void Texture::LoadDDS(int mode)
 	{
 		unsigned int size = ((width+3)/4)*((height+3)/4)*blockSize;
 		glCompressedTexImage2D(mode, level, format, width, height,
-			0, size, buffer + offset);
+		                       0, size, buffer + offset);
 
 		offset += size;
 		width  /= 2;

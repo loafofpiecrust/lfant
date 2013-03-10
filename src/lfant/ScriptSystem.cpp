@@ -5,11 +5,14 @@
 #include <lfant/Console.h>
 #include <lfant/String.h>
 #include <lfant/FileSystem.h>
+#include <lfant/Time.h>
+#include <lfant/Random.h>
 
 // External
 #include <angelscript.h>
 #include <scriptstdstring/scriptstdstring.h>
 #include <scriptbuilder/scriptbuilder.h>
+#include <boost/chrono.hpp>
 
 namespace lfant
 {
@@ -40,6 +43,18 @@ void Script::Compile()
 	}
 }
 
+void TestFunc()
+{
+	int i = Random(0, 999);
+	int k = Random(9999, 99999999);
+	i += k;
+	k -= i;
+	i -= k;
+	k *= i;
+	Log("\t\ti = ", i);
+//	Log("k = ", k);
+}
+
 
 int myint = 2;
 
@@ -47,10 +62,13 @@ void ScriptSystem::Init()
 {
 	Log("ScriptSystem::Init: Touch.");
 	scriptEngine = asCreateScriptEngine(ANGELSCRIPT_VERSION);
+//	scriptEngine->SetDefaultNamespace("lfant");
 
 	RegisterStdString(scriptEngine);
 
-	RegisterFunction("void Log(string msg)", Log<string>);
+	RegisterFunction("Log", Log<string>);
+	RegisterFunction("Log", Log<string, int32_t>);
+	RegisterFunction("TestFunc", TestFunc);
 
 	RegisterVariable("myint", &myint);
 
@@ -58,8 +76,24 @@ void ScriptSystem::Init()
 	test.LoadFile("scripts/test.as");
 	test.Compile();
 
-	CallFunction("test", "void main()");
+	hclock::duration length;
+	hclock::time_point start;
 
+	for(uint i = 0; i < 10; ++i)
+	{
+		start = hclock::now();
+		//test.CallFunction("void main()");
+		CallFunction("test", "void main()");
+		length = hclock::now() - start;
+		Log("\tLength of func from global ", i, ": ", length, ".");
+	}
+
+	start = hclock::now();
+	TestFunc();
+	TestFunc();
+	TestFunc();
+	length = hclock::now() - start;
+	Log("Length of C++ func: ", length, ".");
 }
 
 void ScriptSystem::OnDestroy()
@@ -69,8 +103,7 @@ void ScriptSystem::OnDestroy()
 
 void ScriptSystem::CallFunction(string module, string call)
 {
-	asIScriptModule* mod = scriptEngine->GetModule(module.c_str());
-	asIScriptFunction* func = mod->GetFunctionByDecl(call.c_str());
+	asIScriptFunction* func = scriptEngine->GetModule(module.c_str())->GetFunctionByDecl(call.c_str());
 	if(!func)
 	{
 		Log("ScriptSystem::CallFunction: Function \'"+call+"\' not found.");
@@ -93,9 +126,20 @@ void ScriptSystem::CallFunction(string module, string call)
 template<typename T>
 void ScriptSystem::RegisterFunction(string decl, T* func)
 {
-	//string type = DemangleType(typeid(func).name());
-	//name = Replace(type, "(*)", name);
-	Log("ScriptSystem::RegisterFunction: Func name: "+decl);
+	size_t start_pos = decl.find("(");
+	if(start_pos == string::npos)
+	{
+		string type = DemangleType(typeid(func).name());
+		decl = Replace(type, "(*)", decl);
+		decl = ReplaceAll(decl, ",", " a,");
+		decl = ReplaceAll(decl, "std::", "");
+		size_t start_pos = decl.find("()");
+		if(start_pos == string::npos)
+		{
+			decl = Replace(decl, ")", " a)");
+		}
+	}
+	Log("ScriptSystem::RegisterFunction: Func name: \'"+decl+"\'.");
 	scriptEngine->RegisterGlobalFunction(decl.c_str(), asFUNCTION(func), asCALL_CDECL);
 }
 
@@ -122,7 +166,7 @@ void Script::Class::Create(string type, bool ref, int size)
 }
 
 template<typename T, typename R>
-void Script::Class::Method(string decl, R (T::*func))
+void Script::Class::Method(string decl, R (T::* func))
 {
 	game->scriptSystem->scriptEngine->RegisterObjectMethod(type.c_str(), decl.c_str(), asSMethodPtr<sizeof(R (T::*))>::Convert((R (T::*))(func)), asCALL_THISCALL);
 }

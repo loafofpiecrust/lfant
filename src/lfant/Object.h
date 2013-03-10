@@ -1,22 +1,22 @@
 /******************************************************************************
- *
- *	LFANT Source
- *	Copyright (C) 2012-2013 by LazyFox Studios
- *	Created: 2012-10-28 by Taylor Snead
- *
- *	Licensed under the Apache License, Version 2.0 (the "License");
- *	you may not use this file except in compliance with the License.
- *	You may obtain a copy of the License at
- *
- *		http://www.apache.org/licenses/LICENSE-2.0
- *
- *	Unless required by applicable law or agreed to in writing, software
- *	distributed under the License is distributed on an "AS IS" BASIS,
- *	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *	See the License for the specific language governing permissions and
- *	limitations under the License.
- *
- ******************************************************************************/
+*
+*	LFANT Source
+*	Copyright (C) 2012-2013 by LazyFox Studios
+*	Created: 2012-10-28 by Taylor Snead
+*
+*	Licensed under the Apache License, Version 2.0 (the "License");
+*	you may not use this file except in compliance with the License.
+*	You may obtain a copy of the License at
+*
+*		http://www.apache.org/licenses/LICENSE-2.0
+*
+*	Unless required by applicable law or agreed to in writing, software
+*	distributed under the License is distributed on an "AS IS" BASIS,
+*	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+*	See the License for the specific language governing permissions and
+*	limitations under the License.
+*
+******************************************************************************/
 #pragma once
 
 #include <lfant/stdafx.h>
@@ -32,8 +32,8 @@
 #include <lfant/TypeInfo.h>
 #include <lfant/Property.h>
 
-#define SENDER(obj, sig) obj, #sig
-#define RECEIVER(obj, slot) obj, &remove_ref<decltype(*obj)>::type::slot
+#define SENDER(obj, sig) obj, # sig
+#define RECEIVER(obj, slot) obj, &remove_ref<decltype(* obj)>::type::slot
 
 namespace lfant
 {
@@ -58,7 +58,7 @@ class Object
 {
 	class Event
 	{
-	public:
+public:
 		string name;
 
 		Event()
@@ -77,8 +77,8 @@ class Object
 
 	class Event0 : public Event
 	{
-	public:
-		typedef boost::signals2::signal<void()> sigType;
+public:
+		typedef boost::signals2::signal<void ()> sigType;
 		sigType sig;
 
 		Event0(string name, boost::function<void()> func) :
@@ -88,14 +88,14 @@ class Object
 		}
 	};
 
-	template<typename P1, typename... P>
+	template<typename P1, typename ... P>
 	class EventP : public Event
 	{
-	public:
-		typedef boost::signals2::signal<void(P1, P...)> sigType;
+public:
+		typedef boost::signals2::signal<void (P1, P ...)> sigType;
 		sigType sig;
 
-		EventP(string name, boost::function<void(P1, P...)> func) :
+		EventP(string name, boost::function<void(P1, P ...)> func) :
 			Event(name)
 		{
 			sig.connect(func);
@@ -104,7 +104,7 @@ class Object
 public:
 
 	template<typename R>
-	void Connect(Object* sender, string name, R* receiver, void (R::*func)())
+	void Connect(Object* sender, string name, R* receiver, void (R::* func)())
 	{
 		erase_all(name, " ");
 		name = Type(sender) + "::" + name + "()";
@@ -127,7 +127,7 @@ public:
 	}
 
 	template<typename R, typename P1>
-	void Connect(Object* sender, string name, R* receiver, void (R::*func)(P1))
+	void Connect(Object* sender, string name, R* receiver, void (R::* func)(P1))
 	{
 		erase_all(name, " ");
 		name = Type(sender) + "::" + name + "(" + Type<P1>() + ")";
@@ -150,7 +150,7 @@ public:
 	}
 
 	template<typename R, typename P1, typename P2>
-	void Connect(Object* sender, string name, R* receiver, void (R::*func)(P1, P2))
+	void Connect(Object* sender, string name, R* receiver, void (R::* func)(P1, P2))
 	{
 		erase_all(name, " ");
 		name = Type(sender) + "::" + name + "(" + Type<P1, P2>() + ")";
@@ -173,7 +173,7 @@ public:
 	}
 
 	template<typename R, typename P1, typename P2, typename P3>
-	void Connect(Object* sender, string name, R* receiver, void (R::*func)(P1, P2, P3))
+	void Connect(Object* sender, string name, R* receiver, void (R::* func)(P1, P2, P3))
 	{
 		erase_all(name, " ");
 		name = Type(sender) + "::" + name + "(" + Type<P1, P2, P3>() + ")";
@@ -217,15 +217,15 @@ public:
 	void Trigger(string name, P1 arg, P ... args)
 	{
 		erase_all(name, " ");
-		name = Type(this) + "::" + name + "(" + Type<P1, P...>() + ")";
+		name = Type(this) + "::" + name + "(" + Type<P1, P ...>() + ")";
 		for(auto& event : events)
 		{
 			if(event->name == name)
 			{
-				auto con = dynamic_cast<EventP<P1, P...>*>(event);
+				auto con = dynamic_cast<EventP<P1, P ...>*>(event);
 				if(con)
 				{
-					con->sig(arg, args...);
+					con->sig(arg, args ...);
 				}
 			}
 		}

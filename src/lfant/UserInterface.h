@@ -1,22 +1,22 @@
 /******************************************************************************
- *
- *	LFANT Source
- *	Copyright (C) 2012-2013 by LazyFox Studios
- *	Created: 2013-02-13 by Taylor Snead
- *
- *	Licensed under the Apache License, Version 2.0 (the "License");
- *	you may not use this file except in compliance with the License.
- *	You may obtain a copy of the License at
- *
- *	http://www.apache.org/licenses/LICENSE-2.0
- *
- *	Unless required by applicable law or agreed to in writing, software
- *	distributed under the License is distributed on an "AS IS" BASIS,
- *	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *	See the License for the specific language governing permissions and
- *	limitations under the License.
- *
- ******************************************************************************/
+*
+*	LFANT Source
+*	Copyright (C) 2012-2013 by LazyFox Studios
+*	Created: 2013-02-13 by Taylor Snead
+*
+*	Licensed under the Apache License, Version 2.0 (the "License");
+*	you may not use this file except in compliance with the License.
+*	You may obtain a copy of the License at
+*
+*	http://www.apache.org/licenses/LICENSE-2.0
+*
+*	Unless required by applicable law or agreed to in writing, software
+*	distributed under the License is distributed on an "AS IS" BASIS,
+*	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+*	See the License for the specific language governing permissions and
+*	limitations under the License.
+*
+******************************************************************************/
 #pragma once
 
 // External
@@ -27,28 +27,28 @@
 #include <lfant/Subsystem.h>
 
 /*
-namespace CEGUI
-{
-class OpenGL3Renderer;
-class Window;
-class WindowManager;
-class System;
-class GUIContext;
-}
-*/
+   namespace CEGUI
+   {
+   class OpenGL3Renderer;
+   class Window;
+   class WindowManager;
+   class System;
+   class GUIContext;
+   }
+ */
 
 /*
-namespace Rocket
-{
-namespace Core
-{
+   namespace Rocket
+   {
+   namespace Core
+   {
 
-class Context;
-class ElementDocument;
+   class Context;
+   class ElementDocument;
 
-}
-}
-*/
+   }
+   }
+ */
 
 namespace lfant
 {
@@ -81,21 +81,21 @@ public:
 
 protected:
 	/*
-	CEGUI::OpenGL3Renderer* renderer;
-	CEGUI::Window* rootWindow;
-	CEGUI::WindowManager* windowManager;
-	vector<CEGUI::Window*> windows;
-	CEGUI::System* system;
-	CEGUI::GUIContext* context;
-	*/
+	   CEGUI::OpenGL3Renderer* renderer;
+	   CEGUI::Window* rootWindow;
+	   CEGUI::WindowManager* windowManager;
+	   vector<CEGUI::Window*> windows;
+	   CEGUI::System* system;
+	   CEGUI::GUIContext* context;
+	 */
 
 	/*
-	ptr<Rocket::Core::Context> context;
-	ptr<gui::Renderer> renderer;
-	ptr<gui::System> system;
-	ptr<gui::FileSystem> fileSystem;
-	forward_list< ptr<Rocket::Core::ElementDocument> > documents;
-	*/
+	   ptr<Rocket::Core::Context> context;
+	   ptr<gui::Renderer> renderer;
+	   ptr<gui::System> system;
+	   ptr<gui::FileSystem> fileSystem;
+	   forward_list< ptr<Rocket::Core::ElementDocument> > documents;
+	 */
 
 	bool resized = false;
 	uvec2 size;

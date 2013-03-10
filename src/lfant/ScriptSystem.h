@@ -16,8 +16,9 @@ public:
 
 	class Class
 	{
-	public:
-		Class() {}
+public:
+		Class() {
+		}
 
 		template<typename T>
 		void Create(string type, bool ref)
@@ -26,13 +27,13 @@ public:
 		}
 
 		template<typename T, typename R>
-		void Method(string decl, R (T::*func));
+		void Method(string decl, R (T::* func));
 
 		void Variable();
 		void Operator();
 
 
-	private:
+private:
 		void Create(string type, bool ref, int size);
 
 		string type;

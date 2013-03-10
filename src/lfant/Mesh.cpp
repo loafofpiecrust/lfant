@@ -1,22 +1,22 @@
 /******************************************************************************
- *
- *	LFANT Source
- *	Copyright (C) 2012-2013 by LazyFox Studios
- *	Created: 2012-07-19 by Taylor Snead
- *
- *	Licensed under the Apache License, Version 2.0 (the "License");
- *	you may not use this file except in compliance with the License.
- *	You may obtain a copy of the License at
- *
- *		http://www.apache.org/licenses/LICENSE-2.0
- *
- *	Unless required by applicable law or agreed to in writing, software
- *	distributed under the License is distributed on an "AS IS" BASIS,
- *	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *	See the License for the specific language governing permissions and
- *	limitations under the License.
- *
- ******************************************************************************/
+*
+*	LFANT Source
+*	Copyright (C) 2012-2013 by LazyFox Studios
+*	Created: 2012-07-19 by Taylor Snead
+*
+*	Licensed under the Apache License, Version 2.0 (the "License");
+*	you may not use this file except in compliance with the License.
+*	You may obtain a copy of the License at
+*
+*		http://www.apache.org/licenses/LICENSE-2.0
+*
+*	Unless required by applicable law or agreed to in writing, software
+*	distributed under the License is distributed on an "AS IS" BASIS,
+*	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+*	See the License for the specific language governing permissions and
+*	limitations under the License.
+*
+******************************************************************************/
 
 #include <lfant/Mesh.h>
 
@@ -199,20 +199,20 @@ void Mesh::LoadOBJ(string path)
 	std::vector<glm::vec3> temp_normals;
 
 
-	FILE * file = fopen(path.c_str(), "r");
+	FILE* file = fopen(path.c_str(), "r");
 	if( file == NULL )
 	{
 		Log("Impossible to open the file! Are you in the right path?");
 		return;
 	}
 
-	while( 1 ){
+	while( 1 ) {
 
 		char lineHeader[128];
 		// read the first word of the line
 		int res = fscanf(file, "%s", lineHeader);
 		if (res == EOF)
-			break; // EOF = End Of File. Quit the loop.
+			break;             // EOF = End Of File. Quit the loop.
 
 		// else : parse lineHeader
 
@@ -226,7 +226,7 @@ void Mesh::LoadOBJ(string path)
 		{
 			glm::vec2 uv;
 			fscanf(file, "%f %f\n", &uv.x, &uv.y );
-			uv.y = -uv.y; // Invert V coordinate since we will only use DDS texture, which are inverted. Remove if you want to use TGA or BMP loaders.
+			uv.y = -uv.y;             // Invert V coordinate since we will only use DDS texture, which are inverted. Remove if you want to use TGA or BMP loaders.
 			temp_uvs.push_back(uv);
 		}
 		else if ( strcmp( lineHeader, "vn" ) == 0 )
@@ -248,9 +248,9 @@ void Mesh::LoadOBJ(string path)
 			vertexIndices.push_back(vertexIndex[0]);
 			vertexIndices.push_back(vertexIndex[1]);
 			vertexIndices.push_back(vertexIndex[2]);
-			uvIndices    .push_back(uvIndex[0]);
-			uvIndices    .push_back(uvIndex[1]);
-			uvIndices    .push_back(uvIndex[2]);
+			uvIndices.push_back(uvIndex[0]);
+			uvIndices.push_back(uvIndex[1]);
+			uvIndices.push_back(uvIndex[2]);
 			normalIndices.push_back(normalIndex[0]);
 			normalIndices.push_back(normalIndex[1]);
 			normalIndices.push_back(normalIndex[2]);
@@ -265,7 +265,7 @@ void Mesh::LoadOBJ(string path)
 	}
 
 	// For each vertex of each triangle
-	for( unsigned int i=0; i<vertexIndices.size(); i++ ){
+	for( unsigned int i=0; i<vertexIndices.size(); i++ ) {
 
 		// Get the indices of its attributes
 		unsigned int vertexIndex = vertexIndices[i];

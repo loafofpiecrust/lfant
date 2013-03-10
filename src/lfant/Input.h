@@ -1,22 +1,22 @@
 /******************************************************************************
- *
- *	LFANT Source
- *	Copyright (C) 2012-2013 by LazyFox Studios
- *	Created: 2012-07-16 by Taylor Snead
- *
- *	Licensed under the Apache License, Version 2.0 (the "License");
- *	you may not use this file except in compliance with the License.
- *	You may obtain a copy of the License at
- *
- *	http://www.apache.org/licenses/LICENSE-2.0
- *
- *	Unless required by applicable law or agreed to in writing, software
- *	distributed under the License is distributed on an "AS IS" BASIS,
- *	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *	See the License for the specific language governing permissions and
- *	limitations under the License.
- *
- ******************************************************************************/
+*
+*	LFANT Source
+*	Copyright (C) 2012-2013 by LazyFox Studios
+*	Created: 2012-07-16 by Taylor Snead
+*
+*	Licensed under the Apache License, Version 2.0 (the "License");
+*	you may not use this file except in compliance with the License.
+*	You may obtain a copy of the License at
+*
+*	http://www.apache.org/licenses/LICENSE-2.0
+*
+*	Unless required by applicable law or agreed to in writing, software
+*	distributed under the License is distributed on an "AS IS" BASIS,
+*	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+*	See the License for the specific language governing permissions and
+*	limitations under the License.
+*
+******************************************************************************/
 #pragma once
 
 #include <lfant/stdafx.h>
@@ -155,16 +155,16 @@ class Input : public Subsystem
 		bool up = false;
 
 		Axis(string name, uint16_t positive, uint16_t negative = '\n', float sensitivity = 3.0f, float dead = 0.001f, bool snap =
-				 true, byte joyNum = 0) :
+		         true, byte joyNum = 0) :
 			name(name), positive(positive), negative(negative), sensitivity(sensitivity), dead(dead), snap(snap), joyNum(
-				joyNum)
+			    joyNum)
 		{
 		}
 
 		Axis(string name, uint16_t positive, uint16_t negative = '\n', uint16_t altpos = '\n', uint16_t altneg = '\n',
-			 float sensitivity = 3.0f, float dead = 0.001f, bool snap = true, byte joyNum = 0) :
+		     float sensitivity = 3.0f, float dead = 0.001f, bool snap = true, byte joyNum = 0) :
 			name(name), positive(positive), negative(negative), altPositive(altpos), altNegative(altneg), sensitivity(
-				sensitivity), dead(dead), snap(snap), joyNum(joyNum)
+			    sensitivity), dead(dead), snap(snap), joyNum(joyNum)
 		{
 		}
 
@@ -175,7 +175,7 @@ class Input : public Subsystem
 
 	class Callback
 	{
-	public:
+public:
 		virtual void Call(string name, float value) = 0;
 
 		string axis = "";
@@ -188,13 +188,13 @@ class Input : public Subsystem
 
 	class CallbackSingle : public Callback
 	{
-	public:
+public:
 		virtual void Call(string name, float value)
 		{
 			func(value);
 		}
 
-		typedef boost::function<void(float)> FuncType;
+		typedef boost::function<void (float)> FuncType;
 		FuncType func;
 
 		CallbackSingle(string axis, FuncType func) :
@@ -205,13 +205,13 @@ class Input : public Subsystem
 
 	class CallbackAll : public Callback
 	{
-	public:
+public:
 		virtual void Call(string name, float value)
 		{
 			func(name, value);
 		}
 
-		typedef boost::function<void(string, float)> FuncType;
+		typedef boost::function<void (string, float)> FuncType;
 		FuncType func;
 
 		CallbackAll(FuncType func) :
@@ -251,15 +251,15 @@ public:
 	void SetMousePos(int32_t x, int32_t y);
 
 	template<typename C>
-	void AddCallback(string axis, void (C::*func)(float))
+	void AddCallback(string axis, void (C::* func)(float))
 	{
 		callbacks.push_back(new CallbackSingle(axis, boost::bind<void(float)>(func)));
 	}
 
 	template<typename C>
-	void AddCallback(void (C::*func)(string, float))
+	void AddCallback(void (C::* func)(string, float))
 	{
-		callbacks.push_back(new CallbackAll(boost::bind<void(string,float)>(func)));
+		callbacks.push_back(new CallbackAll(boost::bind<void(string, float)>(func)));
 	}
 
 	bool lockMouse;
