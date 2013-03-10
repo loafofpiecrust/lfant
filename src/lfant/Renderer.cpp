@@ -250,16 +250,17 @@ Shader& Renderer::GetShader(string name)
 {
 	for(auto& shader : shaders)
 	{
-		if(shader.name == name)
+		if(shader.path == name)
 		{
 			return shader;
 		}
 	}
+	return null(Shader);
 }
 
 void Renderer::AddShader(Shader& shader)
 {
-	if(Shader* s = &GetShader(shader.name))
+	if(Shader* s = &GetShader(shader.path))
 	{
 		s->id = shader.id;
 		return;

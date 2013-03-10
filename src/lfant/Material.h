@@ -18,14 +18,13 @@
  *
  ******************************************************************************/
 #pragma once
-
 #include <lfant/stdafx.h>
-
-// External
 
 // Internal
 #include <lfant/Texture.h>
 #include <lfant/Shader.h>
+
+// External
 
 namespace lfant
 {

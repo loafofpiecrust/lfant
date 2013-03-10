@@ -55,12 +55,12 @@ void Transform::SetRotationQuat(quat rot)
 {
 	rotationQuat = rot;
 	rotation = eulerAngles(rot);
-//	Trigger("SetRotation", rotation);
+	//	Trigger("SetRotation", rotation);
 }
 
-vec3& Transform::GetRotation()
+vec3 Transform::GetRotation()
 {
-	return rotation;
+	return degrees(rotation);
 }
 
 void Transform::SetRotation(vec3 rot)
@@ -68,8 +68,8 @@ void Transform::SetRotation(vec3 rot)
 	//rot.x = rollover(rot.x, 0.0f, 360.0f);
 	//rot.y = rollover(rot.y, 0.0f, 360.0f);
 	//rot.z = rollover(rot.z, 0.0f, 360.0f);
-	//rotation = radians(rot);
-	rotation = rot;
+	rotation = radians(rot);
+	//rotation = rot;
 	rotationQuat = quat(rotation);
 }
 
@@ -179,18 +179,19 @@ void Transform::Translate(vec3 pos)
 
 void Transform::Rotate(vec3 rot)
 {
-	SetRotation(rotation + rot);
+	rotation += radians(rot);
+	rotationQuat = quat(rotation);
 	//rotationQuat = quat(rotation);
 	//_rotationQuat = rotate( _rotationQuat, rot.x, xdir );
 	//_rotationQuat = rotate( _rotationQuat, rot.y, ydir );
 	//_rotationQuat = rotate( _rotationQuat, rot.z, zdir );
-//	Trigger("SetRotation", rotation);
+	//	Trigger("SetRotation", rotation);
 }
 
 void Transform::Scale(vec3 scl)
 {
 	SetScale(scale * scl);
-//	Trigger("SetScale", scale);
+	//	Trigger("SetScale", scale);
 }
 
 }

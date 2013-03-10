@@ -68,7 +68,7 @@ void Scene::OnDestroy()
 
 void Scene::RemoveEntity(Entity* ent)
 {
-	entities.remove(ent);
+	entities.remove(ptr<Entity>(ent));
 }
 
 /*Entity* Scene::GetEntity( uint32_t idx )

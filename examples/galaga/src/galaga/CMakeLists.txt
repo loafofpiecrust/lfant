@@ -12,6 +12,8 @@ file(GLOB HEADER_FILES
 # Library Search Paths
 link_directories(
 	"${LIBRARY_OUTPUT_PATH}"
+	# System
+	"/usr/lib/x86_64-linux-gnu/mesa"
 	)
 
 # Output Library Info

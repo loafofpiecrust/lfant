@@ -68,37 +68,21 @@ void Mesh::BeginRender()
 	glGenVertexArrays(1, &vertexArray);
 	glBindVertexArray(vertexArray);
 
-	bool shaderLoaded = false;
 	if(material.shader.id == 0)
 	{
-		if(auto shader = game->renderer->GetShader(material.shader.name))
-		{
-			material.shader.id = shader.id;
-			shaderLoaded = true;
-		}
-		else if(auto shader = game->renderer->GetShader("shaders/Diffuse"))
-		{
-			material.shader.id = shader.id;
-			shaderLoaded = true;
-		}
-	}
-	if(!shaderLoaded)
-	{
-		Log("Mesh::Init: Loading default shader");
-		material.shader.LoadFile("shaders/Diffuse");
-		game->renderer->AddShader(material.shader);
+		material.shader.LoadFile();
 	}
 
 	if(material.texture.id == 0)
 	{
-		material.texture.LoadFile(material.texture.name);
+		material.texture.LoadFile();
 	}
 
 	if(material.shader.id != 0)
 	{
 		// Get any uniforms here
-		matrixId = glGetUniformLocation(material.shader.id, "MVP");
-		material.texture.uniformId = glGetUniformLocation(material.shader.id, "textureSampler");
+		matrixId = material.shader.GetUniform("MVP");
+		material.texture.uniformId = material.shader.GetUniform("textureSampler");
 	}
 
 	vector<uint32_t> indices;

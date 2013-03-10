@@ -190,6 +190,7 @@ bool Physics::OnCollide(string func, btManifoldPoint& cp, const btCollisionObjec
 	 body1->collider->trigger( "OnCollide" + func, col );
 	 }
 	 }*/
+	return false;
 }
 
 bool Physics::OnCollideEnter(btManifoldPoint& cp, const btCollisionObjectWrapper* colObj0, int partId0, int index0,
@@ -201,11 +202,13 @@ bool Physics::OnCollideEnter(btManifoldPoint& cp, const btCollisionObjectWrapper
 bool Physics::OnCollideStay(btManifoldPoint& cp, void* body0, void* body1)
 {
 	//	return OnCollide( "Stay", cp, colObj0, partId0, index0, colObj1, partId1, index1 );
+	return false;
 }
 
 bool Physics::OnCollideExit(void* userPersistentData)
 {
 	//	return OnCollide( "Exit", cp, colObj0, partId0, index0, colObj1, partId1, index1 );
+	return false;
 }
 
 void Physics::AddRigidbody(Rigidbody *ent)

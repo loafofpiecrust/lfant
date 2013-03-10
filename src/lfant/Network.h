@@ -61,7 +61,7 @@ public:
 	C* NewConnection(string name, string host, uint16_t port, string password)
 	{
 		C* con = new C(name, host, port, password);
-		connections.push_front(con);
+		connections.push_front(ptr<Connection>(con));
 		con->Init();
 		return con;
 	}

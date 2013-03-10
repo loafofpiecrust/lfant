@@ -19,7 +19,7 @@
  ******************************************************************************/
 #pragma once
 
-#include <lfant/stdafx.h>
+//#include <lfant/stdafx.h>
 
 // External
 

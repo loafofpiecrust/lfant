@@ -44,6 +44,9 @@ namespace lfant
  */
 class Sprite : public Mesh
 {
+public:
+	DECLARE_COMP(Sprite)
+
 	/**
 	 *	Supported animation play modes.
 	 */
@@ -54,13 +57,13 @@ class Sprite : public Mesh
 
 	/**
 	 *	An animation that consists of a single texture as a sprite-sheet.
-	 *	\details
+	 *	@details
 	 *		A SpriteAnimation has one material of one texture, and for each frame,
 	 *		it moves by frameSize, at frameRate times per second. playMode determines
 	 *		what the animation will do when it reaches its end. It can either stop,
 	 *		loop, or reverse to play forward when it reaches its beginning.
 	 */
-	class SpriteAnimation
+	class Animation
 	{
 	public:
 		string name = "Animation";
@@ -69,25 +72,6 @@ class Sprite : public Mesh
 		uint16_t columns = 10;
 		AnimPlayMode playMode = Loop;
 		byte frameRate = 5;
-	};
-
-	class SpriteAnimVector
-	{
-	public:
-		SpriteAnimation& operator[](string name)
-		{
-			for(uint i = 0; i < anims.size(); ++i)
-			{
-				if(anims[i].name == name)
-				{
-					return anims[i];
-				}
-			}
-			return null(SpriteAnimation);
-		}
-
-	private:
-		vector<SpriteAnimation> anims;
 	};
 
 	friend class Renderer;
@@ -109,17 +93,17 @@ public:
 	void PauseAnim();
 	void ResumeAnim();
 	void StopAnim();
-	void AddAnim(SpriteAnimation anim);
+
+	void AddAnim(Animation& anim);
 	void RemoveAnim(string name);
+	Animation& GetAnim(string name);
 
 	/// The sprite animations to be used.
-	SpriteAnimVector animations;
-	/// The plane mesh used as the basis for the sprite.
-	//Mesh* mesh;
+	forward_list<Animation> animations;
 
 protected:
 	/// The currently playing animation.
-	SpriteAnimation* currentAnim = nullptr;
+	Animation* currentAnim = nullptr;
 
 	vec2 currentFrame = vec2(0.0f, 0.0f);
 

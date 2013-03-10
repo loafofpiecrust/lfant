@@ -26,6 +26,7 @@
 // External
 #include <boost/signals2.hpp>
 #include <typeinfo>
+#include <forward_list>
 
 // Internal
 #include <lfant/TypeInfo.h>
@@ -59,7 +60,10 @@ class Object
 	{
 	public:
 		string name;
-		Object* ptr;
+
+		Event()
+		{
+		}
 
 		Event(string name) :
 			name(name)
@@ -106,7 +110,7 @@ public:
 		name = Type(sender) + "::" + name + "()";
 		cout << "Connecting "+name+"\n";
 		Event0* con = nullptr;
-		for(auto event : sender->events)
+		for(auto& event : sender->events)
 		{
 			if(event->name == name)
 			{
@@ -114,14 +118,12 @@ public:
 				if(con)
 				{
 					con->sig.connect(boost::bind(func, receiver));
-					con->ptr = sender;
 				}
 				return;
 			}
 		}
 		con = new Event0(name, boost::bind(func, receiver));
-		con->ptr = sender;
-		sender->events.push_back(con);
+		sender->events.push_front((Event*)con);
 	}
 
 	template<typename R, typename P1>
@@ -131,21 +133,20 @@ public:
 		name = Type(sender) + "::" + name + "(" + Type<P1>() + ")";
 		cout << "Connecting "+name+"\n";
 		EventP<P1>* con = nullptr;
-		for(auto connection : sender->events)
+		for(auto& event : sender->events)
 		{
-			if(connection->name == name)
+			if(event->name == name)
 			{
-				con = dynamic_cast<EventP<P1>*>(connection);
+				con = dynamic_cast<EventP<P1>*>(event);
 				if(con)
 				{
 					con->sig.connect(boost::bind(func, receiver, _1));
-					con->ptr = sender;
 				}
 				return;
 			}
 		}
 		con = new EventP<P1>(name, boost::bind(func, receiver, _1));
-		sender->events.push_back(con);
+		sender->events.push_front((Event*)con);
 	}
 
 	template<typename R, typename P1, typename P2>
@@ -155,21 +156,20 @@ public:
 		name = Type(sender) + "::" + name + "(" + Type<P1, P2>() + ")";
 		cout << "Connecting "+name+"\n";
 		EventP<P1, P2>* con = nullptr;
-		for(auto connection : sender->events)
+		for(auto& event : sender->events)
 		{
-			if(connection->name == name)
+			if(event->name == name)
 			{
-				con = dynamic_cast<EventP<P1, P2>*>(connection);
+				con = dynamic_cast<EventP<P1, P2>*>(event);
 				if(con)
 				{
 					con->sig.connect(boost::bind(func, receiver, _1, _2));
-					con->ptr = sender;
 				}
 				return;
 			}
 		}
 		con = new EventP<P1, P2>(name, boost::bind(func, receiver, _1, _2));
-		sender->events.push_back(con);
+		sender->events.push_front((Event*)con);
 	}
 
 	template<typename R, typename P1, typename P2, typename P3>
@@ -179,21 +179,20 @@ public:
 		name = Type(sender) + "::" + name + "(" + Type<P1, P2, P3>() + ")";
 		cout << "Connecting "+name+"\n";
 		EventP<P1, P2, P3>* con = nullptr;
-		for(auto connection : sender->events)
+		for(auto& event : sender->events)
 		{
-			if(connection->name == name)
+			if(event->name == name)
 			{
-				con = dynamic_cast<EventP<P1, P2, P3>*>(connection);
+				con = dynamic_cast<EventP<P1, P2, P3>*>(event);
 				if(con)
 				{
 					con->sig.connect(boost::bind(func, receiver, _1, _2, _3));
-					con->ptr = sender;
 				}
 				return;
 			}
 		}
 		con = new EventP<P1, P2, P3>(name, boost::bind(func, receiver, _1, _2, _3));
-		sender->events.push_back(con);
+		sender->events.push_front((Event*)con);
 	}
 
 
@@ -201,10 +200,9 @@ public:
 	{
 		erase_all(name, " ");
 		name = Type(this) + "::" + name + "()";
-		cout << "Triggering "+name+"\n";
-		for(auto event : events)
+		for(auto& event : events)
 		{
-			if(event->name == name && event->ptr == this)
+			if(event->name == name)
 			{
 				Event0* con = dynamic_cast<Event0*>(event);
 				if(con)
@@ -220,10 +218,9 @@ public:
 	{
 		erase_all(name, " ");
 		name = Type(this) + "::" + name + "(" + Type<P1, P...>() + ")";
-		cout << "Triggering "+name+"\n";
-		for(auto event : events)
+		for(auto& event : events)
 		{
-			if(event->name == name && event->ptr == this)
+			if(event->name == name)
 			{
 				auto con = dynamic_cast<EventP<P1, P...>*>(event);
 				if(con)
@@ -239,9 +236,9 @@ public:
 	{
 		erase_all(name, " ");
 		name = Type(this) + "::" + name;
-		for(uint i = 0; i < events.size(); ++i)
+		for(auto& event : events)
 		{
-			if(events[i]->name == name)
+			if(event->name == name)
 			{
 				return true;
 			}
@@ -266,7 +263,7 @@ protected:
 	virtual void Bind();
 
 private:
-	vector<Event*> events;
+	forward_list< Event* > events;
 };
 
 /// @}

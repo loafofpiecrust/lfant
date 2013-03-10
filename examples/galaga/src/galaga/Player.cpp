@@ -101,7 +101,7 @@ void Player::Update()
 	float vrot = game->input->GetAxis("VRotation");
 	if (vrot != 0.0f)
 	{
-		owner->transform->Rotate(radians(vec3(vrot * lookSpeed * game->time->deltaTime, 0, 0)));
+		owner->transform->Rotate(vec3(vrot * lookSpeed * game->time->deltaTime, 0, 0));
 	}
 	if (game->input->GetButtonDown("Fire"))
 	{
@@ -111,7 +111,7 @@ void Player::Update()
 		Mesh* mesh = ent->AddComponent<Mesh>();
 		mesh->LoadFile("suzanne.obj");
 		mesh->material.texture.name = "player.png";
-		mesh->material.shader.name = "Diffuse";
+		mesh->material.shader.path = "Diffuse";
 		*/
 		dynamic_cast<Galaga*>(game)->AddMesh("TestMesh"+lexical_cast<string>(meshCount));
 		++meshCount;
@@ -119,11 +119,11 @@ void Player::Update()
 	}
 	if (game->input->GetButtonDown("TesterSetVar"))
 	{
-		game->console->Input("Tester = 62.76f");
+		game->console->Input("set Tester 62.76f");
 	}
 	if (game->input->GetButtonDown("TesterGetVar"))
 	{
-		game->console->Input("Tester");
+		game->console->Input("get Tester");
 	}
 	if (game->input->GetButtonDown("TesterHelpMe"))
 	{
@@ -132,6 +132,6 @@ void Player::Update()
 	if (game->input->GetButtonDown("Exit"))
 	{
 		Log("Calling exit function");
-		game->console->Input("Exit()");
+		game->console->Input("exit");
 	}
 }

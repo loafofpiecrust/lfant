@@ -1,4 +1,6 @@
 
+#pragma once
+
 // External
 #include <Rocket/Core/RenderInterface.h>
 

@@ -1,0 +1,17 @@
+# git ignore file
+
+# Libraries
+*.so
+*.a
+*.dll
+*.lib
+*.dylib
+
+# Objects
+*.o
+
+# Folders
+build
+analysis
+wiki
+docs

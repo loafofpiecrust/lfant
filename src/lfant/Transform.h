@@ -58,7 +58,7 @@ public:
 	quat GetRotationQuat();
 	void SetRotationQuat(quat rot);
 
-	vec3& GetRotation();
+	vec3 GetRotation();
 	void SetRotation(vec3 rot);
 
 	vec3& GetScale();

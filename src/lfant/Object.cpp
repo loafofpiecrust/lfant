@@ -47,6 +47,10 @@ void Object::Destroy()
 
 void Object::Destroy(Object* obj)
 {
+	for(auto& evt : events)
+	{
+		delete evt;
+	}
 	obj->Destroy();
 }
 

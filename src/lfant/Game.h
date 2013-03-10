@@ -43,6 +43,7 @@ class Console;
 class SystemInfo;
 class UserInterface;
 class Network;
+class ScriptSystem;
 
 /** @addtogroup Game
  *	@{
@@ -112,6 +113,7 @@ public:
 	ptr<Input> input;
 	ptr<Audio> audio;
 	ptr<Network> network;
+	ptr<ScriptSystem> scriptSystem;
 	//boost::scoped_ptr<AISystem>			aiSystem;
 	//boost::scoped_ptr<ScriptSystem>		scriptSystem;
 	//boost::scoped_ptr<FGSystem>			flowgraph;

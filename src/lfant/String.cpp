@@ -69,4 +69,16 @@ string Extension(string path)
 	}
 }
 
+string Replace(string str, string find, string replace)
+{
+	size_t start_pos = str.find(find);
+	if(start_pos == std::string::npos)
+	{
+		return str;
+	}
+
+	str.replace(start_pos, find.length(), replace);
+	return str;
+}
+
 }

@@ -14,8 +14,10 @@ option(BUILD_EXAMPLES "Should the examples be built?" ON)
 
 if(ARCH STREQUAL "x64")
 	set(ARCH "64")
+	set(ARCH_OPTION "x86-64")
 else()
 	set(ARCH "32")
+	set(ARCH_OPTION "x86")
 endif()
 
 set(PLATFORM "")
@@ -36,7 +38,7 @@ if(PLATFORM STREQUAL "")
 endif()
 
 set(CMAKE_BUILD_TYPE Release)
-set(CMAKE_C_FLAGS "-m${ARCH} -fPIC -O3 -Wall -Wno-overloaded-virtual -D__STRICT_ANSI__")
+set(CMAKE_C_FLAGS "-march=${ARCH_OPTION} -fPIC -O3 -Wall -Wno-overloaded-virtual -D__STRICT_ANSI__")
 set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -std=gnu++11 -Wno-invalid-offsetof")
 
 add_definitions(

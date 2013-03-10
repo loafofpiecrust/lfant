@@ -22,6 +22,7 @@
 #include <lfant/stdafx.h>
 
 // External
+#include <forward_list>
 
 // Internal
 
@@ -40,21 +41,30 @@ namespace lfant
 class Shader
 {
 public:
+
+	struct Uniform
+	{
+		string name = "";
+		uint32_t id = 0;
+	};
+
 	Shader()
 	{
 	}
 
-	Shader(string name) :
-		name(name)
+	Shader(string path) :
+		path(path)
 	{
-		LoadFile(name);
+		LoadFile(path);
 	}
 
 	void LoadFile(string file = "");
 
+	uint32_t GetUniform(string name);
+
 	operator string()
 	{
-		return name;
+		return path;
 	}
 
 	operator uint32_t()
@@ -62,8 +72,12 @@ public:
 		return id;
 	}
 
-	string name = "";
+	string path = "";
 	uint32_t id = 0;
+
+protected:
+
+	forward_list<Uniform> uniforms;
 };
 
 /// @}

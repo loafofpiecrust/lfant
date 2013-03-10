@@ -257,7 +257,7 @@ void Settings::LoadSettings(string input)
 
 }
 
-void Settings::SetValue(string name, string value)
+void Settings::SetValue(string name, string value, string help)
 {
 	value = GetRef(name, value, "$()");
 
@@ -266,11 +266,23 @@ void Settings::SetValue(string name, string value)
 		if(var.name == name)
 		{
 			var.Set(value);
+			var.help = help;
 			return;
 		}
 	}
 	Log(name+"="+value);
-	variables.push_back(Var(name, value));
+	variables.push_back(Var(name, value, help));
+}
+
+string Settings::GetHelp(string name)
+{
+	for(auto& var : variables)
+	{
+		if(var.name == name)
+		{
+			return var.help;
+		}
+	}
 }
 
 string Settings::GetRef(string name, string value, string ids)

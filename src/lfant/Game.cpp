@@ -40,6 +40,7 @@
 #include <lfant/Console.h>
 #include <lfant/UserInterface.h>
 #include <lfant/Network.h>
+#include <lfant/ScriptSystem.h>
 
 namespace lfant
 {
@@ -75,7 +76,8 @@ Game::Game() :
 	scene (new Scene),
 	input {new Input},
 	audio {new Audio},
-	network {new Network}
+	network {new Network},
+	scriptSystem {new ScriptSystem}
 {
 }
 
@@ -103,6 +105,7 @@ void Game::Init()
 	input->Init();
 //	audio->Init();
 	network->Init();
+	scriptSystem->Init();
 
 	Log("Window callback set.");
 

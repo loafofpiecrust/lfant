@@ -16,110 +16,20 @@ class ptr_base
 };
 
 template<typename T>
-class ptr : public ptr_base
+class ptr : public unique_ptr<T>, public ptr_base
 {
 public:
-	typedef T* ptr_type;
-	typedef T value_type;
-
-	ptr()
+	explicit ptr(T* v) :
+		unique_ptr<T>(v)
 	{
+		cout << "ptr(T*)\n";
 	}
 
-	ptr(ptr_type v) :
-		value(v)
+	operator T*()
 	{
-		cout << "ptr::ctor(T*): new value: " << value << "\n";
+		return this->get();
 	}
 
-	ptr(ptr<T>& p) :
-		value(p.release())
-	{
-		cout << "ptr::ctor(ptr): new value: " << value << "\n";
-	}
-
-	~ptr()
-	{
-		if(value != nullptr)
-		{
-			cout << "ptr::dtor: delete " << value << "\n";
-			delete value;
-		}
-	}
-
-	ptr_type get()
-	{
-		return value;
-	}
-
-	void reset(ptr_type v)
-	{
-		if(value != nullptr)
-		{
-			cout << "ptr::reset: Trying to delete value, " << value << ".\n";
-			delete value;
-		}
-		cout << "ptr::reset: old value: " << value << "\n";
-		value = v;
-		cout << "ptr::reset: new value: " << value << "\n";
-	}
-
-	operator ptr_type()
-	{
-		return get();
-	}
-
-	ptr<T>& operator=(ptr_type v)
-	{
-		reset(v);
-		return *this;
-	}
-
-	ptr<T>& operator=(ptr<T>& p)
-	{
-		reset(p.release());
-		return *this;
-	}
-
-	operator bool()
-	{
-		return value != nullptr;
-	}
-
-	bool operator==(ptr_type v)
-	{
-		return value == v;
-	}
-
-	bool operator==(const ptr<T>& p)
-	{
-		return value == p.value;
-	}
-
-	ptr_type operator->()
-	{
-		if(value)
-		{
-			return value;
-		}
-		return nullptr;
-	}
-
-	value_type operator*()
-	{
-		return *value;
-	}
-
-private:
-	ptr_type value = nullptr;
-
-	ptr_type release()
-	{
-		ptr_type r = value;
-		value = nullptr;
-		cout << "ptr::release: Releasing value, " << value << "\n";
-		return r;
-	}
 };
 
 template<typename T, typename R>

@@ -35,6 +35,8 @@
 namespace lfant
 {
 
+IMPLEMENT_COMP(Sprite)
+
 Sprite::Sprite()
 {
 }
@@ -240,13 +242,27 @@ void Sprite::EndRender()
 
 void Sprite::PlayAnim(string name, AnimPlayMode mode, bool reverse)
 {
-	currentAnim = &animations[name];
-	playingAnim = true;
-	if(reverse)
+	if(Animation* anim = &GetAnim(name))
 	{
-		playingReverseAnim = true;
+		currentAnim = anim;
+		playingAnim = true;
+		if(reverse)
+		{
+			playingReverseAnim = true;
+		}
+		currAnimMode = mode;
 	}
-	currAnimMode = mode;
+}
+
+Sprite::Animation& Sprite::GetAnim(string name)
+{
+	for(auto& anim : animations)
+	{
+		if(anim.name == name)
+		{
+			return anim;
+		}
+	}
 }
 
 void Sprite::PauseAnim()

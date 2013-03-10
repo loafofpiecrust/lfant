@@ -61,7 +61,7 @@ class Settings : public Subsystem
 			return lexical_cast<T>(value);
 		}
 
-		Var(string name, string value) : name(name)
+		Var(string name, string value, string help = "") : name(name), help(help)
 		{
 			to_lower(this->name);
 			Set(value);
@@ -69,6 +69,7 @@ class Settings : public Subsystem
 
 		string name = "";
 		string value = "";
+		string help = "";
 	};
 
 public:
@@ -79,7 +80,7 @@ public:
 
 	virtual void LoadSettings(string input = "");
 
-	void SetValue(string name, string value);
+	void SetValue(string name, string value, string help = "");
 
 	template<typename T = string>
 	T GetValue(string name)
@@ -102,6 +103,8 @@ public:
 
 		return result.Get<T>();
 	}
+
+	string GetHelp(string name);
 
 protected:
 

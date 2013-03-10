@@ -68,10 +68,10 @@ void FileSystem::Init()
 
 string FileSystem::ConvertPath(string curr)
 {
-	for(auto & chr : curr)
+	for(auto& chr : curr)
 	{
 		// Supported grouping characters here.
-		if(chr == '\\' || chr == ',' || chr == ':' || chr == '*' || chr == '/')
+		if(chr == '\\' || chr == ':' || chr == '/')
 		{
 			// Convert all grouping chars to forward slashes for directory management.
 #		if UNIX
@@ -92,8 +92,8 @@ path FileSystem::GetGamePath(string name)
 	{
 		return result;
 	}
-	Log("FileSystem::GetGameFile: File not found, input: "+result.string());
-	game->Exit();
+	Log("FileSystem::GetGameFile: File not found \'"+result.string()+"\'.");
+//	game->Exit();
 	return "";
 }
 
@@ -105,6 +105,7 @@ path FileSystem::GetUserPath(string name)
 	{
 		return result;
 	}
+	Log("FileSystem::GetGameFile: File not found \'"+result.string()+"\'.");
 	return "";
 }
 

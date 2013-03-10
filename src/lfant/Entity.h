@@ -80,10 +80,12 @@ public:
 		comp->owner = this;
 		comp->Init();
 		cout << "Entity::AddComponent: Initialised, Component id: " << comp << ", exists? " << (bool)comp << "\n";
-		components.push_front(comp);
+		AddComponent(comp);
 		cout << "Entity::AddComponent: Pushed, Component id: " << comp << ", exists? " << (bool)comp << "\n";
 		return comp;
 	}
+
+	void AddComponent(Component* comp);
 
 	/**
 	 *	Removes a component from this Entity
@@ -114,10 +116,10 @@ public:
 	Component* GetComponent(string type);
 
 	template<typename C>
-	forward_list<C*> GetComponents()
+	vector<C*> GetComponents()
 	{
-		forward_list<C*> comps;
-		for(auto & comp : components)
+		vector<C*> comps;
+		for(auto& comp : components)
 		{
 			if(Type(comp) == Type<C>())
 			{
@@ -128,8 +130,6 @@ public:
 	}
 
 	Entity* GetChild(string name, bool recursive = false);
-
-	forward_list< ptr<Component> > components;
 
 	Transform* transform;
 
@@ -163,6 +163,7 @@ protected:
 private:
 
 	forward_list< ptr<Entity> > children;
+	forward_list< ptr<Component> > components;
 	bool useLifeTime = true;
 
 public:

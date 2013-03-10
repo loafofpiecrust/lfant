@@ -58,34 +58,36 @@ struct remove_ref < T && >
 
 string Type();
 
+string DemangleType(string type);
+
 template<typename T>
 auto Type() -> typename is_not_ptr<T, string>::type
 {
-	return string(abi::__cxa_demangle(typeid(T).name(), 0, 0, (int*)0));
+	return DemangleType(typeid(T).name());
 }
 
 template<typename T>
 auto Type() -> typename is_ptr<T, string>::type
 {
-	return string(abi::__cxa_demangle(typeid(T::value_type).name(), 0, 0, (int*)0));
+	return DemangleType(typeid(T::value_type).name());
 }
 
 template<typename T>
 auto Type(T p1) -> typename is_not_ptr<T, string>::type
 {
-	return string(abi::__cxa_demangle(typeid(p1).name(), 0, 0, (int*)0));
+	return DemangleType(typeid(p1).name());
 }
 
 template<typename T>
-auto Type(T p1) -> typename is_ptr<T, string>::type
+auto Type(T& p1) -> typename is_ptr<T, string>::type
 {
-	return string(abi::__cxa_demangle(typeid(*(p1.get())).name(), 0, 0, (int*)0));
+	return DemangleType(typeid(*(p1.get())).name());
 }
 
 template<typename T>
 string Type(T* p1)
 {
-	return string(abi::__cxa_demangle(typeid(*p1).name(), 0, 0, (int*)0));
+	return DemangleType(typeid(*p1).name());
 }
 
 /*

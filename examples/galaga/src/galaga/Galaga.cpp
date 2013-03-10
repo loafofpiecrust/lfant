@@ -33,13 +33,13 @@
 #include <lfant/FileSystem.h>
 #include <lfant/Console.h>
 #include <lfant/SystemInfo.h>
-#include <lfant/Console.h>
 #include <lfant/UserInterface.h>
 #include <lfant/Network.h>
 #include <lfant/ChatClient.h>
 #include <lfant/Mesh.h>
 #include <lfant/Entity.h>
 #include <lfant/Transform.h>
+#include <lfant/Sprite.h>
 
 namespace lfant
 {
@@ -68,7 +68,7 @@ Galaga::Galaga()
 
 void Galaga::Init()
 {
-	Engine::Init();
+	Game::Init();
 
 	//Range<int> ver = game->settings->GetValue("gl.version");
 	//renderer->version = ver;
@@ -99,7 +99,7 @@ void Galaga::Init()
 	Log("CPU: " + systemInfo->cpu.name + " with ", systemInfo->cpu.cores, " cores");
 
 	// Fairly self-explanitory. Check above input axes for keys to press. Will implement better with GUI.
-	console->RegisterVar("Tester", 5.0f, "This is my variable!");
+	game->settings->SetValue("Tester", "5.0f", "This is my var");
 
 	Log("Galaga::Init: Registered test var");
 
@@ -118,7 +118,6 @@ void Galaga::Init()
 void Galaga::Update()
 {
 	PreUpdate();
-	renderer->PreUpdate();
 	time->Update();
 	physics->Update();
 	scene->Update();
@@ -131,7 +130,7 @@ void Galaga::Update()
 
 void Galaga::Destroy()
 {
-	Engine::Destroy();
+	Game::Destroy();
 }
 
 void Galaga::AddMesh(string name)
@@ -141,7 +140,7 @@ void Galaga::AddMesh(string name)
 	Mesh* mesh = ent->AddComponent<Mesh>();
 	mesh->LoadFile("suzanne.obj");
 	mesh->material.texture.LoadFile("player.png");
-	mesh->material.shader.name = "shaders/Diffuse";
+	mesh->material.shader.path = "shaders/Diffuse";
 }
 
 }

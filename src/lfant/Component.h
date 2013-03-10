@@ -37,8 +37,22 @@ namespace lfant
  *	 @{
  */
 
-//map<string, void (Entity::*)()> componentRegistry;
 //#define REGISTER_COMP(comp) static bool BOOST_PP_CAT( comp, __regged ) = componentRegistry.insert( BOOST_PP_STRINGIZE(comp), &Entity::AddComponent<comp>());
+#define DECLARE_COMP(comp) \
+struct RegistryEntry \
+{\
+public:\
+	RegistryEntry();\
+};\
+static RegistryEntry registryEntry;
+
+#define IMPLEMENT_COMP(comp) \
+comp::RegistryEntry::RegistryEntry()\
+{\
+	std::cout << "Registering component: " << BOOST_PP_STRINGIZE(comp) << "\n";\
+/*	componentRegistry[BOOST_PP_STRINGIZE(comp)] = &Entity::AddComponent<comp>;*/\
+}\
+comp::RegistryEntry comp::registryEntry;
 
 /**	The base class for all Entity Components.
  *		Component is the basis for all things to be attached to
@@ -70,6 +84,8 @@ public:
 	Entity* owner;
 
 protected:
+	static map< string, boost::function<void()> > componentRegistry;
+
 	Component()
 	{
 	}

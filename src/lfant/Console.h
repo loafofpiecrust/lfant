@@ -67,7 +67,7 @@ public:
 
 	struct CommandSimple : public Command
 	{
-		typedef void (funcTypeRaw)();
+		typedef void (Console::*funcTypeRaw)();
 		typedef boost::function<void()> funcType;
 		funcType func;
 
@@ -79,7 +79,7 @@ public:
 
 	struct CommandDefault : public Command
 	{
-		typedef void (funcTypeRaw)(vector<string>);
+		typedef void (Console::*funcTypeRaw)(vector<string>);
 		typedef boost::function<void(vector<string>)> funcType;
 		funcType func;
 
@@ -140,7 +140,6 @@ public:
 	bool CallCommand(string name, vector<string> args);
 	bool CallCommand(string name);
 
-	Variable* GetVar(string name);
 	Command* GetCommand(string name);
 
 	template<typename T>
@@ -157,13 +156,15 @@ public:
 	float GetValue(string name);
 	void SetValue(string name, float value);
 
-	static void CmdExit();
+	void CmdExit();
+	void CmdGetVar(vector<string> args);
+	void CmdSetVar(vector<string> args);
+	void CmdHelp(vector<string> args);
 
 protected:
 
 private:
 	vector<Command*> commands;
-	vector<Variable*> variables;
 
 	string logName = "game.log";
 	ofstream logFile;

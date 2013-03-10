@@ -23,7 +23,7 @@
 // External
 
 // Internal
-#include <lfant/Engine.h>
+#include <lfant/Game.h>
 
 namespace lfant
 {
@@ -38,7 +38,7 @@ namespace lfant
 	 *	\details
 	 *	\todo
 	 */
-	class Galaga : public Engine
+	class Galaga : public Game
 	{
 	public:
 		Galaga();

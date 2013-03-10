@@ -21,9 +21,6 @@
 
 #include <lfant/Entity.h>
 
-// External
-#include <stdarg.h>
-
 // Internal
 #include <lfant/Time.h>
 
@@ -36,6 +33,10 @@
 #include <lfant/Transform.h>
 
 #include <lfant/Component.h>
+#include <lfant/ScriptSystem.h>
+
+// External
+#include <stdarg.h>
 
 namespace lfant
 {
@@ -127,6 +128,11 @@ void Entity::RemoveChild(Entity *ent)
 	children.remove(ptr<Entity>(ent));
 }
 
+void Entity::AddComponent(Component* comp)
+{
+	components.push_front(ptr<Component>(comp));
+}
+
 void Entity::Destroy()
 {
 	Object::Destroy();
@@ -135,6 +141,7 @@ void Entity::Destroy()
 	{
 		compo->Destroy();
 	}
+	components.clear();
 	Log("Entity::Destroy: Components destroyed");
 
 	if(!parent)
@@ -231,20 +238,14 @@ Entity* Entity::GetChild(string name, bool recursive)
  *
  *******************************************************************************/
 
+
 void Entity::Bind()
 {
 	/*
-	SClass<Entity> ent;
-	ent.Var("name", &Entity::name);
-	ent.Var("tag", &Entity::tag);
-	ent.Var("layer", &Entity::layer);
-	ent.Var("lifeTime", &Entity::lifeTime);
-	ent.Var("active", &Entity::active);
+	Script::Class obj;
+	obj.Create<Entity>("Entity", true);
 
-	ent.Prop("parent", &Entity::GetParent, &Entity::SetParent);
-
-	ent.Func( "GetChild", &Entity::GetChild );
-	ent.Func( "GetComponent", &Entity::GetComponent<Component> );
+	obj.Method("void Destroy()", &Entity::Destroy);
 	*/
 }
 

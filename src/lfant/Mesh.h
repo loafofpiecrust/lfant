@@ -21,13 +21,15 @@
 
 #include <lfant/stdafx.h>
 
-// External
-
 // Internal
 #include <lfant/Material.h>
 #include <lfant/Vertex.h>
 #include <lfant/Renderable.h>
 #include <lfant/Component.h>
+
+// External
+
+// System
 
 namespace lfant
 {
