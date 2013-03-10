@@ -1,7 +1,7 @@
 /******************************************************************************
  *
- *	ShadowFox Engine Source
- *	Copyright (C) 2012-2013 by ShadowFox Studios
+ *	LFANT Source
+ *	Copyright (C) 2012-2013 by LazyFox Studios
  *	Created: 2012-07-29 by Taylor Snead
  *
  *	Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,7 +18,7 @@
  *
  ******************************************************************************/
 
-#include <lfant/Physics.hpp>
+#include <lfant/Physics.h>
 
 // External
 #include <btBulletDynamicsCommon.h>
@@ -26,10 +26,10 @@
 
 // Internal
 
-#include <lfant/Engine.hpp>
-#include <lfant/Time.hpp>
+#include <lfant/Game.h>
+#include <lfant/Time.h>
 
-#include <lfant/Console.hpp>
+#include <lfant/Console.h>
 
 namespace lfant
 {
@@ -190,6 +190,7 @@ bool Physics::OnCollide(string func, btManifoldPoint& cp, const btCollisionObjec
 	 body1->collider->trigger( "OnCollide" + func, col );
 	 }
 	 }*/
+	return false;
 }
 
 bool Physics::OnCollideEnter(btManifoldPoint& cp, const btCollisionObjectWrapper* colObj0, int partId0, int index0,
@@ -201,11 +202,13 @@ bool Physics::OnCollideEnter(btManifoldPoint& cp, const btCollisionObjectWrapper
 bool Physics::OnCollideStay(btManifoldPoint& cp, void* body0, void* body1)
 {
 	//	return OnCollide( "Stay", cp, colObj0, partId0, index0, colObj1, partId1, index1 );
+	return false;
 }
 
 bool Physics::OnCollideExit(void* userPersistentData)
 {
 	//	return OnCollide( "Exit", cp, colObj0, partId0, index0, colObj1, partId1, index1 );
+	return false;
 }
 
 void Physics::AddRigidbody(Rigidbody *ent)

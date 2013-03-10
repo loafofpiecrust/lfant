@@ -1,7 +1,7 @@
 /******************************************************************************
  *
- *	ShadowFox Engine Source
- *	Copyright (C) 2012-2013 by ShadowFox Studios
+ *	LFANT Source
+ *	Copyright (C) 2012-2013 by LazyFox Studios
  *	Created: 2012-07-19 by Taylor Snead
  *
  *	Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,16 +18,16 @@
  *
  ******************************************************************************/
 
-#include <lfant/Network.hpp>
+#include <lfant/Network.h>
 
 // External
 
 // Internal
 
-#include <lfant/Console.hpp>
-#include <lfant/Thread.hpp>
+#include <lfant/Console.h>
+#include <lfant/Thread.h>
 
-#include <lfant/network/Connection.hpp>
+#include <lfant/network/Connection.h>
 
 namespace lfant
 {
@@ -60,7 +60,7 @@ Connection* Network::GetConnection(string name)
 	{
 		if(con->name == name)
 		{
-			return con.get();
+			return con;
 		}
 	}
 	return nullptr;

@@ -6,7 +6,7 @@ file(GLOB SRC_FILES
 	)
 
 file(GLOB HEADER_FILES
-	"./*.hpp"
+	"./*.h"
 	)
 
 # Library Search Paths

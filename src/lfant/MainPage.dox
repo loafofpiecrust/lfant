@@ -1,8 +1,8 @@
 
-/**	@mainpage ShadowFox Engine
+/**	@mainpage ShadowFox Game
  *
  *	@section intro Introduction
- *		ShadowFox Engine aims to be a workable, extensible, and open, game engine
+ *		ShadowFox Game aims to be a workable, extensible, and open, game engine
  *		that allows the user to do what they want by either using some of the given
  *		modules/samples, or starting from scratch on their project. This may help
  *		people who have a certain project in mind, and one of the included samples
@@ -20,7 +20,7 @@
  *			So, to use the engine, modified or not (I'll cover building from source shortly),
  *			outside the editor, make sure to add the SFE/src directory to your C++ project's
  *			include directories, and SFE/bin32/platform and/or SFE/bin64/platform to linker
- *			directories. Then, add SFEngine.so to your list of libraries to link to.
+ *			directories. Then, add SFGame.so to your list of libraries to link to.
  *		@par Within Editor
  *			Coming soon...
  *
@@ -29,14 +29,14 @@
  *		have to use the Editor, but it is highly suggested, because otherwise you will have to find
  *		your own way to setup scenes. Anyway, you can start a new project in the editor, and it will
  *		generate a new C++ header and source set. The class declared and implemented in these files
- *		is the primary class of your project and is a child class of sfs::Engine. By default, the
+ *		is the primary class of your project and is a child class of sfs::Game. By default, the
  *		`sfe` namespace isn't used, but you can do that for ease simply by adding: "using namespace sfs;".
  *		@par Game Loop
  *			The main functions that will be used for the manipulation of the game loop in all classes
  *			of SFE are: Init(), Update(), and OnDestroy(). If you want/need to overwrite any of these
- *			methods, then you will usually want to call the parent class' version (eg. sfs::Engine::Init()),
+ *			methods, then you will usually want to call the parent class' version (eg. sfs::Game::Init()),
  *			but, for example, if you want to use a custom Time class, then you have to fully overwrite
- *			Init() in your main class (that inherits sfs::Engine) that spawns all the subsystems.
+ *			Init() in your main class (that inherits sfs::Game) that spawns all the subsystems.
  *			These functions can be used in any class that stems from Entity or Component. Just be sure
  *			that, in C++, you always make these methods virtual.
  *

@@ -21,7 +21,7 @@
  distribution.
  */
 
-#include <lfant/tinyxml2.hpp>
+#include <lfant/tinyxml2.h>
 
 #include <cstdio>
 #include <cstdlib>

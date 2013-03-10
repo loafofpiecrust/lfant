@@ -1,7 +1,7 @@
 /******************************************************************************
  *
- *	ShadowFox Engine Source
- *	Copyright (C) 2012-2013 by ShadowFox Studios
+ *	LFANT Source
+ *	Copyright (C) 2012-2013 by LazyFox Studios
  *	Created: 2012-07-23 by Taylor Snead
  *
  *	Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,15 +18,14 @@
  *
  ******************************************************************************/
 
-#include <lfant/Camera.hpp>
+#include <lfant/Camera.h>
 
 // External
 
 // Internal
-#include <lfant/Transform.hpp>
-#include <lfant/Math.hpp>
-
-#include <lfant/Console.hpp>
+#include <lfant/Transform.h>
+#include <lfant/Math.h>
+#include <lfant/Console.h>
 
 namespace lfant
 {
@@ -86,7 +85,7 @@ void Camera::UpdateProjection()
 
 void Camera::UpdateView()
 {
-	view = lookAt(transform->GetWorldPosition(), transform->GetWorldPosition() + transform->direction, transform->up);
+	view = lookAt(owner->transform->GetWorldPosition(), owner->transform->GetWorldPosition() + owner->transform->direction, owner->transform->up);
 }
 
 void Camera::SetFOV(float fov)

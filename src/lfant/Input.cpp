@@ -1,7 +1,7 @@
 /******************************************************************************
  *
- *	ShadowFox Engine Source
- *	Copyright (C) 2012-2013 by ShadowFox Studios
+ *	LFANT Source
+ *	Copyright (C) 2012-2013 by LazyFox Studios
  *	Created: 2012-07-16 by Taylor Snead
  *
  *	Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,7 +18,7 @@
  *
  ******************************************************************************/
 
-#include <lfant/Input.hpp>
+#include <lfant/Input.h>
 
 // External
 #include <iostream>
@@ -26,12 +26,12 @@
 
 // Internal
 
-#include <lfant/Engine.hpp>
-#include <lfant/Time.hpp>
-#include <lfant/Renderer.hpp>
+#include <lfant/Game.h>
+#include <lfant/Time.h>
+#include <lfant/Renderer.h>
 
-#include <lfant/Console.hpp>
-#include <lfant/UserInterface.hpp>
+#include <lfant/Console.h>
+#include <lfant/UserInterface.h>
 
 namespace lfant
 {
@@ -114,14 +114,7 @@ void Input::Update()
 
 void GLFWCALL Input::OnKeyPress(int key, int mode)
 {
-	if(mode == GLFW_PRESS)
-	{
-		game->userInterface->OnKey(key, true);
-	}
-	else if(mode == GLFW_RELEASE)
-	{
-		game->userInterface->OnKey(key, false);
-	}
+	game->input->Trigger("KeyPress", (uint16_t)key, mode);
 	for(auto & axis : game->input->axes)
 	{
 		if(key == axis.positive || key == axis.altPositive)
@@ -195,8 +188,9 @@ void GLFWCALL Input::OnKeyPress(int key, int mode)
 	}
 }
 
-void GLFWCALL Input::OnMouseMove(int32_t x, int32_t y)
+void GLFWCALL Input::OnMouseMove(int x, int y)
 {
+	game->input->Trigger("MouseMove", x, y);
 	if(game->input->lockMouse)
 	{
 		game->input->SetMousePos(game->renderer->GetResolution() / 2);
@@ -206,23 +200,13 @@ void GLFWCALL Input::OnMouseMove(int32_t x, int32_t y)
 
 void GLFWCALL Input::OnMouseButton(int btn, int mode)
 {
-	if(mode == GLFW_PRESS)
-	{
-//		game->userInterface->OnMouseButton(btn, true);
-	}
-	else if(mode == GLFW_RELEASE)
-	{
-//		game->userInterface->OnMouseButton(btn, false);
-	}
+	game->input->Trigger("MouseButton", btn, mode);
 	OnKeyPress(btn, mode);
 }
 
 void GLFWCALL Input::OnCharPress(int key, int mode)
 {
-	//if(mode == GLFW_PRESS)
-	{
-//		game->userInterface->OnChar(key);
-	}
+	game->input->Trigger("CharPress", key);
 }
 
 /*******************************************************************************

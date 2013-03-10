@@ -1,7 +1,7 @@
 /******************************************************************************
  *
- *	ShadowFox Engine Source
- *	Copyright (C) 2012-2013 by ShadowFox Studios
+ *	LFANT Source
+ *	Copyright (C) 2012-2013 by LazyFox Studios
  *	Created: 2012-11-02 by Taylor Snead
  *
  *	Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,16 +18,16 @@
  *
  ******************************************************************************/
 
-#include <lfant/Joint.hpp>
+#include <lfant/Joint.h>
 
 // External
 #include <btBulletDynamicsCommon.h>
 
 // Internal
-#include <lfant/TypeInfo.hpp>
+#include <lfant/TypeInfo.h>
 
-#include <lfant/Entity.hpp>
-#include <lfant/Rigidbody.hpp>
+#include <lfant/Entity.h>
+#include <lfant/Rigidbody.h>
 
 namespace lfant
 {

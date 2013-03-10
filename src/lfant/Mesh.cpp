@@ -1,7 +1,7 @@
 /******************************************************************************
  *
- *	ShadowFox Engine Source
- *	Copyright (C) 2012-2013 by ShadowFox Studios
+ *	LFANT Source
+ *	Copyright (C) 2012-2013 by LazyFox Studios
  *	Created: 2012-07-19 by Taylor Snead
  *
  *	Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,15 +18,19 @@
  *
  ******************************************************************************/
 
-#include <lfant/Mesh.hpp>
+#include <lfant/Mesh.h>
 
 // External
+#include <GL/glew.h>
 
 // Internal
-#include <lfant/String.hpp>
-
-#include <lfant/Console.hpp>
-#include <lfant/Renderer.hpp>
+#include <lfant/String.h>
+#include <lfant/Transform.h>
+#include <lfant/Console.h>
+#include <lfant/Renderer.h>
+#include <lfant/MeshLoader.h>
+#include <lfant/Scene.h>
+#include <lfant/Camera.h>
 
 namespace lfant
 {
@@ -41,17 +45,132 @@ Mesh::~Mesh()
 
 void Mesh::Init()
 {
-
+	Renderable::Init();
 }
 
 void Mesh::Update()
 {
-	game->renderer->RenderMesh(this);
+	Renderable::Update();
 }
 
 void Mesh::OnDestroy()
 {
-	game->renderer->RemoveMesh(this);
+	Renderable::OnDestroy();
+}
+
+void Mesh::BeginRender()
+{
+	if(loaded)
+	{
+		EndRender();
+	}
+
+	glGenVertexArrays(1, &vertexArray);
+	glBindVertexArray(vertexArray);
+
+	if(material.shader.id == 0)
+	{
+		material.shader.LoadFile();
+	}
+
+	if(material.texture.id == 0)
+	{
+		material.texture.LoadFile();
+	}
+
+	if(material.shader.id != 0)
+	{
+		// Get any uniforms here
+		matrixId = material.shader.GetUniform("MVP");
+		material.texture.uniformId = material.shader.GetUniform("textureSampler");
+	}
+
+	vector<uint32_t> indices;
+	vector<vec3> indexed_vertices;
+	vector<vec2> indexed_uvs;
+	vector<vec3> indexed_normals;
+	IndexVBO(vertexBuffer.data, uvBuffer.data, normalBuffer.data, indices, indexed_vertices, indexed_uvs, indexed_normals);
+
+	vertexBuffer.data = indexed_vertices;
+	uvBuffer.data = indexed_uvs;
+	normalBuffer.data = indexed_normals;
+	indexBuffer.data = indices;
+
+	vertexBuffer.id = CreateBuffer(GL_ARRAY_BUFFER, vertexBuffer.data);
+	uvBuffer.id = CreateBuffer(GL_ARRAY_BUFFER, uvBuffer.data);
+	normalBuffer.id = CreateBuffer(GL_ARRAY_BUFFER, normalBuffer.data);
+	indexBuffer.id = CreateBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer.data);
+
+	loaded = true;
+}
+
+void Mesh::Render()
+{
+	if(material.shader.id == 0 || material.texture.id == 0)
+	{
+		return;
+	}
+
+	glBindVertexArray(vertexArray);
+
+	glUseProgram(material.shader.id);
+
+	mat4 mvp = game->scene->mainCamera->projection * game->scene->mainCamera->view * owner->GetComponent<Transform>()->GetMatrix();
+	glUniformMatrix4fv(matrixId, 1, GL_FALSE, &mvp[0][0]);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, material.texture.id);
+	glUniform1i(material.texture.uniformId, 0);
+
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer.id);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+	glEnableVertexAttribArray(1);
+	glBindBuffer(GL_ARRAY_BUFFER, uvBuffer.id);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+	glEnableVertexAttribArray(2);
+	glBindBuffer(GL_ARRAY_BUFFER, normalBuffer.id);
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer.id);
+	glDrawElements(GL_TRIANGLES, indexBuffer.size(), GL_UNSIGNED_INT, (void*)0);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	glDisableVertexAttribArray(2);
+	glDisableVertexAttribArray(1);
+	glDisableVertexAttribArray(0);
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	glBindVertexArray(0);
+}
+
+void Mesh::EndRender()
+{
+	glDeleteBuffers(1, &vertexBuffer.id);
+	glDeleteBuffers(1, &uvBuffer.id);
+	glDeleteBuffers(1, &normalBuffer.id);
+	glDeleteBuffers(1, &indexBuffer.id);
+	glDeleteTextures(1, &material.texture.id);
+	glDeleteVertexArrays(1, &vertexArray);
+	loaded = false;
+}
+
+uint32_t Mesh::CreateBuffer(int target, void* data, uint32_t size, int mode)
+{
+	if(mode == 0)
+	{
+		mode = GL_STATIC_DRAW;
+	}
+	uint32_t id;
+	glGenBuffers(1, &id);
+	glBindBuffer(target, id);
+	glBufferData(target, size, data, mode);
+	return id;
 }
 
 void Mesh::LoadFile(string path)
@@ -61,6 +180,12 @@ void Mesh::LoadFile(string path)
 	{
 		LoadOBJ(path);
 	}
+	else
+	{
+		Log("Mesh::LoadFile: File type not supported.");
+		return;
+	}
+	BeginRender();
 }
 
 void Mesh::LoadOBJ(string path)

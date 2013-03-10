@@ -1,7 +1,7 @@
 /******************************************************************************
  *
- *	ShadowFox Engine Source
- *	Copyright (C) 2012-2013 by ShadowFox Studios
+ *	LFANT Source
+ *	Copyright (C) 2012-2013 by LazyFox Studios
  *	Created: 2012-08-27 by Taylor Snead
  *
  *	Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,23 +19,18 @@
  ******************************************************************************/
 
 
-#include <lfant/Console.hpp>
+#include <lfant/Console.h>
+
+// Internal
+#include <lfant/String.h>
+#include <lfant/Settings.h>
 
 // External
 #include <boost/lexical_cast.hpp>
 #include <boost/format.hpp>
 
-// Internal
-#include <lfant/String.hpp>
-
 namespace lfant
 {
-
-template<>
-void Log<const char*>(const char* msg)
-{
-	game->console->Print(msg);
-}
 
 Console::Console()
 {
@@ -49,61 +44,84 @@ Console::~Console()
 
 void Console::Init()
 {
-	ofstream file;
-	file.open(logFile.c_str());
-	file.clear();
-	file.close();
+	logFile.open(logName);
 
 	// Default commands
-	RegisterCommand(CmdExit, "Exit", "Exit the game");
+	RegisterCommand(&Console::CmdExit, "exit", "Exit the game");
+	RegisterCommand(&Console::CmdGetVar, "get");
+	RegisterCommand(&Console::CmdSetVar, "set");
+}
+
+void Console::CmdGetVar(vector<string> args)
+{
+	Log("get: Value of \'" + args[0] + "\':" + game->settings->GetValue(args[0]));
+}
+
+void Console::CmdSetVar(vector<string> args)
+{
+	if(args.size() < 2)
+	{
+		Log("set: No value given.");
+		return;
+	}
+	game->settings->SetValue(args[0], args[1]);
+	Log("set: Changed \'" + args[0] + "\' to " + game->settings->GetValue(args[0]));
+}
+
+void Console::CmdHelp(vector<string> args)
+{
+	if(Command* cmd = GetCommand(args[0]))
+	{
+		Log("help: "+cmd->help);
+		return;
+	}
+	string var = game->settings->GetHelp(args[0]);
+	if(var != "")
+	{
+		Log("help: "+var);
+		return;
+	}
+
+	Log("help: none found.");
+}
+
+void Console::OnDestroy()
+{
+	logFile.close();
 }
 
 void Console::Input(string line)
 {
-	vector<string> output = Split(line, " ,", "=();");
+	vector<string> output = Split(line, " ", "");
 	string str = "";
 	for(uint i = 0; i < output.size(); ++i)
 	{
 		str = output[i];
-		if(output.size() > 1)
+		if(output.size() > 0)
 		{
 			// If we are calling a function
 			if(auto cmd = GetCommand<CommandDefault>(str))
 			{
+				if(output.size() <= 1)
+				{
+					break;
+				}
 				vector<string> args;
-				if(output[i + 1] == "(")
+				for(uint k = i + 1; k < output.size(); ++k)
 				{
-					for(uint k = i + 2; k < output.size(); ++k)
-					{
-						if(output[k] == ")")
-						{
-							i = k;
-							break;
-						}
-						args.push_back(output[k]);
-					}
-					cmd->func(args);
+					args.push_back(output[k]);
 				}
-				else
-				{
-					cmd->func(args);
-				}
+				cmd->func(args);
 			}
 			else if(auto cmd = GetCommand<CommandSimple>(str))
 			{
-				if(output[i + 1] == "(")
-				{
-					for(uint k = i + 2; k < output.size(); ++k)
-					{
-						if(output[k] == ")")
-						{
-							i = k;
-							break;
-						}
-					}
-				}
 				cmd->func();
 			}
+			else
+			{
+				Print("Console::Input: Unknown command \'"+output[i]+"\'");
+			}
+			/*
 			// Or if we want help
 			else if(str == "help" || str == "h")
 			{
@@ -117,6 +135,8 @@ void Console::Input(string line)
 				}
 				++i;
 			}
+			*/
+			/*
 			// Or if we are setting/getting a variable
 			else if(auto var = GetVar(str))
 			{
@@ -142,7 +162,9 @@ void Console::Input(string line)
 					Print(str + ": " + lexical_cast<string>(var->value));
 				}
 			}
+			*/
 		}
+		/*
 		else if(auto var = GetVar(str))
 		{
 			Print(var->name + ": " + lexical_cast<string>(var->value));
@@ -151,25 +173,12 @@ void Console::Input(string line)
 		{
 			continue;
 		}
+		*/
 		else
 		{
 			break;
 		}
 	}
-}
-
-void Console::RegisterVar(string name, float value, string help, bool readOnly)
-{
-	for(auto& var : variables)
-	{
-		if(var->name == name)
-		{
-			var->value = value;
-			var->help = help;
-			var->readOnly = readOnly;
-		}
-	}
-	variables.push_back(new Variable(name, value, help, readOnly));
 }
 
 void Console::RegisterCommand(CommandDefault::funcTypeRaw func, string name, string help)
@@ -179,12 +188,12 @@ void Console::RegisterCommand(CommandDefault::funcTypeRaw func, string name, str
 		CommandDefault* d = dynamic_cast<CommandDefault*>(cmd);
 		if(d && cmd->name == name)
 		{
-			d->func = func;
+			d->func = boost::bind(func, this, _1);
 			d->help = help;
 			return;
 		}
 	}
-	commands.push_back(new CommandDefault(func, name, help));
+	commands.push_back(new CommandDefault(boost::bind(func, this, _1), name, help));
 }
 
 void Console::RegisterCommand(CommandSimple::funcTypeRaw func, string name, string help)
@@ -194,12 +203,12 @@ void Console::RegisterCommand(CommandSimple::funcTypeRaw func, string name, stri
 		CommandSimple* s = dynamic_cast<CommandSimple*>(cmd);
 		if(s && cmd->name == name)
 		{
-			s->func = func;
+			s->func = boost::bind(func, this);
 			s->help = help;
 			return;
 		}
 	}
-	commands.push_back(new CommandSimple(func, name, help));
+	commands.push_back(new CommandSimple(boost::bind(func, this), name, help));
 }
 
 bool Console::CallCommand(string name, vector<string> args)
@@ -230,18 +239,6 @@ bool Console::CallCommand(string name)
 	return false;
 }
 
-Console::Variable* Console::GetVar(string name)
-{
-	for(auto var : variables)
-	{
-		if(var->name == name)
-		{
-			return var;
-		}
-	}
-	return nullptr;
-}
-
 Console::Command* Console::GetCommand(string name)
 {
 	for(auto cmd : commands)
@@ -252,23 +249,6 @@ Console::Command* Console::GetCommand(string name)
 		}
 	}
 	return nullptr;
-}
-
-float Console::GetValue(string name)
-{
-	if(auto var = GetVar(name))
-	{
-		return var->value;
-	}
-	return 0.0f;
-}
-
-void Console::SetValue(string name, float value)
-{
-	if(auto var = GetVar(name))
-	{
-		var->value = value;
-	}
 }
 
 void Console::CmdExit()

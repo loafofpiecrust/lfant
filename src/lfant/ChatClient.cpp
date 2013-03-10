@@ -1,7 +1,7 @@
 /******************************************************************************
  *
- *	ShadowFox Engine Source
- *	Copyright (C) 2012-2013 by ShadowFox Studios
+ *	LFANT Source
+ *	Copyright (C) 2012-2013 by LazyFox Studios
  *	Created: 2013-02-24 by Taylor Snead
  *
  *	Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,14 +18,14 @@
  *
  ******************************************************************************/
 
-#include <lfant/ChatClient.hpp>
+#include <lfant/ChatClient.h>
 
 // External
 
 // Internal
-#include <lfant/network/Client.hpp>
-#include <lfant/Network.hpp>
-#include <lfant/Console.hpp>
+#include <lfant/network/Client.h>
+#include <lfant/Network.h>
+#include <lfant/Console.h>
 
 namespace lfant
 {

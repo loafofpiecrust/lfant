@@ -1,7 +1,7 @@
 /******************************************************************************
  *
- * ShadowFox Engine Source
- * Copyright (C) 2012-2013 by ShadowFox Studios
+ * LFANT Source
+ * Copyright (C) 2012-2013 by LazyFox Studios
  * Created: Sep 16, 2012 by Taylor Snead
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,7 +18,7 @@
  *
  ******************************************************************************/
 
-#include <lfant/Subsystem.hpp>
+#include <lfant/Subsystem.h>
 
 // External
 
