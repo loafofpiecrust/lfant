@@ -25,8 +25,8 @@
 
 // Internal
 #include <lfant/TextureLoader.h>
-#include <lfant/String.h>
-
+#include <lfant/util/String.h>
+#include <lfant/FileSystem.h>
 #include <lfant/Console.h>
 
 namespace lfant
@@ -43,7 +43,7 @@ void Texture::LoadFile(string path, int mode)
 		mode = GL_TEXTURE_2D;
 	}
 	Log("Want to load an image file");
-	name = path;
+	name = game->fileSystem->GetGamePath(path).string();
 	vector<string> tokens = Split(name, ".", "");
 	string ext = tokens[tokens.size()-1];
 	to_lower(ext);
@@ -114,9 +114,9 @@ void Texture::LoadBMP(int mode)
 	vector<byte> data;
 	byte header[54];
 	uint dataPos;
-//	uint width, height;
+	//	uint width, height;
 	uint imageSize;
-//	vector<byte> data;
+	//	vector<byte> data;
 
 	FILE* file = fopen(name.c_str(), "rb");
 	if (!file)
@@ -182,7 +182,8 @@ void Texture::LoadDDS(int mode)
 	/* verify the type of file */
 	char filecode[4];
 	fread(filecode, 1, 4, fp);
-	if (strncmp(filecode, "DDS ", 4) != 0) {
+	if (strncmp(filecode, "DDS ", 4) != 0)
+	{
 		fclose(fp);
 		return;
 	}
@@ -190,8 +191,8 @@ void Texture::LoadDDS(int mode)
 	/* get the surface desc */
 	fread(&header, 124, 1, fp);
 
-	height      = *(unsigned int*)&(header[8 ]);
-	width        = *(unsigned int*)&(header[12]);
+	height = *(unsigned int*)&(header[8]);
+	width  = *(unsigned int*)&(header[12]);
 	unsigned int linearSize  = *(unsigned int*)&(header[16]);
 	unsigned int mipMapCount = *(unsigned int*)&(header[24]);
 	unsigned int fourCC      = *(unsigned int*)&(header[80]);
@@ -240,7 +241,7 @@ void Texture::LoadDDS(int mode)
 	{
 		unsigned int size = ((width+3)/4)*((height+3)/4)*blockSize;
 		glCompressedTexImage2D(mode, level, format, width, height,
-		                       0, size, buffer + offset);
+							   0, size, buffer + offset);
 
 		offset += size;
 		width  /= 2;

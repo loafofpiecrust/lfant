@@ -20,9 +20,13 @@
 
 #include <lfant/Subsystem.h>
 
+// Internal
+#include <lfant/Game.h>
+#include <lfant/Settings.h>
+#include <lfant/Scene.h>
+
 // External
 
-// Internal
 
 namespace lfant
 {
@@ -35,6 +39,25 @@ Subsystem::Subsystem()
 Subsystem::~Subsystem()
 {
 	// TODO Auto-generated destructor stub
+}
+
+void Subsystem::Init()
+{
+	Object::Init();
+	if(Type(this) != Type<Scene>())
+	{
+		printf("About to load file for subsystem\n");
+		Load();
+	}
+}
+
+void Subsystem::Load()
+{
+	/*
+	string type = Type(this);
+	to_lower(type);
+	game->settings->LoadSettings("settings/"+type+".cfg");
+	*/
 }
 
 }

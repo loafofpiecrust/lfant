@@ -25,7 +25,6 @@
 
 // Internal
 #include <lfant/Component.h>
-#include <lfant/Property.h>
 
 namespace lfant
 {

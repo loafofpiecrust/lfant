@@ -22,11 +22,10 @@
 // External
 
 // Internal
-
 #include <lfant/Entity.h>
-
 #include <lfant/Console.h>
 #include <lfant/Camera.h>
+#include <lfant/Properties.h>
 
 namespace lfant
 {
@@ -63,7 +62,7 @@ void Scene::OnDestroy()
 		Log("Scene::Destroy: Destroying ", ent->name);
 		ent->Destroy();
 	}
-	entities.clear();
+//	entities.clear();
 }
 
 void Scene::RemoveEntity(Entity* ent)
@@ -95,28 +94,25 @@ Entity* Scene::GetEntity(string name, bool recursive)
 	return nullptr;
 }
 
-void Scene::Save(string file)
+void Scene::Save(string path)
 {
-	if(file == "")
+}
+
+void Scene::Load(string path)
+{
+	Properties root(path);
+	Log("Scene::Load: Loaded root");
+	Properties* prop = root.GetChild("scene");
+	Log("Scene::Load: Loaded scene node");
+	vector<Properties*> ents = prop->GetChildren("entity");
+	Log("Scene::Load: Filled entity list");
+	Entity* ent = nullptr;
+	for(auto& i : ents)
 	{
-		file = name;
+		ent = Spawn(i->id);
+		Log("Spawned the entity!");
+		ent->Load(i);
 	}
-	file.append(".scene");
-	ofstream io;
-	io.open(file);
-	io << "<Scene name=\"" << "SceneName" << "\">\n";
-	for(auto& ent : entities)
-	{
-		io << "\t<Entity name=\"" << ent->name << "\">\n";
-		vector<pair<string, string> > vars;        //= ent->Serialize();
-		for(auto& str : vars)
-		{
-			io << "\t\t<Var name=\"" << str.first << "\" value=\"" << str.second << "\"/>\n";
-		}
-		io << "\t</Entity>\n";
-	}
-	io << "</Scene>";
-	io.close();
 }
 
 Entity* Scene::Spawn(string name, Entity* parent)
@@ -141,7 +137,6 @@ Entity* Scene::Spawn(string name, Entity* parent)
 	else
 	{
 		parent->AddChild(ent);
-
 	}
 	return ent;
 }

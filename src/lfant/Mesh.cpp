@@ -24,7 +24,7 @@
 #include <GL/glew.h>
 
 // Internal
-#include <lfant/String.h>
+#include <lfant/util/String.h>
 #include <lfant/Transform.h>
 #include <lfant/Console.h>
 #include <lfant/Renderer.h>

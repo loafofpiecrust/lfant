@@ -32,6 +32,7 @@
 #include <lfant/TypeInfo.h>
 #include <lfant/Game.h>
 #include <lfant/ptr.h>
+#include <lfant/Properties.h>
 
 namespace lfant
 {
@@ -66,15 +67,18 @@ public:
 	Entity(Entity* parent);
 	virtual ~Entity();
 
-	virtual void Bind();
-	virtual void Destroy();
+	void Destroy();
+
+	void Bind();
+	void Save();
+	void Load(Properties* props);
 
 	/**
 	 *	Adds a new component by instancing the given type.
 	 *	@tparam C The class of component to add.
 	 */
 	template<typename C>
-	auto AddComponent()->typename boost::enable_if_c<boost::is_base_of<Component, C>::value, C*>::type
+	C* AddComponent()
 	{
 		C* comp = new C();
 		comp->owner = this;
@@ -84,6 +88,8 @@ public:
 		cout << "Entity::AddComponent: Pushed, Component id: " << comp << ", exists? " << (bool)comp << "\n";
 		return comp;
 	}
+
+	Component* AddComponent(string type);
 
 	void AddComponent(Component* comp);
 
@@ -165,6 +171,8 @@ private:
 	forward_list< ptr<Entity> > children;
 	forward_list< ptr<Component> > components;
 	bool useLifeTime = true;
+	uint32_t componentCount = 0;
+	uint32_t childCount = 0;
 
 public:
 	// Properties

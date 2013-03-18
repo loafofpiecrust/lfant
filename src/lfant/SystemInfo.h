@@ -56,7 +56,7 @@ public:
 	struct Monitor
 	{
 		string name;
-		vec2 resolution;
+		tvec2<uint16_t> resolution;
 	};
 
 	struct Processor

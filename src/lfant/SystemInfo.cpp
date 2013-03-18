@@ -20,12 +20,11 @@
 
 #include <lfant/SystemInfo.h>
 
-// External
-
 // Internal
-
 #include <lfant/Console.h>
-#include <lfant/String.h>
+#include <lfant/util/String.h>
+
+// External
 
 namespace lfant
 {
@@ -163,23 +162,23 @@ void SystemInfo::Init()
 	   drives = GetLogicalDrives();
 	   while (drives != 0)
 	   {
-	        if ((drives & 1) == 1)
-	        {
-	                wsprintf(dName, "%c:\\", 'A' + i);
-	                if (GetDriveType(dName) == DRIVE_FIXED)
-	                {
-	                        if (GetDiskFreeSpaceEx(dName, (PULARGE_INTEGER)&nFree, (PULARGE_INTEGER)&nTotal, 0) != 0)
-	                        {
-	                                HardDrive hdd;
-	                                hdd.name = dName;
-	                                hdd.free = nFree / (1024 * 1024 * 1024.0);
-	                                hdd.total = nTotal / (1024 * 1024 * 1024.0);
-	                                GetVolumeInformation(dName, 0, 0, 0, 0, 0, volName, 10);
-	                                sprintf("%s", volName);
-	                        }
-	                }
-	        }
-	        drives >>= 1;
+			if ((drives & 1) == 1)
+			{
+					wsprintf(dName, "%c:\\", 'A' + i);
+					if (GetDriveType(dName) == DRIVE_FIXED)
+					{
+							if (GetDiskFreeSpaceEx(dName, (PULARGE_INTEGER)&nFree, (PULARGE_INTEGER)&nTotal, 0) != 0)
+							{
+									HardDrive hdd;
+									hdd.name = dName;
+									hdd.free = nFree / (1024 * 1024 * 1024.0);
+									hdd.total = nTotal / (1024 * 1024 * 1024.0);
+									GetVolumeInformation(dName, 0, 0, 0, 0, 0, volName, 10);
+									sprintf("%s", volName);
+							}
+					}
+			}
+			drives >>= 1;
 	   ++i;
 	   }*/
 }
@@ -208,6 +207,79 @@ void SystemInfo::Init()
 	vector<string> result_spl = Split(string(result), " \n");
 	OS = result_spl[result_spl.size() - 1] + " " + result_spl[2];
 	computerName = result_spl[1];
+
+	// GPU currently in use
+	cmd = popen("inxi -G", "r");
+	uint cnt = 0;
+	vector<string> line;
+	while(fgets(result, sizeof(result) - 1, cmd) != 0)
+	{
+		Log("Count: ", cnt);
+		if(cnt == 0)
+		{
+			++cnt;
+			continue;
+		}
+		else if(cnt == 1)
+		{
+			line = Split(result, " ");
+			for(uint i = 0; i < line.size(); ++i)
+			{
+				if(line[i] == "Resolution:")
+				{
+					vector<string> res = Split(line[i+1], "x");
+					monitor.resolution.x = lexical_cast<uint16_t>(res[0]);
+					monitor.resolution.y = lexical_cast<uint16_t>(res[2]);
+					break;
+				}
+			}
+		}
+		else if(cnt == 2)
+		{
+			Log("Past split, res: ", result);
+			line = Split(string(result), " \t");
+			int begin = 0, diff = 0;
+			for(uint i = 0; i < line.size(); ++i)
+			{
+				Log("Line portion: ", line[i]);
+				if(line[i] == "Renderer:")
+				{
+					begin = i;
+					Log("Begin ", begin);
+				}
+				else if(line[i] == "GLX" && line[i+1] == "Version:")
+				{
+					diff = i-begin;
+					Log("Diff: ", diff);
+				}
+			}
+
+			for(uint i = begin; i < diff; ++i)
+			{
+				gpu.append(line[i]);
+				if(i+1 < diff)
+				{
+					gpu.append(" ");
+				}
+			}
+
+			Log("Gpu: "+gpu);
+
+			// OpenGL Version supported
+			for(uint i = 0; i < line.size(); ++i)
+			{
+				if(line[i] == "Version:")
+				{
+					glVersion.major = lexical_cast<uint16_t>(line[i+1][0]);
+					glVersion.minor = lexical_cast<uint16_t>(line[i+1][2]);
+					break;
+				}
+			}
+
+		}
+		++cnt;
+	}
+	pclose(cmd);
 
 }
 #endif

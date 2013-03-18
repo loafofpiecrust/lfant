@@ -29,7 +29,7 @@
 #include <lfant/TypeInfo.h>
 
 #include <lfant/Console.h>
-#include <lfant/String.h>
+#include <lfant/util/String.h>
 #include <lfant/Transform.h>
 
 #include <lfant/Component.h>
@@ -121,35 +121,55 @@ void Entity::Update()
 void Entity::AddChild(Entity* ent)
 {
 	children.push_front(ptr<Entity>(ent));
+	++childCount;
 }
 
 void Entity::RemoveChild(Entity* ent)
 {
 	children.remove(ptr<Entity>(ent));
+	--childCount;
 }
 
 void Entity::AddComponent(Component* comp)
 {
 	components.push_front(ptr<Component>(comp));
+	++componentCount;
 }
 
 void Entity::Destroy()
 {
+	Log("Entity::Destroy: Touch.");
 	Object::Destroy();
+	Log("Entity::Destroy: super called.");
 
-	for(auto& compo : components)
+	if(componentCount > 0)
 	{
-		compo->Destroy();
+		Log("Entity::Destroy: Destroying ", componentCount,"components.");
+		for(auto& compo : components)
+		{
+			compo->Destroy();
+		}
 	}
-	components.clear();
-	Log("Entity::Destroy: Components destroyed");
+	//	components.clear();
+	Log("Entity::Destroy: Components destroyed.");
+
+	if(childCount > 0)
+	{
+		Log("Entity::Destroy: Destroying ", childCount,"children.");
+		for(auto& child : children)
+		{
+			child->Destroy();
+		}
+	}
 
 	if(!parent)
 	{
+		Log("Entity::Destroy: Removing from scene.");
 		game->scene->RemoveEntity(this);
 	}
 	else
 	{
+		Log("Entity::Destroy: Removing from parent.");
 		parent->RemoveChild(this);
 	}
 }
@@ -184,7 +204,10 @@ Component* Entity::GetComponent(string type)
 
 void Entity::RemoveComponent(Component* comp)
 {
+	Log("About to remove comp '", comp, "'.");
 	components.remove(ptr<Component>(comp));
+	--componentCount;
+	printf("Removed component\n");
 }
 
 template<class T>
@@ -199,7 +222,7 @@ void Entity::RemoveComponent()
 				comp2->OnRemoveComponent(comp);
 			}
 			comp->Destroy();
-			components.remove(comp);
+			RemoveComponent(comp);
 		}
 	}
 }
@@ -247,6 +270,67 @@ void Entity::Bind()
 
 	   obj.Method("void Destroy()", &Entity::Destroy);
 	 */
+}
+
+
+/*******************************************************************************
+*
+*		Saving and Loading
+*
+*******************************************************************************/
+
+void Entity::Load(Properties* props)
+{
+	tag =		props->Get<string>("tag");
+	layer =		props->Get<string>("layer");
+	active =	props->Get<bool>("active");
+	lifeTime =	props->Get<float>("lifeTime");
+
+	Log("Entity::Load: Loaded basic properties.");
+
+	vector<Properties*> c;
+	{
+		Properties* comps = props->GetChild("components");
+		if(comps)
+		{
+			c = comps->GetChildren("component");
+		}
+	}
+	Log("Entity::Load: Component nodes loaded.");
+	Component* component = nullptr;
+	for(auto& comp : c)
+	{
+		component = AddComponent(comp->id);
+		component->Load(comp);
+	}
+
+	{
+		Properties* comps = props->GetChild("children");
+		if(comps)
+		{
+			c = comps->GetChildren("entity");
+		}
+	}
+	Log("Entity::Load: Children nodes loaded.");
+	Entity* ent = nullptr;
+	for(auto& child : c)
+	{
+		ent = game->scene->Spawn(child->id, this);
+		ent->Load(child);
+	}
+
+	Log("Entity::Load: Finished.");
+
+}
+
+Component *Entity::AddComponent(string type)
+{
+	auto val = Component::componentRegistry[type];
+	if(val == nullptr)
+	{
+		return nullptr;
+	}
+	return (this->*val)();
 }
 
 }

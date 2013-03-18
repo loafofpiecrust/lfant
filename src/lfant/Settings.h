@@ -22,12 +22,12 @@
 #include <lfant/stdafx.h>
 
 // External
-#include <boost/lexical_cast.hpp>
+#include <lfant/util/lexical_cast.h>
 
 // Internal
 
 #include <lfant/Subsystem.h>
-#include <lfant/String.h>
+#include <lfant/util/String.h>
 #include <lfant/Range.h>
 
 #include <lfant/Console.h>
@@ -50,8 +50,9 @@ class Settings : public Subsystem
 {
 	class Var
 	{
-public:
-		void Set(string value) {
+	public:
+		void Set(string value)
+		{
 			this->value = value;
 		}
 

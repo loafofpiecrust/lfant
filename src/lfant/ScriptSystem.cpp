@@ -3,7 +3,7 @@
 
 // Internal
 #include <lfant/Console.h>
-#include <lfant/String.h>
+#include <lfant/util/String.h>
 #include <lfant/FileSystem.h>
 #include <lfant/Time.h>
 #include <lfant/Random.h>

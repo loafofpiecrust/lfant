@@ -30,10 +30,9 @@
 
 // Internal
 #include <lfant/TypeInfo.h>
-#include <lfant/Property.h>
 
-#define SENDER(obj, sig) obj, # sig
-#define RECEIVER(obj, slot) obj, &remove_ref<decltype(* obj)>::type::slot
+#define SENDER(obj, sig) obj, #sig
+#define RECEIVER(obj, slot) obj, &remove_ref<decltype(*obj)>::type::slot
 
 namespace lfant
 {

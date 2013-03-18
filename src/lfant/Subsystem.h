@@ -41,6 +41,9 @@ class Subsystem : public Object
 protected:
 	Subsystem();
 	virtual ~Subsystem();
+
+	virtual void Init();
+	virtual void Load();
 };
 
 /// @}

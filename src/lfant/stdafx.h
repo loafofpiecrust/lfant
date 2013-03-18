@@ -19,7 +19,7 @@
 ******************************************************************************/
 #pragma once
 
-#include "Config.h"
+#include <lfant/Config.h>
 
 // Includes
 #include <stdint.h>
@@ -46,10 +46,10 @@
 #include <boost/type_traits.hpp>
 #include <boost/config.hpp>
 #include <boost/algorithm/string.hpp>
-#include <boost/lexical_cast.hpp>
+#include <lfant/util/lexical_cast.h>
 
 #ifdef major
-#		undef major
+#	undef major
 #endif
 
 // Namespaces
@@ -61,7 +61,6 @@ using namespace boost::assign;
 using namespace boost::algorithm;
 
 // Boost usings
-using boost::lexical_cast;
 
 // Typedefs
 typedef uint8_t byte;

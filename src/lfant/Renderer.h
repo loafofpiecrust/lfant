@@ -27,7 +27,6 @@
 // Internal
 #include <lfant/Range.h>
 #include <lfant/Shader.h>
-#include <lfant/Property.h>
 #include <lfant/Vertex.h>
 
 #include <lfant/Subsystem.h>
@@ -67,6 +66,8 @@ public:
 	Renderer();
 	virtual ~Renderer();
 
+	virtual void Load();
+
 	/**
 	 *	Opens a new window, using member settings.
 	 *	@param close Whether or not to close the current window. Leave at true unless you really know what you're doing.
@@ -81,7 +82,6 @@ public:
 
 	void SetRendering(bool render);
 
-	void SetPosition(ivec2 pos);
 
 	// Shaders
 	Shader& GetShader(string name);
@@ -104,6 +104,9 @@ public:
 	void SetResolution(ivec2 res);
 	ivec2 GetResolution();
 
+	void SetWindowTitle(string title);
+	void SetWindowPos(ivec2 pos);
+
 	/// The multiplier for anti-aliasing. 2, 4, 8.
 	int fsaa = 4;
 
@@ -111,7 +114,7 @@ public:
 	bool fullscreen = false;
 
 	/// Whether or not the frame-rate should try to sync with the monitor refresh rate (60 hz/fps)
-	bool vSync = true;
+	bool vsync = true;
 
 	/// The amount of texture interpolation to use
 	byte texInterp;
@@ -136,6 +139,8 @@ public:
 private:
 	sf::RenderWindow* window;
 	ivec2 resolution = ivec2(1280, 720);
+	ivec2 windowPos = ivec2(0);
+	string windowTitle = "lfant";
 };
 
 /// @}

@@ -65,8 +65,6 @@ private:
 
 	virtual btTypedConstraint* GetConstraint() = 0;
 	virtual void SetConstraint(btTypedConstraint* con) = 0;
-
-	PROP_RW(Joint, pvCon, GetConstraint, SetConstraint)
 };
 
 /** @} */

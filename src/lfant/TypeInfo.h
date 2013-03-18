@@ -27,6 +27,8 @@
 
 // Internal
 #include <lfant/ptr.h>
+#include <lfant/Range.h>
+#include <lfant/util/String.h>
 
 namespace lfant
 {
@@ -94,7 +96,7 @@ string Type(T* p1)
    template<typename T>
    string Type(T* p1)
    {
-        return string(abi::__cxa_demangle(typeid(*p1).name(), 0, 0, (int*)0));
+		return string(abi::__cxa_demangle(typeid(*p1).name(), 0, 0, (int*)0));
    }
  */
 

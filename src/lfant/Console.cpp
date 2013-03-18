@@ -18,15 +18,14 @@
 *
 ******************************************************************************/
 
-
 #include <lfant/Console.h>
 
 // Internal
-#include <lfant/String.h>
+#include <lfant/util/String.h>
 #include <lfant/Settings.h>
 
 // External
-#include <boost/lexical_cast.hpp>
+#include <lfant/util/lexical_cast.h>
 #include <boost/format.hpp>
 
 namespace lfant

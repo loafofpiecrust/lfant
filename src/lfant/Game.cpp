@@ -18,7 +18,6 @@
 *
 ******************************************************************************/
 
-
 #include <lfant/Game.h>
 
 // External
@@ -42,6 +41,9 @@
 #include <lfant/Network.h>
 #include <lfant/ScriptSystem.h>
 
+#include "Game.h"
+#include "Scene.h"
+
 namespace lfant
 {
 
@@ -57,6 +59,7 @@ extern "C" void Launch()
 	while (!game->destroy)
 	{
 		game->Update();
+
 	}
 	Log("About to destroy game");
 	game->Destroy();
@@ -65,21 +68,19 @@ extern "C" void Launch()
 }
 
 Game::Game() :
-	console {
-	new Console
-},
-fileSystem {new FileSystem},
-settings {new Settings},
-systemInfo {new SystemInfo},
-time {new Time},
-physics {new Physics},
-renderer {new Renderer},
-userInterface {new UserInterface},
-scene (new Scene),
-input {new Input},
-audio {new Audio},
-network {new Network},
-scriptSystem {new ScriptSystem}
+	console {new Console},
+	fileSystem {new FileSystem},
+	settings {new Settings},
+	systemInfo {new SystemInfo},
+	time {new Time},
+	physics {new Physics},
+	renderer {new Renderer},
+	userInterface {new UserInterface},
+	scene (new Scene),
+	input {new Input},
+	audio {new Audio},
+	network {new Network},
+	scriptSystem {new ScriptSystem}
 {
 }
 
@@ -97,7 +98,7 @@ void Game::Init()
 {
 	console->Init();
 	fileSystem->Init();
-	settings->Init();
+//	settings->Init();
 	systemInfo->Init();
 	time->Init();
 	physics->Init();

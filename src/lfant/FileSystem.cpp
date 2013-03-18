@@ -60,7 +60,7 @@ void FileSystem::Init()
 		const string home = getenv("HOME");
 #		endif
 		userFolder = home + "/Documents/My Games/" + game->settings->GetValue("general.orgname") + "/" + game->settings->GetValue("general.gamename");
-		game->settings->LoadSettings();
+	//	game->settings->LoadSettings();
 
 		// Save these to system.cfg
 	}

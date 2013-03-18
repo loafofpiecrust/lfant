@@ -64,6 +64,11 @@ public:
 	{
 	}
 
+	Range(T both) :
+		min(both), max(both)
+	{
+	}
+
 	Range()
 	{
 	}

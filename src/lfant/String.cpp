@@ -17,7 +17,7 @@
 *	limitations under the License.
 *
 ******************************************************************************/
-#include <lfant/String.h>
+#include <lfant/util/String.h>
 
 // External
 

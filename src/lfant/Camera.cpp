@@ -24,7 +24,7 @@
 
 // Internal
 #include <lfant/Transform.h>
-#include <lfant/Math.h>
+#include <lfant/util/Math.h>
 #include <lfant/Console.h>
 
 namespace lfant

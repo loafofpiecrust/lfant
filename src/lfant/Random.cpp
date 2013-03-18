@@ -37,6 +37,7 @@ boost::random::random_device randomizer;
 
 void seedrand()
 {
+	printf("Seeding randoms.\n");
 	randfast.seed(time(0));
 	randfast64.seed(time(0));
 }

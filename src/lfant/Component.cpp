@@ -30,6 +30,8 @@
 namespace lfant
 {
 
+map< string, Component* (Entity::*)() > Component::componentRegistry;
+
 Component::Component(Entity* owner) :
 	owner(owner)
 {
@@ -37,6 +39,11 @@ Component::Component(Entity* owner) :
 
 Component::~Component()
 {
+}
+
+void Component::Load(Properties* props)
+{
+	enabled = props->Get<bool>("enabled");
 }
 
 void Component::Init()

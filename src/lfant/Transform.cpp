@@ -24,7 +24,7 @@
 // Internal
 
 #include <lfant/Entity.h>
-#include <lfant/Math.h>
+#include <lfant/util/Math.h>
 
 #include <lfant/Console.h>
 

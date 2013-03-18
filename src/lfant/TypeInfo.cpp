@@ -1,5 +1,6 @@
 
 // External
+#include <lfant/util/lexical_cast.h>
 
 // Internal
 #include <lfant/TypeInfo.h>
@@ -23,3 +24,4 @@ string DemangleType(string type)
 }
 
 }
+

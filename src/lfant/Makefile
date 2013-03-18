@@ -20,9 +20,12 @@ ifeq ($(config),release_x64)
   ALL_CFLAGS   += $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH) -m64 -fPIC -std=gnu++11 -O3 -Wall -Wno-invalid-offsetof -Wno-overloaded-virtual
   ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CFLAGS)
   ALL_RESFLAGS += $(RESFLAGS) $(DEFINES) $(INCLUDES)
-  ALL_LDFLAGS  += $(LDFLAGS) -L../../bin64/linux -s -shared -m64 -L/usr/lib64
-  LIBS      += -lrocket -lglew -lglfw -lboost -lbullet -lfmod -lpng -lz -lsquirrel
-  LDDEPS    += ../../bin64/linux/librocket.so
+  PCH        = stdafx.h
+  GCH        = $(OBJDIR)/stdafx.h.gch
+  ALL_CPPFLAGS += -I$(OBJDIR) -include $(OBJDIR)/stdafx.h
+  ALL_LDFLAGS  += $(LDFLAGS) -L../../bin64/linux -s -shared -m64 -L/usr/lib64 -Wl,-rpath,$ORIGIN -Wl,-z,origin -Wl,--no-undefined
+  LIBS      += -lglew -lglfw -lboost -lbullet -lfmod -lrocket -lpng -lz -lsquirrel -lpthread
+  LDDEPS    +=
   LINKCMD    = $(CXX) -o $(TARGET) $(OBJECTS) $(RESOURCES) $(ARCH) $(LIBS) $(ALL_LDFLAGS)
   define PREBUILDCMDS
   endef
@@ -45,9 +48,12 @@ ifeq ($(config),release_x32)
   ALL_CFLAGS   += $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH) -m32 -fPIC -std=gnu++11 -O3 -Wall -Wno-invalid-offsetof -Wno-overloaded-virtual
   ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CFLAGS)
   ALL_RESFLAGS += $(RESFLAGS) $(DEFINES) $(INCLUDES)
-  ALL_LDFLAGS  += $(LDFLAGS) -L../../bin32/linux -s -shared -m32 -L/usr/lib32
-  LIBS      += -lrocket -lglew -lglfw -lboost -lbullet -lfmod -lpng -lz -lsquirrel
-  LDDEPS    += ../../bin32/linux/librocket.so
+  PCH        = stdafx.h
+  GCH        = $(OBJDIR)/stdafx.h.gch
+  ALL_CPPFLAGS += -I$(OBJDIR) -include $(OBJDIR)/stdafx.h
+  ALL_LDFLAGS  += $(LDFLAGS) -L../../bin32/linux -s -shared -m32 -L/usr/lib32 -Wl,-rpath,$ORIGIN -Wl,-z,origin -Wl,--no-undefined
+  LIBS      += -lglew -lglfw -lboost -lbullet -lfmod -lrocket -lpng -lz -lsquirrel -lpthread
+  LDDEPS    +=
   LINKCMD    = $(CXX) -o $(TARGET) $(OBJECTS) $(RESOURCES) $(ARCH) $(LIBS) $(ALL_LDFLAGS)
   define PREBUILDCMDS
   endef
@@ -110,6 +116,7 @@ OBJECTS := \
 	$(OBJDIR)/Connection.o \
 	$(OBJDIR)/PeerClient.o \
 	$(OBJDIR)/Server.o \
+	$(OBJDIR)/stdafx.o \
 	$(OBJDIR)/tinyxml2.o \
 
 RESOURCES := \
@@ -315,6 +322,9 @@ $(OBJDIR)/PeerClient.o: network/PeerClient.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) -o "$@" -MF $(@:%.o=%.d) -c "$<"
 $(OBJDIR)/Server.o: network/Server.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) -o "$@" -MF $(@:%.o=%.d) -c "$<"
+$(OBJDIR)/stdafx.o: stdafx.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) -o "$@" -MF $(@:%.o=%.d) -c "$<"
 $(OBJDIR)/tinyxml2.o: tinyxml2.cpp

@@ -2,7 +2,8 @@ project "lfant"
 	basedir "."
 	kind "SharedLib"
 	language "C++"
---	pchheader ("stdafx.h")
+	pchheader "stdafx.h"
+	pchsource "stdafx.cpp"
 	files { "**.h", "**.cpp" }
 	includedirs { 
 		"..",
@@ -28,3 +29,9 @@ project "lfant"
 		"z",
 		"squirrel"
 	}
+	
+	if(os.is("linux")) then
+		links {
+			"pthread"
+		}
+	end

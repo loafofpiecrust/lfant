@@ -22,7 +22,7 @@
 
 // Internal
 #include <lfant/MeshLoader.h>
-#include <lfant/String.h>
+#include <lfant/util/String.h>
 
 namespace lfant
 {

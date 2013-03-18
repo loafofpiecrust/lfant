@@ -25,7 +25,6 @@
 
 // Internal
 #include <lfant/Object.h>
-#include <lfant/Property.h>
 #include <lfant/Entity.h>
 
 namespace lfant
@@ -39,20 +38,15 @@ namespace lfant
 
 //#define REGISTER_COMP(comp) static bool BOOST_PP_CAT( comp, __regged ) = componentRegistry.insert( BOOST_PP_STRINGIZE(comp), &Entity::AddComponent<comp>());
 #define DECLARE_COMP(comp) \
-    struct RegistryEntry \
-	{ \
-public: \
-		RegistryEntry(); \
-	}; \
-    static RegistryEntry registryEntry;
+	static void _RegisterComponent();
 
 #define IMPLEMENT_COMP(comp) \
-    comp::RegistryEntry::RegistryEntry() \
-	{ \
-		std::cout << "Registering component: " << BOOST_PP_STRINGIZE(comp) << "\n"; \
-/*	componentRegistry[BOOST_PP_STRINGIZE(comp)] = &Entity::AddComponent<comp>;*/ \
-	} \
-    comp::RegistryEntry comp::registryEntry;
+	void comp::_RegisterComponent() __attribute__((constructor))\
+	{\
+		std::cout << "Registering component: " << #comp << "\n";\
+		componentRegistry[#comp] = (Component* (Entity::*)())&Entity::AddComponent<comp>;\
+	}
+
 
 /**	The base class for all Entity Components.
  *		Component is the basis for all things to be attached to
@@ -70,6 +64,8 @@ class Component : public Object
 public:
 	virtual ~Component();
 
+	virtual void Load(Properties* props);
+
 	/**
 	 *	Returns whether this component is enabled.
 	 */
@@ -84,7 +80,7 @@ public:
 	Entity* owner;
 
 protected:
-	static map< string, boost::function<void()> > componentRegistry;
+	static map< string, Component* (Entity::*)() > componentRegistry;
 
 	Component()
 	{

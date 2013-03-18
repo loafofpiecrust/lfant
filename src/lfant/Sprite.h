@@ -45,7 +45,7 @@ namespace lfant
 class Sprite : public Mesh
 {
 public:
-	DECLARE_COMP(Sprite)
+//	DECLARE_COMP(Sprite)
 
 	/**
 	 *	Supported animation play modes.
@@ -65,7 +65,7 @@ public:
 	 */
 	class Animation
 	{
-public:
+	public:
 		string name = "Animation";
 		Material material;
 		uint16_t rows = 5;

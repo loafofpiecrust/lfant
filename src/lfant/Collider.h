@@ -26,7 +26,6 @@
 // Internal
 
 #include <lfant/Component.h>
-#include <lfant/Property.h>
 
 class btCollisionShape;
 
@@ -71,7 +70,6 @@ protected:
 private:
 
 public:
-	PROP_RO(Collider, shape, GetShape)
 
 };
 

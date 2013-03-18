@@ -86,14 +86,14 @@ public:
 	 *
 	 *	@param file File to save to, without extension.
 	 */
-	void Save(string file = "");
+	void Save(string path = "");
 
 	/**
 	 *	Loads the scene from a file.
 	 *
 	 *	@param file File to load from, without extension.
 	 */
-	void Load(string file);
+	void Load(string path);
 
 	/**
 	 *	Spawns an entity in this Scene. Use this for any creation
@@ -106,7 +106,7 @@ public:
 	 *	@param scale Scale, defaults to x1.
 	 *	@return The new entity.
 	 */
-	Entity* Spawn(string name, Entity* parent = nullptr);
+	Entity* Spawn(string name = "Entity", Entity* parent = nullptr);
 
 	Camera* mainCamera = nullptr;
 	string name = "Scene";

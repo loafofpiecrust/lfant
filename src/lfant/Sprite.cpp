@@ -35,7 +35,7 @@
 namespace lfant
 {
 
-IMPLEMENT_COMP(Sprite)
+//IMPLEMENT_COMP(Sprite)
 
 Sprite::Sprite()
 {
@@ -50,6 +50,8 @@ void Sprite::BeginRender()
 	glGenVertexArrays(1, &vertexArray);
 	glBindVertexArray(vertexArray);
 
+	Log("Sprite vert arr bound");
+
 	if(material.shader.id == 0)
 	{
 		material.shader.LoadFile();
@@ -63,8 +65,8 @@ void Sprite::BeginRender()
 	if(material.shader.id != 0)
 	{
 		// Get any uniforms here
-		matrixId = glGetUniformLocation(material.shader.id, "MVP");
-		material.texture.uniformId = glGetUniformLocation(material.shader.id, "textureSampler");
+		matrixId = material.shader.GetUniform("MVP");
+		material.texture.uniformId = material.shader.GetUniform("textureSampler");
 	}
 
 	vertexBuffer.push_back(vec3(0, 0, 0));
@@ -93,6 +95,7 @@ void Sprite::Render()
 {
 	if(material.shader.id == 0 || material.texture.id == 0)
 	{
+	//	BeginRender();
 		return;
 	}
 
@@ -116,10 +119,10 @@ void Sprite::Render()
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
 	/*
-	   glEnableVertexAttribArray(2);
-	   glBindBuffer(GL_ARRAY_BUFFER, normalBuffer.id);
-	   glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-	 */
+	glEnableVertexAttribArray(2);
+	glBindBuffer(GL_ARRAY_BUFFER, normalBuffer.id);
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+	*/
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer.id);
 	glDrawElements(GL_QUADS, indexBuffer.size(), GL_UNSIGNED_INT, (void*)0);

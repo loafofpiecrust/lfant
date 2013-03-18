@@ -52,6 +52,7 @@
 
 #include <lfant/TextureLoader.h>
 #include <lfant/MeshLoader.h>
+#include <lfant/Properties.h>
 
 #define OFFSET(i) ((byte*)0 + (i))
 
@@ -66,6 +67,27 @@ Renderer::~Renderer()
 {
 }
 
+void Renderer::Load()
+{
+	Log("Renderer::Load: Touch.");
+	Properties root;
+	root.LoadFile("settings/renderer.cfg");
+	Log("Renderer::Load: Loaded file.");
+	Properties* prop = root.GetChild("renderer");
+	Log("Renderer::Load: Got root child");
+
+	resolution =		prop->Get<ivec2>("resolution", ivec2(500, 500));
+	version =			prop->Get< Range<int> >("version", {3, 2});
+	vsync =				prop->Get<bool>("vsync", true);
+	fullscreen =		prop->Get<bool>("fullscreen", false);
+	fsaa =				prop->Get<int>("fsaa", 4);
+	windowResizable =	prop->Get<bool>("windowResizable", false);
+	windowTitle =		prop->Get<string>("windowTitle", "lfant");
+	windowPos =			prop->Get<ivec2>("windowPos", ivec2(0));
+
+	Log("Window title: '"+windowTitle+"'.");
+}
+
 /*******************************************************************************
 *
 *		Game Loop
@@ -74,6 +96,8 @@ Renderer::~Renderer()
 
 void Renderer::Init()
 {
+	Subsystem::Init();
+
 	Log("Renderer::Init: About to start GLFW");
 	if(!glfwInit())
 	{
@@ -118,7 +142,7 @@ void Renderer::Init()
 	//glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
 	//glEnable(GL_BLEND);
 
-	//glfwSwapInterval(vSync);
+	//glfwSwapInterval(vsync);
 
 	glfwSetWindowCloseCallback(&Renderer::WindowClosed);
 	glfwSetWindowSizeCallback(&Renderer::WindowResized);
@@ -130,9 +154,9 @@ void Renderer::Init()
 	   auto shs = game->fileSystem->GetGameFiles("shaders", "vert");
 	   for(uint i = 0; i < shs.size(); ++i)
 	   {
-	        Shader shader;
-	        shader.LoadFile(shs[i].string());
-	        shaders.push_back(shader);
+			Shader shader;
+			shader.LoadFile(shs[i].string());
+			shaders.push_back(shader);
 	   }*/
 }
 
@@ -184,7 +208,8 @@ bool Renderer::OpenWindow()
 	}
 	Log("Renderer::OpenWindow: GLEW Initialised.");
 
-	glfwSetWindowTitle(game->settings->GetValue("general.windowtitle").c_str());
+	SetWindowTitle(windowTitle);
+	SetWindowPos(windowPos);
 
 	Log("Renderer::OpenWindow: Window successfully opened.");
 
@@ -217,6 +242,12 @@ ivec2 Renderer::GetResolution()
 	return resolution;
 }
 
+void Renderer::SetWindowTitle(string title)
+{
+	windowTitle = title;
+	glfwSetWindowTitle(title.c_str());
+}
+
 void Renderer::SetResolution(ivec2 res)
 {
 	resolution = res;
@@ -241,8 +272,9 @@ void Renderer::SetRendering(bool render)
 	this->render = render;
 }
 
-void Renderer::SetPosition(ivec2 pos)
+void Renderer::SetWindowPos(ivec2 pos)
 {
+	windowPos = pos;
 	glfwSetWindowPos(pos.x, pos.y);
 }
 
