@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?fileVersion 4.0.0?><cproject storage_type_id="org.eclipse.cdt.core.XmlProjectDescriptionStorage">
+	<storageModule moduleId="org.eclipse.cdt.core.settings">
+		<cconfiguration id="0.525123310">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="0.525123310" moduleId="org.eclipse.cdt.core.settings" name="Default">
+				<macros>
+					<stringListMacro name="Build_Warnings" type="VALUE_TEXT_LIST">
+						<value name="all"/>
+						<value name="init-self"/>
+					</stringListMacro>
+					<stringListMacro name="Libs" type="VALUE_PATH_FILE_LIST">
+						<value name="libicui18n.so.49"/>
+						<value name="libicuuc.so.49"/>
+						<value name="libicudata.so.49"/>
+						<value name="libpthread.so"/>
+						<value name="libQt5Widgets.so"/>
+						<value name="libQt5Core.so"/>
+						<value name="libQt5Gui.so"/>
+					</stringListMacro>
+					<stringListMacro name="Build_Options" type="VALUE_TEXT_LIST">
+						<value name="fPIE"/>
+						<value name="fPIC"/>
+						<value name="std=gnu++11"/>
+						<value name="O3"/>
+					</stringListMacro>
+					<stringMacro name="Qt_Lib_Dir" type="VALUE_PATH_DIR" value="/home/taylorsnead/ShadowFox/Qt/5.0.0/gcc_64/lib"/>
+					<stringMacro name="Qt_Include_Dir" type="VALUE_PATH_DIR" value="/home/taylorsnead/ShadowFox/Qt/5.0.0/gcc_64/include"/>
+					<stringListMacro name="Defines" type="VALUE_TEXT_LIST">
+						<value name="_REENTRANT"/>
+						<value name="QT_NO_DEBUG"/>
+						<value name="QT_WIDGETS_LIB"/>
+						<value name="QT_GUI_LIB"/>
+						<value name="QT_CORE_LIB"/>
+					</stringListMacro>
+					<stringMacro name="Output" type="VALUE_TEXT" value="editor"/>
+					<stringMacro name="Lib_Type" type="VALUE_TEXT" value="exec"/>
+					<stringListMacro name="Exclude_Files" type="VALUE_PATH_FILE_LIST"/>
+					<stringMacro name="Source_Dir" type="VALUE_PATH_DIR" value="."/>
+					<stringListMacro name="Lib_Dirs" type="VALUE_PATH_DIR_LIST">
+						<value name="/usr/X11R6/lib64"/>
+						<value name="&quot;${Qt_Lib_Dir}&quot;"/>
+					</stringListMacro>
+					<stringMacro name="Arch" type="VALUE_TEXT" value="64"/>
+					<stringListMacro name="Includes" type="VALUE_PATH_DIR_LIST">
+						<value name="&quot;${Qt_Include_Dir}&quot;"/>
+						<value name="&quot;${Qt_Include_Dir}/QtCore&quot;"/>
+						<value name="&quot;${Qt_Include_Dir}/QtWidgets&quot;"/>
+						<value name="&quot;${Qt_Include_Dir}/QtGui&quot;"/>
+						<value name="../engine"/>
+					</stringListMacro>
+					<stringListMacro name="Project_Dependencies" type="VALUE_TEXT_LIST">
+						<value name="../engine"/>
+					</stringListMacro>
+					<stringListMacro name="Specified_Folders" type="VALUE_PATH_DIR_LIST"/>
+					<stringListMacro name="Exclude_Folders" type="VALUE_PATH_DIR_LIST"/>
+					<stringMacro name="Work_Root" type="VALUE_PATH_DIR" value="${DIR_SFE}"/>
+				</macros>
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.VCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactName="${ProjName}" buildProperties="" description="" id="0.525123310" name="Default" parent="org.eclipse.cdt.build.core.prefbase.cfg">
+					<folderInfo id="0.525123310." name="/" resourcePath="">
+						<toolChain id="org.eclipse.cdt.build.core.prefbase.toolchain.1799543449" name="No ToolChain" resourceTypeBasedDiscovery="false" superClass="org.eclipse.cdt.build.core.prefbase.toolchain">
+							<targetPlatform id="org.eclipse.cdt.build.core.prefbase.toolchain.1799543449.1776710460" name=""/>
+							<builder arguments="-f ${makefile}" command="make" id="org.eclipse.cdt.build.core.settings.default.builder.1720961279" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" superClass="org.eclipse.cdt.build.core.settings.default.builder"/>
+							<tool id="org.eclipse.cdt.build.core.settings.holder.libs.1983055872" name="holder for library settings" superClass="org.eclipse.cdt.build.core.settings.holder.libs"/>
+							<tool id="org.eclipse.cdt.build.core.settings.holder.211044046" name="Assembly" superClass="org.eclipse.cdt.build.core.settings.holder">
+								<inputType id="org.eclipse.cdt.build.core.settings.holder.inType.569698143" languageId="org.eclipse.cdt.core.assembly" languageName="Assembly" sourceContentType="org.eclipse.cdt.core.asmSource" superClass="org.eclipse.cdt.build.core.settings.holder.inType"/>
+							</tool>
+							<tool id="org.eclipse.cdt.build.core.settings.holder.49949986" name="GNU C++" superClass="org.eclipse.cdt.build.core.settings.holder">
+								<inputType id="org.eclipse.cdt.build.core.settings.holder.inType.1509091251" languageId="org.eclipse.cdt.core.g++" languageName="GNU C++" sourceContentType="org.eclipse.cdt.core.cxxSource,org.eclipse.cdt.core.cxxHeader" superClass="org.eclipse.cdt.build.core.settings.holder.inType"/>
+							</tool>
+							<tool id="org.eclipse.cdt.build.core.settings.holder.875840535" name="GNU C" superClass="org.eclipse.cdt.build.core.settings.holder">
+								<inputType id="org.eclipse.cdt.build.core.settings.holder.inType.1259525520" languageId="org.eclipse.cdt.core.gcc" languageName="GNU C" sourceContentType="org.eclipse.cdt.core.cSource,org.eclipse.cdt.core.cHeader" superClass="org.eclipse.cdt.build.core.settings.holder.inType"/>
+							</tool>
+						</toolChain>
+					</folderInfo>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+		</cconfiguration>
+	</storageModule>
+	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+		<project id="Editor.null.957830075" name="Editor"/>
+	</storageModule>
+	<storageModule moduleId="scannerConfiguration">
+		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		<scannerConfigBuildInfo instanceId="0.525123310">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
+	<storageModule moduleId="refreshScope" versionNumber="2">
+		<configuration configurationName="Default">
+			<resource resourceType="PROJECT" workspacePath="/Editor"/>
+		</configuration>
+	</storageModule>
+</cproject>
