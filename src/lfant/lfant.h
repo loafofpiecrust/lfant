@@ -1,4 +1,6 @@
 
 // Subsystems
 #include <lfant/Game.h>
-#include <lfant/
+
+// Entity
+#include <lfant/Entity.h>

@@ -45,8 +45,8 @@ void Script::Compile()
 
 void TestFunc()
 {
-	int i = Random(0, 999);
-	int k = Random(9999, 99999999);
+	int i = random::Range(0, 999);
+	int k = random::Range(9999, 99999999);
 	i += k;
 	k -= i;
 	i -= k;

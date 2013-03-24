@@ -35,6 +35,24 @@ Transform::Transform()
 {
 }
 
+void Transform::Save(Properties *prop)
+{
+	Component::Save(prop);
+
+	prop->Set("position", position);
+	prop->Set("rotation", rotation);
+	prop->Set("scale", scale);
+}
+
+void Transform::Load(Properties *prop)
+{
+	Component::Load(prop);
+
+	prop->Get("position", position);
+	prop->Get("rotation", rotation);
+	prop->Get("scale", scale);
+}
+
 vec3& Transform::GetPosition()
 {
 	return position;
@@ -158,16 +176,16 @@ void Transform::SetDirection()
 {
 	vec3 rot = GetWorldRotation();
 	direction = vec3(
-	    cos(rot.x) * sin(rot.z),
-	    sin(rot.x),
-	    cos(rot.x) * cos(rot.z)
-	    );
+		cos(rot.x) * sin(rot.z),
+		sin(rot.x),
+		cos(rot.x) * cos(rot.z)
+		);
 
 	right = vec3(
-	    sin(rot.z - 3.14f / 2.0f),
-	    0,
-	    cos(rot.z - 3.14f / 2.0f)
-	    );
+		sin(rot.z - 3.14f / 2.0f),
+		0,
+		cos(rot.z - 3.14f / 2.0f)
+		);
 
 	up = cross(right, direction);
 }

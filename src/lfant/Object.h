@@ -104,10 +104,28 @@ class Object
 	};
 public:
 
+	/**
+	 *	Loads the object's data from a Properties structure.
+	 *	@param prop The Properties namespace to load from.
+	 */
 	virtual void Load(Properties* prop);
+
+	/**
+	 *	Loads a Properties structure from a file, then calling Load().
+	 *	@param path File to load from.
+	 */
 	virtual void LoadFile(string path);
 
+	/**
+	 *	Saves Object data to a Properties structure.
+	 *	@param prop Namespace to save to.
+	 */
 	virtual void Save(Properties* prop);
+
+	/**
+	 *	Creates a file and calls Save(), outputting to the file.
+	 *	@param path File to save to.
+	 */
 	virtual void SaveFile(string path);
 
 	template<typename R>
@@ -249,20 +267,34 @@ public:
 		return false;
 	}
 
+	/**
+	 *	Called when the object is initialised. Used instead of
+	 *	constructor to ensure that all subsystems are created as well.
+	 */
 	virtual void Init();
-	virtual void Update()
-	{
-	}
+
+	/**
+	 *	Called every frame to update the object.
+	 */
+	virtual void Update();
+
+	/**
+	 *	Call this to destroy the object.
+	 */
 	virtual void Destroy();
 
 protected:
 	Object();
 	virtual ~Object();
 
-	virtual void Destroy(Object* obj);
-	virtual void OnDestroy()
-	{
-	}
+	/**
+	 *	Called just before the object is destroyed.
+	 */
+	virtual void OnDestroy();
+
+	/**
+	 *	Called when the object should be bound to script.
+	 */
 	virtual void Bind();
 
 private:

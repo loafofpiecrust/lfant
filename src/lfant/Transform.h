@@ -45,6 +45,9 @@ public:
 	{
 	}
 
+	void Save(Properties* prop);
+	void Load(Properties* prop);
+
 	void Translate(vec3 pos);
 	void Rotate(vec3 rot);
 	void Scale(vec3 scl);

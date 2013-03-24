@@ -32,8 +32,7 @@
 namespace lfant
 {
 
-Joint::Joint() :
-	Component(nullptr)
+Joint::Joint()
 {
 }
 

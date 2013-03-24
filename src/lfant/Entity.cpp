@@ -250,10 +250,7 @@ void Entity::RemoveComponent()
 	{
 		if(CheckType<T>(comp))
 		{
-			for(auto& comp2 : components)
-			{
-				comp2->OnRemoveComponent(comp);
-			}
+			Trigger("RemoveComponent", comp.get());
 			comp->Destroy();
 			components.remove(comp);
 			--componentCount;
@@ -349,7 +346,14 @@ void Entity::Load(Properties* prop)
 	Component* component = nullptr;
 	for(auto& comp : c)
 	{
-		component = AddComponent(comp->id);
+		if(comp->id != "Transform")
+		{
+			component = AddComponent(comp->id);
+		}
+		else
+		{
+			component = transform;
+		}
 		component->Load(comp);
 	}
 

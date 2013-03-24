@@ -61,7 +61,8 @@ void Properties::LoadStream(ifstream& stream)
 
 	string line = "";
 	string extline = "";
-	size_t pos;
+	int pos;
+	int pos2;
 	deque<string> stack;
 	vector<string> toks;
 	string name = "";
@@ -157,6 +158,7 @@ void Properties::LoadStream(ifstream& stream)
 
 		// Set value
 		pos = line.find("=");
+		pos2 = line.find("{");
 		if(pos != string::npos)
 		{
 			for(int i = 0; i < pos; ++i)

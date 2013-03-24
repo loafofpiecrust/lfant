@@ -28,6 +28,7 @@ public:
 
 protected:
 	Connection(string name, string host, uint16_t port, string password);
+	Connection() {}
 
 	virtual void Destroy();
 

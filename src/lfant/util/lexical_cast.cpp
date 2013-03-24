@@ -132,6 +132,13 @@ string lexical_cast<string, ivec2>(const ivec2& src)
 }
 
 template<>
+string lexical_cast<string, vec3>(const vec3& src)
+{
+	return "("+lexical_cast<string>(src.x)+","+lexical_cast<string>(src.y)+","+
+			lexical_cast<string>(src.z)+")";
+}
+
+template<>
 string lexical_cast<string, rgba>(const rgba& src)
 {
 	return "("+lexical_cast<string>(src.r)+","+lexical_cast<string>(src.g)+","+

@@ -54,6 +54,25 @@ void Network::Update()
 	}
 }
 
+void Network::Save(Properties *prop)
+{
+	for(auto& con : connections)
+	{
+		con->Save(prop->AddChild());
+	}
+}
+
+void Network::Load(Properties *prop)
+{
+	vector<Properties*> cons = prop->GetChildren("connection");
+	for(auto& pcon : cons)
+	{
+		Connection* con = new Connection;
+		con->Load(pcon);
+		connections.push_front(ptr<Connection>(con));
+	}
+}
+
 Connection* Network::GetConnection(string name)
 {
 	for(auto& con : connections)

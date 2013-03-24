@@ -75,51 +75,30 @@ public:
 	/**
 	 *	Enables or disables this component.
 	 */
-	void SetEnabled(bool enable);
+	void Enable(bool enable);
 
-	static void RegisterType(string name, Component* (Entity::*func)());
 
 	/// The owner of this Component.
 	Entity* owner;
 
 protected:
+	Component();
+
+	/**
+	 *	Registers a component type by string, only used by the IMPLEMENT_COMP macro.
+	 *	@param name The typename
+	 */
+	static void RegisterType(string name, Component* (Entity::*func)());
 	static map< string, Component* (Entity::*)() > componentRegistry;
 
-	Component()
-	{
-	}
-	Component(Entity* owner);
-
+	// Loop Function Overwrites
 	virtual void Init();
-
-	virtual void Update()
-	{
-	}
-
-	virtual void PostUpdate() {
-	}
-
+	virtual void Update();
+	virtual void PostUpdate();
 	virtual void Destroy();
-
-	virtual void OnDestroy()
-	{
-	}
-
-	virtual void OnEnable()
-	{
-	}
-
-	virtual void OnDisable()
-	{
-	}
-
-	virtual void OnAddComponent(Component* comp)
-	{
-	}
-
-	virtual void OnRemoveComponent(Component* comp)
-	{
-	}
+	virtual void OnDestroy();
+	virtual void OnEnable();
+	virtual void OnDisable();
 
 	virtual void Trigger(string name);
 

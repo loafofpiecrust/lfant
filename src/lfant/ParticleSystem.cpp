@@ -163,11 +163,11 @@ void ParticleSystem::Emit(uint32_t amount)
 void ParticleSystem::Emit(Particle* pt, bool old)
 {
 	pt->system = this;
-	pt->SetSizeRange(Random(size.start.min, size.start.max), Random(size.end.min, size.end.max));
+	pt->SetSizeRange(random::Range(size.start.min, size.start.max), random::Range(size.end.min, size.end.max));
 	pt->SetGravity(gravity);
-	pt->color.start = Random(color.start.min, color.start.max);
-	pt->color.end = Random(color.end.min, color.end.max);
-	pt->StartLife(Random(lifetime.start, lifetime.end));
+	pt->color.start = random::Range(color.start.min, color.start.max);
+	pt->color.end = random::Range(color.end.min, color.end.max);
+	pt->StartLife(random::Range(lifetime.start, lifetime.end));
 	pt->Activate(true);
 	GenerateVelocity(pt);
 	pt->Init();
@@ -183,39 +183,39 @@ void ParticleSystem::Recycle(Particle* pt)
 
 void ParticleSystem::GenerateVelocity(Particle* pt)
 {
-	float speed = Random(this->speed.start.min, this->speed.start.max);
+	float speed = random::Range(this->speed.start.min, this->speed.start.max);
 	vec3 dir;
 	vec3 pos;
 
 	// Cone emitter
-	pt->transform->SetPosition( pos = vec3(Random(-radius, radius), 0.0f, Random(-radius, radius)) );
-	dir = vec3(Random(-angle / 90, angle / 90), Random(0.0f, 1.0f), Random(-angle / 90, angle / 90));
+	pt->transform->SetPosition( pos = vec3(random::Range(-radius, radius), 0.0f, random::Range(-radius, radius)) );
+	dir = vec3(random::Range(-angle / 90, angle / 90), random::Range(0.0f, 1.0f), random::Range(-angle / 90, angle / 90));
 	while(dir == vec3(0.0f))
 	{
 		// This is to prevent ever getting a 0 direction and generating an empty velocity.
-		dir = vec3(Random(-angle / 90, angle / 90), Random(0.0f, 1.0f), Random(-angle / 90, angle / 90));
+		dir = vec3(random::Range(-angle / 90, angle / 90), random::Range(0.0f, 1.0f), random::Range(-angle / 90, angle / 90));
 	}
 	pt->velocity = dir * speed;
 
 	// Sphere emitter
 	pt->transform->SetPosition(vec3(0));
-	dir = vec3(Random(-1.0f, 1.0f), Random(-1.0f, 1.0f), Random(-1.0f, 1.0f));
-	pt->transform->Translate(dir * Random(0.0f, radius));
+	dir = vec3(random::Range(-1.0f, 1.0f), random::Range(-1.0f, 1.0f), random::Range(-1.0f, 1.0f));
+	pt->transform->Translate(dir * random::Range(0.0f, radius));
 	pt->velocity = dir * speed;
 
 	// Straight direction emitter
 	// Cube volume, radius being half the side length
-	pt->transform->SetPosition(vec3(Random(-radius, radius), Random(-radius, radius), Random(-radius, radius)));
+	pt->transform->SetPosition(vec3(random::Range(-radius, radius), random::Range(-radius, radius), random::Range(-radius, radius)));
 	// Square area
-	pt->transform->SetPosition(vec3(Random(-radius, radius), 0.0f, Random(-radius, radius)));
+	pt->transform->SetPosition(vec3(random::Range(-radius, radius), 0.0f, random::Range(-radius, radius)));
 	// Point emitter
 	pt->transform->SetPosition(vec3(0));
 	dir = vec3(0, 1, 0);
 	pt->velocity = dir * speed;
 
 	// Beginning and ending velocity range, for an interpolating velocity.
-	pt->velRange.start = Random(velocity.start.min, velocity.start.max);
-	pt->velRange.end = Random(velocity.end.min, velocity.end.max);
+	pt->velRange.start = random::Range(velocity.start.min, velocity.start.max);
+	pt->velRange.end = random::Range(velocity.end.min, velocity.end.max);
 
 	//return pt->velocity;
 }

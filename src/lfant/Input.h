@@ -38,13 +38,18 @@ namespace lfant
  *	 @{
  */
 
-extern map<string, uint16_t> Key;
+//extern map<string, uint16_t> Key;
 
 class Key_Initializer
 {
 public:
 	Key_Initializer();
+	uint16 operator[](string in);
+private:
+	map<string, uint16> _key;
 };
+
+extern Key_Initializer Key;
 
 /*
 enum class Key : uint16_t
@@ -195,7 +200,7 @@ public:
 	virtual void Init();
 	virtual void Update();
 
-	void Load();
+	void Load(Properties *prop);
 
 	/** Called when any key is pressed or released.
 	 *	@param key The key that was used.

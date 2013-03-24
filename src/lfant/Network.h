@@ -57,6 +57,9 @@ public:
 	virtual void Init();
 	virtual void Update();
 
+	void Save(Properties *prop);
+	void Load(Properties *prop);
+
 	template<typename C>
 	C* NewConnection(string name, string host, uint16_t port, string password)
 	{

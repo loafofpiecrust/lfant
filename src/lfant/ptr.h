@@ -25,6 +25,12 @@ public:
 	}
 
 	/*
+	ptr(const ptr<T>& p) :
+		unique_ptr<T>::unique_ptr(p.release())
+	{
+	}
+	*/
+	/*
 	~ptr()
 	{
 	}
@@ -34,7 +40,6 @@ public:
 	{
 		return this->get();
 	}
-
 };
 
 template<typename T, typename R>

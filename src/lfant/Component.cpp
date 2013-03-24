@@ -32,8 +32,7 @@ namespace lfant
 
 map< string, Component* (Entity::*)() > Component::componentRegistry;
 
-Component::Component(Entity* owner) :
-	owner(owner)
+Component::Component()
 {
 }
 
@@ -58,10 +57,32 @@ void Component::Init()
 	Object::Init();
 }
 
+void Component::Update()
+{
+	Object::Update();
+}
+
+void Component::PostUpdate()
+{
+}
+
 void Component::Destroy()
 {
 	Object::Destroy();
 	owner->RemoveComponent(this);
+}
+
+void Component::OnDestroy()
+{
+	Object::OnDestroy();
+}
+
+void Component::OnEnable()
+{
+}
+
+void Component::OnDisable()
+{
 }
 
 void Component::Trigger(string name)
@@ -75,7 +96,7 @@ void Component::Trigger(string name)
 *		\area General
 *******************************************************************************/
 
-void Component::SetEnabled(bool enable)
+void Component::Enable(bool enable)
 {
 	enabled = enable;
 	if(enabled)

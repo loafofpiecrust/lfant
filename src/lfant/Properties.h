@@ -107,8 +107,8 @@ public:
 		return ref;
 	}
 
-	string type;
-	string id;
+	string type = "";
+	string id = "";
 
 protected:
 
@@ -126,7 +126,7 @@ private:
 
 	map<string, string> values;
 	map<string, string> enums;
-	vector< ptr<Properties> > children;
+	deque< ptr<Properties> > children;
 	Properties* parent = nullptr;
 };
 
