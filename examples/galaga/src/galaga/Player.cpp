@@ -34,24 +34,14 @@
 #include <lfant/Scene.h>
 #include <lfant/Transform.h>
 
-using namespace lfant;
+
+namespace lfant
+{
+
+IMPLEMENT_COMP(Player)
 
 void Player::Init()
 {
-	//	owner->AddComponent<Sprite>();
-	float f = game->settings->GetValue<float>("player.lookspeed");
-	if(f != 0.0f)
-	{
-		lookSpeed = f;
-		Log("Looking at ", f);
-	}
-	f = game->settings->GetValue<float>("player.movementSpeed");
-	if(f != 0.0f)
-	{
-		movementSpeed = f;
-		Log("Moving at ", f);
-	}
-
 	//	Connect(SENDER(game->input, Horizontal), this, &Player::Move);
 	//	Connect(SENDER(game->input, Vertical), this, &Player::Move);
 }
@@ -61,9 +51,27 @@ void Player::Move(string axis, float value)
 
 }
 
+void Player::Load(Properties *prop)
+{
+	Component::Load(prop);
+
+	prop->Get("movementSpeed", movementSpeed);
+	prop->Get("lookSpeed", lookSpeed);
+	prop->Get("mouseLook", mouseLook);
+}
+
+void Player::Save(Properties *prop)
+{
+	Component::Save(prop);
+
+	prop->Set("movementSpeed", movementSpeed);
+	prop->Set("lookSpeed", lookSpeed);
+	prop->Set("mouseLook", mouseLook);
+}
+
 void Player::Update()
 {
-	if(game->settings->GetValue<bool>("player.mouseLook"))
+	if(mouseLook)
 	{
 		ivec2 mousePos = game->input->GetMousePos();
 		ivec2 screenRes = game->renderer->GetResolution();
@@ -115,7 +123,7 @@ void Player::Update()
 		*/
 		dynamic_cast<Galaga*>(game)->AddMesh("TestMesh"+lexical_cast<string>(meshCount));
 		++meshCount;
-		Log("Added mesh ", meshCount+game->settings->GetValue<int>("galaga.meshcount"));
+		Log("Added mesh ", meshCount);
 	}
 	if (game->input->GetButtonDown("TesterSetVar"))
 	{
@@ -129,9 +137,11 @@ void Player::Update()
 	{
 		game->console->Input("help Tester");
 	}
-	if (game->input->GetButtonDown("Exit"))
+	if (game->input->GetButtonDown("Quit"))
 	{
 		Log("Calling exit function");
-		game->console->Input("exit");
+		game->console->Input("quit");
 	}
+}
+
 }

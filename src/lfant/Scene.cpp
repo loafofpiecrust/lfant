@@ -1,32 +1,31 @@
 /******************************************************************************
- *
- * LFANT Source
- * Copyright (C) 2012-2013 by LazyFox Studios
- * Created: 2012-09-02 by Taylor Snead
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *	http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- ******************************************************************************/
+*
+* LFANT Source
+* Copyright (C) 2012-2013 by LazyFox Studios
+* Created: 2012-09-02 by Taylor Snead
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*	http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*
+******************************************************************************/
 #include <lfant/Scene.h>
 
 // External
 
 // Internal
-
 #include <lfant/Entity.h>
-
 #include <lfant/Console.h>
 #include <lfant/Camera.h>
+#include <lfant/Properties.h>
 
 namespace lfant
 {
@@ -61,20 +60,24 @@ void Scene::OnDestroy()
 	for(auto& ent : entities)
 	{
 		Log("Scene::Destroy: Destroying ", ent->name);
-		ent->Destroy();
+		ent->UnsafeDestroy();
 	}
-	entities.clear();
+//	entities.clear();
 }
 
 void Scene::RemoveEntity(Entity* ent)
 {
-	entities.remove(ptr<Entity>(ent));
+	for(auto& ep : entities)
+	{
+		if(ep == ent)
+		{
+			Log("Scene::RemoveEntity: Removing '", ep->name, "'.");
+			entities.remove(ep);
+			break;
+		}
+	}
+	Log("Scene::RemoveEntity: Finished.");
 }
-
-/*Entity* Scene::GetEntity( uint32_t idx )
- {
- return entities[idx];
- }*/
 
 Entity* Scene::GetEntity(string name, bool recursive)
 {
@@ -95,31 +98,32 @@ Entity* Scene::GetEntity(string name, bool recursive)
 	return nullptr;
 }
 
-void Scene::Save(string file)
+void Scene::Save(Properties* prop)
 {
-	if(file == "")
-	{
-		file = name;
-	}
-	file.append(".scene");
-	ofstream io;
-	io.open(file);
-	io << "<Scene name=\"" << "SceneName" << "\">\n";
+	prop->type = "scene";
+	prop->id = name;
+
 	for(auto& ent : entities)
 	{
-		io << "\t<Entity name=\"" << ent->name << "\">\n";
-		vector<pair<string, string>> vars ;//= ent->Serialize();
-		for(auto& str : vars)
-		{
-			io << "\t\t<Var name=\"" << str.first << "\" value=\"" << str.second << "\"/>\n";
-		}
-		io << "\t</Entity>\n";
+		ent->Save(prop->AddChild());
 	}
-	io << "</Scene>";
-	io.close();
 }
 
-Entity* Scene::Spawn(string name, Entity *parent)
+void Scene::Load(Properties *prop)
+{
+	Log("Scene::Load: Loaded scene node");
+	vector<Properties*> ents = prop->GetChildren("entity");
+	Log("Scene::Load: Filled entity list");
+	Entity* ent = nullptr;
+	for(auto& i : ents)
+	{
+		ent = Spawn(i->id);
+		Log("Spawned the entity!");
+		ent->Load(i);
+	}
+}
+
+Entity* Scene::Spawn(string name, Entity* parent)
 {
 	Entity* ent = new Entity;
 	Log("Scene::Spawn: Allocated Entity pointer.");
@@ -141,7 +145,6 @@ Entity* Scene::Spawn(string name, Entity *parent)
 	else
 	{
 		parent->AddChild(ent);
-
 	}
 	return ent;
 }

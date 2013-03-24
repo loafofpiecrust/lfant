@@ -1,22 +1,22 @@
 /******************************************************************************
- *
- *	LFANT Source
- *	Copyright (C) 2012-2013 by LazyFox Studios
- *	Created: 2012-08-27 by Taylor Snead
- *
- *	Licensed under the Apache License, Version 2.0 (the "License");
- *	you may not use this file except in compliance with the License.
- *	You may obtain a copy of the License at
- *
- *	http://www.apache.org/licenses/LICENSE-2.0
- *
- *	Unless required by applicable law or agreed to in writing, software
- *	distributed under the License is distributed on an "AS IS" BASIS,
- *	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *	See the License for the specific language governing permissions and
- *	limitations under the License.
- *
- ******************************************************************************/
+*
+*	LFANT Source
+*	Copyright (C) 2012-2013 by LazyFox Studios
+*	Created: 2012-08-27 by Taylor Snead
+*
+*	Licensed under the Apache License, Version 2.0 (the "License");
+*	you may not use this file except in compliance with the License.
+*	You may obtain a copy of the License at
+*
+*	http://www.apache.org/licenses/LICENSE-2.0
+*
+*	Unless required by applicable law or agreed to in writing, software
+*	distributed under the License is distributed on an "AS IS" BASIS,
+*	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+*	See the License for the specific language governing permissions and
+*	limitations under the License.
+*
+******************************************************************************/
 #pragma once
 
 #include <lfant/stdafx.h>
@@ -62,13 +62,14 @@ public:
 		{
 		}
 
-		virtual ~Command() {}
+		virtual ~Command() {
+		}
 	};
 
 	struct CommandSimple : public Command
 	{
-		typedef void (Console::*funcTypeRaw)();
-		typedef boost::function<void()> funcType;
+		typedef void (Console::* funcTypeRaw)();
+		typedef boost::function<void ()> funcType;
 		funcType func;
 
 		CommandSimple(funcType func, string name, string help) :
@@ -79,8 +80,8 @@ public:
 
 	struct CommandDefault : public Command
 	{
-		typedef void (Console::*funcTypeRaw)(vector<string>);
-		typedef boost::function<void(vector<string>)> funcType;
+		typedef void (Console::* funcTypeRaw)(vector<string>);
+		typedef boost::function<void (vector<string>)> funcType;
 		funcType func;
 
 		CommandDefault(funcType func, string name, string help) :
@@ -109,6 +110,8 @@ public:
 	virtual void Update()
 	{
 	}
+
+	void Load(Properties* prop);
 
 	virtual void OnDestroy();
 
@@ -166,7 +169,7 @@ protected:
 private:
 	vector<Command*> commands;
 
-	string logName = "game.log";
+	string logName = "lfant.log";
 	ofstream logFile;
 };
 
@@ -180,7 +183,7 @@ template<typename T, typename P, typename ... A>
 void Log(T msg, P msg2, A ... args)
 {
 	game->console->LinePrint(msg);
-	Log(msg2, args...);
+	Log(msg2, args ...);
 }
 
 /// @}

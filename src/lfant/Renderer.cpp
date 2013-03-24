@@ -1,22 +1,22 @@
 /******************************************************************************
- *
- *	LFANT Source
- *	Copyright (C) 2012-2013 by LazyFox Studios
- *	Created: 2012-07-17 by Taylor Snead
- *
- *	Licensed under the Apache License, Version 2.0 (the "License");
- *	you may not use this file except in compliance with the License.
- *	You may obtain a copy of the License at
- *
- *	http://www.apache.org/licenses/LICENSE-2.0
- *
- *	Unless required by applicable law or agreed to in writing, software
- *	distributed under the License is distributed on an "AS IS" BASIS,
- *	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *	See the License for the specific language governing permissions and
- *	limitations under the License.
- *
- ******************************************************************************/
+*
+*	LFANT Source
+*	Copyright (C) 2012-2013 by LazyFox Studios
+*	Created: 2012-07-17 by Taylor Snead
+*
+*	Licensed under the Apache License, Version 2.0 (the "License");
+*	you may not use this file except in compliance with the License.
+*	You may obtain a copy of the License at
+*
+*	http://www.apache.org/licenses/LICENSE-2.0
+*
+*	Unless required by applicable law or agreed to in writing, software
+*	distributed under the License is distributed on an "AS IS" BASIS,
+*	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+*	See the License for the specific language governing permissions and
+*	limitations under the License.
+*
+******************************************************************************/
 
 #include <lfant/Renderer.h>
 
@@ -52,6 +52,7 @@
 
 #include <lfant/TextureLoader.h>
 #include <lfant/MeshLoader.h>
+#include <lfant/Properties.h>
 
 #define OFFSET(i) ((byte*)0 + (i))
 
@@ -66,14 +67,46 @@ Renderer::~Renderer()
 {
 }
 
+void Renderer::Load(Properties* prop)
+{
+	Subsystem::Load(prop);
+	Log("Renderer::Load: Got root child, '", prop->id, "'.");
+
+	prop->Get("resolution", resolution);
+	prop->Get("version", version);
+	prop->Get("vsync", vsync);
+	prop->Get("fullscreen", fullscreen);
+	prop->Get("fsaa", fsaa);
+	prop->Get("windowResizable", windowResizable);
+	prop->Get("windowPos", windowPos);
+	prop->Get("windowTitle", windowTitle);
+
+	Log("Window title: '"+windowTitle+"'.");
+}
+
+void Renderer::Save(Properties *prop)
+{
+	Subsystem::Save(prop);
+
+	prop->Set("resolution", resolution);
+	prop->Set("version", version);
+	prop->Set("vsync", vsync);
+	prop->Set("fullscreen", fullscreen);
+	prop->Set("fsaa", fsaa);
+	prop->Set("windowResizable", windowResizable);
+	prop->Set("windowTitle", windowTitle);
+}
+
 /*******************************************************************************
- *
- *		Game Loop
- *
- *******************************************************************************/
+*
+*		Game Loop
+*
+*******************************************************************************/
 
 void Renderer::Init()
 {
+	Subsystem::Init();
+
 	Log("Renderer::Init: About to start GLFW");
 	if(!glfwInit())
 	{
@@ -118,7 +151,7 @@ void Renderer::Init()
 	//glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
 	//glEnable(GL_BLEND);
 
-	//glfwSwapInterval(vSync);
+	//glfwSwapInterval(vsync);
 
 	glfwSetWindowCloseCallback(&Renderer::WindowClosed);
 	glfwSetWindowSizeCallback(&Renderer::WindowResized);
@@ -127,13 +160,13 @@ void Renderer::Init()
 
 	// Load all shaders
 	/*
-	auto shs = game->fileSystem->GetGameFiles("shaders", "vert");
-	for(uint i = 0; i < shs.size(); ++i)
-	{
-		Shader shader;
-		shader.LoadFile(shs[i].string());
-		shaders.push_back(shader);
-	}*/
+	   auto shs = game->fileSystem->GetGameFiles("shaders", "vert");
+	   for(uint i = 0; i < shs.size(); ++i)
+	   {
+			Shader shader;
+			shader.LoadFile(shs[i].string());
+			shaders.push_back(shader);
+	   }*/
 }
 
 void Renderer::Update()
@@ -143,10 +176,10 @@ void Renderer::Update()
 }
 
 /*******************************************************************************
- *
- *		Windowing
- *
- *******************************************************************************/
+*
+*		Windowing
+*
+*******************************************************************************/
 
 bool Renderer::OpenWindow()
 {
@@ -168,7 +201,7 @@ bool Renderer::OpenWindow()
 	Log("Renderer::OpenWindow: Window mode determined.");
 
 	ivec2 res = GetResolution();
-	if( !glfwOpenWindow( res.x, res.y, 0,0,0,0,32,0, mode ) )
+	if( !glfwOpenWindow( res.x, res.y, 0, 0, 0, 0, 32, 0, mode ) )
 	{
 		Log( "Renderer::OpenWindow: Failed to open GLFW window." );
 		glfwTerminate();
@@ -176,7 +209,7 @@ bool Renderer::OpenWindow()
 	}
 	Log("Renderer::OpenWindow: Window opened.");
 
-	glewExperimental = true; // Needed for core profile
+	glewExperimental = true;     // Needed for core profile
 	if (glewInit() != GLEW_OK)
 	{
 		Log("Renderer::OpenWindow: Failed to initialize GLEW.");
@@ -184,7 +217,8 @@ bool Renderer::OpenWindow()
 	}
 	Log("Renderer::OpenWindow: GLEW Initialised.");
 
-	glfwSetWindowTitle(game->settings->GetValue("general.windowtitle").c_str());
+	SetWindowTitle(windowTitle);
+	SetWindowPos(windowPos);
 
 	Log("Renderer::OpenWindow: Window successfully opened.");
 
@@ -201,20 +235,26 @@ int Renderer::WindowClosed()
 void Renderer::WindowResized(int x, int y)
 {
 	Log("Renderer::WindowResized: Touch.");
-	game->renderer->resolution = ivec2(x,y);
+	game->renderer->resolution = ivec2(x, y);
 	glViewport(0, 0, x, y);
 	game->userInterface->OnWindowResize((uint)x, (uint)y);
 }
 
 /*******************************************************************************
- *
- *		Gets/Sets/Shaders
- *
- *******************************************************************************/
+*
+*		Gets/Sets/Shaders
+*
+*******************************************************************************/
 
 ivec2 Renderer::GetResolution()
 {
 	return resolution;
+}
+
+void Renderer::SetWindowTitle(string title)
+{
+	windowTitle = title;
+	glfwSetWindowTitle(title.c_str());
 }
 
 void Renderer::SetResolution(ivec2 res)
@@ -241,8 +281,9 @@ void Renderer::SetRendering(bool render)
 	this->render = render;
 }
 
-void Renderer::SetPosition(ivec2 pos)
+void Renderer::SetWindowPos(ivec2 pos)
 {
+	windowPos = pos;
 	glfwSetWindowPos(pos.x, pos.y);
 }
 
@@ -250,9 +291,9 @@ Shader& Renderer::GetShader(string name)
 {
 	for(auto& shader : shaders)
 	{
-		if(shader.path == name)
+//		if(shader.path == name)
 		{
-			return shader;
+//			return shader;
 		}
 	}
 	return null(Shader);
@@ -260,10 +301,10 @@ Shader& Renderer::GetShader(string name)
 
 void Renderer::AddShader(Shader& shader)
 {
-	if(Shader* s = &GetShader(shader.path))
+//	if(Shader* s = &GetShader(shader.path))
 	{
-		s->id = shader.id;
-		return;
+//		s->id = shader.id;
+//		return;
 	}
 	shaders.push_back(shader);
 }

@@ -1,22 +1,22 @@
 /******************************************************************************
- *
- *	LFANT Source
- *	Copyright (C) 2012-2013 by LazyFox Studios
- *	Created: 2012-07-29 by Taylor Snead
- *
- *	Licensed under the Apache License, Version 2.0 (the "License");
- *	you may not use this file except in compliance with the License.
- *	You may obtain a copy of the License at
- *
- *	http://www.apache.org/licenses/LICENSE-2.0
- *
- *	Unless required by applicable law or agreed to in writing, software
- *	distributed under the License is distributed on an "AS IS" BASIS,
- *	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *	See the License for the specific language governing permissions and
- *	limitations under the License.
- *
- ******************************************************************************/
+*
+*	LFANT Source
+*	Copyright (C) 2012-2013 by LazyFox Studios
+*	Created: 2012-07-29 by Taylor Snead
+*
+*	Licensed under the Apache License, Version 2.0 (the "License");
+*	you may not use this file except in compliance with the License.
+*	You may obtain a copy of the License at
+*
+*	http://www.apache.org/licenses/LICENSE-2.0
+*
+*	Unless required by applicable law or agreed to in writing, software
+*	distributed under the License is distributed on an "AS IS" BASIS,
+*	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+*	See the License for the specific language governing permissions and
+*	limitations under the License.
+*
+******************************************************************************/
 
 
 // External
@@ -44,9 +44,9 @@ Rigidbody::~Rigidbody()
 }
 
 /*******************************************************************************
- *		General functions
- *		\area General
- *******************************************************************************/
+*		General functions
+*		\area General
+*******************************************************************************/
 
 void Rigidbody::Init()
 {
@@ -71,9 +71,9 @@ void Rigidbody::OnDestroy()
 }
 
 /*******************************************************************************
- *		Transform functions
- *		\area Transform
- *******************************************************************************/
+*		Transform functions
+*		\area Transform
+*******************************************************************************/
 void Rigidbody::OnSetPos( vec3 pos )
 {
 	body->getWorldTransform().setOrigin(vec3_cast<btVector3>(pos));
@@ -85,9 +85,9 @@ void Rigidbody::OnSetRot( vec3 rot )
 }
 
 /*******************************************************************************
- *		Gravity functions
- *		\area Gravity
- *******************************************************************************/
+*		Gravity functions
+*		\area Gravity
+*******************************************************************************/
 
 float Rigidbody::GetMass()
 {
@@ -103,9 +103,9 @@ void Rigidbody::SetMass(float mass)
 }
 
 /*******************************************************************************
- *		Constraints functions
- *		\area Constraints
- *******************************************************************************/
+*		Constraints functions
+*		\area Constraints
+*******************************************************************************/
 
 btTypedConstraint* Rigidbody::GetConstraint(uint16_t idx)
 {
@@ -133,7 +133,7 @@ void Rigidbody::SetVelocity(vec3 vel)
 	body->setLinearVelocity(vec3_cast<btVector3>(vel));
 }
 
-void Rigidbody::OnSetMesh(Mesh *mesh)
+void Rigidbody::OnSetMesh(Mesh* mesh)
 {
 }
 

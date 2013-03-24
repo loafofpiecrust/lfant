@@ -1,37 +1,36 @@
 /******************************************************************************
- *
- *	LFANT Source
- *	Copyright (C) 2012-2013 by LazyFox Studios
- *	Created: 2012-08-05 by Taylor Snead
- *
- *	Licensed under the Apache License, Version 2.0 (the "License");
- *	you may not use this file except in compliance with the License.
- *	You may obtain a copy of the License at
- *
- *	http://www.apache.org/licenses/LICENSE-2.0
- *
- *	Unless required by applicable law or agreed to in writing, software
- *	distributed under the License is distributed on an "AS IS" BASIS,
- *	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *	See the License for the specific language governing permissions and
- *	limitations under the License.
- *
- ******************************************************************************/
+*
+*	LFANT Source
+*	Copyright (C) 2012-2013 by LazyFox Studios
+*	Created: 2012-08-05 by Taylor Snead
+*
+*	Licensed under the Apache License, Version 2.0 (the "License");
+*	you may not use this file except in compliance with the License.
+*	You may obtain a copy of the License at
+*
+*	http://www.apache.org/licenses/LICENSE-2.0
+*
+*	Unless required by applicable law or agreed to in writing, software
+*	distributed under the License is distributed on an "AS IS" BASIS,
+*	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+*	See the License for the specific language governing permissions and
+*	limitations under the License.
+*
+******************************************************************************/
 
 #include <lfant/Settings.h>
+
+
+// Internal
+#include <lfant/Game.h>
+#include <lfant/FileSystem.h>
+#include <lfant/util/String.h>
+#include <lfant/Console.h>
 
 // External
 #include <boost/filesystem.hpp>
 #include <fstream>
 #include <iostream>
-
-// Internal
-
-#include <lfant/Game.h>
-#include <lfant/FileSystem.h>
-#include <lfant/String.h>
-
-#include <lfant/Console.h>
 
 using namespace boost::filesystem;
 
@@ -41,7 +40,7 @@ namespace lfant
 template<>
 Range<int> Settings::Var::Get< Range<int> >()
 {
-	vector<string> words = Split(value, " .", "");
+	vector<string> words = Split(value, " .:-", "");
 	if(words.size() == 1)
 	{
 		return Range<int>(lexical_cast<int>(words[0]), 0);
@@ -55,7 +54,7 @@ Range<int> Settings::Var::Get< Range<int> >()
 template<>
 vec2 Settings::Var::Get<vec2>()
 {
-	vector<string> tokens = Split(value, " x.", "");
+	vector<string> tokens = Split(value, " x.:", "");
 	vec2 result(0);
 	if(tokens.size() > 0)
 	{
@@ -71,7 +70,7 @@ vec2 Settings::Var::Get<vec2>()
 template<>
 vec3 Settings::Var::Get<vec3>()
 {
-	vector<string> tokens = Split(value, " x.", "");
+	vector<string> tokens = Split(value, " x.:", "");
 	vec3 result(0);
 	if(tokens.size() > 0)
 	{
@@ -91,7 +90,7 @@ vec3 Settings::Var::Get<vec3>()
 template<>
 ivec2 Settings::Var::Get<ivec2>()
 {
-	vector<string> tokens = Split(value, " x.", "");
+	vector<string> tokens = Split(value, " x.:", "");
 	ivec2 result(0);
 	if(tokens.size() > 0)
 	{
@@ -107,7 +106,7 @@ ivec2 Settings::Var::Get<ivec2>()
 template<>
 ivec3 Settings::Var::Get<ivec3>()
 {
-	vector<string> tokens = Split(value, " x.", "");
+	vector<string> tokens = Split(value, " x.:", "");
 	ivec3 result(0);
 	if(tokens.size() > 0)
 	{
@@ -138,8 +137,8 @@ void Settings::LoadSettings(string input)
 	{
 		input = userFile;
 	}
-	input = game->fileSystem->userFolder+"/"+input;
-	string cfg = game->fileSystem->gameFolder+"/"+defaultFile;
+	input = game->fileSystem->userFolder+"/settings/"+input;
+	string cfg = game->fileSystem->gameFolder+"/settings/"+defaultFile;
 	if(exists(cfg.c_str()))
 	{
 		if(exists(input.c_str()))
@@ -157,12 +156,12 @@ void Settings::LoadSettings(string input)
 			Log("Settings::LoadSettings: Loading settings from "+cfg);
 
 			ifstream file;
-			file.open(cfg);
-
 			string line = "";
 			vector<string> words;
 			vector<string> prefix;
 			string lastWord;
+
+			file.open(cfg);
 			while(file.good())
 			{
 				if(!getline(file, line))
@@ -343,6 +342,13 @@ void Settings::Init()
 	//SetValue("orgName", "LazyFox Studios");
 
 	LoadSettings();
+}
+
+void Settings::Load(Properties* prop)
+{
+	prop = prop->GetChild("settings");
+	prop->Get("orgName", orgName);
+	prop->Get("gameName", gameName);
 }
 
 }

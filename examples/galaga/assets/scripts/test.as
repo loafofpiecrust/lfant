@@ -1,4 +1,6 @@
 void main()
 {
-	Log("Testing, testing, AngelScript here.");
+	TestFunc();
+	TestFunc();
+	TestFunc();
 }

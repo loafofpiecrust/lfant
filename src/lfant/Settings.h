@@ -1,33 +1,33 @@
 /******************************************************************************
- *
- *	LFANT Source
- *	Copyright (C) 2012-2013 by LazyFox Studios
- *	Created: 2012-08-05 by Taylor Snead
- *
- *	Licensed under the Apache License, Version 2.0 (the "License");
- *	you may not use this file except in compliance with the License.
- *	You may obtain a copy of the License at
- *
- *	http://www.apache.org/licenses/LICENSE-2.0
- *
- *	Unless required by applicable law or agreed to in writing, software
- *	distributed under the License is distributed on an "AS IS" BASIS,
- *	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *	See the License for the specific language governing permissions and
- *	limitations under the License.
- *
- ******************************************************************************/
+*
+*	LFANT Source
+*	Copyright (C) 2012-2013 by LazyFox Studios
+*	Created: 2012-08-05 by Taylor Snead
+*
+*	Licensed under the Apache License, Version 2.0 (the "License");
+*	you may not use this file except in compliance with the License.
+*	You may obtain a copy of the License at
+*
+*	http://www.apache.org/licenses/LICENSE-2.0
+*
+*	Unless required by applicable law or agreed to in writing, software
+*	distributed under the License is distributed on an "AS IS" BASIS,
+*	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+*	See the License for the specific language governing permissions and
+*	limitations under the License.
+*
+******************************************************************************/
 #pragma once
 
 #include <lfant/stdafx.h>
 
 // External
-#include <boost/lexical_cast.hpp>
+#include <lfant/util/lexical_cast.h>
 
 // Internal
 
 #include <lfant/Subsystem.h>
-#include <lfant/String.h>
+#include <lfant/util/String.h>
 #include <lfant/Range.h>
 
 #include <lfant/Console.h>
@@ -51,7 +51,8 @@ class Settings : public Subsystem
 	class Var
 	{
 	public:
-		void Set(string value) {
+		void Set(string value)
+		{
 			this->value = value;
 		}
 
@@ -77,8 +78,9 @@ public:
 	~Settings();
 
 	virtual void Init();
-
 	virtual void LoadSettings(string input = "");
+
+	void Load(Properties* prop);
 
 	void SetValue(string name, string value, string help = "");
 
@@ -106,6 +108,9 @@ public:
 
 	string GetHelp(string name);
 
+	string orgName = "lazyfox";
+	string gameName = "lfant";
+
 protected:
 
 	string GetRef(string name, string value, string ids = "$()");
@@ -114,6 +119,7 @@ protected:
 	string defaultFile = "settings.cfg";
 
 	vector<Var> variables;
+
 
 };
 

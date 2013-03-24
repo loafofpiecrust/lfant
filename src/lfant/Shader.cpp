@@ -14,20 +14,23 @@
 namespace lfant
 {
 
+void Shader::Load(Properties *prop)
+{
+	prop->Get("vertex", vertex);
+	prop->Get("fragment", fragment);
+	LoadFile();
+}
+
+void Shader::Save(Properties *prop)
+{
+	prop->Set("vertex", vertex);
+	prop->Set("fragment", fragment);
+}
+
 void Shader::LoadFile(string file)
 {
-	if(file == "")
-	{
-		file = path;
-	}
-	if(Shader* s = &game->renderer->GetShader(file))
-	{
-		*this = *s;
-		return;
-	}
-
-	string vert = game->fileSystem->GetGamePath(file+".vert").string();
-	string frag = game->fileSystem->GetGamePath(file+".frag").string();
+	string vert = game->fileSystem->GetGamePath(vertex).string();
+	string frag = game->fileSystem->GetGamePath(fragment).string();
 	FILE* vertFile = fopen(vert.c_str(), "rb");
 	FILE* fragFile = fopen(frag.c_str(), "rb");
 	Log("LoadShader: Files opened");
@@ -137,7 +140,7 @@ void Shader::LoadFile(string file)
 
 	glDeleteShader(VertexShaderID);
 	glDeleteShader(FragmentShaderID);
-	path = file;
+//	path = file;
 	id = ProgramID;
 
 	game->renderer->AddShader(*this);
@@ -145,7 +148,9 @@ void Shader::LoadFile(string file)
 
 uint32_t Shader::GetUniform(string name)
 {
+	int id = 0;
 	glGetUniformLocation(id, name.c_str());
+	return id;
 }
 
 }

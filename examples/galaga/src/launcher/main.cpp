@@ -34,10 +34,20 @@ shared_library loadlib( std::string name )
 	return lib;
 }
 
+/*
+#include <galaga/Galaga.h>
+
+int main()
+{
+	Launch();
+	return 0;
+}
+*/
+
 int main( void )
 {
 	//Launch();
-	shared_library lib = loadlib( "libgalaga" EXT );
+	shared_library lib = loadlib( "/home/taylorsnead/lazyfox/lfant/examples/galaga/bin64/linux/libgalaga" EXT );
 	boost::function<void()> func = lib.get<void>( "Launch" );
 	if (func)
 	{

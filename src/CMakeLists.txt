@@ -3,7 +3,7 @@
 set(LIBRARY_OUTPUT_PATH "${SFE}/bin${ARCH}/${PLATFORM}")
 
 # Subdirs
-add_subdirectory(external)
+#add_subdirectory(external)
 add_subdirectory(lfant)
 #add_subdirectory(editor)
 

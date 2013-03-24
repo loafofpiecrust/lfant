@@ -1,8 +1,8 @@
 ## lfant
-===================
-A so-far small OpenGL game engine. It uses an Entity-Component model, somewhat similar Unity3D, where 
+=========
+A cross-platform, OpenGL game engine that uses an Entity-Component model, fairly similar Unity3D, where 
 Entities have a list of Components that they can access at any given time. These components "add" 
-functionality to the owner Entity (albeit not directly). Examples of Components are Rigidbody, Inventory,
+functionality to the owner Entity. Examples of Components are Rigidbody, Inventory,
 MeshRenderer, ParticleSystem, etc. This allows the easy manipulation of what Entities can do at runtime.
 
 External Library Usage:
@@ -11,9 +11,9 @@ External Library Usage:
  - GLEW
  - GLFW
  - GLM
- - Squirrel (Scripting Language)
+ - AngelScript
  - TinyXML2
- - CEGUI or libRocket (undecided)
+ - libRocket (subject to change)
  
 Visit our website: http://www.shadowfoxltd.com
 
@@ -21,11 +21,11 @@ Latest unstable development: https://github.com/babybluesedan/lfant
 
 Latest mostly-stable development: https://github.com/lazyfox-studios/lfant
 
-## Installation
-===============
+## Building
+============
 Binaries here are not always up-to-date with the code, so it is suggested to build them.
-lfant uses primarily CMake for building. Qt Creator is the main IDE used, too.
-To compile with Qt Creator is simple, you just add the root CMakeLists.txt as a project and build. 
+lfant uses primarily CMake for building. Some IDEs support the use of a CMakeLists.txt file directly 
+as a project. 
 To compile using the CMake CLI, first install it. On Linux distributions using aptitude for package
 management (eg. Ubuntu):
 ```bash
@@ -35,20 +35,28 @@ On Windows or OSX, download it from here: http://cmake.org/cmake/resources/softw
 
 We use the LLVM/Clang compiler, but it builds perfectly fine with the latest GCC. GCC comes with
 most/all Linux distros by default, but Windows users will need to install MinGW (I suggest TDM-GCC).
-OSX users should have it by installing XCode.
+On Mac OSX, XCode comes with both GCC and Clang.
 
-Then, create a folder to build to. For example, lfant/build. This directory's location doesn't
-matter all that much in the end. Open a terminal in your build directory, and do this (substituting
-"~/lfant" with your directory):
+Then, create a folder to build to. This directory's location is irrelevant, but I suggest 'lfant/build'. 
+Open a terminal in your build directory, and do this (substituting '~/lfant' with your directory):
 ```bash
-cmake ~/lfant
+mkdir ~/lfant/build
+cd ~/lfant/build
+cmake ../
 make
 ```
 This will build the engine, it's dependencies, and the example(s). The engine and dependencies will build
 to lfant/bin(ARCH)/(PLATFORM), eg. bin64/linux. Examples output to their respective binary
 folders, like lfant/examples/galaga/bin64/linux.
 
+The project may soon be switched to premake, once the new platform setup of premake 4/5 is more complete.
+
+## Creating a project (WIP)
+============================
+To create a new project based on lfant, the script 'new-project.sh'(WIP) in lfant root can be run. When
+the editor is available, it will allow the creation and management of projects.
+
 ## Running Examples
-===================
+====================
 Each example builds a launcher with it, residing alongside its respective project binary. Simply run
 this launcher, and the "Launch()" function in the game library will be called.
