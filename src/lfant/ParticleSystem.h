@@ -1,22 +1,22 @@
 /******************************************************************************
- *
- *	LFANT Source
- *	Copyright (C) 2012-2013 by LazyFox Studios
- *	Created: 2012-08-02 by Taylor Snead
- *
- *	Licensed under the Apache License, Version 2.0 (the "License");
- *	you may not use this file except in compliance with the License.
- *	You may obtain a copy of the License at
- *
- *	http://www.apache.org/licenses/LICENSE-2.0
- *
- *	Unless required by applicable law or agreed to in writing, software
- *	distributed under the License is distributed on an "AS IS" BASIS,
- *	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *	See the License for the specific language governing permissions and
- *	limitations under the License.
- *
- ******************************************************************************/
+*
+*	LFANT Source
+*	Copyright (C) 2012-2013 by LazyFox Studios
+*	Created: 2012-08-02 by Taylor Snead
+*
+*	Licensed under the Apache License, Version 2.0 (the "License");
+*	you may not use this file except in compliance with the License.
+*	You may obtain a copy of the License at
+*
+*	http://www.apache.org/licenses/LICENSE-2.0
+*
+*	Unless required by applicable law or agreed to in writing, software
+*	distributed under the License is distributed on an "AS IS" BASIS,
+*	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+*	See the License for the specific language governing permissions and
+*	limitations under the License.
+*
+******************************************************************************/
 #pragma once
 
 // External
@@ -69,7 +69,7 @@ public:
 	/**
 	 *	Supported emitter types.
 	 */
-	enum EmitterType
+	enum class EmitterType
 	{
 		Point,
 		Box,
@@ -77,9 +77,9 @@ public:
 		Cone
 	};
 
-	enum DisplayType
+	enum class DisplayType
 	{
-		PointSprite,
+		Point,
 		Billboard
 	};
 
@@ -89,6 +89,9 @@ public:
 	virtual void Init();
 	virtual void Update();
 	virtual void OnDestroy();
+
+	void Save(Properties* prop);
+	void Load(Properties *prop);
 
 	/**
 	 *	Emits a specific amount of particles
@@ -103,31 +106,30 @@ public:
 
 	// Particle properties
 	Range<float> lifetime;
-	Range<Range<rgba>> color;
-	Range<Range<float>> size;
-	Range<Range<float>> speed;
-	Range<Range<vec3>> velocity;
+	Range<Range<rgba> > color;
+	Range<Range<float> > size;
+	Range<Range<float> > speed;
+	Range<Range<vec3> > velocity;
 
 	// Emitter properties
-	float radius;
+	float radius = 1.0f;
 	float angle;
 	float startDelay;
 	float time;
 	float duration;
-	float timeScale;
-	uint32_t rate;
-	uint32_t maxParticles;
-	vec3 dimensions;
-	vec3 gravity;
-	bool pausable;
-	bool paused;
-	bool looping;
+	float timeScale = 1.0f;
+	uint32_t rate = 1;
+	uint32_t maxParticles = 1500;
+	vec3 dimensions = vec3(1.0f);
+	vec3 gravity = vec3(0.0f, -9.81f, 0.0f);
+	bool pausable = true;
+	bool paused = false;
+	bool looping = true;
 
 	DisplayType displayType;
 	EmitterType emitterType;
 
-	vector<Particle*> particles;
-	vector<Particle*> recycle;
+	deque< ptr<Particle> > particles;
 	vector<Burst> bursts;
 
 	Material material;

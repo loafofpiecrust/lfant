@@ -1,22 +1,22 @@
 /******************************************************************************
- *
- *	LFANT Source
- *	Copyright (C) 2012-2013 by LazyFox Studios
- *	Created: 2012-07-28 by Taylor Snead
- *
- *	Licensed under the Apache License, Version 2.0 (the "License");
- *	you may not use this file except in compliance with the License.
- *	You may obtain a copy of the License at
- *
- *		http://www.apache.org/licenses/LICENSE-2.0
- *
- *	Unless required by applicable law or agreed to in writing, software
- *	distributed under the License is distributed on an "AS IS" BASIS,
- *	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *	See the License for the specific language governing permissions and
- *	limitations under the License.
- *
- ******************************************************************************/
+*
+*	LFANT Source
+*	Copyright (C) 2012-2013 by LazyFox Studios
+*	Created: 2012-07-28 by Taylor Snead
+*
+*	Licensed under the Apache License, Version 2.0 (the "License");
+*	you may not use this file except in compliance with the License.
+*	You may obtain a copy of the License at
+*
+*		http://www.apache.org/licenses/LICENSE-2.0
+*
+*	Unless required by applicable law or agreed to in writing, software
+*	distributed under the License is distributed on an "AS IS" BASIS,
+*	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+*	See the License for the specific language governing permissions and
+*	limitations under the License.
+*
+******************************************************************************/
 #pragma once
 
 #include <lfant/stdafx.h>
@@ -27,6 +27,8 @@
 
 // Internal
 #include <lfant/ptr.h>
+#include <lfant/Range.h>
+#include <lfant/util/String.h>
 
 namespace lfant
 {
@@ -51,7 +53,7 @@ struct remove_ref<T&>
 };
 
 template<typename T>
-struct remove_ref < T && >
+struct remove_ref < T&& >
 {
 	typedef T type;
 };
@@ -59,27 +61,28 @@ struct remove_ref < T && >
 string Type();
 
 string DemangleType(string type);
+string RemoveScoping(string type);
 
 template<typename T>
-auto Type() -> typename is_not_ptr<T, string>::type
+auto Type()->typename is_not_ptr<T, string>::type
 {
 	return DemangleType(typeid(T).name());
 }
 
 template<typename T>
-auto Type() -> typename is_ptr<T, string>::type
+auto Type()->typename is_ptr<T, string>::type
 {
 	return DemangleType(typeid(T::value_type).name());
 }
 
 template<typename T>
-auto Type(T p1) -> typename is_not_ptr<T, string>::type
+auto Type(T p1)->typename is_not_ptr<T, string>::type
 {
 	return DemangleType(typeid(p1).name());
 }
 
 template<typename T>
-auto Type(T& p1) -> typename is_ptr<T, string>::type
+auto Type(T& p1)->typename is_ptr<T, string>::type
 {
 	return DemangleType(typeid(*(p1.get())).name());
 }
@@ -91,17 +94,17 @@ string Type(T* p1)
 }
 
 /*
-template<typename T>
-string Type(T* p1)
-{
-	return string(abi::__cxa_demangle(typeid(*p1).name(), 0, 0, (int*)0));
-}
-*/
+   template<typename T>
+   string Type(T* p1)
+   {
+		return string(abi::__cxa_demangle(typeid(*p1).name(), 0, 0, (int*)0));
+   }
+ */
 
-template<typename P1, typename P2, typename ...P>
+template<typename P1, typename P2, typename ... P>
 string Type()
 {
-	return Type<P1>() + "," + Type<P2, P...>();
+	return Type<P1>() + "," + Type<P2, P ...>();
 }
 
 template<typename T2, typename T1>

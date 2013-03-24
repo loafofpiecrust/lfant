@@ -19,11 +19,16 @@ template<typename T>
 class ptr : public unique_ptr<T>, public ptr_base
 {
 public:
-	explicit ptr(T* v) :
-		unique_ptr<T>(v)
+	explicit ptr(T* v) noexcept :
+		unique_ptr<T>::unique_ptr(v)
 	{
-		cout << "ptr(T*)\n";
 	}
+
+	/*
+	~ptr()
+	{
+	}
+	*/
 
 	operator T*()
 	{

@@ -1,22 +1,22 @@
 /******************************************************************************
- *
- *	LFANT Source
- *	Copyright (C) 2012-2013 by LazyFox Studios
- *	Created: 2012-07-16 by Taylor Snead
- *
- *	Licensed under the Apache License, Version 2.0 (the "License");
- *	you may not use this file except in compliance with the License.
- *	You may obtain a copy of the License at
- *
- *	http://www.apache.org/licenses/LICENSE-2.0
- *
- *	Unless required by applicable law or agreed to in writing, software
- *	distributed under the License is distributed on an "AS IS" BASIS,
- *	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *	See the License for the specific language governing permissions and
- *	limitations under the License.
- *
- ******************************************************************************/
+*
+*	LFANT Source
+*	Copyright (C) 2012-2013 by LazyFox Studios
+*	Created: 2012-07-16 by Taylor Snead
+*
+*	Licensed under the Apache License, Version 2.0 (the "License");
+*	you may not use this file except in compliance with the License.
+*	You may obtain a copy of the License at
+*
+*	http://www.apache.org/licenses/LICENSE-2.0
+*
+*	Unless required by applicable law or agreed to in writing, software
+*	distributed under the License is distributed on an "AS IS" BASIS,
+*	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+*	See the License for the specific language governing permissions and
+*	limitations under the License.
+*
+******************************************************************************/
 #pragma once
 
 #include <lfant/stdafx.h>
@@ -38,6 +38,15 @@ namespace lfant
  *	 @{
  */
 
+extern map<string, uint16_t> Key;
+
+class Key_Initializer
+{
+public:
+	Key_Initializer();
+};
+
+/*
 enum class Key : uint16_t
 {
 	Q = 'Q',
@@ -122,6 +131,7 @@ enum class Key : uint16_t
 	MouseRight = GLFW_MOUSE_BUTTON_RIGHT,
 	MouseMiddle = GLFW_MOUSE_BUTTON_MIDDLE
 };
+*/
 
 /**	This class controls the input system.
  *		Receives input from GLFW and manages it, allowing the
@@ -138,8 +148,8 @@ class Input : public Subsystem
 		string name = "NewAxis";
 		uint16_t positive;
 		uint16_t negative;
-		uint16_t altPositive;
-		uint16_t altNegative;
+		uint16_t positiveAlt;
+		uint16_t negativeAlt;
 		float sensitivity = 3.0f;
 		float dead = 0.001f;
 		bool snap = true;
@@ -154,6 +164,11 @@ class Input : public Subsystem
 		bool down = false;
 		bool up = false;
 
+		Axis(string name) :
+			name(name)
+		{
+		}
+
 		Axis(string name, uint16_t positive, uint16_t negative = '\n', float sensitivity = 3.0f, float dead = 0.001f, bool snap =
 				 true, byte joyNum = 0) :
 			name(name), positive(positive), negative(negative), sensitivity(sensitivity), dead(dead), snap(snap), joyNum(
@@ -163,59 +178,12 @@ class Input : public Subsystem
 
 		Axis(string name, uint16_t positive, uint16_t negative = '\n', uint16_t altpos = '\n', uint16_t altneg = '\n',
 			 float sensitivity = 3.0f, float dead = 0.001f, bool snap = true, byte joyNum = 0) :
-			name(name), positive(positive), negative(negative), altPositive(altpos), altNegative(altneg), sensitivity(
+			name(name), positive(positive), negative(negative), positiveAlt(altpos), negativeAlt(altneg), sensitivity(
 				sensitivity), dead(dead), snap(snap), joyNum(joyNum)
 		{
 		}
 
 		~Axis()
-		{
-		}
-	};
-
-	class Callback
-	{
-	public:
-		virtual void Call(string name, float value) = 0;
-
-		string axis = "";
-
-		Callback(string axis) :
-			axis(axis)
-		{
-		}
-	};
-
-	class CallbackSingle : public Callback
-	{
-	public:
-		virtual void Call(string name, float value)
-		{
-			func(value);
-		}
-
-		typedef boost::function<void(float)> FuncType;
-		FuncType func;
-
-		CallbackSingle(string axis, FuncType func) :
-			Callback(axis), func(func)
-		{
-		}
-	};
-
-	class CallbackAll : public Callback
-	{
-	public:
-		virtual void Call(string name, float value)
-		{
-			func(name, value);
-		}
-
-		typedef boost::function<void(string, float)> FuncType;
-		FuncType func;
-
-		CallbackAll(FuncType func) :
-			Callback("all"), func(func)
 		{
 		}
 	};
@@ -227,6 +195,8 @@ public:
 	virtual void Init();
 	virtual void Update();
 
+	void Load();
+
 	/** Called when any key is pressed or released.
 	 *	@param key The key that was used.
 	 *	@param mode The way the key was used. 0 = Release; 1 = Press;
@@ -236,7 +206,7 @@ public:
 	static void GLFWCALL OnMouseButton(int btn, int mode);
 	static void GLFWCALL OnCharPress(int key, int mode);
 
-	void AddAxis(string name, Key positive, Key negative = Key::NewLine, Key altpos = Key::NewLine, Key altneg = Key::NewLine, float sens = 3.0f, float dead = 0.001f, bool snap = true, byte joyNum = 0);
+	void AddAxis(string name, uint16_t positive, uint16_t negative = Key["\n"], uint16_t altpos = Key["\n"], uint16_t altneg = Key["\n"], float sens = 3.0f, float dead = 0.001f, bool snap = true, byte joyNum = 0);
 
 	// Axes
 	float GetAxis(string name);
@@ -250,18 +220,6 @@ public:
 	void SetMousePos(ivec2 pos);
 	void SetMousePos(int32_t x, int32_t y);
 
-	template<typename C>
-	void AddCallback(string axis, void (C::*func)(float))
-	{
-		callbacks.push_back(new CallbackSingle(axis, boost::bind<void(float)>(func)));
-	}
-
-	template<typename C>
-	void AddCallback(void (C::*func)(string, float))
-	{
-		callbacks.push_back(new CallbackAll(boost::bind<void(string,float)>(func)));
-	}
-
 	bool lockMouse;
 	float mouseSpeed;
 
@@ -272,8 +230,6 @@ protected:
 	string inputString;
 
 	//bitset<sizeof(byte)> keysHeld;
-
-	vector<Callback*> callbacks;
 
 private:
 };

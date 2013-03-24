@@ -25,10 +25,10 @@ add_dependencies(${PROJECT_NAME} sfengine)
 include_directories(
 	"../"
 	"${SFE}/src"
-	"${SFE}/src/external/glm"
-	"${SFE}/src/external/boost"
-	"${SFE}/src/external/glfw/include"
-	"${SFE}/src/external/raknet/Source"
+	"${SFE}/external/glm"
+	"${SFE}/external/boost"
+	"${SFE}/external/glfw/include"
+	"${SFE}/external/raknet/Source"
 	)
 
 target_link_libraries(${PROJECT_NAME}

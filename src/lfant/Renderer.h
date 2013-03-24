@@ -1,22 +1,22 @@
 /******************************************************************************
- *
- *	LFANT Source
- *	Copyright (C) 2012-2013 by LazyFox Studios
- *	Created: 2012-07-17 by Taylor Snead
- *
- *	Licensed under the Apache License, Version 2.0 (the "License");
- *	you may not use this file except in compliance with the License.
- *	You may obtain a copy of the License at
- *
- *	http://www.apache.org/licenses/LICENSE-2.0
- *
- *	Unless required by applicable law or agreed to in writing, software
- *	distributed under the License is distributed on an "AS IS" BASIS,
- *	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *	See the License for the specific language governing permissions and
- *	limitations under the License.
- *
- ******************************************************************************/
+*
+*	LFANT Source
+*	Copyright (C) 2012-2013 by LazyFox Studios
+*	Created: 2012-07-17 by Taylor Snead
+*
+*	Licensed under the Apache License, Version 2.0 (the "License");
+*	you may not use this file except in compliance with the License.
+*	You may obtain a copy of the License at
+*
+*	http://www.apache.org/licenses/LICENSE-2.0
+*
+*	Unless required by applicable law or agreed to in writing, software
+*	distributed under the License is distributed on an "AS IS" BASIS,
+*	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+*	See the License for the specific language governing permissions and
+*	limitations under the License.
+*
+******************************************************************************/
 #pragma once
 
 #include <lfant/stdafx.h>
@@ -27,7 +27,6 @@
 // Internal
 #include <lfant/Range.h>
 #include <lfant/Shader.h>
-#include <lfant/Property.h>
 #include <lfant/Vertex.h>
 
 #include <lfant/Subsystem.h>
@@ -67,6 +66,9 @@ public:
 	Renderer();
 	virtual ~Renderer();
 
+	void Load(Properties *prop);
+	void Save(Properties *prop);
+
 	/**
 	 *	Opens a new window, using member settings.
 	 *	@param close Whether or not to close the current window. Leave at true unless you really know what you're doing.
@@ -81,7 +83,6 @@ public:
 
 	void SetRendering(bool render);
 
-	void SetPosition(ivec2 pos);
 
 	// Shaders
 	Shader& GetShader(string name);
@@ -104,6 +105,9 @@ public:
 	void SetResolution(ivec2 res);
 	ivec2 GetResolution();
 
+	void SetWindowTitle(string title);
+	void SetWindowPos(ivec2 pos);
+
 	/// The multiplier for anti-aliasing. 2, 4, 8.
 	int fsaa = 4;
 
@@ -111,7 +115,7 @@ public:
 	bool fullscreen = false;
 
 	/// Whether or not the frame-rate should try to sync with the monitor refresh rate (60 hz/fps)
-	bool vSync = true;
+	bool vsync = true;
 
 	/// The amount of texture interpolation to use
 	byte texInterp;
@@ -136,6 +140,8 @@ public:
 private:
 	sf::RenderWindow* window;
 	ivec2 resolution = ivec2(1280, 720);
+	ivec2 windowPos = ivec2(0);
+	string windowTitle = "lfant";
 };
 
 /// @}

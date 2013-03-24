@@ -1,36 +1,37 @@
 /******************************************************************************
- *
- *	LFANT Source
- *	Copyright (C) 2012-2013 by LazyFox Studios
- *	Created: 2012-10-28 by Taylor Snead
- *
- *	Licensed under the Apache License, Version 2.0 (the "License");
- *	you may not use this file except in compliance with the License.
- *	You may obtain a copy of the License at
- *
- *		http://www.apache.org/licenses/LICENSE-2.0
- *
- *	Unless required by applicable law or agreed to in writing, software
- *	distributed under the License is distributed on an "AS IS" BASIS,
- *	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *	See the License for the specific language governing permissions and
- *	limitations under the License.
- *
- ******************************************************************************/
+*
+*	LFANT Source
+*	Copyright (C) 2012-2013 by LazyFox Studios
+*	Created: 2012-10-28 by Taylor Snead
+*
+*	Licensed under the Apache License, Version 2.0 (the "License");
+*	you may not use this file except in compliance with the License.
+*	You may obtain a copy of the License at
+*
+*		http://www.apache.org/licenses/LICENSE-2.0
+*
+*	Unless required by applicable law or agreed to in writing, software
+*	distributed under the License is distributed on an "AS IS" BASIS,
+*	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+*	See the License for the specific language governing permissions and
+*	limitations under the License.
+*
+******************************************************************************/
 #pragma once
-
 #include <lfant/stdafx.h>
 
 #define BOOST_BIND_NO_PLACEHOLDERS
 
-// External
-#include <boost/signals2.hpp>
-#include <typeinfo>
-#include <forward_list>
-
 // Internal
 #include <lfant/TypeInfo.h>
-#include <lfant/Property.h>
+#include <lfant/Properties.h>
+
+// External
+#include <boost/signals2.hpp>
+#include <boost/bind.hpp>
+#include <boost/function.hpp>
+#include <typeinfo>
+#include <forward_list>
 
 #define SENDER(obj, sig) obj, #sig
 #define RECEIVER(obj, slot) obj, &remove_ref<decltype(*obj)>::type::slot
@@ -78,7 +79,7 @@ class Object
 	class Event0 : public Event
 	{
 	public:
-		typedef boost::signals2::signal<void()> sigType;
+		typedef boost::signals2::signal<void ()> sigType;
 		sigType sig;
 
 		Event0(string name, boost::function<void()> func) :
@@ -88,14 +89,14 @@ class Object
 		}
 	};
 
-	template<typename P1, typename... P>
+	template<typename P1, typename ... P>
 	class EventP : public Event
 	{
 	public:
-		typedef boost::signals2::signal<void(P1, P...)> sigType;
+		typedef boost::signals2::signal<void (P1, P ...)> sigType;
 		sigType sig;
 
-		EventP(string name, boost::function<void(P1, P...)> func) :
+		EventP(string name, boost::function<void(P1, P ...)> func) :
 			Event(name)
 		{
 			sig.connect(func);
@@ -103,12 +104,17 @@ class Object
 	};
 public:
 
+	virtual void Load(Properties* prop);
+	virtual void LoadFile(string path);
+
+	virtual void Save(Properties* prop);
+	virtual void SaveFile(string path);
+
 	template<typename R>
-	void Connect(Object* sender, string name, R* receiver, void (R::*func)())
+	void Connect(Object* sender, string name, R* receiver, void (R::* func)())
 	{
 		erase_all(name, " ");
 		name = Type(sender) + "::" + name + "()";
-		cout << "Connecting "+name+"\n";
 		Event0* con = nullptr;
 		for(auto& event : sender->events)
 		{
@@ -127,11 +133,10 @@ public:
 	}
 
 	template<typename R, typename P1>
-	void Connect(Object* sender, string name, R* receiver, void (R::*func)(P1))
+	void Connect(Object* sender, string name, R* receiver, void (R::* func)(P1))
 	{
 		erase_all(name, " ");
 		name = Type(sender) + "::" + name + "(" + Type<P1>() + ")";
-		cout << "Connecting "+name+"\n";
 		EventP<P1>* con = nullptr;
 		for(auto& event : sender->events)
 		{
@@ -150,11 +155,10 @@ public:
 	}
 
 	template<typename R, typename P1, typename P2>
-	void Connect(Object* sender, string name, R* receiver, void (R::*func)(P1, P2))
+	void Connect(Object* sender, string name, R* receiver, void (R::* func)(P1, P2))
 	{
 		erase_all(name, " ");
 		name = Type(sender) + "::" + name + "(" + Type<P1, P2>() + ")";
-		cout << "Connecting "+name+"\n";
 		EventP<P1, P2>* con = nullptr;
 		for(auto& event : sender->events)
 		{
@@ -173,11 +177,10 @@ public:
 	}
 
 	template<typename R, typename P1, typename P2, typename P3>
-	void Connect(Object* sender, string name, R* receiver, void (R::*func)(P1, P2, P3))
+	void Connect(Object* sender, string name, R* receiver, void (R::* func)(P1, P2, P3))
 	{
 		erase_all(name, " ");
 		name = Type(sender) + "::" + name + "(" + Type<P1, P2, P3>() + ")";
-		cout << "Connecting "+name+"\n";
 		EventP<P1, P2, P3>* con = nullptr;
 		for(auto& event : sender->events)
 		{
@@ -217,15 +220,15 @@ public:
 	void Trigger(string name, P1 arg, P ... args)
 	{
 		erase_all(name, " ");
-		name = Type(this) + "::" + name + "(" + Type<P1, P...>() + ")";
+		name = Type(this) + "::" + name + "(" + Type<P1, P ...>() + ")";
 		for(auto& event : events)
 		{
 			if(event->name == name)
 			{
-				auto con = dynamic_cast<EventP<P1, P...>*>(event);
+				auto con = dynamic_cast<EventP<P1, P ...>*>(event);
 				if(con)
 				{
-					con->sig(arg, args...);
+					con->sig(arg, args ...);
 				}
 			}
 		}

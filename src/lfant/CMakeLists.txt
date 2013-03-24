@@ -7,12 +7,6 @@ set(VERSION_MINOR 1)
 set(INCLUDE_DIR "${SFE}/src")
 set(SOURCE_DIR ".")
 
-# Configured Header for Macro'd settings, like versioning
-configure_file(
-	"${PROJECT_SOURCE_DIR}/Config.h.in"
-	"${PROJECT_SOURCE_DIR}/Config.h"
-	)
-
 # Library Search Paths
 link_directories(
 	"${LIBRARY_OUTPUT_PATH}"
@@ -24,26 +18,30 @@ link_directories(
 file(GLOB_RECURSE SRC_FILES "${SOURCE_DIR}/*.cpp")
 file(GLOB_RECURSE HEADER_FILES "${INCLUDE_DIR}/lfant/*.h")
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ggdb")
+set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -g")
+
 # Output Library Info
 add_library(${PROJECT_NAME} SHARED ${SRC_FILES} ${HEADER_FILES})
 #add_executable(${PROJECT_NAME} ${SRC_FILES} ${HEADER_FILES})
 
 # Dependencies
-add_dependencies(${PROJECT_NAME} ../external)
+add_dependencies(${PROJECT_NAME} ${SFE}/external)
 
 # Includes Info
 include_directories(
 	"${INCLUDE_DIR}"
-	"${SFE}/src/external/fmod/api/inc"
-	"${SFE}/src/external/glm"
-	"${SFE}/src/external/boost"
-	"../external/bullet/src"
-	"${SFE}/src/external/raknet/Source"
-	"../external/glew/include"
-	"../external/glfw/include"
-	"../external/rocket/Include"
-	"../external/angelscript/include"
-	"../external/angelscript/add_on"
+	"${SFE}/external/fmod/api/inc"
+	"${SFE}/external/glm"
+	"${SFE}/external/boost"
+	"${SFE}/external/bullet/src"
+	"${SFE}/external/raknet/Source"
+	"${SFE}/external/glew/include"
+	"${SFE}/external/glfw/include"
+	"${SFE}/external/rocket/Include"
+	"${SFE}/external/angelscript/include"
+	"${SFE}/external/angelscript/add_on"
+#	"${SFE}/external/json_spirit/include"
 	)
 
 # Linker Options
@@ -58,4 +56,5 @@ target_link_libraries(${PROJECT_NAME}
 	z
 	angelscript
 	yaml
+#	jsonspirit
 	)

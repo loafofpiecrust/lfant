@@ -1,22 +1,22 @@
 /******************************************************************************
- *
- *	LFANT Source
- *	Copyright (C) 2012-2013 by LazyFox Studios
- *	Created: 2012-07-28 by Taylor Snead
- *
- *	Licensed under the Apache License, Version 2.0 (the "License");
- *	you may not use this file except in compliance with the License.
- *	You may obtain a copy of the License at
- *
- *	http://www.apache.org/licenses/LICENSE-2.0
- *
- *	Unless required by applicable law or agreed to in writing, software
- *	distributed under the License is distributed on an "AS IS" BASIS,
- *	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *	See the License for the specific language governing permissions and
- *	limitations under the License.
- *
- ******************************************************************************/
+*
+*	LFANT Source
+*	Copyright (C) 2012-2013 by LazyFox Studios
+*	Created: 2012-07-28 by Taylor Snead
+*
+*	Licensed under the Apache License, Version 2.0 (the "License");
+*	you may not use this file except in compliance with the License.
+*	You may obtain a copy of the License at
+*
+*	http://www.apache.org/licenses/LICENSE-2.0
+*
+*	Unless required by applicable law or agreed to in writing, software
+*	distributed under the License is distributed on an "AS IS" BASIS,
+*	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+*	See the License for the specific language governing permissions and
+*	limitations under the License.
+*
+******************************************************************************/
 #pragma once
 
 // External
@@ -44,16 +44,8 @@ namespace lfant
  */
 class Sprite : public Mesh
 {
-public:
 	DECLARE_COMP(Sprite)
-
-	/**
-	 *	Supported animation play modes.
-	 */
-	enum AnimPlayMode
-	{
-		Once, Loop, Bounce, Default = Loop
-	};
+public:
 
 	/**
 	 *	An animation that consists of a single texture as a sprite-sheet.
@@ -66,12 +58,20 @@ public:
 	class Animation
 	{
 	public:
+		enum class Mode : byte
+		{
+			Loop = 0,
+			Bounce,
+			Once,
+			Default = Loop
+		};
+
 		string name = "Animation";
 		Material material;
 		uint16_t rows = 5;
 		uint16_t columns = 10;
-		AnimPlayMode playMode = Loop;
-		byte frameRate = 5;
+		Mode mode = Mode::Default;
+		uint16_t frameRate = 5;
 	};
 
 	friend class Renderer;
@@ -84,11 +84,13 @@ public:
 	virtual void Update();
 //	virtual void OnDestroy();
 
+	void Load(Properties *props);
+
 	void BeginRender();
 	void Render();
 	void EndRender();
 
-	void PlayAnim(string name, AnimPlayMode mode = Default, bool reverse = false);
+	void PlayAnim(string name, Animation::Mode mode = Animation::Mode::Default, bool reverse = false);
 	void PlayLastAnim();
 	void PauseAnim();
 	void ResumeAnim();
@@ -112,8 +114,8 @@ protected:
 	bool playingAnim = false;
 	bool playingReverseAnim = false;
 
-	AnimPlayMode animMode = Default;
-	AnimPlayMode currAnimMode = Default;
+	Animation::Mode animMode = Animation::Mode::Default;
+	Animation::Mode currAnimMode = Animation::Mode::Default;
 
 private:
 };

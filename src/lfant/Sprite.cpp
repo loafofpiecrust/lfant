@@ -1,22 +1,22 @@
 /******************************************************************************
- *
- *	LFANT Source
- *	Copyright (C) 2012-2013 by LazyFox Studios
- *	Created: 2012-07-28 by Taylor Snead
- *
- *	Licensed under the Apache License, Version 2.0 (the "License");
- *	you may not use this file except in compliance with the License.
- *	You may obtain a copy of the License at
- *
- *	http://www.apache.org/licenses/LICENSE-2.0
- *
- *	Unless required by applicable law or agreed to in writing, software
- *	distributed under the License is distributed on an "AS IS" BASIS,
- *	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *	See the License for the specific language governing permissions and
- *	limitations under the License.
- *
- ******************************************************************************/
+*
+*	LFANT Source
+*	Copyright (C) 2012-2013 by LazyFox Studios
+*	Created: 2012-07-28 by Taylor Snead
+*
+*	Licensed under the Apache License, Version 2.0 (the "License");
+*	you may not use this file except in compliance with the License.
+*	You may obtain a copy of the License at
+*
+*	http://www.apache.org/licenses/LICENSE-2.0
+*
+*	Unless required by applicable law or agreed to in writing, software
+*	distributed under the License is distributed on an "AS IS" BASIS,
+*	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+*	See the License for the specific language governing permissions and
+*	limitations under the License.
+*
+******************************************************************************/
 #include <lfant/Sprite.h>
 
 // External
@@ -50,6 +50,8 @@ void Sprite::BeginRender()
 	glGenVertexArrays(1, &vertexArray);
 	glBindVertexArray(vertexArray);
 
+	Log("Sprite vert arr bound");
+
 	if(material.shader.id == 0)
 	{
 		material.shader.LoadFile();
@@ -63,8 +65,8 @@ void Sprite::BeginRender()
 	if(material.shader.id != 0)
 	{
 		// Get any uniforms here
-		matrixId = glGetUniformLocation(material.shader.id, "MVP");
-		material.texture.uniformId = glGetUniformLocation(material.shader.id, "textureSampler");
+		matrixId = material.shader.GetUniform("MVP");
+		material.texture.uniformId = material.shader.GetUniform("textureSampler");
 	}
 
 	vertexBuffer.push_back(vec3(0, 0, 0));
@@ -93,6 +95,7 @@ void Sprite::Render()
 {
 	if(material.shader.id == 0 || material.texture.id == 0)
 	{
+	//	BeginRender();
 		return;
 	}
 
@@ -155,21 +158,17 @@ void Sprite::Update()
 			if(currentTime >= currentAnim->frameRate)
 			{
 				currentTime = 0.0f;
-				AnimPlayMode mode = animMode;
-				if(mode == Default)
+				Animation::Mode mode = animMode;
+				if(mode == Animation::Mode::Default)
 				{
-					if(currAnimMode == Default)
+					if(currAnimMode == Animation::Mode::Default)
 					{
-						mode = currentAnim->playMode;
+						mode = currentAnim->mode;
 					}
 					else
 					{
 						mode = currAnimMode;
 					}
-				}
-				if(mode == Default)
-				{
-					mode = Loop;
 				}
 				if(!playingReverseAnim)
 				{
@@ -184,11 +183,11 @@ void Sprite::Update()
 					}
 					else
 					{
-						if(mode == Once)
+						if(mode == Animation::Mode::Once)
 						{
 							playingAnim = false;
 						}
-						else if(mode == Bounce)
+						else if(mode == Animation::Mode::Bounce)
 						{
 							playingReverseAnim = true;
 						}
@@ -210,11 +209,11 @@ void Sprite::Update()
 					}
 					else
 					{
-						if(mode == Once)
+						if(mode == Animation::Mode::Once)
 						{
 							playingAnim = false;
 						}
-						else if(mode == Bounce)
+						else if(mode == Animation::Mode::Bounce)
 						{
 							playingReverseAnim = false;
 						}
@@ -229,6 +228,28 @@ void Sprite::Update()
 	Renderable::Update();
 }
 
+void Sprite::Load(Properties *props)
+{
+	Log("Loading a sprite from props");
+	Mesh::Load(props);
+
+	// Register Animation::Mode enum
+	props->SetEnum("Mode::Loop", Animation::Mode::Loop);
+	props->SetEnum("Mode::Bounce", Animation::Mode::Bounce);
+	props->SetEnum("Mode::Once", Animation::Mode::Once);
+	props->SetEnum("Mode::Default", Animation::Mode::Default);
+
+	vector<Properties*> panims = props->GetChildren("animation");
+	for(Properties*& pa : panims)
+	{
+		Animation anim;
+		anim.name = pa->id;
+		anim.material.LoadFile(pa->Get<string>("material", "materials/Diffuse.mat"));
+		pa->Get("frameRate", anim.frameRate);
+		pa->GetEnum("playMode", anim.mode);
+	}
+}
+
 void Sprite::EndRender()
 {
 	glDeleteBuffers(1, &vertexBuffer.id);
@@ -240,7 +261,7 @@ void Sprite::EndRender()
 	Renderable::EndRender();
 }
 
-void Sprite::PlayAnim(string name, AnimPlayMode mode, bool reverse)
+void Sprite::PlayAnim(string name, Animation::Mode mode, bool reverse)
 {
 	if(Animation* anim = &GetAnim(name))
 	{

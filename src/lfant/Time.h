@@ -1,22 +1,22 @@
 /******************************************************************************
- *
- *	LFANT Source
- *	Copyright (C) 2012-2013 by LazyFox Studios
- *	Created: 2012-07-21 by Taylor Snead
- *
- *	Licensed under the Apache License, Version 2.0 (the "License");
- *	you may not use this file except in compliance with the License.
- *	You may obtain a copy of the License at
- *
- *		http://www.apache.org/licenses/LICENSE-2.0
- *
- *	Unless required by applicable law or agreed to in writing, software
- *	distributed under the License is distributed on an "AS IS" BASIS,
- *	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *	See the License for the specific language governing permissions and
- *	limitations under the License.
- *
- ******************************************************************************/
+*
+*	LFANT Source
+*	Copyright (C) 2012-2013 by LazyFox Studios
+*	Created: 2012-07-21 by Taylor Snead
+*
+*	Licensed under the Apache License, Version 2.0 (the "License");
+*	you may not use this file except in compliance with the License.
+*	You may obtain a copy of the License at
+*
+*		http://www.apache.org/licenses/LICENSE-2.0
+*
+*	Unless required by applicable law or agreed to in writing, software
+*	distributed under the License is distributed on an "AS IS" BASIS,
+*	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+*	See the License for the specific language governing permissions and
+*	limitations under the License.
+*
+******************************************************************************/
 #pragma once
 
 #include <lfant/stdafx.h>
@@ -25,8 +25,9 @@
 #include <boost/chrono.hpp>
 
 // Internal
-
 #include <lfant/Subsystem.h>
+
+using namespace boost::chrono;
 
 namespace lfant
 {
@@ -36,13 +37,6 @@ namespace lfant
 /** @addtogroup Core
  *	 @{
  */
-
-struct STimer
-{
-	string name;
-	double length;
-	boost::function<void()> callback;
-};
 
 typedef boost::chrono::high_resolution_clock hclock;
 
@@ -68,28 +62,23 @@ public:
 	 *	@param length The amount of time this timer should wait before finishing.
 	 *	@param callback The function to call when the timer ends. Should be set with boost::bind(&func, &inst);
 	 */
-	STimer& SetTimer(string name, const double length, boost::function<void()> callback);
+	void SetTimer(string name, float length);
 
-	STimer& GetTimer(string name);
+	float GetTimer(string name);
 
-	void CallTimer(STimer& timer);
 	void CallTimer(string name);
-	void CallTimer(int idx);
-
-	/// This function is called on a new thread to handle a timer efficiently.
-	void TimerThread(STimer& tmr);
 
 	// Properties
 
 	/// Deltatime in seconds
-	double deltaTime;
-	double deltaTimeFixed;
-	double frameRate;
-	double timeScale;
+	float deltaTime = 0.016666667f;
+	float deltaTimeFixed = 0.016666667f;
+	float frameRate = 60.0f;
+	float timeScale = 1.0f;
 	double lastFrame;
 
 private:
-	vector<STimer> timers;
+	map<string, float> timers;
 	hclock::time_point startTime;
 };
 

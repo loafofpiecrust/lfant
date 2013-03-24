@@ -61,8 +61,8 @@ void Client::GetData(uint size)
 //	lastSize = size;
 	//boost::asio::read(socket, boost::asio::buffer(&lastData[0], lastSize));
 	boost::asio::async_read(socket, boost::asio::buffer(lastData, 4),
-							boost::bind(&Client::OnGetData, this, boost::asio::placeholders::error)
-							);
+	                        boost::bind(&Client::OnGetData, this, boost::asio::placeholders::error)
+	                        );
 }
 
 void Client::OnConnect(const boost::system::error_code& error)

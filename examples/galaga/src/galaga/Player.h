@@ -38,6 +38,7 @@ namespace lfant
 	 */
 	class Player : public Component
 	{
+		DECLARE_COMP(Player)
 	public:
 		Player()
 		{
@@ -51,10 +52,14 @@ namespace lfant
 
 		virtual void Move(string axis, float value);
 
+		void Load(Properties* prop);
+		void Save(Properties *prop);
+
 	protected:
 
 		float movementSpeed = 3.0f;
 		float lookSpeed = 0.01f;
+		bool mouseLook = true;
 
 		int meshCount = 0;
 
