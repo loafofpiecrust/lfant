@@ -43,6 +43,21 @@ Mesh::~Mesh()
 {
 }
 
+void Mesh::Load(Properties *props)
+{
+	Component::Load(props);
+
+	if(Properties* pmat = props->GetChild("material"))
+	{
+		material.Load(pmat);
+	}
+	else
+	{
+		Log("Loading material from file");
+		material.LoadFile(props->Get<string>("material", "materials/Diffuse.mat"));
+	}
+}
+
 void Mesh::Init()
 {
 	Renderable::Init();

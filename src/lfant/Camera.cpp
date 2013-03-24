@@ -30,6 +30,8 @@
 namespace lfant
 {
 
+IMPLEMENT_COMP(Camera)
+
 Camera::Camera()
 {
 }

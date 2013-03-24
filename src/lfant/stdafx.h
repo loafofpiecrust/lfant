@@ -24,13 +24,9 @@
 // Includes
 #include <stdint.h>
 #include <stdlib.h>
-#include <stdio.h>
 #include <string>
-#include <vector>
 #include <memory>
-#include <map>
 #include <utility>
-#include <iostream>
 #include <new>
 
 #include <glm/glm.hpp>
@@ -46,7 +42,6 @@
 #include <boost/type_traits.hpp>
 #include <boost/config.hpp>
 #include <boost/algorithm/string.hpp>
-#include <lfant/util/lexical_cast.h>
 
 #ifdef major
 #	undef major
@@ -64,7 +59,17 @@ using namespace boost::algorithm;
 
 // Typedefs
 typedef uint8_t byte;
-typedef uint32_t uint;
+typedef unsigned int uint; // Generally used in 'for' loops
+
+// Int primitives, ridding suffix '_t', cuz I don't like it
+typedef int8_t int8;
+typedef uint8_t uint8;
+typedef int16_t int16;
+typedef uint16_t uint16;
+typedef int32_t int32;
+typedef uint32_t uint32;
+typedef int64_t int64;
+typedef uint64_t uint64;
 
 typedef tvec2<int> ivec2;
 typedef tvec3<int> ivec3;
@@ -72,7 +77,5 @@ typedef tvec2<uint32_t> uvec2;
 typedef tvec3<uint32_t> uvec3;
 
 /// Unsigned char 4-component vector
-typedef tvec3<unsigned char> cvec3;
 typedef tvec3<unsigned char> rgb;
-typedef tvec4<unsigned char> cvec4;
 typedef tvec4<unsigned char> rgba;

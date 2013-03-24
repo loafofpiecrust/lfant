@@ -34,6 +34,7 @@
 
 #include <lfant/Component.h>
 #include <lfant/ScriptSystem.h>
+#include <lfant/Camera.h>
 
 // External
 #include <stdarg.h>
@@ -136,6 +137,30 @@ void Entity::AddComponent(Component* comp)
 	++componentCount;
 }
 
+void Entity::UnsafeDestroy()
+{
+	Object::Destroy();
+
+
+	if(componentCount > 0)
+	{
+		Log("Entity::Destroy: Destroying ", componentCount,"components.");
+		for(auto& compo : components)
+		{
+			compo->Destroy();
+		}
+	}
+
+	if(childCount > 0)
+	{
+		Log("Entity::Destroy: Destroying ", childCount,"children.");
+		for(auto& child : children)
+		{
+			child->UnsafeDestroy();
+		}
+	}
+}
+
 void Entity::Destroy()
 {
 	Log("Entity::Destroy: Touch.");
@@ -205,7 +230,15 @@ Component* Entity::GetComponent(string type)
 void Entity::RemoveComponent(Component* comp)
 {
 	Log("About to remove comp '", comp, "'.");
-	components.remove(ptr<Component>(comp));
+//	components.remove(ptr<Component>(comp));
+	for(auto& cp : components)
+	{
+		if(cp == comp)
+		{
+			components.remove(cp);
+			break;
+		}
+	}
 	--componentCount;
 	printf("Removed component\n");
 }
@@ -222,7 +255,8 @@ void Entity::RemoveComponent()
 				comp2->OnRemoveComponent(comp);
 			}
 			comp->Destroy();
-			RemoveComponent(comp);
+			components.remove(comp);
+			--componentCount;
 		}
 	}
 }
@@ -279,23 +313,38 @@ void Entity::Bind()
 *
 *******************************************************************************/
 
-void Entity::Load(Properties* props)
+void Entity::Save(Properties* prop)
 {
-	tag =		props->Get<string>("tag");
-	layer =		props->Get<string>("layer");
-	active =	props->Get<bool>("active");
-	lifeTime =	props->Get<float>("lifeTime");
+	prop->type = "entity";
+	prop->id = name;
+
+	prop->Set("tag", tag);
+	prop->Set("layer", layer);
+	prop->Set("active", active);
+	prop->Set("lifeTime", lifeTime);
+
+	for(auto& comp : components)
+	{
+		comp->Save(prop->AddChild());
+	}
+
+	for(auto& child : children)
+	{
+		child->Save(prop->AddChild());
+	}
+}
+
+void Entity::Load(Properties* prop)
+{
+	tag =		prop->Get<string>("tag");
+	layer =		prop->Get<string>("layer");
+	active =	prop->Get<bool>("active");
+	lifeTime =	prop->Get<float>("lifeTime");
 
 	Log("Entity::Load: Loaded basic properties.");
 
 	vector<Properties*> c;
-	{
-		Properties* comps = props->GetChild("components");
-		if(comps)
-		{
-			c = comps->GetChildren("component");
-		}
-	}
+	c = prop->GetChildren("component");
 	Log("Entity::Load: Component nodes loaded.");
 	Component* component = nullptr;
 	for(auto& comp : c)
@@ -304,13 +353,7 @@ void Entity::Load(Properties* props)
 		component->Load(comp);
 	}
 
-	{
-		Properties* comps = props->GetChild("children");
-		if(comps)
-		{
-			c = comps->GetChildren("entity");
-		}
-	}
+	c = prop->GetChildren("entity");
 	Log("Entity::Load: Children nodes loaded.");
 	Entity* ent = nullptr;
 	for(auto& child : c)
@@ -325,12 +368,24 @@ void Entity::Load(Properties* props)
 
 Component *Entity::AddComponent(string type)
 {
+	printf("Adding comp via string of type\n");
 	auto val = Component::componentRegistry[type];
+	Component* result = nullptr;
 	if(val == nullptr)
 	{
-		return nullptr;
+		result = nullptr;
 	}
-	return (this->*val)();
+	else
+	{
+		result = (this->*val)();
+	}
+
+	if(type == "Camera")
+	{
+		game->scene->mainCamera = dynamic_cast<Camera*>(result);
+	}
+
+	return result;
 }
 
 }

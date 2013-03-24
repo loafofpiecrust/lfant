@@ -41,11 +41,14 @@
 #include <lfant/Transform.h>
 #include <lfant/Sprite.h>
 
+#include <galaga/Player.h>
+
 namespace lfant
 {
 
 extern "C" void Launch()
 {
+	printf("Launched\n");
 	game = new Galaga();
 	game->standAlone = true;
 	game->Init();
@@ -70,6 +73,10 @@ void Galaga::Init()
 {
 	Game::Init();
 
+	scene->LoadFile("scenes/main.scene");
+	Log("Finished loading scene");
+	scene->SaveFile("scenes/saved.scene");
+
 	//Range<int> ver = game->settings->GetValue("gl.version");
 	//renderer->version = ver;
 
@@ -79,18 +86,20 @@ void Galaga::Init()
 	//renderer->SetPosition(pos);
 
 	// Look at Player.cpp
-	input->AddAxis("Horizontal", Key::D, Key::A);
-	input->AddAxis("Vertical", Key::W, Key::S);
-	input->AddAxis("VRotation", Key::Up, Key::Down);
-	input->AddAxis("HRotation", Key::Right, Key::Left);
-	input->AddAxis("ShowLoc", Key::E);
-	input->AddAxis("ShowRot", Key::R);
-	input->AddAxis("ShowFPS", Key::Q);
-	input->AddAxis("Fire", Key::Space);
-	input->AddAxis("TesterSetVar", Key::X);
-	input->AddAxis("TesterGetVar", Key::Z);
-	input->AddAxis("TesterHelpMe", Key::H);
-	input->AddAxis("Exit", Key::Esc);
+	/*
+	input->AddAxis("Horizontal", Key["D"], Key["A"]);
+	input->AddAxis("Vertical", Key["W"], Key["S"]);
+	input->AddAxis("VRotation", Key["Up"], Key["Down"]);
+	input->AddAxis("HRotation", Key["Right"], Key["Left"]);
+	input->AddAxis("ShowLoc", Key["E"]);
+	input->AddAxis("ShowRot", Key["R"]);
+	input->AddAxis("ShowFPS", Key["Q"]);
+	input->AddAxis("Fire", Key["Space"]);
+	input->AddAxis("TesterSetVar", Key["X"]);
+	input->AddAxis("TesterGetVar", Key["Z"]);
+	input->AddAxis("TesterHelpMe", Key["H"]);
+	input->AddAxis("Exit", Key["Esc"]);
+	*/
 
 	// Just tests SystemInfo (very minimal on Linux, nothing on OSX, some on Windows)
 	Log("Computer name: " + systemInfo->computerName);
@@ -101,18 +110,9 @@ void Galaga::Init()
 	// Fairly self-explanitory. Check above input axes for keys to press. Will implement better with GUI.
 	game->settings->SetValue("Tester", "5.0f", "This is my var");
 
-	Log("Galaga::Init: Registered test var");
 
-	Entity* ent = nullptr;
-	Log("Galaga::Init: Allocated Entity pointer");
-
-	ent = scene->Spawn("Player");
-
-	Log("Galaga::Init: Spawned player");
-
-
-	ent = scene->Spawn("ChatClientObj", nullptr);
-	ent->AddComponent<ChatClient>();
+//	ent = scene->Spawn("ChatClientObj", nullptr);
+//	ent->AddComponent<ChatClient>();
 }
 
 void Galaga::Update()
@@ -140,7 +140,7 @@ void Galaga::AddMesh(string name)
 	Mesh* mesh = ent->AddComponent<Mesh>();
 	mesh->LoadFile("suzanne.obj");
 	mesh->material.texture.LoadFile("player.png");
-	mesh->material.shader.path = "shaders/Diffuse";
+//	mesh->material.shader.path = "shaders/Diffuse";
 }
 
 }

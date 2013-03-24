@@ -35,7 +35,7 @@
 namespace lfant
 {
 
-//IMPLEMENT_COMP(Sprite)
+IMPLEMENT_COMP(Sprite)
 
 Sprite::Sprite()
 {
@@ -158,21 +158,17 @@ void Sprite::Update()
 			if(currentTime >= currentAnim->frameRate)
 			{
 				currentTime = 0.0f;
-				AnimPlayMode mode = animMode;
-				if(mode == Default)
+				Animation::Mode mode = animMode;
+				if(mode == Animation::Mode::Default)
 				{
-					if(currAnimMode == Default)
+					if(currAnimMode == Animation::Mode::Default)
 					{
-						mode = currentAnim->playMode;
+						mode = currentAnim->mode;
 					}
 					else
 					{
 						mode = currAnimMode;
 					}
-				}
-				if(mode == Default)
-				{
-					mode = Loop;
 				}
 				if(!playingReverseAnim)
 				{
@@ -187,11 +183,11 @@ void Sprite::Update()
 					}
 					else
 					{
-						if(mode == Once)
+						if(mode == Animation::Mode::Once)
 						{
 							playingAnim = false;
 						}
-						else if(mode == Bounce)
+						else if(mode == Animation::Mode::Bounce)
 						{
 							playingReverseAnim = true;
 						}
@@ -213,11 +209,11 @@ void Sprite::Update()
 					}
 					else
 					{
-						if(mode == Once)
+						if(mode == Animation::Mode::Once)
 						{
 							playingAnim = false;
 						}
-						else if(mode == Bounce)
+						else if(mode == Animation::Mode::Bounce)
 						{
 							playingReverseAnim = false;
 						}
@@ -232,6 +228,28 @@ void Sprite::Update()
 	Renderable::Update();
 }
 
+void Sprite::Load(Properties *props)
+{
+	Log("Loading a sprite from props");
+	Mesh::Load(props);
+
+	// Register Animation::Mode enum
+	props->SetEnum("Mode::Loop", Animation::Mode::Loop);
+	props->SetEnum("Mode::Bounce", Animation::Mode::Bounce);
+	props->SetEnum("Mode::Once", Animation::Mode::Once);
+	props->SetEnum("Mode::Default", Animation::Mode::Default);
+
+	vector<Properties*> panims = props->GetChildren("animation");
+	for(Properties*& pa : panims)
+	{
+		Animation anim;
+		anim.name = pa->id;
+		anim.material.LoadFile(pa->Get<string>("material", "materials/Diffuse.mat"));
+		pa->Get("frameRate", anim.frameRate);
+		pa->GetEnum("playMode", anim.mode);
+	}
+}
+
 void Sprite::EndRender()
 {
 	glDeleteBuffers(1, &vertexBuffer.id);
@@ -243,7 +261,7 @@ void Sprite::EndRender()
 	Renderable::EndRender();
 }
 
-void Sprite::PlayAnim(string name, AnimPlayMode mode, bool reverse)
+void Sprite::PlayAnim(string name, Animation::Mode mode, bool reverse)
 {
 	if(Animation* anim = &GetAnim(name))
 	{

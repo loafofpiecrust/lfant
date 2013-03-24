@@ -47,17 +47,10 @@ void Subsystem::Init()
 	if(Type(this) != Type<Scene>())
 	{
 		printf("About to load file for subsystem\n");
-		Load();
+		string type = RemoveScoping(Type(this));
+		to_lower(type);
+		LoadFile("settings/"+type+".cfg");
 	}
-}
-
-void Subsystem::Load()
-{
-	/*
-	string type = Type(this);
-	to_lower(type);
-	game->settings->LoadSettings("settings/"+type+".cfg");
-	*/
 }
 
 }

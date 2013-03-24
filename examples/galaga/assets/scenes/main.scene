@@ -1,0 +1,35 @@
+ 
+// Main Scene container
+scene Galaga
+{
+	entity Camera
+	{
+		layer = Entities
+		tag = MainCamera
+
+		component Camera
+		{
+		}
+
+		component Player
+		{
+		}
+	}
+
+	entity StarShip
+	{
+		layer = Entities
+		tag = Player
+
+		component Sprite
+		{
+			material = materials/Diffuse.mat
+		}
+	}
+	
+	entity BlasterMinor
+	{
+		layer = Entities
+		tag = Enemy
+	}
+}

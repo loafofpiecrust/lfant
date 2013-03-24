@@ -39,12 +39,21 @@ namespace lfant
  *		Allows attraction and repulsion based on the position and rotation
  *		of two magnetic Entities.
  *	@todo
+ *		Actually figure this out.
  *		Efficient handling of Magnet to Magnet interaction.
  *		Using rotation and position to roughly guess how much force to use.
  */
 class Magnet : public Component
 {
 public:
+	enum class Mode : byte
+	{
+		None = 0,
+		Attract,
+		Repulse,
+		Both = Attract | Repulse
+	};
+
 	Magnet();
 	~Magnet();
 
@@ -52,13 +61,13 @@ protected:
 
 private:
 	/// The strength and range of attraction and repulsion to use.
-	float mMagnetism;
+	float magnetism;
 
 	/// The mode of magnetism. 0 = none. 1 = attraction. 2 = repulsion. 3 = both.
-	byte mMode;
+	Mode mode;
 
-	/// The axis at which to split the poles. 0 = x; 1 = y; 2 = z.
-	byte mAxis;
+	/// The axis at which to split the poles. 1 = x; 2 = y; 3 = z.
+	byte axis;
 };
 
 /** @} */

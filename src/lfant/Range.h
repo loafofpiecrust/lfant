@@ -40,27 +40,16 @@ class Range
 public:
 	union
 	{
-		T min, start, major, primary, first;
+		T min, start, major;
 	};
+
 	union
 	{
-		T max, end, minor, secondary, second;
+		T max, end, minor;
 	};
 
-	T operator[](byte idx)
-	{
-		if(idx == 0)
-		{
-			return min;
-		}
-		else
-		{
-			return max;
-		}
-	}
-
-	Range(T one, T two) :
-		min(one), max(two)
+	Range(T min, T max) :
+		min(min), max(max)
 	{
 	}
 
@@ -69,9 +58,7 @@ public:
 	{
 	}
 
-	Range()
-	{
-	}
+	Range() {}
 };
 
 /// @}

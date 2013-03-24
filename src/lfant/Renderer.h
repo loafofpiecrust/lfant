@@ -66,7 +66,8 @@ public:
 	Renderer();
 	virtual ~Renderer();
 
-	virtual void Load();
+	void Load(Properties *prop);
+	void Save(Properties *prop);
 
 	/**
 	 *	Opens a new window, using member settings.

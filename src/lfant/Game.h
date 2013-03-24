@@ -118,7 +118,7 @@ public:
 	//boost::scoped_ptr<ScriptSystem>		scriptSystem;
 	//boost::scoped_ptr<FGSystem>			flowgraph;
 
-	bool standAlone;
+	bool standAlone = true;
 	bool destroy = false;
 
 protected:

@@ -18,18 +18,20 @@
 *
 ******************************************************************************/
 #pragma once
-
 #include <lfant/stdafx.h>
 
 #define BOOST_BIND_NO_PLACEHOLDERS
 
-// External
-#include <boost/signals2.hpp>
-#include <typeinfo>
-#include <forward_list>
-
 // Internal
 #include <lfant/TypeInfo.h>
+#include <lfant/Properties.h>
+
+// External
+#include <boost/signals2.hpp>
+#include <boost/bind.hpp>
+#include <boost/function.hpp>
+#include <typeinfo>
+#include <forward_list>
 
 #define SENDER(obj, sig) obj, #sig
 #define RECEIVER(obj, slot) obj, &remove_ref<decltype(*obj)>::type::slot
@@ -57,7 +59,7 @@ class Object
 {
 	class Event
 	{
-public:
+	public:
 		string name;
 
 		Event()
@@ -76,7 +78,7 @@ public:
 
 	class Event0 : public Event
 	{
-public:
+	public:
 		typedef boost::signals2::signal<void ()> sigType;
 		sigType sig;
 
@@ -90,7 +92,7 @@ public:
 	template<typename P1, typename ... P>
 	class EventP : public Event
 	{
-public:
+	public:
 		typedef boost::signals2::signal<void (P1, P ...)> sigType;
 		sigType sig;
 
@@ -102,12 +104,17 @@ public:
 	};
 public:
 
+	virtual void Load(Properties* prop);
+	virtual void LoadFile(string path);
+
+	virtual void Save(Properties* prop);
+	virtual void SaveFile(string path);
+
 	template<typename R>
 	void Connect(Object* sender, string name, R* receiver, void (R::* func)())
 	{
 		erase_all(name, " ");
 		name = Type(sender) + "::" + name + "()";
-		cout << "Connecting "+name+"\n";
 		Event0* con = nullptr;
 		for(auto& event : sender->events)
 		{
@@ -130,7 +137,6 @@ public:
 	{
 		erase_all(name, " ");
 		name = Type(sender) + "::" + name + "(" + Type<P1>() + ")";
-		cout << "Connecting "+name+"\n";
 		EventP<P1>* con = nullptr;
 		for(auto& event : sender->events)
 		{
@@ -153,7 +159,6 @@ public:
 	{
 		erase_all(name, " ");
 		name = Type(sender) + "::" + name + "(" + Type<P1, P2>() + ")";
-		cout << "Connecting "+name+"\n";
 		EventP<P1, P2>* con = nullptr;
 		for(auto& event : sender->events)
 		{
@@ -176,7 +181,6 @@ public:
 	{
 		erase_all(name, " ");
 		name = Type(sender) + "::" + name + "(" + Type<P1, P2, P3>() + ")";
-		cout << "Connecting "+name+"\n";
 		EventP<P1, P2, P3>* con = nullptr;
 		for(auto& event : sender->events)
 		{

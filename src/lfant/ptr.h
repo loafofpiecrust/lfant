@@ -22,7 +22,6 @@ public:
 	explicit ptr(T* v) noexcept :
 		unique_ptr<T>::unique_ptr(v)
 	{
-		cout << "ptr(T*)" << v <<"\n";
 	}
 
 	/*

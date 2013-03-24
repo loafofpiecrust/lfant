@@ -219,10 +219,10 @@ void Input::Load()
 		axis->positiveAlt = Key[i->Get<string>("positiveAlt")];
 		axis->positiveAlt = Key[i->Get<string>("negativeAlt")];
 
-		axis->sensitivity = i->Get<float>("sensitivity", 3.0f);
-		axis->dead = i->Get<float>("dead", 0.001f);
-		axis->snap = i->Get<bool>("snap", true);
-		axis->joyNum = i->Get<int>("joyNum", 0);
+		i->Get("sensitivity", axis->sensitivity);
+		i->Get("dead", axis->dead);
+		i->Get("snap", axis->snap);
+		i->Get("joyNum", axis->joyNum);
 	}
 }
 

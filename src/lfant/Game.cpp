@@ -67,6 +67,7 @@ extern "C" void Launch()
 	delete game;
 }
 
+
 Game::Game() :
 	console {new Console},
 	fileSystem {new FileSystem},
@@ -140,7 +141,6 @@ void Game::LoadScene(string scene)
 
 void Game::Destroy()
 {
-	console->Destroy();
 	fileSystem->Destroy();
 	settings->Destroy();
 	systemInfo->Destroy();
@@ -149,9 +149,11 @@ void Game::Destroy()
 	renderer->Destroy();
 	userInterface->Destroy();
 	scene->Destroy();
+	Log("Scene destroyed.");
 	input->Destroy();
 	audio->Destroy();
 	network->Destroy();
+	console->Destroy();
 }
 
 void Game::Exit()

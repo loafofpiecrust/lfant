@@ -41,9 +41,16 @@ Component::~Component()
 {
 }
 
-void Component::Load(Properties* props)
+void Component::Load(Properties* prop)
 {
-	enabled = props->Get<bool>("enabled");
+	prop->Get("enabled", enabled);
+}
+
+void Component::Save(Properties *prop)
+{
+	prop->type = "component";
+	prop->id = RemoveScoping(Type(this));
+	prop->Set("enabled", enabled);
 }
 
 void Component::Init()
@@ -79,6 +86,11 @@ void Component::SetEnabled(bool enable)
 	{
 		OnDisable();
 	}
+}
+
+void Component::RegisterType(string name, Component *(Entity::*func)())
+{
+	componentRegistry[name] = func;
 }
 
 

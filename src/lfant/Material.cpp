@@ -2,7 +2,7 @@
 *
 *	LFANT Source
 *	Copyright (C) 2012-2013 by LazyFox Studios
-*	Created: 2012-11-01 by Taylor Snead
+*	Created: 2013-03-18 by Taylor Snead
 *
 *	Licensed under the Apache License, Version 2.0 (the "License");
 *	you may not use this file except in compliance with the License.
@@ -17,46 +17,54 @@
 *	limitations under the License.
 *
 ******************************************************************************/
-#pragma once
 
-#include <lfant/stdafx.h>
+#include <lfant/Material.h>
+
+// Internal
+#include <lfant/Game.h>
+#include <lfant/FileSystem.h>
+#include <lfant/Properties.h>
 
 // External
 
-// Internal
-#include <lfant/Collider.h>
-
-class btBoxShape;
-
 namespace lfant
 {
-/** @addtogroup Game
- *	@{
- */
-/** @addtogroup Physics
- *	@{
- */
 
-/**
- *
- */
-class BoxCollider : public Collider
+Material::Material()
 {
-public:
+}
 
-protected:
-//		using Collider::Collider;
-//		using Collider::~Collider;
+Material::Material(string texture, string shader)
+{
+	this->texture.LoadFile(texture);
+	this->shader.LoadFile(shader);
+}
 
-	virtual void Update();
-	virtual void OnSetScale(vec3 scale);
+Material& Material::operator()(Texture texture, Shader shader)
+{
+	this->texture = texture;
+	this->shader = shader;
+	return *this;
+}
 
-	btBoxShape* shape;
+void Material::Load(Properties* prop)
+{
+	if(Properties* tex = prop->GetChild("texture"))
+	{
+		texture.Load(tex);
+	}
 
-private:
+	if(Properties* sh = prop->GetChild("shader"))
+	{
+		shader.Load(sh);
+	}
+}
 
-};
+void Material::Save(Properties *prop)
+{
+	Object::Save(prop);
+	texture.Save(prop->AddChild());
+	shader.Save(prop->AddChild());
+}
 
-/** @} */
-/** @} */
 }

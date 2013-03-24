@@ -111,6 +111,8 @@ public:
 	{
 	}
 
+	void Load(Properties* prop);
+
 	virtual void OnDestroy();
 
 	void Input(string line);
@@ -167,7 +169,7 @@ protected:
 private:
 	vector<Command*> commands;
 
-	string logName = "game.log";
+	string logName = "lfant.log";
 	ofstream logFile;
 };
 

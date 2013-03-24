@@ -69,4 +69,34 @@ void Object::Bind()
 	//cls.FUNC( Object, Update );
 }
 
+void Object::LoadFile(string path)
+{
+	ptr<Properties> prop {new Properties};
+	prop->LoadFile(path);
+	string type = RemoveScoping(Type(this));
+	to_lower(type);
+	if(Properties* pc = prop->GetChild(type))
+	{
+		Load(pc);
+	}
+}
+
+void Object::Load(Properties *prop)
+{
+}
+
+void Object::SaveFile(string path)
+{
+	ptr<Properties> prop {new Properties};
+	Save(prop);
+	prop->SaveFile(path);
+}
+
+void Object::Save(Properties *prop)
+{
+	string type = RemoveScoping(Type(this));
+	to_lower(type);
+	prop->type = type;
+}
+
 }

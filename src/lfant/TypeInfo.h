@@ -61,6 +61,7 @@ struct remove_ref < T&& >
 string Type();
 
 string DemangleType(string type);
+string RemoveScoping(string type);
 
 template<typename T>
 auto Type()->typename is_not_ptr<T, string>::type

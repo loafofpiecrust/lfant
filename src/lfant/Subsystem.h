@@ -43,7 +43,6 @@ protected:
 	virtual ~Subsystem();
 
 	virtual void Init();
-	virtual void Load();
 };
 
 /// @}

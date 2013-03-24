@@ -344,4 +344,11 @@ void Settings::Init()
 	LoadSettings();
 }
 
+void Settings::Load(Properties* prop)
+{
+	prop = prop->GetChild("settings");
+	prop->Get("orgName", orgName);
+	prop->Get("gameName", gameName);
+}
+
 }

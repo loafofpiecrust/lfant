@@ -78,8 +78,9 @@ public:
 	~Settings();
 
 	virtual void Init();
-
 	virtual void LoadSettings(string input = "");
+
+	void Load(Properties* prop);
 
 	void SetValue(string name, string value, string help = "");
 
@@ -107,6 +108,9 @@ public:
 
 	string GetHelp(string name);
 
+	string orgName = "lazyfox";
+	string gameName = "lfant";
+
 protected:
 
 	string GetRef(string name, string value, string ids = "$()");
@@ -115,6 +119,7 @@ protected:
 	string defaultFile = "settings.cfg";
 
 	vector<Var> variables;
+
 
 };
 

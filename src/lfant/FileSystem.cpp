@@ -34,8 +34,7 @@
 namespace lfant
 {
 
-FileSystem::FileSystem() :
-	gameFolder(absolute(path("../..")).string())
+FileSystem::FileSystem()
 {
 }
 
@@ -45,78 +44,35 @@ FileSystem::~FileSystem()
 
 void FileSystem::Init()
 {
-	path p("../../ssystem.cfg");
-	if(exists(p))
-	{
-		// Load settings from system.cfg
-	}
-	else
-	{
-		// Use default settings
-		gameFolder = "../..";
-#		if WINDOWS
-		const string home = getenv("USERPROFILE");
-#		elif UNIX
-		const string home = getenv("HOME");
-#		endif
-		userFolder = home + "/Documents/My Games/" + game->settings->GetValue("general.orgname") + "/" + game->settings->GetValue("general.gamename");
-	//	game->settings->LoadSettings();
-
-		// Save these to system.cfg
-	}
-}
-
-string FileSystem::ConvertPath(string curr)
-{
-	for(auto& chr : curr)
-	{
-		// Supported grouping characters here.
-		if(chr == '\\' || chr == ':' || chr == '/')
-		{
-			// Convert all grouping chars to forward slashes for directory management.
-#				if UNIX
-			chr = '/';
-#				elif WINDOWS
-			chr = '\\';
-#				endif
-		}
-	}
-	return curr;
+	// Use default settings
+	gameFolder = "../..";
+#if WINDOWS
+	const string home = getenv("USERPROFILE");
+#elif UNIX
+	const string home = getenv("HOME");
+#endif
+	userFolder = home + "/Documents/My Games/" + game->settings->orgName + "/" + game->settings->gameName;
 }
 
 path FileSystem::GetGamePath(string name)
 {
-	path result(ConvertPath(name));
-	if(exists(result))
+	path result(gameFolder + "/assets/" + name);
+	if(!exists(result))
 	{
-		return result;
+		Log("FileSystem::GetGamePath: File not found '"+result.string()+"'.");
+	//	game->Exit();
 	}
-
-	result = path(ConvertPath(gameFolder + "/assets/" + name));
-	if(exists(result))
-	{
-		return result;
-	}
-	Log("FileSystem::GetGamePath: File not found \'"+result.string()+"\'.");
-//	game->Exit();
-	return "";
+	return result;
 }
 
 path FileSystem::GetUserPath(string name)
 {
-	path result(ConvertPath(name));
-	if(exists(result))
+	path result(userFolder + "/" + name);
+	if(!exists(result))
 	{
-		return result;
+		Log("FileSystem::GetUserPath: File not found '"+result.string()+"'.");
 	}
-
-	result = path(ConvertPath(userFolder + "/" + name));
-	if(exists(result))
-	{
-		return result;
-	}
-	Log("FileSystem::GetUserPath: File not found \'"+result.string()+"\'.");
-	return "";
+	return result;
 }
 
 vector<path> FileSystem::GetGameFiles(string dir)

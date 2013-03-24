@@ -70,8 +70,8 @@ public:
 	void Destroy();
 
 	void Bind();
-	void Save();
-	void Load(Properties* props);
+	void Save(Properties* prop);
+	void Load(Properties* prop);
 
 	/**
 	 *	Adds a new component by instancing the given type.
@@ -83,9 +83,7 @@ public:
 		C* comp = new C();
 		comp->owner = this;
 		comp->Init();
-		cout << "Entity::AddComponent: Initialised, Component id: " << comp << ", exists? " << (bool)comp << "\n";
 		AddComponent(comp);
-		cout << "Entity::AddComponent: Pushed, Component id: " << comp << ", exists? " << (bool)comp << "\n";
 		return comp;
 	}
 
@@ -165,6 +163,7 @@ protected:
 
 	void AddChild(Entity* ent);
 	void RemoveChild(Entity* ent);
+	void UnsafeDestroy();
 
 private:
 

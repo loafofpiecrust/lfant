@@ -33,7 +33,7 @@ vector<string> Split(string str, string dropDelim, string keepDelim)
 	vector<string> result;
 	if(str == "")
 	{
-	return result;
+		return result;
 	}
 	char_separator<char> sep(dropDelim.c_str(), keepDelim.c_str(), drop_empty_tokens);
 	tokenizer<char_separator<char> > tok(str, sep);
@@ -53,6 +53,61 @@ vector<string> Split(vector<string> str, string dropDelim, string keepDelim)
 		combined.insert(combined.end(), temp.begin(), temp.end());
 	}
 	return combined;
+}
+
+vector<string> SplitParens(string str, string dropDelim, string keepDelim)
+{
+	vector<string> result;
+	bool newstr = false;
+	int parlev = 0;
+	string curr = "";
+	for(uint i = 0; i < str.size(); ++i)
+	{
+		if(parlev <= 0)
+		{
+			for(uint k = 0; k < dropDelim.size(); ++k)
+			{
+				if(str[i] == dropDelim[k])
+				{
+					newstr = true;
+					break;
+				}
+			}
+			for(uint k = 0; k < keepDelim.size(); ++k)
+			{
+				if(str[i] == keepDelim[k])
+				{
+
+					curr.push_back(str[i]);
+					newstr = true;
+					break;
+				}
+			}
+		}
+
+		if(str[i] == '(')
+		{
+			++parlev;
+		}
+		else if(str[i] == ')')
+		{
+			--parlev;
+		}
+
+		if(!newstr)
+		{
+			curr.push_back(str[i]);
+		}
+		else
+		{
+			if(curr != "")
+			{
+				result.push_back(curr);
+			}
+			newstr = false;
+			curr = "";
+		}
+	}
 }
 
 string Extension(string path)

@@ -95,6 +95,8 @@ public:
 	Mesh();
 	~Mesh();
 
+	void Load(Properties *props);
+
 	virtual void Init();
 	virtual void Update();
 	virtual void OnDestroy();

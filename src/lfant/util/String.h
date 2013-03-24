@@ -43,6 +43,8 @@ string Extension(string path);
 string Replace(string str, string find, string replace);
 string ReplaceAll(string str, string find, string replace);
 
+vector<string> SplitParens(string str, string dropDelim = " ", string keepDelim = "");
+
 /** @} */
 /** @} */
 }

@@ -23,8 +23,11 @@
 // Internal
 #include <lfant/ptr.h>
 #include <lfant/Range.h>
+#include <lfant/util/lexical_cast.h>
 
 // External
+#include <map>
+#include <iostream>
 
 namespace lfant
 {
@@ -53,15 +56,55 @@ public:
 	Properties* GetChildById(string id);
 	vector<Properties*> GetChildren(string type = "");
 
+	Properties* AddChild(string type = "");
+
 	template<typename T>
-	T Get(string name, T defval = T())
+	void Set(string name, const T& value)
+	{
+		name = TrimSpace(name);
+		values[name] = lexical_cast<string>(value);
+	}
+
+	void AddValue(string name, string value);
+	void SubtractValue(string name, string value);
+
+	template<typename T>
+	void Get(string name, T& ref)
 	{
 		string val = values[name];
-		if(val == "")
+		if(val != "")
 		{
-			return defval;
+			ref = lexical_cast<T>(Expand(val));
 		}
-		return lexical_cast<T>(val);
+	}
+
+	template<typename T = string>
+	T Get(string name, string def = "")
+	{
+		cout << "Getting '"+name+"'.\n";
+		string val = values[name];
+		if(val != "")
+		{
+			return lexical_cast<T>(Expand(val));
+		}
+		return lexical_cast<T>(Expand(def));
+	}
+
+	template<typename T>
+	void SetEnum(string name, T value)
+	{
+		enums[name] = lexical_cast<string>((int)value);
+	}
+
+	template<typename T>
+	T GetEnum(string name, T& ref)
+	{
+		string val = enums[values[name]];
+		if(val != "")
+		{
+			ref = (T)lexical_cast<int>(val);
+		}
+		return ref;
 	}
 
 	string type;
@@ -70,15 +113,21 @@ public:
 protected:
 
 private:
-	Properties(ifstream& stream, string type, string id = "");
+	Properties(ifstream& stream, string type, string id = "", Properties* parent = nullptr);
+	Properties(ofstream& stream, string type, string id = "", Properties* parent = nullptr);
 
 	void LoadStream(ifstream& stream);
+	void SaveStream(ofstream& stream);
 
-	void SkipWhiteSpace(ifstream& stream);
-	char* TrimWhiteSpace(char* str);
+	void SkipSpace(ifstream& stream);
+	string TrimSpace(string str, bool onlyIndent = false);
+	string Expand(string value);
+	string GetIndent();
 
 	map<string, string> values;
+	map<string, string> enums;
 	vector< ptr<Properties> > children;
+	Properties* parent = nullptr;
 };
 
 /** @} */

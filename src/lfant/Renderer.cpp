@@ -67,25 +67,34 @@ Renderer::~Renderer()
 {
 }
 
-void Renderer::Load()
+void Renderer::Load(Properties* prop)
 {
-	Log("Renderer::Load: Touch.");
-	Properties root;
-	root.LoadFile("settings/renderer.cfg");
-	Log("Renderer::Load: Loaded file.");
-	Properties* prop = root.GetChild("renderer");
-	Log("Renderer::Load: Got root child");
+	Subsystem::Load(prop);
+	Log("Renderer::Load: Got root child, '", prop->id, "'.");
 
-	resolution =		prop->Get<ivec2>("resolution", ivec2(500, 500));
-	version =			prop->Get< Range<int> >("version", {3, 2});
-	vsync =				prop->Get<bool>("vsync", true);
-	fullscreen =		prop->Get<bool>("fullscreen", false);
-	fsaa =				prop->Get<int>("fsaa", 4);
-	windowResizable =	prop->Get<bool>("windowResizable", false);
-	windowTitle =		prop->Get<string>("windowTitle", "lfant");
-	windowPos =			prop->Get<ivec2>("windowPos", ivec2(0));
+	prop->Get("resolution", resolution);
+	prop->Get("version", version);
+	prop->Get("vsync", vsync);
+	prop->Get("fullscreen", fullscreen);
+	prop->Get("fsaa", fsaa);
+	prop->Get("windowResizable", windowResizable);
+	prop->Get("windowPos", windowPos);
+	prop->Get("windowTitle", windowTitle);
 
 	Log("Window title: '"+windowTitle+"'.");
+}
+
+void Renderer::Save(Properties *prop)
+{
+	Subsystem::Save(prop);
+
+	prop->Set("resolution", resolution);
+	prop->Set("version", version);
+	prop->Set("vsync", vsync);
+	prop->Set("fullscreen", fullscreen);
+	prop->Set("fsaa", fsaa);
+	prop->Set("windowResizable", windowResizable);
+	prop->Set("windowTitle", windowTitle);
 }
 
 /*******************************************************************************
@@ -282,9 +291,9 @@ Shader& Renderer::GetShader(string name)
 {
 	for(auto& shader : shaders)
 	{
-		if(shader.path == name)
+//		if(shader.path == name)
 		{
-			return shader;
+//			return shader;
 		}
 	}
 	return null(Shader);
@@ -292,10 +301,10 @@ Shader& Renderer::GetShader(string name)
 
 void Renderer::AddShader(Shader& shader)
 {
-	if(Shader* s = &GetShader(shader.path))
+//	if(Shader* s = &GetShader(shader.path))
 	{
-		s->id = shader.id;
-		return;
+//		s->id = shader.id;
+//		return;
 	}
 	shaders.push_back(shader);
 }

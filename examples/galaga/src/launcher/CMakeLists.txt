@@ -20,7 +20,10 @@ add_executable(${PROJECT_NAME} ${SRC_FILES} ${HEADER_FILES})
 # Includes
 include_directories(
 	"."
-	"${SFE}/src/external/boost"
+	"${SFE}/external/boost"
+	"../"
+	"${SFE}/src"
+	"${SFE}/external/glm"
 	)
 
 target_link_libraries(${PROJECT_NAME}

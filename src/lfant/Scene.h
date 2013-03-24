@@ -86,14 +86,14 @@ public:
 	 *
 	 *	@param file File to save to, without extension.
 	 */
-	void Save(string path = "");
+	void Save(Properties *prop);
 
 	/**
 	 *	Loads the scene from a file.
 	 *
 	 *	@param file File to load from, without extension.
 	 */
-	void Load(string path);
+	void Load(Properties* prop);
 
 	/**
 	 *	Spawns an entity in this Scene. Use this for any creation

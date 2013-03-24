@@ -38,13 +38,13 @@ namespace lfant
 
 //#define REGISTER_COMP(comp) static bool BOOST_PP_CAT( comp, __regged ) = componentRegistry.insert( BOOST_PP_STRINGIZE(comp), &Entity::AddComponent<comp>());
 #define DECLARE_COMP(comp) \
-	static void _RegisterComponent();
+	static void _RegisterComponent() __attribute__((constructor));
 
 #define IMPLEMENT_COMP(comp) \
-	void comp::_RegisterComponent() __attribute__((constructor))\
+	void comp::_RegisterComponent()\
 	{\
 		std::cout << "Registering component: " << #comp << "\n";\
-		componentRegistry[#comp] = (Component* (Entity::*)())&Entity::AddComponent<comp>;\
+		Component::RegisterType(#comp, (Component* (Entity::*)())&Entity::AddComponent<comp>);\
 	}
 
 
@@ -64,7 +64,8 @@ class Component : public Object
 public:
 	virtual ~Component();
 
-	virtual void Load(Properties* props);
+	virtual void Load(Properties* prop);
+	virtual void Save(Properties* prop);
 
 	/**
 	 *	Returns whether this component is enabled.
@@ -75,6 +76,8 @@ public:
 	 *	Enables or disables this component.
 	 */
 	void SetEnabled(bool enable);
+
+	static void RegisterType(string name, Component* (Entity::*func)());
 
 	/// The owner of this Component.
 	Entity* owner;

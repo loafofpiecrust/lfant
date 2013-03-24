@@ -41,7 +41,7 @@ class ParticleSystem;
 /**
  *	Particle
  */
-class Particle
+class Particle : public Object
 {
 public:
 	Particle();
@@ -88,7 +88,7 @@ public:
 	float sizeDiff;
 	Range<rgba> color;
 	rgba colorDiff;
-	bool active;
+	bool active = true;
 
 	ParticleSystem* system;
 

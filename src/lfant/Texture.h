@@ -18,12 +18,12 @@
 *
 ******************************************************************************/
 #pragma once
-
 #include <lfant/stdafx.h>
 
-// External
-
 // Internal
+#include <lfant/Object.h>
+
+// External
 
 namespace lfant
 {
@@ -37,36 +37,23 @@ namespace lfant
 /**
  *	Base class for texture handling.
  */
-class Texture
+class Texture : public Object
 {
 public:
-
-	enum FilterMode
+	enum class FilterMode : byte
 	{
-		FM_POINT, FM_BILINEAR, FM_TRILINEAR
+		Point, Bilinear, Trilinear
 	};
 
-	enum WrapMode
+	enum class WrapMode : byte
 	{
-		WM_CLAMP, WM_REPEAT
+		Clamp, Repeat
 	};
 
-	enum TexFormat
+	enum class Format : byte
 	{
-		TF_COMPRESSED, TF_16BIT, TF_TRUECOLOR
+		Compressed, Bit16, TrueColor
 	};
-
-	void LoadFile(string path = "", int mode = 0);
-
-	string name = "";
-	//WrapMode wrapMode = WM_REPEAT;
-	//FilterMode filterMode = FM_BILINEAR;
-	//uint16_t anisoLevel = 1;
-	//TexFormat format = TF_COMPRESSED;
-	uint width;
-	uint height;
-	uint32_t id = 0;
-	uint32_t uniformId = 0;
 
 	Texture()
 	{
@@ -74,15 +61,31 @@ public:
 
 	Texture& operator=(string name)
 	{
-		this->name = name;
+		this->path = name;
 		return *this;
 	}
+
+	void LoadFile(string path = "", int mode = 0);
+	void Load(Properties* prop);
+	void Save(Properties *prop);
+
+	uvec2 GetSize();
+
+	string path = "";
+	WrapMode wrapMode = WrapMode::Repeat;
+	FilterMode filterMode = FilterMode::Bilinear;
+	uint16 anisoLevel = 1;
+	Format format = Format::Compressed;
+	uvec2 size;
+	uint32 id = 0;
+	uint32 uniformId = 0;
 
 private:
 	void LoadPNG(int mode);
 	void LoadJPEG(int mode);
 	void LoadBMP(int mode);
 	void LoadDDS(int mode);
+
 };
 
 /** @} */

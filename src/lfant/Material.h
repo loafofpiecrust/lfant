@@ -23,6 +23,7 @@
 // Internal
 #include <lfant/Texture.h>
 #include <lfant/Shader.h>
+#include <lfant/Object.h>
 
 // External
 
@@ -38,9 +39,17 @@ namespace lfant
 /**
  *
  */
-class Material
+class Material : public Object
 {
 public:
+	Material();
+	Material(string texture, string shader);
+
+	Material& operator()(Texture texture, Shader shader);
+
+	void Load(Properties *prop);
+	void Save(Properties *prop);
+
 	// Path and name for the texture file.
 	Texture texture;
 	uint32_t textureUnif;
@@ -48,22 +57,6 @@ public:
 	vec2 tiling { 1, 1 };
 	vec2 offset { 0, 0 };
 	rgba color { 255, 255, 255, 255 };
-
-	Material()
-	{
-	}
-
-	Material(Texture texture, Shader shader) :
-		texture(texture), shader(shader)
-	{
-	}
-
-	Material& operator()(Texture texture, Shader shader)
-	{
-		this->texture = texture;
-		this->shader = shader;
-		return *this;
-	}
 };
 
 /// @}

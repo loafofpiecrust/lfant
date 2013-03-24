@@ -1,9 +1,0 @@
-<Prefab name="Player">
-	<Components>
-		<Component type="Movement">
-			
-		</Component>
-		<Component>
-		
-	</Components>
-</Prefab>

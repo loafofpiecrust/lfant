@@ -27,26 +27,17 @@
 // Internal
 
 #include <lfant/Subsystem.h>
-#include <lfant/tinyxml2.h>
 
 using namespace boost::filesystem;
 
 namespace lfant
 {
-const string GameName = "ShadowFox";
-
 /** @addtogroup Game
  *	@{
  */
 /** @addtogroup Utilities
  *	@{
  */
-
-// Typedefs for ease-of-use and switchability
-typedef tinyxml2::XMLDocument xmldoc;
-typedef tinyxml2::XMLElement xmlelem;
-typedef tinyxml2::XMLNode xmlnode;
-typedef tinyxml2::XMLAttribute xmlattr;
 
 /**
  *
@@ -60,20 +51,15 @@ public:
 
 	void Init();
 
-	xmldoc LoadXML(string type, string dir);
-	void UnloadXML(xmldoc doc);
-
-//	path GetAssetPath(string name);
-	path GetUserPath(string name = "/");
-	path GetGamePath(string name = "/");
+	path GetUserPath(string name);
+	path GetGamePath(string name);
 
 	vector<path> GetGameFiles(string dir);
 
 protected:
-	string ConvertPath(string curr);
 
 public:
-	string gameFolder = "../..";
+	string gameFolder = absolute(path("../..")).string();
 	string userFolder;
 };
 

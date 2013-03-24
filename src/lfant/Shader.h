@@ -21,10 +21,11 @@
 
 #include <lfant/stdafx.h>
 
+// Internal
+#include <lfant/Object.h>
+
 // External
 #include <forward_list>
-
-// Internal
 
 namespace lfant
 {
@@ -38,7 +39,7 @@ namespace lfant
 /**
  *
  */
-class Shader
+class Shader : public Object
 {
 public:
 
@@ -52,27 +53,19 @@ public:
 	{
 	}
 
-	Shader(string path) :
-		path(path)
-	{
-		LoadFile(path);
-	}
-
+	void Load(Properties *prop);
+	void Save(Properties* prop);
 	void LoadFile(string file = "");
 
 	uint32_t GetUniform(string name);
-
-	operator string()
-	{
-		return path;
-	}
 
 	operator uint32_t()
 	{
 		return id;
 	}
 
-	string path = "";
+	string vertex = "";
+	string fragment = "";
 	uint32_t id = 0;
 
 protected:

@@ -69,44 +69,33 @@ void ParticleSystem::Update()
 	}
 
 	toEmit += rate / duration * delta;
+
+	for(auto& particle : particles)
+	{
+		if(particle->active)
+		{
+			particle->Update(delta);
+		}
+		else if(toEmit >= 1.0f)
+		{
+			Emit(particle, true);
+			toEmit -= 1.0f;
+		}
+	}
+
 	while(toEmit >= 1.0f)
 	{
-		if(recycle.size() > 0)
-		{
-			Emit(recycle[recycle.size() - 1]);
-		}
-		else
-		{
-			Emit();
-		}
+		Emit();
 		toEmit -= 1.0f;
 	}
 
-	for(uint32_t i = 0; i < GetCount(); ++i)
+	for(auto& burst : bursts)
 	{
-		if(particles[i]->active)
+		burst.last += delta;
+		if(burst.last >= burst.time)
 		{
-			particles[i]->Update(delta);
-		}
-	}
-
-	for(uint32_t i = 0; i < bursts.size(); ++i)
-	{
-		bursts[i].last += delta;
-		if(bursts[i].last >= bursts[i].time)
-		{
-			for(uint i = 0; i < bursts[i].particles; ++i)
-			{
-				if(recycle.size() > 0)
-				{
-					Emit(recycle[recycle.size() - 1]);
-				}
-				else
-				{
-					Emit(1);
-				}
-			}
-			bursts[i].last = 0;
+			Emit(burst.particles);
+			burst.last = 0;
 		}
 	}
 
@@ -116,11 +105,58 @@ void ParticleSystem::OnDestroy()
 {
 }
 
+void ParticleSystem::Load(Properties *prop)
+{
+	Component::Load(prop);
+
+	/*
+	prop->Get("lifeTime", lifetime);
+	prop->Get("color", color);
+	prop->Get("size", size);
+	prop->Get("velocity", velocity);
+
+	prop->Get("radius", radius);
+	prop->Get("timeScale", timeScale);
+	prop->Get("rate", rate);
+	prop->Get("maxParticles", maxParticles);
+	prop->Get("dimensions", dimensions);
+	prop->Get("gravity", gravity);
+	prop->Get("pausable", pausable);
+	prop->Get("paused", paused);
+	prop->Get("looping", looping);
+
+	material.LoadFile(prop->Get("material"));
+	*/
+}
+
+void ParticleSystem::Save(Properties *prop)
+{
+	Component::Save(prop);
+
+	/*
+	prop->Set("lifeTime", lifetime);
+	prop->Set("color", color);
+	prop->Set("size", size);
+	prop->Set("velocity", velocity);
+
+	prop->Set("radius", radius);
+	prop->Set("timeScale", timeScale);
+	prop->Set("rate", rate);
+	prop->Set("maxParticles", maxParticles);
+	prop->Set("dimensions", dimensions);
+	prop->Set("gravity", gravity);
+	prop->Set("pausable", pausable);
+	prop->Set("paused", paused);
+	prop->Set("looping", looping);
+	//	prop->Set("material", material.path);
+	*/
+}
+
 void ParticleSystem::Emit(uint32_t amount)
 {
 	for(uint32_t i = 0; i < amount; ++i)
 	{
-		Emit(new Particle());
+		Emit(new Particle);
 	}
 }
 
@@ -135,31 +171,14 @@ void ParticleSystem::Emit(Particle* pt, bool old)
 	pt->Activate(true);
 	GenerateVelocity(pt);
 	pt->Init();
-	particles.push_back(pt);
-
-	if(old)
+	if(!old)
 	{
-		for(uint i = 0; i < recycle.size(); ++i)
-		{
-			if(recycle[i] == pt)
-			{
-				recycle.erase(recycle.begin() + i);
-			}
-		}
+		particles.push_back(ptr<Particle>(pt));
 	}
 }
 
 void ParticleSystem::Recycle(Particle* pt)
 {
-	if(particles.size() + recycle.size() < maxParticles)
-	{
-		recycle.push_back(pt);
-		pt->active = false;
-	}
-	else
-	{
-		pt->Destroy();
-	}
 }
 
 void ParticleSystem::GenerateVelocity(Particle* pt)

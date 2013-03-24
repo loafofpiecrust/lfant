@@ -60,20 +60,24 @@ void Scene::OnDestroy()
 	for(auto& ent : entities)
 	{
 		Log("Scene::Destroy: Destroying ", ent->name);
-		ent->Destroy();
+		ent->UnsafeDestroy();
 	}
 //	entities.clear();
 }
 
 void Scene::RemoveEntity(Entity* ent)
 {
-	entities.remove(ptr<Entity>(ent));
+	for(auto& ep : entities)
+	{
+		if(ep == ent)
+		{
+			Log("Scene::RemoveEntity: Removing '", ep->name, "'.");
+			entities.remove(ep);
+			break;
+		}
+	}
+	Log("Scene::RemoveEntity: Finished.");
 }
-
-/*Entity* Scene::GetEntity( uint32_t idx )
-   {
-   return entities[idx];
-   }*/
 
 Entity* Scene::GetEntity(string name, bool recursive)
 {
@@ -94,15 +98,19 @@ Entity* Scene::GetEntity(string name, bool recursive)
 	return nullptr;
 }
 
-void Scene::Save(string path)
+void Scene::Save(Properties* prop)
 {
+	prop->type = "scene";
+	prop->id = name;
+
+	for(auto& ent : entities)
+	{
+		ent->Save(prop->AddChild());
+	}
 }
 
-void Scene::Load(string path)
+void Scene::Load(Properties *prop)
 {
-	Properties root(path);
-	Log("Scene::Load: Loaded root");
-	Properties* prop = root.GetChild("scene");
 	Log("Scene::Load: Loaded scene node");
 	vector<Properties*> ents = prop->GetChildren("entity");
 	Log("Scene::Load: Filled entity list");
