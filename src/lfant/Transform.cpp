@@ -46,11 +46,14 @@ void Transform::Save(Properties *prop)
 
 void Transform::Load(Properties *prop)
 {
+	Log("Loading transform from type '"+prop->type+"', id '"+prop->id+"'.");
 	Component::Load(prop);
 
 	prop->Get("position", position);
 	prop->Get("rotation", rotation);
 	prop->Get("scale", scale);
+
+	Log("Loaded position: "+lexical_cast<string>(position));
 }
 
 vec3& Transform::GetPosition()
@@ -61,7 +64,7 @@ vec3& Transform::GetPosition()
 void Transform::SetPosition(vec3 pos)
 {
 	position = pos;
-	Trigger("SetPosition", position);
+	TriggerEvent("SetPosition", position);
 }
 
 quat Transform::GetRotationQuat()
@@ -73,7 +76,7 @@ void Transform::SetRotationQuat(quat rot)
 {
 	rotationQuat = rot;
 	rotation = eulerAngles(rot);
-	//	Trigger("SetRotation", rotation);
+	//	TriggerEvent("SetRotation", rotation);
 }
 
 vec3 Transform::GetRotation()
@@ -83,12 +86,12 @@ vec3 Transform::GetRotation()
 
 void Transform::SetRotation(vec3 rot)
 {
-	//rot.x = rollover(rot.x, 0.0f, 360.0f);
-	//rot.y = rollover(rot.y, 0.0f, 360.0f);
-	//rot.z = rollover(rot.z, 0.0f, 360.0f);
-	rotation = radians(rot);
-	//rotation = rot;
+	rotation = rot;
 	rotationQuat = quat(rotation);
+
+	rollover(rot.x, 0.0f, pi2);
+	rollover(rot.y, 0.0f, pi2);
+	rollover(rot.z, 0.0f, pi2);
 }
 
 vec3& Transform::GetScale()
@@ -99,7 +102,7 @@ vec3& Transform::GetScale()
 void Transform::SetScale(vec3 scl)
 {
 	scale = scl;
-	Trigger("SetScale", scale);
+	TriggerEvent("SetScale", scale);
 }
 
 vec3 Transform::GetWorldPosition()
@@ -197,19 +200,19 @@ void Transform::Translate(vec3 pos)
 
 void Transform::Rotate(vec3 rot)
 {
-	rotation += radians(rot);
-	rotationQuat = quat(rotation);
+	SetRotation(rotation + rot);
+
 	//rotationQuat = quat(rotation);
 	//_rotationQuat = rotate( _rotationQuat, rot.x, xdir );
 	//_rotationQuat = rotate( _rotationQuat, rot.y, ydir );
 	//_rotationQuat = rotate( _rotationQuat, rot.z, zdir );
-	//	Trigger("SetRotation", rotation);
+	//	TriggerEvent("SetRotation", rotation);
 }
 
 void Transform::Scale(vec3 scl)
 {
 	SetScale(scale * scl);
-	//	Trigger("SetScale", scale);
+	//	TriggerEvent("SetScale", scale);
 }
 
 }

@@ -30,7 +30,16 @@
 namespace lfant
 {
 
+namespace network
+{
 class Client;
+}
+
+struct Peer
+{
+	string name = "lfantClient";
+	string ip = "127.0.0.1";
+};
 
 /**
  *
@@ -43,17 +52,25 @@ public:
 
 	virtual void Init();
 
+	void SendMessage(string msg);
+	void Host();
+	void Connect();
+
 protected:
 
+	void ReceiveMessage(string msg);
 
-	void SendMessage(string msg);
+	void OnDestroy();
 
 	// Callbacks
-	void OnConnect();
-	void OnGetData(char data[], uint size);
+	void OnConnect(string error = "");
+	void OnHost(string error = "");
+	void OnGetData(string data);
 
-	Client* connection;
+	network::Client* client;
 	string lastMsg;
+	string name = "lfantClient";
+	deque<Peer> peers;
 
 private:
 };

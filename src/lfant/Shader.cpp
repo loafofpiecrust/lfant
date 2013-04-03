@@ -143,13 +143,22 @@ void Shader::LoadFile(string file)
 //	path = file;
 	id = ProgramID;
 
-	game->renderer->AddShader(*this);
+	game->renderer->AddShader(this);
 }
 
-uint32_t Shader::GetUniform(string name)
+uint32 Shader::GetUniform(string name)
 {
-	int id = 0;
-	glGetUniformLocation(id, name.c_str());
+	return uniforms[name];
+}
+
+void Shader::AddUniform(string name)
+{
+	uniforms[name] = glGetUniformLocation(id, name.c_str());
+	Log("Adding uniform '"+name+"' as ", uniforms[name]);
+}
+
+uint32 Shader::GetId()
+{
 	return id;
 }
 

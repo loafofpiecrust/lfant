@@ -30,7 +30,7 @@
 #	include <conio.h>
 #	define GLFWCALL __stdcall
 #elif UNIX
-#	define SFEXP extern "C++"
+#	define ROOTXP extern "C++"
 #	define GLFWCALL
 #	include <unistd.h>
 #endif

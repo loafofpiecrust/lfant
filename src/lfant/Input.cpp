@@ -41,13 +41,11 @@ Key_Initializer Key;
 uint16 Key_Initializer::operator [](string in)
 {
 	to_lower(in);
-	Log("Getting key '"+in+"', result: '", (byte)_key[in], "'.");
 	return _key[in];
 }
 
 Key_Initializer::Key_Initializer()
 {
-	printf("About to add keys\n");
 
 	_key[""] = '\0';
 	_key["q"] = 'Q';
@@ -166,9 +164,9 @@ void Input::Update()
 	{
 		if(axis.down || axis.up)
 		{
-			Trigger(axis.name, axis.value);
-			Trigger(axis.name, axis.name, axis.value);
-			Trigger("All", axis.name, axis.value);
+			TriggerEvent(axis.name, axis.value);
+			TriggerEvent(axis.name, axis.name, axis.value);
+			TriggerEvent("All", axis.name, axis.value);
 		}
 		if(axis.down)
 		{
@@ -215,22 +213,24 @@ void Input::Load(Properties* prop)
 //	Properties root("settings/input.cfg");
 //	Properties* prop = root.GetChild("input");
 	Log("Loading input props...");
-	vector<Properties*> binds = prop->GetChildren("axis");
-	Axis* axis = nullptr;
+	deque<Properties*> binds = prop->GetChildren("axis");
+	Axis axis("");
 	for(auto& i : binds)
 	{
-		printf("Loading an axis %s, pos: %s\n", i->id.c_str(), i->Get<string>("positive").c_str());
-		axis = new Axis(i->id);
+		axis.name = i->id;
+		if(axis.name == "") continue;
 
-		axis->positive = Key[i->Get<string>("positive")];
-		axis->negative = Key[i->Get<string>("negative")];
-		axis->positiveAlt = Key[i->Get<string>("positiveAlt")];
-		axis->positiveAlt = Key[i->Get<string>("negativeAlt")];
+		axis.positive = Key[i->Get<string>("positive")];
+		axis.negative = Key[i->Get<string>("negative")];
+		axis.positiveAlt = Key[i->Get<string>("positiveAlt")];
+		axis.positiveAlt = Key[i->Get<string>("negativeAlt")];
 
-		i->Get("sensitivity", axis->sensitivity);
-		i->Get("dead", axis->dead);
-		i->Get("snap", axis->snap);
-		i->Get("joyNum", axis->joyNum);
+		axes.push_back(axis);
+
+		i->Get("sensitivity", axis.sensitivity);
+		i->Get("dead", axis.dead);
+		i->Get("snap", axis.snap);
+		i->Get("joyNum", axis.joyNum);
 	}
 }
 
@@ -242,7 +242,7 @@ void Input::Load(Properties* prop)
 
 void GLFWCALL Input::OnKeyPress(int key, int mode)
 {
-	game->input->Trigger("KeyPress", (uint16_t)key, mode);
+	game->input->TriggerEvent("KeyPress", (uint16_t)key, mode);
 	for(auto& axis : game->input->axes)
 	{
 		if(key == axis.positive || key == axis.positiveAlt)
@@ -318,7 +318,7 @@ void GLFWCALL Input::OnKeyPress(int key, int mode)
 
 void GLFWCALL Input::OnMouseMove(int x, int y)
 {
-	game->input->Trigger("MouseMove", x, y);
+	game->input->TriggerEvent("MouseMove", x, y);
 	if(game->input->lockMouse)
 	{
 		game->input->SetMousePos(game->renderer->GetResolution() / 2);
@@ -328,13 +328,13 @@ void GLFWCALL Input::OnMouseMove(int x, int y)
 
 void GLFWCALL Input::OnMouseButton(int btn, int mode)
 {
-	game->input->Trigger("MouseButton", btn, mode);
+	game->input->TriggerEvent("MouseButton", btn, mode);
 	OnKeyPress(btn, mode);
 }
 
 void GLFWCALL Input::OnCharPress(int key, int mode)
 {
-	game->input->Trigger("CharPress", key);
+	game->input->TriggerEvent("CharPress", key);
 }
 
 /*******************************************************************************

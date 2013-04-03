@@ -70,16 +70,23 @@ public:
 	/**
 	 *	Gets an entity by its unique id.
 	 */
-	Entity* GetEntityById(uint32_t id);
+	Entity* GetEntityById(uint32 id);
 
 	/**
 	 *	Gets the first entity in a given layer.
-	 *
-	 *
 	 *	@todo
 	 *		Not sure whether layer should be uint16 or string.
 	 */
 	Entity* GetEntityByLayer(string layer);
+
+	/**
+	 *	Returns pointers to all entities with a certain tag.
+	 *	@param tag Tag to search for.
+	 *	@return All entities with tag.
+	 */
+	deque<Entity*> GetEntities(string tag);
+
+	deque<Entity*> GetLayer(string layer);
 
 	/**
 	 *	Saves the scene to a file.
@@ -120,7 +127,7 @@ protected:
 	 */
 	void RemoveEntity(Entity* ent);
 
-	forward_list< ptr<Entity> > entities;
+	deque< ptr<Entity, Object::Delete> > entities;
 
 private:
 

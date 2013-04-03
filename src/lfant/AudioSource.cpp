@@ -46,7 +46,7 @@ void AudioSource::Init()
 	{
 		SetSource(inputFile);
 	}
-	Connect(owner->GetComponent<Transform>(), "SetPosition", this, &AudioSource::OnSetPosition);
+	ConnectEvent(owner->GetComponent<Transform>(), "SetPosition", this, &AudioSource::OnSetPosition);
 }
 
 void AudioSource::SetSource(string file)

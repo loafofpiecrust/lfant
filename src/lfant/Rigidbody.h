@@ -55,7 +55,7 @@ class Mesh;
 class Rigidbody : public Component
 {
 	friend class Physics;
-
+	DECLARE_COMP(Rigidbody)
 public:
 	// ctor and dtor
 	Rigidbody();
@@ -64,22 +64,22 @@ public:
 	// Nested classes
 	enum class PhysicsMode : byte
 	{
-		DISCRETE,
-		CONTINUOUS,
-		CONTINUOUS_DYNAMIC
+		Discrete,
+		Continuous,
+		ContinuousDynamic
 	};
 
 	enum class ColliderType : byte
 	{
-		MESH,
-		BOX,
-		CYLINDER,
-		CAPSULE
+		Mesh,
+		Box,
+		Cylinder,
+		Capsule
 	};
 
 	// Methods
-	btTypedConstraint* GetConstraint(uint16_t idx);
-	void RemoveConstraint(uint16_t idx);
+	btTypedConstraint* GetConstraint(uint16 idx);
+	void RemoveConstraint(uint16 idx);
 
 	void AddForce(float force);
 	void AddForceAtPosition(float force, vec3 pos);
@@ -142,14 +142,15 @@ protected:
 	void OnSetRot(vec3 rot);
 	void OnSetScale(vec3 scale);
 	void OnSetMesh(Mesh* mesh);
+	void OnSetCollider(Collider* collider);
 
 	/// The current mass of this object, in kg.
 	float mass = 0.0f;
 
 	btRigidBody* body;
 	btMotionState* motionState;
-	btCollisionShape* collider;
-	vec3 inertia;
+	Collider* collider;
+	vec3 inertia = vec3(0);
 };
 
 /** @} */

@@ -15,12 +15,17 @@ class ptr_base
 {
 };
 
-template<typename T>
-class ptr : public unique_ptr<T>, public ptr_base
+template<typename T, typename _Dp = default_delete<T> >
+class ptr : public unique_ptr<T, _Dp>, public ptr_base
 {
 public:
-	explicit ptr(T* v) noexcept :
-		unique_ptr<T>::unique_ptr(v)
+	ptr() noexcept
+	//	: unique_ptr<T, _Dp>::unique_ptr()
+	{
+	}
+
+	ptr(T* v) noexcept :
+		unique_ptr<T, _Dp>::unique_ptr(v)
 	{
 	}
 
@@ -42,13 +47,13 @@ public:
 	}
 };
 
-template<typename T, typename R>
-struct is_ptr : public boost::enable_if_c<boost::is_base_of<ptr_base, T>::value, R>
+template<typename T>
+struct is_ptr : public boost::is_base_of<ptr_base, T>
 {
 };
 
-template<typename T, typename R>
-struct is_not_ptr : public boost::disable_if_c<boost::is_base_of<ptr_base, T>::value, R>
+template<typename T>
+struct is_not_ptr : public boost::is_base_of<ptr_base, T>
 {
 };
 

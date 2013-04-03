@@ -204,14 +204,14 @@ void SystemInfo::Init()
 	}
 	pclose(cmd);
 
-	vector<string> result_spl = Split(string(result), " \n");
+	deque<string> result_spl = Split(string(result), " \n");
 	OS = result_spl[result_spl.size() - 1] + " " + result_spl[2];
 	computerName = result_spl[1];
 
 	// GPU currently in use
 	cmd = popen("inxi -G", "r");
 	uint cnt = 0;
-	vector<string> line;
+	deque<string> line;
 	while(fgets(result, sizeof(result) - 1, cmd) != 0)
 	{
 		Log("Count: ", cnt);
@@ -227,7 +227,7 @@ void SystemInfo::Init()
 			{
 				if(line[i] == "Resolution:")
 				{
-					vector<string> res = Split(line[i+1], "x");
+					deque<string> res = Split(line[i+1], "x");
 					monitor.resolution.x = lexical_cast<uint16_t>(res[0]);
 					monitor.resolution.y = lexical_cast<uint16_t>(res[2]);
 					break;

@@ -61,12 +61,12 @@ void Console::Load(Properties *prop)
 	prop->Get("logFile", logName);
 }
 
-void Console::CmdGetVar(vector<string> args)
+void Console::CmdGetVar(deque<string> args)
 {
 	Log("get: Value of '" + args[0] + "':" + game->settings->GetValue(args[0]));
 }
 
-void Console::CmdSetVar(vector<string> args)
+void Console::CmdSetVar(deque<string> args)
 {
 	if(args.size() < 2)
 	{
@@ -77,7 +77,7 @@ void Console::CmdSetVar(vector<string> args)
 	Log("set: Changed '" + args[0] + "' to " + game->settings->GetValue(args[0]));
 }
 
-void Console::CmdHelp(vector<string> args)
+void Console::CmdHelp(deque<string> args)
 {
 	if(Command* cmd = GetCommand(args[0]))
 	{
@@ -101,7 +101,7 @@ void Console::OnDestroy()
 
 void Console::Input(string line)
 {
-	vector<string> output = Split(line, " ", "");
+	deque<string> output = Split(line, " ", "");
 	string str = "";
 	for(uint i = 0; i < output.size(); ++i)
 	{
@@ -115,7 +115,7 @@ void Console::Input(string line)
 				{
 					break;
 				}
-				vector<string> args;
+				deque<string> args;
 				for(uint k = i + 1; k < output.size(); ++k)
 				{
 					args.push_back(output[k]);
@@ -220,7 +220,7 @@ void Console::RegisterCommand(CommandSimple::funcTypeRaw func, string name, stri
 	commands.push_back(new CommandSimple(boost::bind(func, this), name, help));
 }
 
-bool Console::CallCommand(string name, vector<string> args)
+bool Console::CallCommand(string name, deque<string> args)
 {
 	for(auto cmd : commands)
 	{

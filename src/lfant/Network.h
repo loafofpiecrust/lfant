@@ -61,11 +61,14 @@ public:
 	void Load(Properties *prop);
 
 	template<typename C>
-	C* NewConnection(string name, string host, uint16_t port, string password)
+	C* AddConnection(uint16 port = 0)
 	{
-		C* con = new C(name, host, port, password);
-		connections.push_front(ptr<Connection>(con));
-		con->Init();
+		C* con = new C;
+		if(port != 0)
+		{
+			con->SetPort(port);
+		}
+		connections.push_back(ptr<Connection>(con));
 		return con;
 	}
 
@@ -75,7 +78,7 @@ protected:
 //	byte GetPacketId(RakNet::Packet* p);
 
 public:
-	forward_list< ptr<Connection> > connections;
+	deque< ptr<Connection> > connections;
 
 };
 

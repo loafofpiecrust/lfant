@@ -52,9 +52,12 @@ public:
 	void LoadFile(string path);
 	void SaveFile(string path);
 
+	void LoadStream(istream& stream);
+	void SaveStream(ostream& stream);
+
 	Properties* GetChild(string type);
 	Properties* GetChildById(string id);
-	vector<Properties*> GetChildren(string type = "");
+	deque<Properties*> GetChildren(string type = "");
 
 	Properties* AddChild(string type = "");
 
@@ -69,25 +72,25 @@ public:
 	void SubtractValue(string name, string value);
 
 	template<typename T>
-	void Get(string name, T& ref)
+	T& Get(string name, T& ref)
 	{
+		to_lower(name);
 		string val = values[name];
 		if(val != "")
 		{
-			ref = lexical_cast<T>(Expand(val));
+			ref = lexical_cast<T>(val);
+			cout << "\tGetting '" << lexical_cast<string>(ref) << "'.\n\n";
 		}
+		return ref;
 	}
 
 	template<typename T = string>
-	T Get(string name, string def = "")
+	T Get(string name)
 	{
+		to_lower(name);
 		cout << "Getting '"+name+"'.\n";
 		string val = values[name];
-		if(val != "")
-		{
-			return lexical_cast<T>(Expand(val));
-		}
-		return lexical_cast<T>(Expand(def));
+		return lexical_cast<T>(val);
 	}
 
 	template<typename T>
@@ -113,13 +116,10 @@ public:
 protected:
 
 private:
-	Properties(ifstream& stream, string type, string id = "", Properties* parent = nullptr);
-	Properties(ofstream& stream, string type, string id = "", Properties* parent = nullptr);
+	Properties(istream& stream, string type, string id = "", Properties* parent = nullptr);
+	Properties(ostream& stream, string type, string id = "", Properties* parent = nullptr);
 
-	void LoadStream(ifstream& stream);
-	void SaveStream(ofstream& stream);
-
-	void SkipSpace(ifstream& stream);
+	void SkipSpace(istream& stream);
 	string TrimSpace(string str, bool onlyIndent = false);
 	string Expand(string value);
 	string GetIndent();

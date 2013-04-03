@@ -54,23 +54,20 @@ inline R round(R x, int decimal)
 }
 
 template<typename R = float>
-inline R rollover(R x, R min, R max)
+inline void rollover(R& x, R min, R max)
 {
-	int r = x;
-	if(r >= max)
+	if(x > max)
 	{
-		r = min;
+		x -= max;
 	}
-	else if(r <= min)
+	else if(x < min)
 	{
-		r = max;
+		x += max;
 	}
-	return r;
 }
 
-const float pi = 3.14159265358979323846f;
-const float degToRad = pi / 180;
-const float radToDeg = 180 / pi;
+const float pi = 3.1415926535897932384626433832795f;
+const float pi2 = pi*2;
 
 /** @} */
 /** @} */

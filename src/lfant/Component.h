@@ -38,13 +38,14 @@ namespace lfant
 
 //#define REGISTER_COMP(comp) static bool BOOST_PP_CAT( comp, __regged ) = componentRegistry.insert( BOOST_PP_STRINGIZE(comp), &Entity::AddComponent<comp>());
 #define DECLARE_COMP(comp) \
+	friend class Entity;\
 	static void _RegisterComponent() __attribute__((constructor));
 
 #define IMPLEMENT_COMP(comp) \
 	void comp::_RegisterComponent()\
 	{\
 		std::cout << "Registering component: " << #comp << "\n";\
-		Component::RegisterType(#comp, (Component* (Entity::*)())&Entity::AddComponent<comp>);\
+		Component::RegisterType(#comp, (Component* (Entity::*)(Properties*))&Entity::AddComponent<comp>);\
 	}
 
 
@@ -79,7 +80,7 @@ public:
 
 
 	/// The owner of this Component.
-	Entity* owner;
+	Entity* owner = nullptr;
 
 protected:
 	Component();
@@ -88,8 +89,8 @@ protected:
 	 *	Registers a component type by string, only used by the IMPLEMENT_COMP macro.
 	 *	@param name The typename
 	 */
-	static void RegisterType(string name, Component* (Entity::*func)());
-	static map< string, Component* (Entity::*)() > componentRegistry;
+	static void RegisterType(string name, Component* (Entity::*func)(Properties*));
+	static map< string, Component* (Entity::*)(Properties*) > componentRegistry;
 
 	// Loop Function Overwrites
 	virtual void Init();
@@ -100,13 +101,13 @@ protected:
 	virtual void OnEnable();
 	virtual void OnDisable();
 
-	virtual void Trigger(string name);
+	virtual void TriggerEvent(string name);
 
 	template<typename P1, typename ... P>
-	void Trigger(string name, P1 arg, P ... args)
+	void TriggerEvent(string name, P1 arg, P ... args)
 	{
-		owner->Trigger(name, arg, args ...);
-		Object::Trigger(name, arg, args ...);
+		owner->TriggerEvent(name, arg, args ...);
+		Object::TriggerEvent(name, arg, args ...);
 	}
 
 private:

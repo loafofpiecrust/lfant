@@ -27,10 +27,10 @@
 namespace lfant
 {
 
-vector<string> Split(string str, string dropDelim, string keepDelim)
+deque<string> Split(string str, string dropDelim, string keepDelim)
 {
 	using namespace boost;
-	vector<string> result;
+	deque<string> result;
 	if(str == "")
 	{
 		return result;
@@ -44,20 +44,20 @@ vector<string> Split(string str, string dropDelim, string keepDelim)
 	return result;
 }
 
-vector<string> Split(vector<string> str, string dropDelim, string keepDelim)
+deque<string> Split(deque<string> str, string dropDelim, string keepDelim)
 {
-	vector<string> combined;
+	deque<string> combined;
 	for(auto& i : str)
 	{
-		vector<string> temp = Split(i, dropDelim, keepDelim);
+		deque<string> temp = Split(i, dropDelim, keepDelim);
 		combined.insert(combined.end(), temp.begin(), temp.end());
 	}
 	return combined;
 }
 
-vector<string> SplitParens(string str, string dropDelim, string keepDelim)
+deque<string> SplitParens(string str, string dropDelim, string keepDelim)
 {
-	vector<string> result;
+	deque<string> result;
 	bool newstr = false;
 	int parlev = 0;
 	string curr = "";
@@ -112,7 +112,7 @@ vector<string> SplitParens(string str, string dropDelim, string keepDelim)
 
 string Extension(string path)
 {
-	vector<string> tokens = Split(path, ".", "");
+	deque<string> tokens = Split(path, ".", "");
 	if(tokens.size() > 1)
 	{
 		to_lower(tokens[tokens.size()-1]);

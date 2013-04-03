@@ -125,7 +125,7 @@ void ParticleSystem::Load(Properties *prop)
 	prop->Get("paused", paused);
 	prop->Get("looping", looping);
 
-	material.LoadFile(prop->Get("material"));
+	material->LoadFile(prop->Get("material"));
 	*/
 }
 
@@ -148,7 +148,7 @@ void ParticleSystem::Save(Properties *prop)
 	prop->Set("pausable", pausable);
 	prop->Set("paused", paused);
 	prop->Set("looping", looping);
-	//	prop->Set("material", material.path);
+	//	prop->Set("material", material->path);
 	*/
 }
 

@@ -56,7 +56,7 @@ public:
 
 	virtual void Init();
 	virtual void Update();
-	//virtual void OnDestroy();
+	virtual void OnDestroy();
 
 	/**	Sets the projection of this Camera for viewing.
 	 *	@param fov The FoV to use, eg. 70

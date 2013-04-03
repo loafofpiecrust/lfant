@@ -40,7 +40,7 @@ namespace lfant
 template<>
 Range<int> Settings::Var::Get< Range<int> >()
 {
-	vector<string> words = Split(value, " .:-", "");
+	deque<string> words = Split(value, " .:-", "");
 	if(words.size() == 1)
 	{
 		return Range<int>(lexical_cast<int>(words[0]), 0);
@@ -54,7 +54,7 @@ Range<int> Settings::Var::Get< Range<int> >()
 template<>
 vec2 Settings::Var::Get<vec2>()
 {
-	vector<string> tokens = Split(value, " x.:", "");
+	deque<string> tokens = Split(value, " x.:", "");
 	vec2 result(0);
 	if(tokens.size() > 0)
 	{
@@ -70,7 +70,7 @@ vec2 Settings::Var::Get<vec2>()
 template<>
 vec3 Settings::Var::Get<vec3>()
 {
-	vector<string> tokens = Split(value, " x.:", "");
+	deque<string> tokens = Split(value, " x.:", "");
 	vec3 result(0);
 	if(tokens.size() > 0)
 	{
@@ -90,7 +90,7 @@ vec3 Settings::Var::Get<vec3>()
 template<>
 ivec2 Settings::Var::Get<ivec2>()
 {
-	vector<string> tokens = Split(value, " x.:", "");
+	deque<string> tokens = Split(value, " x.:", "");
 	ivec2 result(0);
 	if(tokens.size() > 0)
 	{
@@ -106,7 +106,7 @@ ivec2 Settings::Var::Get<ivec2>()
 template<>
 ivec3 Settings::Var::Get<ivec3>()
 {
-	vector<string> tokens = Split(value, " x.:", "");
+	deque<string> tokens = Split(value, " x.:", "");
 	ivec3 result(0);
 	if(tokens.size() > 0)
 	{
@@ -157,8 +157,8 @@ void Settings::LoadSettings(string input)
 
 			ifstream file;
 			string line = "";
-			vector<string> words;
-			vector<string> prefix;
+			deque<string> words;
+			deque<string> prefix;
 			string lastWord;
 
 			file.open(cfg);
@@ -286,7 +286,7 @@ string Settings::GetHelp(string name)
 
 string Settings::GetRef(string name, string value, string ids)
 {
-	vector<string> tokens = Split(value, "", ids);
+	deque<string> tokens = Split(value, "", ids);
 	string f = "", s = "", t = "";
 	f.push_back(ids[0]);
 	s.push_back(ids[1]);
@@ -307,7 +307,7 @@ string Settings::GetRef(string name, string value, string ids)
 					continue;
 				}
 				string temp = "";
-				vector<string> scope = Split(name, ".", "");
+				deque<string> scope = Split(name, ".", "");
 				int idx = scope.size()-1;
 
 				while(var == "")

@@ -88,7 +88,7 @@ void Time::Update()
 		}
 		else
 		{
-			Trigger(t.first);
+			TriggerEvent(t.first);
 			timers.erase(t.first);
 		}
 	}

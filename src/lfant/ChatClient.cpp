@@ -40,20 +40,87 @@ ChatClient::~ChatClient()
 
 void ChatClient::Init()
 {
-	connection = game->network->NewConnection<Client>("Chat", "www.google.com", 80, "");
-	Connect(SENDER(connection, Connect), RECEIVER(this, OnConnect));
-	Connect(SENDER(connection, GetData), RECEIVER(this, OnGetData));
+	client = new network::Client;
+//	connection = game->network->AddConnection<network::Client>(80);
+	ConnectEvent(SENDER(client, Connect), RECEIVER(this, OnConnect));
+	ConnectEvent(SENDER(client, Accept), RECEIVER(this, OnHost));
+	ConnectEvent(SENDER(client, GetData), RECEIVER(this, OnGetData));
 }
 
-void ChatClient::OnConnect()
+void ChatClient::SendMessage(string msg)
 {
-	Log("Connected! 2");
-	connection->GetData(2);
+	client->SendData(msg);
+	lastMsg = msg;
 }
 
-void ChatClient::OnGetData(char data[], uint size)
+void ChatClient::ReceiveMessage(string msg)
 {
-	Log("ChatClient::OnGetData: Received data:\n\t", data, "\n");
+	Log("Received message: '"+msg+"'\n");
+	lastMsg = msg;
+}
+
+void ChatClient::OnDestroy()
+{
+	delete client;
+}
+
+void ChatClient::OnConnect(string error)
+{
+	if(error == "")
+	{
+		Log("ChatClient::OnConnect: Success.");
+		client->SendData(":/client "+name+" "+client->socket.remote_endpoint().address().to_string());
+		client->GetDataAsync(256);
+	}
+	else
+	{
+		// Connect failed, let's host!
+		Host();
+	}
+}
+
+void ChatClient::OnHost(string error)
+{
+	Log("Started hosting.");
+	if(error == "")
+	{
+
+	}
+	TriggerEvent("Host");
+}
+
+void ChatClient::OnGetData(string data)
+{
+	if(data.size() > 1 && data[0] == ':' && data[1] == '/')
+	{
+		// Calling a command
+		data.erase(data.begin(), data.begin()+2);
+		deque<string> toks = Split(data, " ");
+		if(toks[0] == "client")
+		{
+			Peer peer;
+			peer.name = toks[1];
+			peer.ip = toks[2];
+			peers.push_back(peer);
+		}
+		return;
+	}
+
+	ReceiveMessage(data);
+}
+
+void ChatClient::Connect()
+{
+	Log("Starting connection process...");
+	/// @todo Use a legit IP, some specific, or method for determining?
+	/// @todo Use a specific port.
+	client->Connect("127.0.0.1", 22222);
+}
+
+void ChatClient::Host()
+{
+	Log("Starting hosting process...");
+	client->Host(22222);
 }
 
 }

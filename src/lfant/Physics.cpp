@@ -166,9 +166,9 @@ bool Physics::OnCollide(string func, btManifoldPoint& cp, const btCollisionObjec
 	   col.point = vec3_cast<vec3>( cp.pointA ); //fix
 	   col.normal = vec3_cast<vec3>( cp.normalA ); //fix
 
-	   if (body1->isTrigger)
+	   if (body1->isTriggerEvent)
 	   {
-	   body0->collider->trigger( "OnTrigger" + func, col );
+	   body0->collider->trigger( "OnTriggerEvent" + func, col );
 	   }
 	   else
 	   {
@@ -181,9 +181,9 @@ bool Physics::OnCollide(string func, btManifoldPoint& cp, const btCollisionObjec
 	   col.point = vec3_cast<vec3>( cp.pointB ); //fix
 	   col.normal = vec3_cast<vec3>( cp.normalB ); //fix
 
-	   if (body0->isTrigger)
+	   if (body0->isTriggerEvent)
 	   {
-	   body1->collider->trigger( "OnTrigger" + func, col );
+	   body1->collider->trigger( "OnTriggerEvent" + func, col );
 	   }
 	   else
 	   {

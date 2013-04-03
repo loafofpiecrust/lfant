@@ -31,15 +31,21 @@ namespace lfant
 
 void Collider::Init()
 {
-//	connect( transform, "SetScale", this, &Collider::OnSetScale );
+	TriggerEvent("SetCollider", this);
+	ConnectEvent(SENDER(owner, SetScale), RECEIVER(this, OnSetScale));
 }
 
 void Collider::OnAddComponent(Component* comp)
 {
-	if(CheckType<Rigidbody*>(comp))
+	if(CheckType<Rigidbody>(comp))
 	{
 		//	rigidbody = dynamic_cast<Rigidbody*>( comp );
 	}
+}
+
+void Collider::OnSetScale(vec3 scale)
+{
+	GetShape()->setLocalScaling(vec3_cast<btVector3>(scale));
 }
 
 btCollisionShape* Collider::GetShape()

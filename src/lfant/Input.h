@@ -229,7 +229,7 @@ public:
 	float mouseSpeed;
 
 protected:
-	vector<Axis> axes;
+	deque<Axis> axes;
 
 	/// The string of input this frame.
 	string inputString;

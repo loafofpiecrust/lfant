@@ -82,13 +82,11 @@ public:
 
 	void SetDirection();
 
-	const Entity* owner;
-
 	Transform* parent;
 
-	vec3 direction;
-	vec3 right;
-	vec3 up;
+	vec3 direction = vec3(1);
+	vec3 right = vec3(1);
+	vec3 up = vec3(1);
 
 protected:
 	vec3 position = vec3(0);

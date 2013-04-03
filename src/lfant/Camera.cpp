@@ -26,6 +26,7 @@
 #include <lfant/Transform.h>
 #include <lfant/util/Math.h>
 #include <lfant/Console.h>
+#include <lfant/Scene.h>
 
 namespace lfant
 {
@@ -49,12 +50,18 @@ Camera::~Camera()
 void Camera::Init()
 {
 	UpdateProjection();
+	Log("mainCamera = ", game->scene->mainCamera);
 }
 
 void Camera::Update()
 {
 	UpdateView();
-	UpdateProjection();
+	//	UpdateProjection();
+}
+
+void Camera::OnDestroy()
+{
+	Log("mainCamera = ", game->scene->mainCamera);
 }
 
 /*******************************************************************************
@@ -87,7 +94,11 @@ void Camera::UpdateProjection()
 
 void Camera::UpdateView()
 {
-	view = lookAt(owner->transform->GetWorldPosition(), owner->transform->GetWorldPosition() + owner->transform->direction, owner->transform->up);
+	view = lookAt(
+				owner->transform->GetWorldPosition(),
+				owner->transform->GetWorldPosition() + owner->transform->direction,
+				owner->transform->up
+				);
 }
 
 void Camera::SetFOV(float fov)

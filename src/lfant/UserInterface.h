@@ -84,7 +84,7 @@ protected:
 	   CEGUI::OpenGL3Renderer* renderer;
 	   CEGUI::Window* rootWindow;
 	   CEGUI::WindowManager* windowManager;
-	   vector<CEGUI::Window*> windows;
+	   deque<CEGUI::Window*> windows;
 	   CEGUI::System* system;
 	   CEGUI::GUIContext* context;
 	 */
@@ -94,7 +94,7 @@ protected:
 	   ptr<gui::Renderer> renderer;
 	   ptr<gui::System> system;
 	   ptr<gui::FileSystem> fileSystem;
-	   forward_list< ptr<Rocket::Core::ElementDocument> > documents;
+	   deque< ptr<Rocket::Core::ElementDocument> > documents;
 	 */
 
 	bool resized = false;

@@ -62,10 +62,10 @@ UserInterface::~UserInterface()
 void UserInterface::Init()
 {
 
-	Connect(SENDER(game->input, KeyPress), RECEIVER(this, OnKey));
-	Connect(SENDER(game->input, CharPress), RECEIVER(this, OnChar));
-	Connect(SENDER(game->input, MouseButton), RECEIVER(this, OnMouseButton));
-	Connect(SENDER(game->input, MouseMove), RECEIVER(this, OnMouseMove));
+	ConnectEvent(SENDER(game->input, KeyPress), RECEIVER(this, OnKey));
+	ConnectEvent(SENDER(game->input, CharPress), RECEIVER(this, OnChar));
+	ConnectEvent(SENDER(game->input, MouseButton), RECEIVER(this, OnMouseButton));
+	ConnectEvent(SENDER(game->input, MouseMove), RECEIVER(this, OnMouseMove));
 }
 
 void UserInterface::Update()

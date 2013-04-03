@@ -4,7 +4,7 @@ project(lfant)
 set(VERSION_MAJOR 0)
 set(VERSION_MINOR 1)
 
-set(INCLUDE_DIR "${SFE}/src")
+set(INCLUDE_DIR "${ROOT}/src")
 set(SOURCE_DIR ".")
 
 # Library Search Paths
@@ -26,27 +26,28 @@ add_library(${PROJECT_NAME} SHARED ${SRC_FILES} ${HEADER_FILES})
 #add_executable(${PROJECT_NAME} ${SRC_FILES} ${HEADER_FILES})
 
 # Dependencies
-add_dependencies(${PROJECT_NAME} ${SFE}/external)
+add_dependencies(${PROJECT_NAME} ${ROOT}/external)
 
 # Includes Info
 include_directories(
 	"${INCLUDE_DIR}"
-	"${SFE}/external/fmod/api/inc"
-	"${SFE}/external/glm"
-	"${SFE}/external/boost"
-	"${SFE}/external/bullet/src"
-	"${SFE}/external/raknet/Source"
-	"${SFE}/external/glew/include"
-	"${SFE}/external/glfw/include"
-	"${SFE}/external/rocket/Include"
-	"${SFE}/external/angelscript/include"
-	"${SFE}/external/angelscript/add_on"
-#	"${SFE}/external/json_spirit/include"
+	"${ROOT}/external/fmod/api/inc"
+	"${ROOT}/external/assimp/include"
+	"${ROOT}/external/glm"
+	"${ROOT}/external/boost"
+	"${ROOT}/external/bullet/src"
+	"${ROOT}/external/glew/include"
+	"${ROOT}/external/glfw/include"
+	"${ROOT}/external/rocket/Include"
+	"${ROOT}/external/angelscript/include"
+	"${ROOT}/external/angelscript/add_on"
+	"${ROOT}/external/devil/include"
 	)
 
 # Linker Options
 target_link_libraries(${PROJECT_NAME}
 	glew
+	assimp
 	glfw
 	boost
 	bullet
@@ -55,6 +56,8 @@ target_link_libraries(${PROJECT_NAME}
 	:libpng.a
 	z
 	angelscript
-	yaml
+	rt
+	jpeg
+#	devil
 #	jsonspirit
 	)

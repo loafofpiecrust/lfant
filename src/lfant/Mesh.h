@@ -31,6 +31,8 @@
 
 // System
 
+struct aiScene;
+
 namespace lfant
 {
 /** @addtogroup Game
@@ -40,8 +42,17 @@ namespace lfant
  *	@{
  */
 
+class BufferBase
+{
+public:
+	void Destroy();
+
+//protected:
+	uint32 id = 0;
+};
+
 template<typename T>
-class Buffer
+class Buffer : public BufferBase
 {
 public:
 
@@ -50,22 +61,17 @@ public:
 		return data;
 	}
 
-	operator uint32_t()
+	operator uint32()
 	{
 		return id;
 	}
 
-	operator int()
-	{
-		return id;
-	}
-
-	T& operator[](uint i)
+	T& operator[](uint32 i)
 	{
 		return data[i];
 	}
 
-	uint size()
+	uint32 size()
 	{
 		return data.size();
 	}
@@ -77,7 +83,6 @@ public:
 
 	vector<T> data;
 	//vector<uint32_t> index;
-	uint32_t id = 0;
 };
 
 /**	The Mesh class holds a 3D mesh and possibly an animated skeleton.
@@ -90,12 +95,16 @@ public:
 class Mesh : public Renderable
 {
 	friend class Renderer;
+	DECLARE_COMP(Mesh)
 
 public:
 	Mesh();
 	~Mesh();
 
-	void Load(Properties *props);
+	void Load(Properties *prop);
+	void Save(Properties *prop);
+
+	void SetShape(string preset);
 
 	virtual void Init();
 	virtual void Update();
@@ -111,18 +120,18 @@ public:
 	void LoadFile(string path);
 
 
-	Material material;
+	ptr<Material> material {new Material};
 
 protected:
 
 	// Raw Rendering Functions not to be used outside.
 
-	static uint32_t CreateBuffer(int target, void* data, uint32_t size, int mode = 0);
+	static uint32 CreateBuffer(void* data, uint32 size, int target, int mode = 0);
 
 	template<typename T>
-	static uint32_t CreateBuffer(int target, vector<T>& data, int mode = 0)
+	static void CreateBuffer(Buffer<T>& data, int target, int mode = 0)
 	{
-		return CreateBuffer(target, &data[0], mode);
+		data.id = CreateBuffer(&data[0], sizeof(T)*data.size(), target, mode);
 	}
 
 	string file = "";
@@ -138,11 +147,15 @@ protected:
 	Buffer<vec3> vertexBuffer;
 	Buffer<vec2> uvBuffer;
 	Buffer<vec3> normalBuffer;
-	Buffer<uint32_t> indexBuffer;
+	Buffer<uint32> indexBuffer;
 
 private:
 
 	void LoadOBJ(string path);
+
+	void IndexVBO();
+
+	aiScene* scene = nullptr;
 };
 
 /// @}

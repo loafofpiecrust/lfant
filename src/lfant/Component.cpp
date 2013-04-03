@@ -24,13 +24,13 @@
 // External
 
 // Internal
-
+#include <lfant/Console.h>
 #include <lfant/Entity.h>
 
 namespace lfant
 {
 
-map< string, Component* (Entity::*)() > Component::componentRegistry;
+map< string, Component* (Entity::*)(Properties*) > Component::componentRegistry;
 
 Component::Component()
 {
@@ -55,6 +55,7 @@ void Component::Save(Properties *prop)
 void Component::Init()
 {
 	Object::Init();
+	Log("Component::Init: owner = ", owner);
 }
 
 void Component::Update()
@@ -85,10 +86,10 @@ void Component::OnDisable()
 {
 }
 
-void Component::Trigger(string name)
+void Component::TriggerEvent(string name)
 {
-	owner->Trigger(name);
-	Object::Trigger(name);
+	owner->TriggerEvent(name);
+	Object::TriggerEvent(name);
 }
 
 /*******************************************************************************
@@ -109,7 +110,7 @@ void Component::Enable(bool enable)
 	}
 }
 
-void Component::RegisterType(string name, Component *(Entity::*func)())
+void Component::RegisterType(string name, Component* (Entity::*func)(Properties*))
 {
 	componentRegistry[name] = func;
 }

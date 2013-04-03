@@ -101,7 +101,7 @@ public:
 	Animation& GetAnim(string name);
 
 	/// The sprite animations to be used.
-	forward_list<Animation> animations;
+	deque<Animation> animations;
 
 protected:
 	/// The currently playing animation.

@@ -8,6 +8,8 @@
 // Internal
 #include <lfant/Object.h>
 
+namespace asio = boost::asio;
+
 namespace lfant
 {
 
@@ -26,18 +28,21 @@ public:
 	{
 	}
 
+	void SetPort(uint16 port);
+	uint16 GetPort();
+
 protected:
-	Connection(string name, string host, uint16_t port, string password);
+	Connection(string name, string host, uint16 port, string password);
 	Connection() {}
 
 	virtual void Destroy();
 
 	string name = "";
-	string host = "";
-	uint16_t port = 80;
+	string host = "127.0.0.1";
+	uint16 port = 0;
 	string password = "";
 
-	boost::asio::io_service io;
+	asio::io_service io;
 
 	bool started = false;
 };

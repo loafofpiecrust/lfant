@@ -164,7 +164,7 @@ void Renderer::Init()
 	   for(uint i = 0; i < shs.size(); ++i)
 	   {
 			Shader shader;
-			shader.LoadFile(shs[i].string());
+			shader->LoadFile(shs[i].string());
 			shaders.push_back(shader);
 	   }*/
 }
@@ -287,26 +287,26 @@ void Renderer::SetWindowPos(ivec2 pos)
 	glfwSetWindowPos(pos.x, pos.y);
 }
 
-Shader& Renderer::GetShader(string name)
+Shader *Renderer::GetShader(string name)
 {
 	for(auto& shader : shaders)
 	{
-//		if(shader.path == name)
+//		if(shader->path == name)
 		{
 //			return shader;
 		}
 	}
-	return null(Shader);
+	return nullptr;
 }
 
-void Renderer::AddShader(Shader& shader)
+void Renderer::AddShader(Shader *shader)
 {
-//	if(Shader* s = &GetShader(shader.path))
+//	if(Shader* s = &GetShader(shader->path))
 	{
-//		s->id = shader.id;
+//		s->id = shader->id;
 //		return;
 	}
-	shaders.push_back(shader);
+	shaders.push_back(ptr<Shader>(shader));
 }
 
 void Renderer::HideMouse(bool hide)

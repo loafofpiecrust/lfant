@@ -85,8 +85,8 @@ public:
 
 
 	// Shaders
-	Shader& GetShader(string name);
-	void AddShader(Shader& shader);
+	Shader* GetShader(string name);
+	void AddShader(Shader* shader);
 
 	/**
 	 *	Hides, shows, or toggles the mouse cursor.
@@ -133,7 +133,7 @@ protected:
 	bool hideMouse = false;
 	bool windowResizable = false;
 
-	deque<Shader> shaders;
+	deque< ptr<Shader> > shaders;
 
 public:
 

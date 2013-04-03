@@ -42,19 +42,16 @@ namespace lfant
  */
 class BoxCollider : public Collider
 {
+	DECLARE_COMP(BoxCollider)
+
 public:
+	void Init();
+//	void Update();
 
 protected:
-//		using Collider::Collider;
-//		using Collider::~Collider;
-
-	virtual void Update();
-	virtual void OnSetScale(vec3 scale);
+	btCollisionShape* GetShape();
 
 	btBoxShape* shape;
-
-private:
-
 };
 
 /** @} */

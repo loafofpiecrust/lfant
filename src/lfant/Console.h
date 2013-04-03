@@ -80,8 +80,8 @@ public:
 
 	struct CommandDefault : public Command
 	{
-		typedef void (Console::* funcTypeRaw)(vector<string>);
-		typedef boost::function<void (vector<string>)> funcType;
+		typedef void (Console::* funcTypeRaw)(deque<string>);
+		typedef boost::function<void (deque<string>)> funcType;
 		funcType func;
 
 		CommandDefault(funcType func, string name, string help) :
@@ -120,19 +120,23 @@ public:
 	template<typename T = string>
 	void Print(T msg)
 	{
+		logFile.open(logName, ios_base::app);
 		// Print to console window
 		cout << msg << "\n";
 		// Append message to file
 		logFile << msg << "\n";
+		logFile.close();
 	}
 
 	template<typename T = string>
 	void LinePrint(T msg)
 	{
+		logFile.open(logName, ios_base::app);
 		// Print to console window
 		cout << msg;
 		// Append message to file
 		logFile << msg;
+		logFile.close();
 	}
 
 	void RegisterCommand(CommandDefault::funcTypeRaw func, string name, string help = "");
@@ -140,7 +144,7 @@ public:
 
 	void RegisterVar(string name, float val, string help = "", bool readOnly = false);
 
-	bool CallCommand(string name, vector<string> args);
+	bool CallCommand(string name, deque<string> args);
 	bool CallCommand(string name);
 
 	Command* GetCommand(string name);
@@ -160,9 +164,9 @@ public:
 	void SetValue(string name, float value);
 
 	void CmdExit();
-	void CmdGetVar(vector<string> args);
-	void CmdSetVar(vector<string> args);
-	void CmdHelp(vector<string> args);
+	void CmdGetVar(deque<string> args);
+	void CmdSetVar(deque<string> args);
+	void CmdHelp(deque<string> args);
 
 protected:
 
