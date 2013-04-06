@@ -130,7 +130,7 @@ public:
 	EmitterType emitterType;
 
 	deque< ptr<Particle> > particles;
-	vector<Burst> bursts;
+	deque<Burst> bursts;
 
 	Material material;
 

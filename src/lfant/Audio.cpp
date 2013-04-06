@@ -43,6 +43,8 @@ Audio::~Audio()
 
 void Audio::Init()
 {
+	Subsystem::Init();
+
 	FMOD::System_Create(&soundSystem);
 	soundSystem->init(maxChannels, FMOD_INIT_NORMAL, 0);
 }

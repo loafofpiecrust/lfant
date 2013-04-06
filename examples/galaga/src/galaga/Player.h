@@ -62,6 +62,7 @@ namespace lfant
 		bool mouseLook = true;
 
 		int meshCount = 0;
+		ivec2 lastMouse;
 
 	private:
 

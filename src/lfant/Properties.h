@@ -59,6 +59,8 @@ public:
 	Properties* GetChildById(string id);
 	deque<Properties*> GetChildren(string type = "");
 
+	map<string, string>& GetValues();
+
 	Properties* AddChild(string type = "");
 
 	template<typename T>
@@ -74,7 +76,7 @@ public:
 	template<typename T>
 	T& Get(string name, T& ref)
 	{
-		to_lower(name);
+	//	to_lower(name);
 		string val = values[name];
 		if(val != "")
 		{
@@ -87,7 +89,7 @@ public:
 	template<typename T = string>
 	T Get(string name)
 	{
-		to_lower(name);
+	//	to_lower(name);
 		cout << "Getting '"+name+"'.\n";
 		string val = values[name];
 		return lexical_cast<T>(val);

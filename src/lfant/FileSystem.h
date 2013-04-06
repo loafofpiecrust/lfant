@@ -54,7 +54,7 @@ public:
 	path GetUserPath(string name);
 	path GetGamePath(string name);
 
-	vector<path> GetGameFiles(string dir);
+	deque<path> GetGameFiles(string dir);
 
 protected:
 

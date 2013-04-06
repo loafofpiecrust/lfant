@@ -44,6 +44,8 @@ FileSystem::~FileSystem()
 
 void FileSystem::Init()
 {
+	Subsystem::Init();
+
 	// Use default settings
 	gameFolder = "../..";
 #if WINDOWS
@@ -51,7 +53,7 @@ void FileSystem::Init()
 #elif UNIX
 	const string home = getenv("HOME");
 #endif
-	userFolder = home + "/Documents/My Games/" + game->settings->orgName + "/" + game->settings->gameName;
+	userFolder = home + "/Documents/My Games/" + game->orgName + "/" + game->gameName;
 }
 
 path FileSystem::GetGamePath(string name)
@@ -75,9 +77,9 @@ path FileSystem::GetUserPath(string name)
 	return result;
 }
 
-vector<path> FileSystem::GetGameFiles(string dir)
+deque<path> FileSystem::GetGameFiles(string dir)
 {
-	vector<path> result;
+	deque<path> result;
 	if(exists(dir) && is_directory(dir))
 	{
 		copy(directory_iterator(dir), directory_iterator(), back_inserter(result));

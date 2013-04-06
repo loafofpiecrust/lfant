@@ -19,23 +19,21 @@
 ******************************************************************************/
 #pragma once
 
-// External
-#include <forward_list>
-
 // Internal
 #include <lfant/ptr.h>
 #include <lfant/Subsystem.h>
 
-/*
-   namespace CEGUI
-   {
-   class OpenGL3Renderer;
-   class Window;
-   class WindowManager;
-   class System;
-   class GUIContext;
-   }
- */
+// External
+#include <deque>
+
+namespace CEGUI
+{
+class OpenGL3Renderer;
+class Window;
+class WindowManager;
+class System;
+class GUIContext;
+}
 
 /*
    namespace Rocket
@@ -70,24 +68,25 @@ public:
 	virtual void Update();
 	virtual void OnDestroy();
 
-	virtual void CreateWindow(string fileName);
+	void Load(Properties *prop);
+	//	void Save(Properties *prop);
+
+	virtual void CreateWindow(Properties* prop, CEGUI::Window *parent = nullptr);
 	virtual void RemoveWindow(string fileName);
 
-	virtual void OnKey(int key, int mode);
+	virtual void OnKey(uint16 key, int mode);
 	virtual void OnChar(char key);
-	virtual void OnMouseButton(int btn, int pressed);
+	virtual void OnMouseButton(uint16 btn, int mode);
 	virtual void OnMouseMove(int x, int y);
 	virtual void OnWindowResize(uint width, uint height);
 
 protected:
-	/*
-	   CEGUI::OpenGL3Renderer* renderer;
-	   CEGUI::Window* rootWindow;
-	   CEGUI::WindowManager* windowManager;
-	   deque<CEGUI::Window*> windows;
-	   CEGUI::System* system;
-	   CEGUI::GUIContext* context;
-	 */
+	CEGUI::OpenGL3Renderer* renderer;
+	CEGUI::Window* rootWindow;
+	CEGUI::WindowManager* windowManager;
+	deque<CEGUI::Window*> windows;
+	CEGUI::System* system;
+	CEGUI::GUIContext* context;
 
 	/*
 	   ptr<Rocket::Core::Context> context;

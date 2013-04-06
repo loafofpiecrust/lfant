@@ -170,7 +170,11 @@ mat4 Transform::GetMatrix()
 {
 	mat4 matrix;
 	matrix = glm::translate(mat4(1.0f), GetWorldPosition());
-	matrix *= glm::mat4_cast(GetWorldRotationQuat());
+//	matrix *= glm::mat4_cast(GetWorldRotationQuat());
+	vec3 rot = degrees(GetWorldRotation());
+	matrix = glm::rotate(matrix, rot.x, vec3(1,0,0));
+	matrix = glm::rotate(matrix, rot.y, vec3(0,1,0));
+	matrix = glm::rotate(matrix, rot.z, vec3(0,0,1));
 	matrix = glm::scale(matrix, GetWorldScale());
 	return matrix;
 }

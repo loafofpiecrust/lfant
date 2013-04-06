@@ -43,6 +43,8 @@ Network::~Network()
 
 void Network::Init()
 {
+	Subsystem::Init();
+
 	Log("Network::Init: Touch.");
 }
 

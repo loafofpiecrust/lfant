@@ -69,16 +69,15 @@ void Client::Accept()
 
 void Client::Host(uint16 port)
 {
+	Log("Client::Host: Touch.");
 	endpoint = asio::ip::tcp::endpoint(asio::ip::address::from_string("127.0.0.1"), port);
 	acceptor.open(endpoint.protocol());
 	acceptor.set_option(asio::socket_base::reuse_address(true));
 	acceptor.bind(endpoint);
 	acceptor.listen();
 
-	Accept();
-
 	connected = true;
-
+	Accept();
 	TriggerEvent("Host");
 }
 
@@ -109,10 +108,8 @@ void Client::SendData(string data)
 	{
 		lastData[i] = '\0';
 	}
-	for(i = 0; i < peers; ++i)
-	{
-		asio::async_write(socket, asio::buffer(lastData), boost::bind(&Client::OnSendData, this, asio::placeholders::error, asio::placeholders::bytes_transferred));
-	}
+
+	asio::async_write(socket, asio::buffer(lastData), boost::bind(&Client::OnSendData, this, asio::placeholders::error, asio::placeholders::bytes_transferred));
 }
 
 void Client::SendData(Properties *prop, string path)
@@ -162,13 +159,16 @@ void Client::OnConnect(const boost::system::error_code& error)
 	if (!error)
 	{
 		Log("Connected!");
+
+		TriggerEvent("Connect", string(""));
 	}
 	else
 	{
 		Log(error.message());
 	//	Disconnect();
+
+		TriggerEvent("Connect", error.message());
 	}
-	TriggerEvent("Connect", error.message());
 }
 
 void Client::OnAccept(const boost::system::error_code &error)
@@ -176,14 +176,15 @@ void Client::OnAccept(const boost::system::error_code &error)
 	if(error)
 	{
 		Log("Server::OnAccept: Error '", error.message(), "'.");
+		TriggerEvent("Accept", error.message());
 	}
 	else
 	{
 		++peers;
+		TriggerEvent("Accept", string(""));
 	}
 
 	Log("Server::OnAccept: Peer joined. Do something with this?");
-	TriggerEvent("Accept", error.message());
 //	Accept();
 }
 
@@ -192,6 +193,7 @@ void Client::OnGetData(const boost::system::error_code& error)
 	Log("Client::OnGetData: Touch.");
 	if(!error)
 	{
+		bool used = false;
 		string data = lastData;
 		if(data.size() > 0)
 		{
@@ -206,6 +208,7 @@ void Client::OnGetData(const boost::system::error_code& error)
 					Log("Client::OnGetData: Begin structure, "+lastType+".");
 					if(lastType == "File" && toks.size() > 1)
 					{
+						used = true;
 						lastPath = game->fileSystem->GetGamePath(toks[1]).string();
 						ofstream stream(lastPath);
 						stream.flush();
@@ -237,7 +240,10 @@ void Client::OnGetData(const boost::system::error_code& error)
 		}
 
 	//	Log("Client::OnGetData: Received data, '", data, "'.");
-		TriggerEvent("GetData", data);
+		if(!used)
+		{
+			TriggerEvent("GetData", string(lastData));
+		}
 	}
 	else
 	{

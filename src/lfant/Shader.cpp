@@ -40,6 +40,7 @@ void Shader::LoadFile(string file)
 		return;
 	}
 
+	/*
 	// Create the shaders
 	uint32_t VertexShaderID = glCreateShader(GL_VERTEX_SHADER);
 	uint32_t FragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
@@ -121,25 +122,31 @@ void Shader::LoadFile(string file)
 
 	Log("Shader::LoadFile: Fragment shader checked");
 
+	*/
+	int32 result;
+	int32 logLength;
+	uint32 vertId = Compile(GL_VERTEX_SHADER, vert);
+	uint32 fragId = Compile(GL_FRAGMENT_SHADER, frag);
+
 	// Link the program
 	Log("Shader::LoadFile: Linking shader");
 	uint32_t ProgramID = glCreateProgram();
-	glAttachShader(ProgramID, VertexShaderID);
-	glAttachShader(ProgramID, FragmentShaderID);
+	glAttachShader(ProgramID, vertId);
+	glAttachShader(ProgramID, fragId);
 	glLinkProgram(ProgramID);
 
 	// Check the program
-	glGetProgramiv(ProgramID, GL_LINK_STATUS, &Result);
-	glGetProgramiv(ProgramID, GL_INFO_LOG_LENGTH, &InfoLogLength);
-	char ProgramErrorMessage[glm::max(InfoLogLength, int(1))];
-	glGetProgramInfoLog(ProgramID, InfoLogLength, 0, &ProgramErrorMessage[0]);
-	if (InfoLogLength > 0)
+	glGetProgramiv(ProgramID, GL_LINK_STATUS, &result);
+	glGetProgramiv(ProgramID, GL_INFO_LOG_LENGTH, &logLength);
+	char ProgramErrorMessage[glm::max(logLength, int(1))];
+	glGetProgramInfoLog(ProgramID, logLength, 0, &ProgramErrorMessage[0]);
+	if (logLength > 0)
 	{
 		Log(ProgramErrorMessage);
 	}
 
-	glDeleteShader(VertexShaderID);
-	glDeleteShader(FragmentShaderID);
+	glDeleteShader(vertId);
+	glDeleteShader(fragId);
 //	path = file;
 	id = ProgramID;
 
@@ -160,6 +167,38 @@ void Shader::AddUniform(string name)
 uint32 Shader::GetId()
 {
 	return id;
+}
+
+uint32 Shader::Compile(uint32 type, const string &path)
+{
+	ifstream stream(path);
+	string line = "";
+	string source = "";
+
+	while(stream.good())
+	{
+		getline(stream, line);
+		source += "\n"+line;
+	}
+	stream.close();
+
+	uint32 shader = glCreateShader(type);
+	const char* csource = source.c_str();
+	glShaderSource(shader, 1, &csource, 0);
+	glCompileShader(shader);
+
+	int32 logLength = 0;
+	int32 result = 0;
+	glGetShaderiv(shader, GL_COMPILE_STATUS, &result);
+	glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &logLength);
+	char error[logLength];
+	glGetShaderInfoLog(shader, logLength, 0, &error[0]);
+	if (logLength > 0)
+	{
+		Log(error);
+	}
+
+	return shader;
 }
 
 }

@@ -41,6 +41,8 @@ SystemInfo::~SystemInfo()
 
 void SystemInfo::Init()
 {
+	Subsystem::Init();
+
 	SYSTEM_INFO info;
 	GetNativeSystemInfo(&info);
 	/// @todo Change rest to use this
@@ -193,6 +195,8 @@ void SystemInfo::Init()
 #elif LINUX
 void SystemInfo::Init()
 {
+	Subsystem::Init();
+
 	FILE* cmd;
 	int status;
 	char result[250];

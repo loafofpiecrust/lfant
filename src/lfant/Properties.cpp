@@ -68,8 +68,8 @@ void Properties::LoadStream(istream& stream)
 	string value = "";
 	char c;
 
-	Set("type", type);
-	Set("name", id);
+//	Set("type", type);
+//	Set("name", id);
 
 	while(stream.good())
 	{
@@ -192,7 +192,7 @@ void Properties::LoadStream(istream& stream)
 					}
 				}
 
-				to_lower(name);
+			//	to_lower(name);
 				Set(name, TrimSpace(value, true));
 				name = "";
 				value = "";
@@ -208,7 +208,7 @@ void Properties::LoadStream(istream& stream)
 			{
 				value.push_back(line[i]);
 			}
-			to_lower(name);
+		//	to_lower(name);
 			Log("\tSetting, '"+TrimSpace(name)+" = "+TrimSpace(value, true)+"'.");
 			Set(name, TrimSpace(value, true));
 			name = "";
@@ -367,6 +367,11 @@ deque<Properties*> Properties::GetChildren(string type)
 		}
 	}
 	return props;
+}
+
+map<string, string>& Properties::GetValues()
+{
+	return values;
 }
 
 Properties* Properties::AddChild(string type)

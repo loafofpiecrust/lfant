@@ -64,6 +64,8 @@ public:
 
 protected:
 
+	static uint32 Compile(uint32 type, const string& path);
+
 	string vertex = "";
 	string fragment = "";
 	uint32 id = 0;

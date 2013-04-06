@@ -43,6 +43,8 @@ Console::~Console()
 
 void Console::Init()
 {
+	Subsystem::Init();
+
 	logFile.open(logName);
 
 	// Default commands
@@ -63,7 +65,7 @@ void Console::Load(Properties *prop)
 
 void Console::CmdGetVar(deque<string> args)
 {
-	Log("get: Value of '" + args[0] + "':" + game->settings->GetValue(args[0]));
+//	Log("get: Value of '" + args[0] + "':" + game->settings->GetValue(args[0]));
 }
 
 void Console::CmdSetVar(deque<string> args)
@@ -73,8 +75,8 @@ void Console::CmdSetVar(deque<string> args)
 		Log("set: No value given.");
 		return;
 	}
-	game->settings->SetValue(args[0], args[1]);
-	Log("set: Changed '" + args[0] + "' to " + game->settings->GetValue(args[0]));
+//	game->settings->SetValue(args[0], args[1]);
+//	Log("set: Changed '" + args[0] + "' to " + game->settings->GetValue(args[0]));
 }
 
 void Console::CmdHelp(deque<string> args)
@@ -84,13 +86,14 @@ void Console::CmdHelp(deque<string> args)
 		Log("help: "+cmd->help);
 		return;
 	}
+	/*
 	string var = game->settings->GetHelp(args[0]);
 	if(var != "")
 	{
 		Log("help: "+var);
 		return;
 	}
-
+	*/
 	Log("help: none found.");
 }
 

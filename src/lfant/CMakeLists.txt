@@ -38,7 +38,7 @@ include_directories(
 	"${ROOT}/external/bullet/src"
 	"${ROOT}/external/glew/include"
 	"${ROOT}/external/glfw/include"
-	"${ROOT}/external/rocket/Include"
+	"${ROOT}/external/cegui/cegui/include"
 	"${ROOT}/external/angelscript/include"
 	"${ROOT}/external/angelscript/add_on"
 	"${ROOT}/external/devil/include"
@@ -52,7 +52,7 @@ target_link_libraries(${PROJECT_NAME}
 	boost
 	bullet
 	fmod
-	rocket
+	CEGUI
 	:libpng.a
 	z
 	angelscript

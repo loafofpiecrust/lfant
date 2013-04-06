@@ -46,10 +46,8 @@ uint16 Key_Initializer::operator [](string in)
 
 Key_Initializer::Key_Initializer()
 {
-
 	_key[""] = '\0';
 	_key["q"] = 'Q';
-
 	_key["w"] = 'W';
 	_key["e"] = 'E';
 	_key["r"] = 'R';
@@ -328,13 +326,13 @@ void GLFWCALL Input::OnMouseMove(int x, int y)
 
 void GLFWCALL Input::OnMouseButton(int btn, int mode)
 {
-	game->input->TriggerEvent("MouseButton", btn, mode);
-	OnKeyPress(btn, mode);
+	game->input->TriggerEvent("MouseButton", (uint16)btn, mode);
+//	OnKeyPress(btn, mode);
 }
 
 void GLFWCALL Input::OnCharPress(int key, int mode)
 {
-	game->input->TriggerEvent("CharPress", key);
+	game->input->TriggerEvent("CharPress", (char)key);
 }
 
 /*******************************************************************************
@@ -440,7 +438,7 @@ ivec2 Input::GetMousePos()
 	return result;
 }
 
-void Input::SetMousePos(int32_t x, int32_t y)
+void Input::SetMousePos(int32 x, int32 y)
 {
 	glfwSetMousePos(x, y);
 }

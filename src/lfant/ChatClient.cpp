@@ -41,26 +41,54 @@ ChatClient::~ChatClient()
 void ChatClient::Init()
 {
 	client = new network::Client;
-//	connection = game->network->AddConnection<network::Client>(80);
+	//	connection = game->network->AddConnection<network::Client>(80);
 	ConnectEvent(SENDER(client, Connect), RECEIVER(this, OnConnect));
 	ConnectEvent(SENDER(client, Accept), RECEIVER(this, OnHost));
 	ConnectEvent(SENDER(client, GetData), RECEIVER(this, OnGetData));
 }
 
+void ChatClient::Update()
+{
+	client->Update();
+}
+
 void ChatClient::SendMessage(string msg)
 {
-	client->SendData(msg);
+	msg = name+":"+msg;
+	for(uint i = 0; i < peers.size(); ++i)
+	{
+		Log("Sending message to peer #", i);
+		client->SendData(msg);
+	}
 	lastMsg = msg;
+	Log("Message sent: '"+lastMsg+"'.");
 }
 
 void ChatClient::ReceiveMessage(string msg)
 {
-	Log("Received message: '"+msg+"'\n");
+	string sender = "";
+	uint pos = msg.find_first_of(':');
+	if(pos != -1)
+	{
+		for(uint i = 0; i < pos; ++i)
+		{
+			sender.push_back(msg[i]);
+		}
+		msg.erase(msg.begin(), msg.begin()+pos+1);
+	}
+	Log("Received message: '"+msg+"' from '"+sender+"'.\n");
 	lastMsg = msg;
+}
+
+void ChatClient::Disconnect()
+{
+	client->SendData(":\\client "+name+" "+client->socket.remote_endpoint().address().to_string());
+	client->Disconnect();
 }
 
 void ChatClient::OnDestroy()
 {
+	Disconnect();
 	delete client;
 }
 
@@ -71,11 +99,7 @@ void ChatClient::OnConnect(string error)
 		Log("ChatClient::OnConnect: Success.");
 		client->SendData(":/client "+name+" "+client->socket.remote_endpoint().address().to_string());
 		client->GetDataAsync(256);
-	}
-	else
-	{
-		// Connect failed, let's host!
-		Host();
+		TriggerEvent("Connect");
 	}
 }
 
@@ -84,26 +108,58 @@ void ChatClient::OnHost(string error)
 	Log("Started hosting.");
 	if(error == "")
 	{
-
+		client->GetDataAsync(256);
 	}
 	TriggerEvent("Host");
 }
 
 void ChatClient::OnGetData(string data)
 {
-	if(data.size() > 1 && data[0] == ':' && data[1] == '/')
+	Log("ChatClient::OnGetData: Touch.");
+	if(data.size() > 1 && data[0] == ':')
 	{
-		// Calling a command
-		data.erase(data.begin(), data.begin()+2);
-		deque<string> toks = Split(data, " ");
-		if(toks[0] == "client")
+		if(data[1] == '/')
 		{
-			Peer peer;
-			peer.name = toks[1];
-			peer.ip = toks[2];
-			peers.push_back(peer);
+			// Calling a command
+			data.erase(data.begin(), data.begin()+2);
+			deque<string> toks = Split(data, " ");
+			if(toks[0] == "client")
+			{
+				Log("ChatClient::OnGetData: Adding a peer.");
+				Peer* peer = new Peer;
+				peer->name = toks[1];
+				peer->ip = toks[2];
+				peers.push_back(*peer);
+
+				client->SendData(":/server "+name+" "+client->socket.remote_endpoint().address().to_string());
+			}
+			else if(toks[0] == "server")
+			{
+				Log("ChatClient::OnGetData: Adding server as peer.");
+				Peer* peer = new Peer;
+				peer->name = toks[1];
+				peer->ip = toks[2];
+				peers.push_back(*peer);
+			}
+			return;
 		}
-		return;
+		else if(data[1] == '\\')
+		{
+			// Calling a command
+			data.erase(data.begin(), data.begin()+2);
+			deque<string> toks = Split(data, " ");
+			if(toks[0] == "client")
+			{
+				for(uint i = 0; i < peers.size(); ++i)
+				{
+					if(peers[i].name == toks[1] && peers[i].ip == toks[2])
+					{
+						peers.erase(peers.begin()+i);
+					}
+				}
+			}
+			return;
+		}
 	}
 
 	ReceiveMessage(data);

@@ -51,10 +51,12 @@ public:
 	virtual ~ChatClient();
 
 	virtual void Init();
+	void Update();
 
 	void SendMessage(string msg);
 	void Host();
 	void Connect();
+	void Disconnect();
 
 protected:
 
@@ -64,6 +66,7 @@ protected:
 
 	// Callbacks
 	void OnConnect(string error = "");
+	void OnDisconnect(string error = "");
 	void OnHost(string error = "");
 	void OnGetData(string data);
 

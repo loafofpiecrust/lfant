@@ -115,9 +115,9 @@ public:
 	Component* GetComponent(string type);
 
 	template<typename C>
-	vector<C*> GetComponents()
+	deque<C*> GetComponents()
 	{
-		vector<C*> comps;
+		deque<C*> comps;
 		for(auto& comp : components)
 		{
 			if(Type(comp) == Type<C>())

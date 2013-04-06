@@ -223,7 +223,7 @@ public:
 
 	ivec2 GetMousePos();
 	void SetMousePos(ivec2 pos);
-	void SetMousePos(int32_t x, int32_t y);
+	void SetMousePos(int32 x, int32 y);
 
 	bool lockMouse;
 	float mouseSpeed;

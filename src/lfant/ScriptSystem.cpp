@@ -60,6 +60,8 @@ int myint = 2;
 
 void ScriptSystem::Init()
 {
+	Subsystem::Init();
+
 	Log("ScriptSystem::Init: Touch.");
 	scriptEngine = asCreateScriptEngine(ANGELSCRIPT_VERSION);
 //	scriptEngine->SetDefaultNamespace("lfant");

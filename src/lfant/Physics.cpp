@@ -50,6 +50,8 @@ Physics::~Physics()
 
 void Physics::Init()
 {
+	Subsystem::Init();
+
 	collisionConfig = new btDefaultCollisionConfiguration();
 	Log("Physics::Init: Collision config created.");
 	dispatcher = new btCollisionDispatcher(collisionConfig);
@@ -139,7 +141,7 @@ void Physics::SetGravityPoint(string name, float force)
 *******************************************************************************/
 
 bool Physics::OnCollide(string func, btManifoldPoint& cp, const btCollisionObjectWrapper* colObj0, int partId0, int index0,
-                        const btCollisionObjectWrapper* colObj1, int partId1, int index1)
+						const btCollisionObjectWrapper* colObj1, int partId1, int index1)
 {
 	/*Rigidbody* body0 = nullptr;
 	   Rigidbody* body1 = nullptr;
@@ -194,7 +196,7 @@ bool Physics::OnCollide(string func, btManifoldPoint& cp, const btCollisionObjec
 }
 
 bool Physics::OnCollideEnter(btManifoldPoint& cp, const btCollisionObjectWrapper* colObj0, int partId0, int index0,
-                             const btCollisionObjectWrapper* colObj1, int partId1, int index1)
+							 const btCollisionObjectWrapper* colObj1, int partId1, int index1)
 {
 	return OnCollide("Enter", cp, colObj0, partId0, index0, colObj1, partId1, index1);
 }

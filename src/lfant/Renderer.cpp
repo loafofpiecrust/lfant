@@ -153,8 +153,8 @@ void Renderer::Init()
 
 	//glfwSwapInterval(vsync);
 
-	glfwSetWindowCloseCallback(&Renderer::WindowClosed);
-	glfwSetWindowSizeCallback(&Renderer::WindowResized);
+	glfwSetWindowCloseCallback(&Renderer::OnCloseWindow);
+	glfwSetWindowSizeCallback(&Renderer::OnSetResolution);
 
 	Log("Renderer: Initialized");
 
@@ -225,19 +225,19 @@ bool Renderer::OpenWindow()
 	return true;
 }
 
-int Renderer::WindowClosed()
+int Renderer::OnCloseWindow()
 {
 	Log("Renderer::WindowClosed: Touch.");
 	game->Exit();
 	return 1;
 }
 
-void Renderer::WindowResized(int x, int y)
+void Renderer::OnSetResolution(int x, int y)
 {
-	Log("Renderer::WindowResized: Touch.");
+	Log("Renderer::OnSetResolution: Touch.");
 	game->renderer->resolution = ivec2(x, y);
 	glViewport(0, 0, x, y);
-	game->userInterface->OnWindowResize((uint)x, (uint)y);
+	game->renderer->TriggerEvent("SetResolution", (uint32)x, (uint32)y);
 }
 
 /*******************************************************************************

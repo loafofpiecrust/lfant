@@ -171,7 +171,7 @@ public:
 protected:
 
 private:
-	vector<Command*> commands;
+	deque<Command*> commands;
 
 	string logName = "lfant.log";
 	ofstream logFile;

@@ -177,6 +177,8 @@ void Mesh::Render()
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	glBindVertexArray(0);
+
+	glUseProgram(0);
 }
 
 void Mesh::EndRender()

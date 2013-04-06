@@ -72,6 +72,8 @@ float Time::GetTimer(string name)
 
 void Time::Init()
 {
+	Subsystem::Init();
+
 	ResetTime();
 	UpdateTimes();
 }
