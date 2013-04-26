@@ -27,8 +27,8 @@
 #include <lfant/Object.h>
 #include <lfant/Entity.h>
 
-namespace lfant
-{
+namespace lfant {
+
 /** @addtogroup Game
  *	 @{
  */
@@ -37,16 +37,12 @@ namespace lfant
  */
 
 //#define REGISTER_COMP(comp) static bool BOOST_PP_CAT( comp, __regged ) = componentRegistry.insert( BOOST_PP_STRINGIZE(comp), &Entity::AddComponent<comp>());
-#define DECLARE_COMP(comp) \
-	friend class Entity;\
-	static void _RegisterComponent() __attribute__((constructor));
+#define DECLARE_COMP(type) \
+	friend class lfant::Entity;\
+	static RegistryEntry<type> _registryEntry;
 
-#define IMPLEMENT_COMP(comp) \
-	void comp::_RegisterComponent()\
-	{\
-		std::cout << "Registering component: " << #comp << "\n";\
-		Component::RegisterType(#comp, (Component* (Entity::*)(Properties*))&Entity::AddComponent<comp>);\
-	}
+#define IMPLEMENT_COMP(type) \
+	Component::RegistryEntry<type> type::_registryEntry {#type};
 
 
 /**	The base class for all Entity Components.
@@ -62,8 +58,20 @@ namespace lfant
 class Component : public Object
 {
 	friend class Entity;
+protected:
+
+	template<typename T>
+	class RegistryEntry
+	{
+	public:
+		RegistryEntry(string type)
+		{
+			Component::componentRegistry[type] = (Component* (Entity::*)(Properties*))&Entity::AddComponent<T>;
+		}
+	};
+
 public:
-	virtual ~Component();
+	~Component();
 
 	virtual void Load(Properties* prop);
 	virtual void Save(Properties* prop);
@@ -85,12 +93,13 @@ public:
 protected:
 	Component();
 
+	static map<string, Component* (Entity::*)(Properties*) > componentRegistry __attribute__((init_priority(101)));
+
 	/**
 	 *	Registers a component type by string, only used by the IMPLEMENT_COMP macro.
 	 *	@param name The typename
 	 */
 	static void RegisterType(string name, Component* (Entity::*func)(Properties*));
-	static map< string, Component* (Entity::*)(Properties*) > componentRegistry;
 
 	// Loop Function Overwrites
 	virtual void Init();
@@ -101,7 +110,7 @@ protected:
 	virtual void OnEnable();
 	virtual void OnDisable();
 
-	virtual void TriggerEvent(string name);
+	virtual void TriggerEvent(string name) final;
 
 	template<typename P1, typename ... P>
 	void TriggerEvent(string name, P1 arg, P ... args)

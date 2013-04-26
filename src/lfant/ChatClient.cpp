@@ -20,17 +20,24 @@
 
 #include <lfant/ChatClient.h>
 
-// External
-
 // Internal
-#include <lfant/network/Client.h>
 #include <lfant/Network.h>
 #include <lfant/Console.h>
+#include <lfant/SystemInfo.h>
+#include <lfant/ChatServer.h>
+
+// External
 
 namespace lfant
 {
 
 ChatClient::ChatClient()
+{
+	name = game->systemInfo->computerName;
+}
+
+ChatClient::ChatClient(asio::io_service& new_io) :
+	net::tcp::Client(new_io)
 {
 }
 
@@ -40,143 +47,66 @@ ChatClient::~ChatClient()
 
 void ChatClient::Init()
 {
-	client = new network::Client;
-	//	connection = game->network->AddConnection<network::Client>(80);
-	ConnectEvent(SENDER(client, Connect), RECEIVER(this, OnConnect));
-	ConnectEvent(SENDER(client, Accept), RECEIVER(this, OnHost));
-	ConnectEvent(SENDER(client, GetData), RECEIVER(this, OnGetData));
 }
 
-void ChatClient::Update()
+void ChatClient::SendData(string msg)
 {
-	client->Update();
-}
+	if(msg[0] == '/')
+	{
+		// Parse as command
+	}
 
-void ChatClient::SendMessage(string msg)
-{
 	msg = name+":"+msg;
-	for(uint i = 0; i < peers.size(); ++i)
-	{
-		Log("Sending message to peer #", i);
-		client->SendData(msg);
-	}
-	lastMsg = msg;
-	Log("Message sent: '"+lastMsg+"'.");
-}
-
-void ChatClient::ReceiveMessage(string msg)
-{
-	string sender = "";
-	uint pos = msg.find_first_of(':');
-	if(pos != -1)
-	{
-		for(uint i = 0; i < pos; ++i)
-		{
-			sender.push_back(msg[i]);
-		}
-		msg.erase(msg.begin(), msg.begin()+pos+1);
-	}
-	Log("Received message: '"+msg+"' from '"+sender+"'.\n");
-	lastMsg = msg;
+	Client::SendData(msg);
+	messages.push_back(msg);
+	Log("Message sent: '"+msg+"'.");
 }
 
 void ChatClient::Disconnect()
 {
-	client->SendData(":\\client "+name+" "+client->socket.remote_endpoint().address().to_string());
-	client->Disconnect();
+	SendData("[RemoveClient "+name+"]");
+	Client::Disconnect();
 }
 
 void ChatClient::OnDestroy()
 {
 	Disconnect();
-	delete client;
 }
 
-void ChatClient::OnConnect(string error)
+void ChatClient::OnConnect(const boost::system::error_code &error)
 {
-	if(error == "")
-	{
-		Log("ChatClient::OnConnect: Success.");
-		client->SendData(":/client "+name+" "+client->socket.remote_endpoint().address().to_string());
-		client->GetDataAsync(256);
-		TriggerEvent("Connect");
-	}
+	Client::OnConnect(error);
+	Log("ChatClient::OnConnect: Success.");
+	SendData("[AddClient "+name+" "+socket.remote_endpoint().address().to_string()+"]");
+//	GetData();
 }
 
-void ChatClient::OnHost(string error)
+void ChatClient::OnGetData(const boost::system::error_code &error)
 {
-	Log("Started hosting.");
-	if(error == "")
-	{
-		client->GetDataAsync(256);
-	}
-	TriggerEvent("Host");
-}
+	Client::OnGetData(error);
 
-void ChatClient::OnGetData(string data)
-{
-	Log("ChatClient::OnGetData: Touch.");
-	if(data.size() > 1 && data[0] == ':')
+	string data = lastData;
+
+	// Receive normal message
+	string sender = "";
+	uint pos = data.find_first_of(':');
+	if(pos != -1)
 	{
-		if(data[1] == '/')
+		for(uint i = 0; i < pos; ++i)
 		{
-			// Calling a command
-			data.erase(data.begin(), data.begin()+2);
-			deque<string> toks = Split(data, " ");
-			if(toks[0] == "client")
-			{
-				Log("ChatClient::OnGetData: Adding a peer.");
-				Peer* peer = new Peer;
-				peer->name = toks[1];
-				peer->ip = toks[2];
-				peers.push_back(*peer);
-
-				client->SendData(":/server "+name+" "+client->socket.remote_endpoint().address().to_string());
-			}
-			else if(toks[0] == "server")
-			{
-				Log("ChatClient::OnGetData: Adding server as peer.");
-				Peer* peer = new Peer;
-				peer->name = toks[1];
-				peer->ip = toks[2];
-				peers.push_back(*peer);
-			}
-			return;
+			sender.push_back(data[i]);
 		}
-		else if(data[1] == '\\')
-		{
-			// Calling a command
-			data.erase(data.begin(), data.begin()+2);
-			deque<string> toks = Split(data, " ");
-			if(toks[0] == "client")
-			{
-				for(uint i = 0; i < peers.size(); ++i)
-				{
-					if(peers[i].name == toks[1] && peers[i].ip == toks[2])
-					{
-						peers.erase(peers.begin()+i);
-					}
-				}
-			}
-			return;
-		}
+		data.erase(data.begin(), data.begin()+pos+1);
 	}
-
-	ReceiveMessage(data);
+	TriggerEvent("ReceiveMessage", sender, data);
+	Log("Received message: '"+data+"' from '"+sender+"'.\n");
+	messages.push_back(data);
 }
 
-void ChatClient::Connect()
+void ChatClient::OnSendData(const boost::system::error_code &error, size_t bytes)
 {
-	Log("Starting connection process...");
-	/// @todo Use a legit IP, some specific, or method for determining?
-	/// @todo Use a specific port.
-	client->Connect("127.0.0.1", 22222);
-}
-
-void ChatClient::Host()
-{
-	Log("Starting hosting process...");
-	client->Host(22222);
+	Log("ChatClient::OnSendData: Touch.");
+	Client::OnSendData(error, bytes);
 }
 
 }

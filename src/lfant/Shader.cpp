@@ -164,6 +164,19 @@ void Shader::AddUniform(string name)
 	Log("Adding uniform '"+name+"' as ", uniforms[name]);
 }
 
+void Shader::Use()
+{
+	if(id != 0)
+	{
+		glUseProgram(id);
+	}
+}
+
+void Shader::Unuse()
+{
+	glUseProgram(0);
+}
+
 uint32 Shader::GetId()
 {
 	return id;

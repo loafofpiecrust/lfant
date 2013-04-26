@@ -31,8 +31,6 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <glm/core/func_geometric.hpp>
-#include <glm/core/func_common.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/quaternion.hpp>
 
@@ -72,8 +70,8 @@ typedef uint32_t uint32;
 typedef int64_t int64;
 typedef uint64_t uint64;
 
-typedef tvec2<int> ivec2;
-typedef tvec3<int> ivec3;
+typedef tvec2<int32> ivec2;
+typedef tvec3<int32> ivec3;
 typedef tvec2<uint32_t> uvec2;
 typedef tvec3<uint32_t> uvec3;
 

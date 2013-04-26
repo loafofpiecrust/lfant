@@ -105,7 +105,7 @@ void Game::Update()
 	physics->Update();
 	scene->Update();
 	input->Update();
-	userInterface->Update();
+//	userInterface->Update();
 	renderer->Update();
 	network->Update();
 	PostUpdate();

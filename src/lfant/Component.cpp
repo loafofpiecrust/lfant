@@ -27,10 +27,9 @@
 #include <lfant/Console.h>
 #include <lfant/Entity.h>
 
-namespace lfant
-{
+namespace lfant {
 
-map< string, Component* (Entity::*)(Properties*) > Component::componentRegistry;
+map< string, Component* (Entity::*)(Properties*)> Component::componentRegistry __attribute__((init_priority(101)));
 
 Component::Component()
 {
@@ -112,7 +111,18 @@ void Component::Enable(bool enable)
 
 void Component::RegisterType(string name, Component* (Entity::*func)(Properties*))
 {
-	componentRegistry[name] = func;
+//	Log("Registering component type '"+name+"', func: '", func, "'.");
+	printf("Component::RegisterType: Touch.\n");
+	if(func)
+	{
+		componentRegistry[name] = nullptr;
+		cout << "Registering type with function ptr " << func << " to this current value: " << componentRegistry[name] << "\n";
+		componentRegistry[name] = func;
+	}
+	else
+	{
+		printf("Component::RegisterType: Function is null.\n");
+	}
 }
 
 

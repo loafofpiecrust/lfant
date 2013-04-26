@@ -30,7 +30,7 @@ add_dependencies(${PROJECT_NAME} ${ROOT}/external)
 
 # Includes Info
 include_directories(
-	"${INCLUDE_DIR}"
+	"../"
 	"${ROOT}/external/fmod/api/inc"
 	"${ROOT}/external/assimp/include"
 	"${ROOT}/external/glm"

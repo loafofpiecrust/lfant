@@ -211,7 +211,7 @@ public:
 	static void GLFWCALL OnMouseButton(int btn, int mode);
 	static void GLFWCALL OnCharPress(int key, int mode);
 
-	void AddAxis(string name, uint16_t positive, uint16_t negative = Key["\n"], uint16_t altpos = Key["\n"], uint16_t altneg = Key["\n"], float sens = 3.0f, float dead = 0.001f, bool snap = true, byte joyNum = 0);
+	void AddAxis(string name, string positive = "null", string negative = "null", string altpos = "null", string altneg = "null", float sens = 3.0f, float dead = 0.001f, bool snap = true, byte joyNum = 0);
 
 	// Axes
 	float GetAxis(string name);

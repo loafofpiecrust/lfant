@@ -27,7 +27,7 @@
 #include <lfant/Console.h>
 #include <lfant/Thread.h>
 
-#include <lfant/network/Connection.h>
+#include <lfant/net/Connection.h>
 
 namespace lfant
 {
@@ -69,13 +69,13 @@ void Network::Load(Properties *prop)
 	deque<Properties*> cons = prop->GetChildren("connection");
 	for(auto& pcon : cons)
 	{
-		Connection* con = new Connection;
-		con->Load(pcon);
-		connections.push_front(con);
+	//	net::Connection* con = new net::Connection;
+	//	con->Load(pcon);
+	//	connections.push_front(con);
 	}
 }
 
-Connection* Network::GetConnection(string name)
+net::Connection* Network::GetConnection(string name)
 {
 	for(auto& con : connections)
 	{

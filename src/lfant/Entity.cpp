@@ -87,8 +87,6 @@ void Entity::Update()
 		}
 	}
 
-	GetComponent<Transform>()->SetDirection();
-
 	for(auto& comp : components)
 	{
 		if(comp->IsEnabled())

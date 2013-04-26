@@ -33,6 +33,7 @@ class Window;
 class WindowManager;
 class System;
 class GUIContext;
+class EventArgs;
 }
 
 /*
@@ -80,9 +81,13 @@ public:
 	virtual void OnMouseMove(int x, int y);
 	virtual void OnWindowResize(uint width, uint height);
 
+	bool OnClickButton(const CEGUI::EventArgs &evt);
+	bool OnCloseWindow(const CEGUI::EventArgs &evt);
+
+	CEGUI::Window* rootWindow;
+
 protected:
 	CEGUI::OpenGL3Renderer* renderer;
-	CEGUI::Window* rootWindow;
 	CEGUI::WindowManager* windowManager;
 	deque<CEGUI::Window*> windows;
 	CEGUI::System* system;

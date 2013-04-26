@@ -45,6 +45,7 @@ namespace lfant
 class Sprite : public Mesh
 {
 	DECLARE_COMP(Sprite)
+	friend class Renderer;
 public:
 
 	/**
@@ -74,8 +75,6 @@ public:
 		uint16_t frameRate = 5;
 	};
 
-	friend class Renderer;
-public:
 	Sprite();
 	virtual ~Sprite();
 

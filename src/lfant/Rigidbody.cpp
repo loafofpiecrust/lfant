@@ -57,12 +57,15 @@ void Rigidbody::Init()
 	Log("Rigidbody::Init: Spawning underlying btRigidBody.");
 	if(collider)
 	{
+		Log("Rigidbody::Init: With collider.");
 		body = new btRigidBody(mass, motionState, collider->GetShape(), vec3_cast<btVector3>(inertia));
 	}
 	else
 	{
+		Log("Rigidbody::Init: Without collider.");
 		body = new btRigidBody(mass, motionState, new btEmptyShape, vec3_cast<btVector3>(inertia));
 	}
+	Log("Rigidbody::Init: Setting mass.");
 	SetMass(mass);
 
 	Log("Rigidbody::Init: Adding Rigidbody to physics system.");
@@ -71,10 +74,19 @@ void Rigidbody::Init()
 	ConnectEvent(SENDER(owner, SetPosition), RECEIVER(this, OnSetPos));
 	ConnectEvent(SENDER(owner, SetRotation), RECEIVER(this, OnSetRot));
 	ConnectEvent(SENDER(owner, SetCollider), RECEIVER(this, OnSetCollider));
+
+	body->getWorldTransform().setOrigin(vec3_cast<btVector3>(owner->transform->GetPosition()));
 }
 
 void Rigidbody::Update()
 {
+//	body->applyCentralForce(btVector3(0, -0.01, 0));
+	vec3 pos = vec3_cast<vec3>(body->getWorldTransform().getOrigin());
+	if(pos != owner->transform->GetPosition())
+	{
+		owner->transform->SetPosition(pos);
+		Log("Rigidbody position: ", lexical_cast<string>(pos));
+	}
 }
 
 void Rigidbody::OnDestroy()
@@ -88,12 +100,20 @@ void Rigidbody::OnDestroy()
 *******************************************************************************/
 void Rigidbody::OnSetPos( vec3 pos )
 {
+	if(pos == vec3_cast<vec3>(body->getWorldTransform().getOrigin()))
+	{
+		return;
+	}
 	body->getWorldTransform().setOrigin(vec3_cast<btVector3>(pos));
 }
 
 void Rigidbody::OnSetRot( vec3 rot )
 {
-//	body->getWorldTransform().setRotation( vec3_cast<btVector3>( rot ) );
+	if(rot == eulerAngles(quat_cast<quat>(body->getWorldTransform().getRotation())))
+	{
+		return;
+	}
+	body->getWorldTransform().setRotation(quat_cast<btQuaternion>(quat(rot)));
 }
 
 /*******************************************************************************
@@ -154,7 +174,15 @@ void Rigidbody::SetVelocity(vec3 vel)
 void Rigidbody::OnSetCollider(Collider *collider)
 {
 	delete body->getCollisionShape();
-	body->setCollisionShape(collider->GetShape());
+	if(!collider)
+	{
+		body->setCollisionShape(new btEmptyShape);
+	}
+	else
+	{
+		body->setCollisionShape(collider->GetShape());
+	}
+	body->getWorldTransform().setOrigin(vec3_cast<btVector3>(owner->transform->GetPosition()));
 }
 
 }

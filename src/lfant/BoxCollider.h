@@ -43,7 +43,6 @@ namespace lfant
 class BoxCollider : public Collider
 {
 	DECLARE_COMP(BoxCollider)
-
 public:
 	void Init();
 //	void Update();

@@ -95,15 +95,19 @@ void Sprite::Render()
 {
 	if(!material->shader->GetId() || !material->texture->GetId())
 	{
+		printf("Failing sprite rendering...\n");
 	//	BeginRender();
 		return;
 	}
 
+	printf("Rendering sprite...\n");
+
 	glBindVertexArray(vertexArray);
 
-	glUseProgram(material->shader->GetId());
+//	glUseProgram(material->shader->GetId());
+	material->shader->Use();
 
-	mat4 mvp = game->scene->mainCamera->projection * game->scene->mainCamera->view * owner->GetComponent<Transform>()->GetMatrix();
+	mat4 mvp = game->scene->mainCamera->projection * game->scene->mainCamera->view * owner->transform->GetMatrix();
 	glUniformMatrix4fv(material->shader->GetUniform("MVP"), 1, GL_FALSE, &mvp[0][0]);
 
 	glActiveTexture(GL_TEXTURE0);
@@ -130,7 +134,7 @@ void Sprite::Render()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-	//glDisableVertexAttribArray(2);
+//	glDisableVertexAttribArray(2);
 	glDisableVertexAttribArray(1);
 	glDisableVertexAttribArray(0);
 

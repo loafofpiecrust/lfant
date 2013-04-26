@@ -48,9 +48,8 @@ namespace lfant
 class Camera : public Component
 {
 	DECLARE_COMP(Camera)
-public:
 	friend class Renderer;
-
+public:
 	Camera();
 	virtual ~Camera();
 

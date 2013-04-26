@@ -41,6 +41,7 @@ namespace lfant
  */
 class AudioListener : public Component
 {
+//	DECLARE_COMP(AudioListener)
 public:
 	float gain;
 	vec3 velocity;

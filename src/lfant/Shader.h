@@ -60,6 +60,9 @@ public:
 	uint32 GetUniform(string name);
 	void AddUniform(string name);
 
+	void Use();
+	void Unuse();
+
 	uint32 GetId();
 
 protected:

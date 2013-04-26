@@ -53,9 +53,20 @@ UserInterface::~UserInterface()
 {
 }
 
+// CEGUI
+
 void UserInterface::CreateWindow(Properties* prop, CEGUI::Window* parent)
 {
 	CEGUI::Window* win = windowManager->createWindow(prop->Get<string>("type"), prop->id);
+
+	string type = Split(prop->Get<string>("type"), "/")[1];
+	if(type == "Button")
+	{
+		win->subscribeEvent(CEGUI::PushButton::EventClicked, &UserInterface::OnClickButton, this);
+	}
+	else if(type == "FrameWindow")
+	win->subscribeEvent(CEGUI::FrameWindow::EventCloseClicked, &UserInterface::OnCloseWindow, this);
+
 	if(!parent)
 	{
 		rootWindow->addChild(win);
@@ -71,7 +82,7 @@ void UserInterface::CreateWindow(Properties* prop, CEGUI::Window* parent)
 		{
 			continue;
 		}
-		Log("UserInterface::CreateWindow: Setting Property '"+val.first+"' to '"+val.second+"'.");
+	//	Log("UserInterface::CreateWindow: Setting Property '"+val.first+"' to '"+val.second+"'.");
 		win->setProperty(val.first, val.second);
 	}
 
@@ -117,8 +128,6 @@ void UserInterface::Load(Properties *prop)
 	}
 }
 
-// libRocket
-
 void UserInterface::Init()
 {
 	//	Subsystem::Init();
@@ -127,8 +136,6 @@ void UserInterface::Init()
 	windowManager = CEGUI::WindowManager::getSingletonPtr();
 	system = CEGUI::System::getSingletonPtr();
 	context = &system->getDefaultGUIContext();
-
-//	context->draw();
 
 	renderer->enableExtraStateSettings(true);
 
@@ -147,7 +154,7 @@ void UserInterface::Init()
 	CEGUI::ImageManager::setImagesetDefaultResourceGroup("imagesets");
 	CEGUI::Scheme::setDefaultResourceGroup("schemes");
 	CEGUI::Font::setDefaultResourceGroup("fonts");
-	//	CEGUI::TinyXMLParser::setSchemaDefaultResourceGroup("xml_schemas");
+//	CEGUI::TinyXMLParser::setSchemaDefaultResourceGroup("xml_schemas");
 	CEGUI::WindowManager::setDefaultResourceGroup("layouts");
 	CEGUI::WidgetLookManager::setDefaultResourceGroup("looknfeel");
 
@@ -160,7 +167,6 @@ void UserInterface::Init()
 	ConnectEvent(SENDER(game->input, CharPress), RECEIVER(this, OnChar));
 	ConnectEvent(SENDER(game->input, MouseButton), RECEIVER(this, OnMouseButton));
 	ConnectEvent(SENDER(game->input, MouseMove), RECEIVER(this, OnMouseMove));
-
 	ConnectEvent(SENDER(game->renderer, SetResolution), RECEIVER(this, OnWindowResize));
 
 	Log("UserInterface::Init: Calling Subsystem::Init at end.");
@@ -300,113 +306,22 @@ void UserInterface::OnWindowResize(uint width, uint height)
 	}
 }
 
+bool UserInterface::OnClickButton(const CEGUI::EventArgs &evt)
+{
+	const CEGUI::WindowEventArgs* args = dynamic_cast<const CEGUI::WindowEventArgs*>(&evt);
+	if(!args) return false;
 
+	TriggerEvent("ClickButton", args->window);
+}
 
-// CEGUI
-/*
-   void UserInterface::Init()
-   {
-		Log("UserInterface::Init: Begin");
-		CEGUI::Logger::getSingletonPtr();
-		Log("Got log single");
-		renderer = &CEGUI::OpenGL3Renderer::bootstrapSystem();
-		windowManager = CEGUI::WindowManager::getSingletonPtr();
-		system = CEGUI::System::getSingletonPtr();
-		context = &system->getDefaultGUIContext();
-		renderer->enableExtraStateSettings(true);
-		Log("UserInterface::Init: Spawned renderer");
+bool UserInterface::OnCloseWindow(const CEGUI::EventArgs &evt)
+{
+	const CEGUI::WindowEventArgs* args = dynamic_cast<const CEGUI::WindowEventArgs*>(&evt);
+	if(!args) return false;
 
-		CEGUI::DefaultResourceProvider* rp = static_cast<CEGUI::DefaultResourceProvider*>(CEGUI::System::getSingleton().getResourceProvider());
-		rp->setResourceGroupDirectory("imagesets", game->fileSystem->GetGameFile("gui/imagesets").string());
-		Log("UserInterface::Init: Set a resource dir");
-		rp->setResourceGroupDirectory("schemes", game->fileSystem->GetGameFile("gui/schemes").string());
-		rp->setResourceGroupDirectory("xml_schemas", game->fileSystem->GetGameFile("gui/xml_schemas").string());
-		rp->setResourceGroupDirectory("styles", game->fileSystem->GetGameFile("gui/styles").string());
-		rp->setResourceGroupDirectory("layouts", game->fileSystem->GetGameFile("gui/layouts").string());
-		rp->setResourceGroupDirectory("fonts", game->fileSystem->GetGameFile("gui/fonts").string());
-		rp->setResourceGroupDirectory("looknfeel", game->fileSystem->GetGameFile("gui/looks").string());
-		rp->setDefaultResourceGroup("looknfeel");
+	TriggerEvent("CloseWindow", args->window);
 
-		CEGUI::ImageManager::setImagesetDefaultResourceGroup("imagesets");
-		CEGUI::Scheme::setDefaultResourceGroup("schemes");
-		CEGUI::Font::setDefaultResourceGroup("fonts");
-		CEGUI::XercesParser::setSchemaDefaultResourceGroup("xml_schemas");
-		CEGUI::WindowManager::setDefaultResourceGroup("layouts");
-		CEGUI::WidgetLookManager::setDefaultResourceGroup("looknfeel");
-
-		CEGUI::SchemeManager::getSingleton().createFromFile("Generic.scheme", "schemes");
-		CEGUI::SchemeManager::getSingleton().createFromFile("TaharezLook.scheme", "schemes");
-		CEGUI::SchemeManager::getSingleton().createFromFile("VanillaSkin.scheme", "schemes");
-		CEGUI::SchemeManager::getSingleton().createFromFile("SampleBrowser.scheme", "schemes");
-		CEGUI::SchemeManager::getSingleton().createFromFile("GameMenu.scheme", "schemes");
-		context->getMouseCursor().setDefaultImage("TaharezLook/MouseArrow");
-		context->getMouseCursor().setInitialMousePosition(vec2_cast<CEGUI::Vector2f>(game->input->GetMousePos()));
-		context->setDefaultTooltipType("TaharezLook/Tooltip");
-		Log("UserInterface::Init: Created scheme!");
-
-		rootWindow = windowManager->createWindow("DefaultWindow", "Root");
-		Log("UserInterface::Init: Root window");
-
-		//CEGUI::Font& font = CEGUI::FontManager::getSingleton().createFromFile("DejaVuSans-12.font");
-		//context->setDefaultFont(&font);
-
-		context->setRootWindow(rootWindow);
-		rootWindow->setMouseInputPropagationEnabled(true);
-		rootWindow->setRiseOnClickEnabled(true);
-		rootWindow->setZOrderingEnabled(true);
-		//rootWindow->setSize(CEGUI::USize(cegui_reldim(1.0f), cegui_reldim( 1.0f)));
-		//rootWindow->setAspectRatio(game->scene->mainCamera->aspectRatio);
-		//rootWindow->setAutoWindow(true);
-
-		CreateWindow(game->settings->GetValue("gui.windowLayout").s());
-
-		//auto tex = renderer->createTextureTarget();
-		//context->setRenderTarget(*tex);
-   }
-
-   void UserInterface::Update()
-   {
-		//	CEGUI::System::getSingleton().renderGUI();
-		system->injectTimePulse(game->time->deltaTime);
-		context->injectTimePulse(game->time->deltaTime);
-
-		if(resized)
-		{
-				system->notifyDisplaySizeChanged(CEGUI::Sizef((float)size.x, (float)size.y));
-				resized = false;
-		}
-
-		renderer->beginRendering();
-		context->draw();
-		renderer->endRendering();
-		windowManager->cleanDeadPool();
-		//rootWindow->render();
-   }
-
-   void UserInterface::OnDestroy()
-   {
-   }
-
-   void UserInterface::CreateWindow(string layout)
-   {
-		auto win = windowManager->loadLayoutFromFile(layout);
-		if(win)
-		{
-				win->setRiseOnClickEnabled(true);
-				win->setZOrderingEnabled(true);
-				if(CEGUI::FrameWindow* fwin = dynamic_cast<CEGUI::FrameWindow*>(win))
-				{
-						fwin->setCloseButtonEnabled(true);
-				}
-				rootWindow->addChild(win);
-		}
-		else
-		{
-				Log("UserInterface::CreateWindow: Unable to create window.");
-		}
-   }
-
-
- */
+	args->window->destroy();
+}
 
 }

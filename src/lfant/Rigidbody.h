@@ -62,7 +62,7 @@ public:
 	virtual ~Rigidbody();
 
 	// Nested classes
-	enum class PhysicsMode : byte
+	enum class Mode : byte
 	{
 		Discrete,
 		Continuous,
@@ -121,7 +121,7 @@ public:
 	float GetSpeed();
 
 	// Variables
-	PhysicsMode physicsMode;
+	Mode mode;
 
 	bool useWorldGravity;
 	bool usePointGravity;
@@ -145,11 +145,11 @@ protected:
 	void OnSetCollider(Collider* collider);
 
 	/// The current mass of this object, in kg.
-	float mass = 0.0f;
+	float mass = 1.0f;
 
 	btRigidBody* body;
 	btMotionState* motionState;
-	Collider* collider;
+	Collider* collider = nullptr;
 	vec3 inertia = vec3(0);
 };
 

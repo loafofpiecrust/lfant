@@ -24,8 +24,8 @@
 // External
 
 // Internal
-#include "lfant/Component.h"
-#include "lfant/Range.h"
+#include <lfant/Component.h>
+#include <lfant/Range.h>
 
 namespace FMOD
 {
@@ -47,6 +47,7 @@ namespace lfant
  */
 class AudioSource : public Component
 {
+//	DECLARE_COMP(AudioSource)
 public:
 	AudioSource();
 	virtual ~AudioSource();

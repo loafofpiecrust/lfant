@@ -107,7 +107,7 @@ public:
 	 *	@param force The gravitational force of this point.
 	 */
 	void SetGravityPoint(string name, vec3 point, float force);
-	void SetGravityPoint(string name, vec3& point, float force);
+	void SetGravityPoint(string name, vec3* point, float force);
 	void SetGravityPoint(string name, float force);
 
 	/**
@@ -142,11 +142,11 @@ private:
 
 	static bool OnCollideExit(void* userPersistentData);
 
-	btDiscreteDynamicsWorld* world;
-	btBroadphaseInterface* broadphase;
-	btCollisionDispatcher* dispatcher;
-	btConstraintSolver* solver;
-	btDefaultCollisionConfiguration* collisionConfig;
+	ptr<btDiscreteDynamicsWorld> world;
+	ptr<btBroadphaseInterface> broadphase;
+	ptr<btCollisionDispatcher> dispatcher;
+	ptr<btConstraintSolver> solver;
+	ptr<btDefaultCollisionConfiguration> collisionConfig;
 
 	deque<GravPoint> gravityPoints;
 };

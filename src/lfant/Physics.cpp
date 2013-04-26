@@ -65,7 +65,10 @@ void Physics::Init()
 	gContactAddedCallback = &Physics::OnCollideEnter;
 	gContactProcessedCallback = &Physics::OnCollideStay;
 	gContactDestroyedCallback = &Physics::OnCollideExit;
+
 	Log("Physics::Init: Contact callbacks set.");
+
+	world->setGravity(btVector3(0,-0.2f,0));
 }
 
 void Physics::Update()
@@ -114,15 +117,15 @@ void Physics::SetGravityPoint(string name, vec3 point, float force)
 	gravityPoints.push_back(GravPoint(name, new vec3(point), force));
 }
 
-void Physics::SetGravityPoint(string name, vec3& point, float force)
+void Physics::SetGravityPoint(string name, vec3 *point, float force)
 {
 	if(GravPoint* grav = GetGravityPoint(name))
 	{
-		grav->point = &point;
+		grav->point = point;
 		grav->force = force;
 		return;
 	}
-	gravityPoints.push_back(GravPoint(name, &point, force));
+	gravityPoints.push_back(GravPoint(name, point, force));
 }
 
 void Physics::SetGravityPoint(string name, float force)
@@ -215,6 +218,7 @@ bool Physics::OnCollideExit(void* userPersistentData)
 
 void Physics::AddRigidbody(Rigidbody* ent)
 {
+	Log("Adding rigidbody..");
 	world->addRigidBody(ent->body);
 }
 

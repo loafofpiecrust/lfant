@@ -30,6 +30,8 @@
 namespace lfant
 {
 
+//IMPLEMENT_COMP(AudioSource)
+
 AudioSource::AudioSource()
 {
 	//ctor
@@ -46,7 +48,8 @@ void AudioSource::Init()
 	{
 		SetSource(inputFile);
 	}
-	ConnectEvent(owner->GetComponent<Transform>(), "SetPosition", this, &AudioSource::OnSetPosition);
+
+	ConnectEvent(SENDER(owner, SetPosition), RECEIVER(this, OnSetPosition));
 }
 
 void AudioSource::SetSource(string file)

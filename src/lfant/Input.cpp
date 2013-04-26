@@ -110,6 +110,7 @@ Key_Initializer::Key_Initializer()
 	_key["backspace"] = GLFW_KEY_BACKSPACE;
 	_key["back"] = GLFW_KEY_BACKSPACE;
 	_key["delete"] = GLFW_KEY_DEL;
+	_key["del"] = GLFW_KEY_DEL;
 	_key["insert"] = GLFW_KEY_INSERT;
 	_key["home"] = GLFW_KEY_HOME;
 	_key["end"] = GLFW_KEY_END;
@@ -135,7 +136,8 @@ Key_Initializer::Key_Initializer()
 }
 
 Input::Input() :
-	lockMouse(false), mouseSpeed(0.005f)
+	lockMouse(false),
+	mouseSpeed(0.005f)
 {
 }
 
@@ -235,7 +237,6 @@ void Input::Load(Properties* prop)
 /*******************************************************************************
 *		Callback Functions
 *			KeyPress();
-*		\area Callback
 *******************************************************************************/
 
 void GLFWCALL Input::OnKeyPress(int key, int mode)
@@ -341,10 +342,9 @@ void GLFWCALL Input::OnCharPress(int key, int mode)
 *
 *******************************************************************************/
 
-void Input::AddAxis(string name, uint16_t positive, uint16_t negative, uint16_t altpos, uint16_t altneg, float sens, float dead, bool snap,
-					byte joyNum)
+void Input::AddAxis(string name, string positive, string negative, string altpos, string altneg, float sens, float dead, bool snap, byte joyNum)
 {
-	axes.push_back(Axis(name, positive, negative, altpos, altneg, sens, dead, snap, joyNum));
+	axes.push_back(Axis(name, Key[positive], Key[negative], Key[altpos], Key[altneg], sens, dead, snap, joyNum));
 }
 
 float Input::GetAxis(string name)
@@ -353,10 +353,12 @@ float Input::GetAxis(string name)
 	{
 		if(axis.name == name)
 		{
-			/*if (abs(axis.value) <= axis.dead)
-			   {
-			   return 0.0f;
-			   }*/
+			/*
+			if (abs(axis.value) <= axis.dead)
+			{
+				return 0.0f;
+			}
+			*/
 			return axis.value;
 		}
 	}

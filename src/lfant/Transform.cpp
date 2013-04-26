@@ -75,23 +75,27 @@ quat Transform::GetRotationQuat()
 void Transform::SetRotationQuat(quat rot)
 {
 	rotationQuat = rot;
-	rotation = eulerAngles(rot);
-	//	TriggerEvent("SetRotation", rotation);
+	rotation = degrees(eulerAngles(rot));
+	TriggerEvent("SetRotation", rotation);
 }
 
 vec3 Transform::GetRotation()
 {
-	return degrees(rotation);
+	return rotation;
 }
 
 void Transform::SetRotation(vec3 rot)
 {
-	rotation = rot;
-	rotationQuat = quat(rotation);
+	rollover(rot.x, 0.0f, 360.0f);
+	rollover(rot.y, 0.0f, 360.0f);
+	rollover(rot.z, 0.0f, 360.0f);
 
-	rollover(rot.x, 0.0f, pi2);
-	rollover(rot.y, 0.0f, pi2);
-	rollover(rot.z, 0.0f, pi2);
+	rotation = rot;
+//	rotationQuat = quat(rotation);
+//	Log("Setting rotation to ", lexical_cast<string>(rotation));
+
+	TriggerEvent("SetRotation", rot);
+//	TriggerEvent("SetRotation", rotationQuat);
 }
 
 vec3& Transform::GetScale()
@@ -166,35 +170,53 @@ void Transform::SetWorldScale(vec3 scl)
 	SetScale(scl - parent->GetWorldScale());
 }
 
-mat4 Transform::GetMatrix()
+void Transform::Update()
 {
-	mat4 matrix;
+	SetDirection();
+	SetMatrix();
+}
+
+void Transform::SetMatrix()
+{
+//	mat4 matrix;
 	matrix = glm::translate(mat4(1.0f), GetWorldPosition());
 //	matrix *= glm::mat4_cast(GetWorldRotationQuat());
-	vec3 rot = degrees(GetWorldRotation());
+	vec3 rot = radians(GetWorldRotation());
 	matrix = glm::rotate(matrix, rot.x, vec3(1,0,0));
 	matrix = glm::rotate(matrix, rot.y, vec3(0,1,0));
 	matrix = glm::rotate(matrix, rot.z, vec3(0,0,1));
+//	matrix *= mat4_cast(rotationQuat);
+//	glm::rotate
 	matrix = glm::scale(matrix, GetWorldScale());
+//	return matrix;
+}
+
+mat4 Transform::GetMatrix()
+{
 	return matrix;
 }
 
 void Transform::SetDirection()
 {
-	vec3 rot = GetWorldRotation();
+	vec3 rot = radians(GetWorldRotation());
 	direction = vec3(
-		cos(rot.x) * sin(rot.z),
+		cos(rot.x) * sin(rot.y),
 		sin(rot.x),
-		cos(rot.x) * cos(rot.z)
+		cos(rot.x) * cos(rot.y)
 		);
 
 	right = vec3(
-		sin(rot.z - 3.14f / 2.0f),
+		sin(rot.y - 3.14f / 2.0f),
 		0,
-		cos(rot.z - 3.14f / 2.0f)
+		cos(rot.y - 3.14f / 2.0f)
 		);
 
 	up = cross(right, direction);
+}
+
+void Transform::GetWorldRotatedPosition()
+{
+
 }
 
 void Transform::Translate(vec3 pos)

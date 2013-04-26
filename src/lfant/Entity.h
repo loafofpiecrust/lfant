@@ -34,8 +34,8 @@
 #include <lfant/ptr.h>
 #include <lfant/Properties.h>
 
-namespace lfant
-{
+namespace lfant {
+
 class Component;
 class Item;
 class Transform;
