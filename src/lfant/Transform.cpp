@@ -35,6 +35,11 @@ Transform::Transform()
 {
 }
 
+Transform::~Transform()
+{
+
+}
+
 void Transform::Save(Properties *prop)
 {
 	Component::Save(prop);
@@ -56,7 +61,7 @@ void Transform::Load(Properties *prop)
 	Log("Loaded position: "+lexical_cast<string>(position));
 }
 
-vec3& Transform::GetPosition()
+vec3 Transform::GetPosition()
 {
 	return position;
 }
@@ -98,7 +103,7 @@ void Transform::SetRotation(vec3 rot)
 //	TriggerEvent("SetRotation", rotationQuat);
 }
 
-vec3& Transform::GetScale()
+vec3 Transform::GetScale()
 {
 	return scale;
 }
@@ -123,7 +128,14 @@ vec3 Transform::GetWorldPosition()
 
 void Transform::SetWorldPosition(vec3 pos)
 {
-	SetPosition(pos - parent->GetWorldPosition());
+	if(owner->parent)
+	{
+		SetPosition(pos - owner->parent->transform->GetWorldPosition());
+	}
+	else
+	{
+		SetPosition(pos);
+	}
 }
 
 quat Transform::GetWorldRotationQuat()
@@ -150,7 +162,14 @@ vec3 Transform::GetWorldRotation()
 
 void Transform::SetWorldRotation(vec3 rot)
 {
-	SetRotation(rot - parent->GetWorldRotation());
+	if(owner->parent)
+	{
+		SetRotation(rot - owner->parent->transform->GetWorldRotation());
+	}
+	else
+	{
+		SetRotation(rot);
+	}
 }
 
 vec3 Transform::GetWorldScale()
@@ -167,7 +186,14 @@ vec3 Transform::GetWorldScale()
 
 void Transform::SetWorldScale(vec3 scl)
 {
-	SetScale(scl - parent->GetWorldScale());
+	if(owner->parent)
+	{
+		SetScale(scl - owner->parent->transform->GetWorldScale());
+	}
+	else
+	{
+		SetScale(scl);
+	}
 }
 
 void Transform::Update()
@@ -179,6 +205,7 @@ void Transform::Update()
 void Transform::SetMatrix()
 {
 //	mat4 matrix;
+	matrix = mat4(1.0f);
 	matrix = glm::translate(mat4(1.0f), GetWorldPosition());
 //	matrix *= glm::mat4_cast(GetWorldRotationQuat());
 	vec3 rot = radians(GetWorldRotation());
@@ -189,9 +216,10 @@ void Transform::SetMatrix()
 //	glm::rotate
 	matrix = glm::scale(matrix, GetWorldScale());
 //	return matrix;
+//	Log("Transform position: ", lexical_cast<string>(vec3(matrix[3].xyz)));
 }
 
-mat4 Transform::GetMatrix()
+const mat4& Transform::GetMatrix()
 {
 	return matrix;
 }
@@ -199,6 +227,7 @@ mat4 Transform::GetMatrix()
 void Transform::SetDirection()
 {
 	vec3 rot = radians(GetWorldRotation());
+//	Log("Cam rotation: ", lexical_cast<string>(rot));
 	direction = vec3(
 		cos(rot.x) * sin(rot.y),
 		sin(rot.x),
@@ -214,9 +243,20 @@ void Transform::SetDirection()
 	up = cross(right, direction);
 }
 
-void Transform::GetWorldRotatedPosition()
+vec3 Transform::GetWorldRotatedPosition()
 {
+	if(!owner->parent)
+	{
+		return vec3(0);
+	}
 
+	vec3 newpos(0);
+	vec3 parrot = owner->parent->transform->GetWorldRotation();
+
+	newpos.x = position.x*cos(parrot.x) - position.y*sin(parrot.y);
+	newpos.y = position.y*cos(parrot.y) - position.x*sin(parrot.x);
+
+	return newpos;
 }
 
 void Transform::Translate(vec3 pos)
@@ -232,13 +272,13 @@ void Transform::Rotate(vec3 rot)
 	//_rotationQuat = rotate( _rotationQuat, rot.x, xdir );
 	//_rotationQuat = rotate( _rotationQuat, rot.y, ydir );
 	//_rotationQuat = rotate( _rotationQuat, rot.z, zdir );
-	//	TriggerEvent("SetRotation", rotation);
+//	TriggerEvent("SetRotation", rotation);
 }
 
 void Transform::Scale(vec3 scl)
 {
 	SetScale(scale * scl);
-	//	TriggerEvent("SetScale", scale);
+//	TriggerEvent("SetScale", scale);
 }
 
 }

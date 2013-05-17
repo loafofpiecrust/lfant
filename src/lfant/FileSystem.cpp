@@ -31,6 +31,8 @@
 
 #include <lfant/Console.h>
 
+using namespace boost::filesystem;
+
 namespace lfant
 {
 
@@ -47,7 +49,7 @@ void FileSystem::Init()
 	Subsystem::Init();
 
 	// Use default settings
-	gameFolder = "../..";
+//	gameFolder = "../..";
 #if WINDOWS
 	const string home = getenv("USERPROFILE");
 #elif UNIX

@@ -139,6 +139,7 @@ void Settings::LoadSettings(string input)
 	}
 	input = game->fileSystem->userFolder+"/settings/"+input;
 	string cfg = game->fileSystem->gameFolder+"/settings/"+defaultFile;
+
 	if(exists(cfg.c_str()))
 	{
 		if(exists(input.c_str()))

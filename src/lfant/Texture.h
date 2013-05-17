@@ -68,7 +68,7 @@ public:
 	void OnDestroy();
 
 	void LoadFile(string path = "", int mode = 0);
-	void Load(Properties* prop);
+	virtual void Load(Properties* prop);
 	void Save(Properties *prop);
 
 	uint32 GetId();

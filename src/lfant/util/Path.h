@@ -2,7 +2,7 @@
 *
 *	LFANT Source
 *	Copyright (C) 2012-2013 by LazyFox Studios
-*	Created: 2012-08-08 by Taylor Snead
+*	Created: 2013-04-27 by Taylor Snead
 *
 *	Licensed under the Apache License, Version 2.0 (the "License");
 *	you may not use this file except in compliance with the License.
@@ -18,49 +18,22 @@
 *
 ******************************************************************************/
 #pragma once
-
 #include <lfant/stdafx.h>
 
-// External
-
 // Internal
-#include <lfant/util/Path.h>
-#include <lfant/Subsystem.h>
 
+// External
+#include <boost/filesystem.hpp>
 
-namespace lfant
-{
-/** @addtogroup Game
- *	@{
- */
-/** @addtogroup Utilities
- *	@{
- */
+using namespace boost::filesystem;
 
-/**
- *
- */
-class FileSystem : public Subsystem
-{
-	friend class Settings;
-public:
-	FileSystem();
-	~FileSystem();
+namespace lfant {
 
-	void Init();
+path operator+(path const& p, string s);
+//path operator+(path& p, string s);
 
-	path GetUserPath(string name);
-	path GetGamePath(string name);
+//operator string(const path& p);
 
-	deque<path> GetGameFiles(string dir);
+//operator const char*(const path& p);
 
-protected:
-
-public:
-	string gameFolder = "../..";
-	string userFolder;
-};
-
-/** @} */
-/** @} */
 }

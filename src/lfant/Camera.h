@@ -94,8 +94,8 @@ public:
 	float aspectRatio = 16 / 9;
 
 	/// The projection matrix for rendering the projection.
-	mat4 projection = mat4(0);
-	mat4 view = mat4(0);
+	mat4 projection = mat4(1);
+	mat4 view = mat4(1);
 
 	/// The viewing range (near and far) of this camera's view, eg. (0.1f, 1000.0f)
 	Range<float> viewRange = { 0.1f, 1000.0f };
@@ -104,11 +104,12 @@ public:
 
 	Rect<uint32_t> _viewport;
 
-	enum ProjectionMode
+	enum class Mode : byte
 	{
-		PM_PERSPECTIVE, PM_ORTHO
+		Perspective,
+		Orthographic
 	};
-	ProjectionMode projectionMode = PM_PERSPECTIVE;
+	Mode projectionMode = Mode::Perspective;
 
 //		PROP_RW(Camera, viewport, GetViewport, SetViewport)
 

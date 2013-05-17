@@ -80,18 +80,22 @@ void Game::Init()
 	LoadFile("settings/game.cfg");
 
 	console->Init();
+	Log("Initing filesystem");
 	fileSystem->Init();
 //	settings->Init();
+	Log("Initing systeminfo");
 	systemInfo->Init();
+	Log("Initing time");
 	time->Init();
+	Log("Initing physics");
 	physics->Init();
 	renderer->Init();
 	scene->Init();
 	input->Init();
 //	audio->Init();
-	network->Init();
+//	network->Init();
 	scriptSystem->Init();
-	userInterface->Init();
+//	userInterface->Init();
 
 	Log("Window callback set.");
 
@@ -107,7 +111,7 @@ void Game::Update()
 	input->Update();
 //	userInterface->Update();
 	renderer->Update();
-	network->Update();
+//	network->Update();
 	PostUpdate();
 }
 

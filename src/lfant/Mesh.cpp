@@ -141,9 +141,14 @@ void Mesh::Render()
 		return;
 	}
 
+//	Log("Rendering mesh..");
+
 	glBindVertexArray(vertexArray);
 
 	glUseProgram(material->shader->GetId());
+//	Log("Shader id: ", material->shader->GetId());
+
+//	Log("mainCamera = ", game->scene->mainCamera);
 
 	mat4 mvp = game->scene->mainCamera->projection * game->scene->mainCamera->view * owner->transform->GetMatrix();
 	glUniformMatrix4fv(material->shader->GetUniform("MVP"), 1, GL_FALSE, &mvp[0][0]);
@@ -151,6 +156,7 @@ void Mesh::Render()
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, material->texture->GetId());
 	glUniform1i(material->shader->GetUniform("textureSampler"), 0);
+//	Log("Texture id: ", material->texture->GetId());
 
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);

@@ -120,7 +120,7 @@ public:
 	void LoadFile(string path);
 
 
-	ptr<Material> material {new Material};
+	ptr<Material> material = new Material;
 
 protected:
 

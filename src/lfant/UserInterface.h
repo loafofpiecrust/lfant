@@ -49,6 +49,13 @@ class EventArgs;
    }
  */
 
+namespace gameswf
+{
+struct player;
+struct root;
+struct render_handler;
+}
+
 namespace lfant
 {
 
@@ -62,6 +69,20 @@ class FileSystem;
 class UserInterface : public Subsystem
 {
 public:
+	class Movie
+	{
+	public:
+		Movie(string name, gameswf::root* swf);
+		~Movie();
+
+		void Play();
+		void Pause();
+
+		string name = "";
+		ptr<gameswf::root> swf; //= nullptr;
+		bool active = true;
+	};
+
 	UserInterface();
 	virtual ~UserInterface();
 
@@ -70,10 +91,10 @@ public:
 	virtual void OnDestroy();
 
 	void Load(Properties *prop);
-	//	void Save(Properties *prop);
+	void Save(Properties *prop);
 
-	virtual void CreateWindow(Properties* prop, CEGUI::Window *parent = nullptr);
-	virtual void RemoveWindow(string fileName);
+//	virtual void CreateWindow(Properties* prop, CEGUI::Window *parent = nullptr);
+//	virtual void RemoveWindow(string fileName);
 
 	virtual void OnKey(uint16 key, int mode);
 	virtual void OnChar(char key);
@@ -84,14 +105,20 @@ public:
 	bool OnClickButton(const CEGUI::EventArgs &evt);
 	bool OnCloseWindow(const CEGUI::EventArgs &evt);
 
-	CEGUI::Window* rootWindow;
+	Movie* LoadMovie(string name, string path);
+	Movie* GetMovie(string name);
+
+//	CEGUI::Window* rootWindow;
 
 protected:
+
+	/*
 	CEGUI::OpenGL3Renderer* renderer;
 	CEGUI::WindowManager* windowManager;
 	deque<CEGUI::Window*> windows;
 	CEGUI::System* system;
 	CEGUI::GUIContext* context;
+	*/
 
 	/*
 	   ptr<Rocket::Core::Context> context;
@@ -100,6 +127,11 @@ protected:
 	   ptr<gui::FileSystem> fileSystem;
 	   deque< ptr<Rocket::Core::ElementDocument> > documents;
 	 */
+
+	ptr<gameswf::player> player;
+	ptr<gameswf::render_handler> renderer;
+	deque< ptr<Movie> > movies;
+	ptr<Movie> root;
 
 	bool resized = false;
 	uvec2 size;

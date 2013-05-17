@@ -49,12 +49,14 @@ Camera::~Camera()
 
 void Camera::Init()
 {
+	Log("Updated projection");
 	UpdateProjection();
 	Log("mainCamera = ", game->scene->mainCamera);
 }
 
 void Camera::Update()
 {
+//	Log("Updating cam view");
 	UpdateView();
 	//	UpdateProjection();
 }
@@ -74,12 +76,16 @@ void Camera::SetProjection(float fov, float aspect, float min, float max)
 {
 	switch(projectionMode)
 	{
-	case PM_PERSPECTIVE:
-		projection = perspective(fov, aspect, min, max);
-		break;
-	case PM_ORTHO:
-		projection = ortho(-fov / 2 * aspect, fov / 2 * aspect, -fov / 2 / aspect, fov / 2 / aspect, min, max);
-		break;
+		case Mode::Perspective:
+		{
+			projection = perspective(fov, aspect, min, max);
+			break;
+		}
+		case Mode::Orthographic:
+		{
+			projection = ortho(-fov / 2 * aspect, fov / 2 * aspect, -fov / 2 / aspect, fov / 2 / aspect, min, max);
+			break;
+		}
 	}
 	this->fov = fov;
 	this->aspectRatio = aspect;
@@ -94,6 +100,8 @@ void Camera::UpdateProjection()
 
 void Camera::UpdateView()
 {
+//	Log("Camera pos: ", lexical_cast<string>(owner->transform->GetWorldPosition()));
+//	Log("Camera direction: ", lexical_cast<string>(owner->transform->direction), ", up: ", lexical_cast<string>(owner->transform->up));
 	view = lookAt(
 				owner->transform->GetWorldPosition(),
 				owner->transform->GetWorldPosition() + owner->transform->direction,

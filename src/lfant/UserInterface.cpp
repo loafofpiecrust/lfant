@@ -34,6 +34,7 @@
 #include <lfant/Renderer.h>
 
 // External
+/*
 //#include <Rocket/Core.h>
 #include <CEGUI/CEGUI.h>
 #include <CEGUI/RendererModules/OpenGL3/Renderer.h>
@@ -41,6 +42,13 @@
 #include <CEGUI/DefaultResourceProvider.h>
 #include <CEGUI/ImageManager.h>
 #include <CEGUI/XMLParserModules/TinyXML/XMLParser.h>
+*/
+#include <gameswf/gameswf.h>
+#include <base/tu_file.h>
+#include <base/tu_types.h>
+#include <gameswf/gameswf_types.h>
+#include <gameswf/gameswf_player.h>
+#include <gameswf/gameswf_root.h>
 
 namespace lfant
 {
@@ -53,8 +61,203 @@ UserInterface::~UserInterface()
 {
 }
 
-// CEGUI
 
+// gameswf
+
+static tu_file*	file_opener(const char* url)
+// Callback function.  This opens files for the gameswf library.
+{
+	return new tu_file(game->fileSystem->GetGamePath(url).c_str(), "rb");
+}
+
+static void log_callback(bool error, const char* message)
+{
+	Log(message);
+}
+
+void UserInterface::Init()
+{
+	player = new gameswf::player;
+
+	player->set_separate_thread(false);
+
+	player->set_force_realtime_framerate(30);
+	player->set_workdir("../../assets");
+	gameswf::set_glyph_provider(gameswf::create_glyph_provider_tu());
+
+	renderer = gameswf::create_render_handler_ogl();
+	gameswf::set_render_handler(renderer);
+	renderer->open();
+	renderer->set_antialiased(true);
+
+	gameswf::register_file_opener_callback(file_opener);
+	gameswf::register_log_callback(log_callback);
+
+
+//	root = new Movie("root", player->get_root());
+}
+
+void UserInterface::Update()
+{
+//	static Movie* m = root;
+	for(ptr<Movie>& m : movies)
+	{
+		Log("Player has root? ", player->get_root());
+		if(m->swf)
+		{
+			Log("Movie ptr of '", m->name, "' is ", m->swf->get_root_movie());
+			static auto res = game->renderer->GetResolution();
+		//	Log("Updating swf '", m->name, "', movie type: ", Type(m->swf->m_movie.get()));
+			Log("Setting movie res '"+m->name+"'. ", lexical_cast<string>(res));
+		//	m->swf->set_display_viewport(0, 0, res.x, res.y);
+			Log("Setting back alpha '"+m->name+"'.");
+			m->swf->set_background_alpha(0.1f);
+			Log("Notifying mouse pos '"+m->name+"'.");
+			res = game->input->GetMousePos();
+			m->swf->notify_mouse_state(res.x,res.y,0);
+			Log("Updating movie '"+m->name+"', at delta ", game->time->deltaTime, ".");
+			m->swf->advance(game->time->deltaTime);
+			Log("Rendering movie '"+m->name+"'.");
+			m->swf->display();
+		}
+		else
+		{
+		//	Log("Setting root swf to player root movie.");
+		//	m->swf = player->get_root();
+		}
+	}
+}
+
+void UserInterface::OnDestroy()
+{
+	gameswf::set_render_handler(nullptr);
+}
+
+void UserInterface::Save(Properties *prop)
+{
+
+}
+
+void UserInterface::Load(Properties *prop)
+{
+
+}
+
+void UserInterface::OnKey(uint16 key, int mode)
+{
+
+	gameswf::key::code newKey = gameswf::key::INVALID;
+
+	if(key == Key["Esc"]) { newKey = gameswf::key::ESCAPE; }
+	else if(key == Key["f1"]) { newKey = gameswf::key::F1; }
+	else if(key == Key["f2"]) { newKey = gameswf::key::F2; }
+	else if(key == Key["f3"]) { newKey = gameswf::key::F3; }
+	else if(key == Key["f4"]) { newKey = gameswf::key::F4; }
+	else if(key == Key["f5"]) { newKey = gameswf::key::F5; }
+	else if(key == Key["f6"]) { newKey = gameswf::key::F6; }
+	else if(key == Key["f7"]) { newKey = gameswf::key::F7; }
+	else if(key == Key["f8"]) { newKey = gameswf::key::F8; }
+	else if(key == Key["f9"]) { newKey = gameswf::key::F9; }
+	else if(key == Key["f10"]) { newKey = gameswf::key::F10; }
+	else if(key == Key["f11"]) { newKey = gameswf::key::F11; }
+	else if(key == Key["f12"]) { newKey = gameswf::key::F12; }
+	else if(key == Key["Up"]) { newKey = gameswf::key::UP; }
+	else if(key == Key["Down"]) { newKey = gameswf::key::DOWN; }
+	else if(key == Key["Left"]) { newKey = gameswf::key::LEFT; }
+	else if(key == Key["Right"]) { newKey = gameswf::key::RIGHT; }
+	else if(key == Key["LShift"]) { newKey = gameswf::key::SHIFT; }
+	else if(key == Key["RShift"]) { newKey = gameswf::key::SHIFT; }
+	else if(key == Key["LCtrl"]) { newKey = gameswf::key::CONTROL; }
+	else if(key == Key["RCtrl"]) { newKey = gameswf::key::CONTROL; }
+	else if(key == Key["LAlt"]) { newKey = gameswf::key::ALT; }
+	else if(key == Key["RAlt"]) { newKey = gameswf::key::ALT; }
+	else if(key == Key["Tab"]) { newKey = gameswf::key::TAB; }
+	else if(key == Key["Enter"]) { newKey = gameswf::key::ENTER; }
+	else if(key == Key["Backspace"]) { newKey = gameswf::key::BACKSPACE; }
+	else if(key == Key["Insert"]) { newKey = gameswf::key::INSERT; }
+//	else if(key == Key["Delete"]) { newKey = gameswf::key::DEL; }
+	else if(key == Key["PageUp"]) { newKey = gameswf::key::PGUP; }
+	else if(key == Key["PageDown"]) { newKey = gameswf::key::PGDN; }
+	else if(key == Key["Home"]) { newKey = gameswf::key::HOME; }
+	else if(key == Key["End"]) { newKey = gameswf::key::END; }
+	else if(key == Key["NumEnter"]) { newKey = gameswf::key::KP_ENTER; }
+	else { newKey = (gameswf::key::code)key; }
+
+	if(newKey != gameswf::key::INVALID)
+	{
+		player->notify_key_event(newKey, mode);
+	}
+}
+
+void UserInterface::OnChar(char key)
+{
+}
+
+void UserInterface::OnMouseButton(uint16 btn, int mode)
+{
+}
+
+void UserInterface::OnMouseMove(int x, int y)
+{
+	/// @todo Only do for active movies? Decide how/when to set m.active
+	for(auto& m : movies)
+	{
+		m->swf->notify_mouse_state(x, y, 0);
+	}
+}
+
+void UserInterface::OnWindowResize(uint width, uint height)
+{
+	/// @todo Give movies a bool to do this or not. (based on linkage to screen?)
+	for(auto& m : movies)
+	{
+		m->swf->set_display_viewport(0, 0, width, height);
+	}
+}
+
+UserInterface::Movie *UserInterface::LoadMovie(string name, string path)
+{
+	Movie* m = new Movie(name, player->load_file(path.c_str()));
+	movies.push_back(m);
+	player->set_root(m->swf);
+	Log("Movie ptr of '", m->name, "' is ", m->swf->get_root_movie());
+	return m;
+}
+
+UserInterface::Movie *UserInterface::GetMovie(string name)
+{
+	for(auto& m : movies)
+	{
+		if(m->name == name)
+		{
+			return m;
+		}
+	}
+	return nullptr;
+}
+
+UserInterface::Movie::Movie(string name, gameswf::root *swf) :
+	name(name), swf(swf)
+{
+}
+
+UserInterface::Movie::~Movie()
+{
+}
+
+void UserInterface::Movie::Play()
+{
+	swf->set_play_state(gameswf::character::PLAY);
+}
+
+void UserInterface::Movie::Pause()
+{
+	swf->set_play_state(gameswf::character::STOP);
+}
+
+
+// CEGUI
+/*
 void UserInterface::CreateWindow(Properties* prop, CEGUI::Window* parent)
 {
 	CEGUI::Window* win = windowManager->createWindow(prop->Get<string>("type"), prop->id);
@@ -323,5 +526,6 @@ bool UserInterface::OnCloseWindow(const CEGUI::EventArgs &evt)
 
 	args->window->destroy();
 }
+*/
 
 }

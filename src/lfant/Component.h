@@ -71,7 +71,7 @@ protected:
 	};
 
 public:
-	~Component();
+	virtual ~Component();
 
 	virtual void Load(Properties* prop);
 	virtual void Save(Properties* prop);

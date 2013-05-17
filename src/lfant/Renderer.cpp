@@ -137,14 +137,14 @@ void Renderer::Init()
 	//glDepthRange(0.0f, 1.0f);
 
 	// Backface culling
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
-	glFrontFace(GL_CCW);
+//	glEnable(GL_CULL_FACE);
+//	glCullFace(GL_BACK);
+//	glFrontFace(GL_CCW);
 
 	// Texture and shading
 	glEnable(GL_TEXTURE_2D);
 	glShadeModel(GL_SMOOTH);
-	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+//	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
 	// Point sprites
 	//glEnable(GL_POINT_SPRITE);

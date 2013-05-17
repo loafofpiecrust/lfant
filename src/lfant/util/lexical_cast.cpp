@@ -34,6 +34,13 @@ string lexical_cast<string, const char*>(const char* const& src)
 	return string(src);
 }
 
+
+template<>
+string lexical_cast<string, void*>(void* const& src)
+{
+//	return to_string(src);
+}
+
 /*
  *	Primitives from string
  */

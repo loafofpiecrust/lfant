@@ -68,7 +68,7 @@ void Physics::Init()
 
 	Log("Physics::Init: Contact callbacks set.");
 
-	world->setGravity(btVector3(0,-0.2f,0));
+	world->setGravity(btVector3(0,0.0f,0));
 }
 
 void Physics::Update()

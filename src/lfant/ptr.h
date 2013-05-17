@@ -45,6 +45,11 @@ public:
 	{
 		return this->get();
 	}
+
+	T* operator->()
+	{
+		return this->get();
+	}
 };
 
 template<typename T>

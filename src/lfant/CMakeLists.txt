@@ -42,6 +42,7 @@ include_directories(
 	"${ROOT}/external/angelscript/include"
 	"${ROOT}/external/angelscript/add_on"
 	"${ROOT}/external/devil/include"
+	"${ROOT}/external/gameswf"
 	)
 
 # Linker Options
@@ -58,6 +59,7 @@ target_link_libraries(${PROJECT_NAME}
 	angelscript
 	rt
 	jpeg
+	gameswf
 #	devil
 #	jsonspirit
 	)
