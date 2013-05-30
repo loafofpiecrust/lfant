@@ -133,7 +133,7 @@ void Renderer::Init()
 
 	// Fragment depth testing
 	glDepthFunc(GL_LESS);
-	//glDepthMask(GL_TRUE);
+	//glDepthMask(GL_FALSE);
 	//glDepthRange(0.0f, 1.0f);
 
 	// Backface culling
@@ -147,14 +147,14 @@ void Renderer::Init()
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
 	// Point sprites
-	//glEnable(GL_POINT_SPRITE);
-	//glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
-	//glEnable(GL_BLEND);
+	glEnable(GL_POINT_SPRITE);
+	glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
+	glEnable(GL_BLEND);
 
-	//glfwSwapInterval(vsync);
+	glfwSwapInterval(vsync);
 
-	glfwSetWindowCloseCallback(&Renderer::WindowClosed);
-	glfwSetWindowSizeCallback(&Renderer::WindowResized);
+	glfwSetWindowCloseCallback(&Renderer::OnCloseWindow);
+	glfwSetWindowSizeCallback(&Renderer::OnSetResolution);
 
 	Log("Renderer: Initialized");
 
@@ -164,7 +164,7 @@ void Renderer::Init()
 	   for(uint i = 0; i < shs.size(); ++i)
 	   {
 			Shader shader;
-			shader.LoadFile(shs[i].string());
+			shader->LoadFile(shs[i].string());
 			shaders.push_back(shader);
 	   }*/
 }
@@ -225,19 +225,19 @@ bool Renderer::OpenWindow()
 	return true;
 }
 
-int Renderer::WindowClosed()
+int Renderer::OnCloseWindow()
 {
 	Log("Renderer::WindowClosed: Touch.");
 	game->Exit();
 	return 1;
 }
 
-void Renderer::WindowResized(int x, int y)
+void Renderer::OnSetResolution(int x, int y)
 {
-	Log("Renderer::WindowResized: Touch.");
+	Log("Renderer::OnSetResolution: Touch.");
 	game->renderer->resolution = ivec2(x, y);
 	glViewport(0, 0, x, y);
-	game->userInterface->OnWindowResize((uint)x, (uint)y);
+	game->renderer->TriggerEvent("SetResolution", (uint32)x, (uint32)y);
 }
 
 /*******************************************************************************
@@ -287,26 +287,26 @@ void Renderer::SetWindowPos(ivec2 pos)
 	glfwSetWindowPos(pos.x, pos.y);
 }
 
-Shader& Renderer::GetShader(string name)
+Shader *Renderer::GetShader(string name)
 {
 	for(auto& shader : shaders)
 	{
-//		if(shader.path == name)
+//		if(shader->path == name)
 		{
 //			return shader;
 		}
 	}
-	return null(Shader);
+	return nullptr;
 }
 
-void Renderer::AddShader(Shader& shader)
+void Renderer::AddShader(Shader *shader)
 {
-//	if(Shader* s = &GetShader(shader.path))
+//	if(Shader* s = &GetShader(shader->path))
 	{
-//		s->id = shader.id;
+//		s->id = shader->id;
 //		return;
 	}
-	shaders.push_back(shader);
+	shaders.push_back(ptr<Shader>(shader));
 }
 
 void Renderer::HideMouse(bool hide)

@@ -24,16 +24,14 @@
 // External
 
 // Internal
-
+#include <lfant/Console.h>
 #include <lfant/Entity.h>
 
-namespace lfant
-{
+namespace lfant {
 
-map< string, Component* (Entity::*)() > Component::componentRegistry;
+map< string, Component* (Entity::*)(Properties*)> Component::componentRegistry __attribute__((init_priority(101)));
 
-Component::Component(Entity* owner) :
-	owner(owner)
+Component::Component()
 {
 }
 
@@ -56,6 +54,16 @@ void Component::Save(Properties *prop)
 void Component::Init()
 {
 	Object::Init();
+	Log("Component::Init: owner = ", owner);
+}
+
+void Component::Update()
+{
+	Object::Update();
+}
+
+void Component::PostUpdate()
+{
 }
 
 void Component::Destroy()
@@ -64,10 +72,23 @@ void Component::Destroy()
 	owner->RemoveComponent(this);
 }
 
-void Component::Trigger(string name)
+void Component::OnDestroy()
 {
-	owner->Trigger(name);
-	Object::Trigger(name);
+	Object::OnDestroy();
+}
+
+void Component::OnEnable()
+{
+}
+
+void Component::OnDisable()
+{
+}
+
+void Component::TriggerEvent(string name)
+{
+	owner->TriggerEvent(name);
+	Object::TriggerEvent(name);
 }
 
 /*******************************************************************************
@@ -75,7 +96,7 @@ void Component::Trigger(string name)
 *		\area General
 *******************************************************************************/
 
-void Component::SetEnabled(bool enable)
+void Component::Enable(bool enable)
 {
 	enabled = enable;
 	if(enabled)
@@ -88,9 +109,20 @@ void Component::SetEnabled(bool enable)
 	}
 }
 
-void Component::RegisterType(string name, Component *(Entity::*func)())
+void Component::RegisterType(string name, Component* (Entity::*func)(Properties*))
 {
-	componentRegistry[name] = func;
+//	Log("Registering component type '"+name+"', func: '", func, "'.");
+	printf("Component::RegisterType: Touch.\n");
+	if(func)
+	{
+		componentRegistry[name] = nullptr;
+		cout << "Registering type with function ptr " << func << " to this current value: " << componentRegistry[name] << "\n";
+		componentRegistry[name] = func;
+	}
+	else
+	{
+		printf("Component::RegisterType: Function is null.\n");
+	}
 }
 
 

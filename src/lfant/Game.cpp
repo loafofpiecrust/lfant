@@ -49,29 +49,9 @@ namespace lfant
 
 Game* game;
 
-extern "C" void Launch()
-{
-	game = new Game();
-	game->standAlone = true;
-	game->Init();
-	game->destroy = false;
-	Log("Game initialised");
-	while (!game->destroy)
-	{
-		game->Update();
-
-	}
-	Log("About to destroy game");
-	game->Destroy();
-	Log("Game ending");
-	delete game;
-}
-
-
 Game::Game() :
 	console {new Console},
 	fileSystem {new FileSystem},
-	settings {new Settings},
 	systemInfo {new SystemInfo},
 	time {new Time},
 	physics {new Physics},
@@ -97,19 +77,25 @@ Game::~Game()
 
 void Game::Init()
 {
+	LoadFile("settings/game.cfg");
+
 	console->Init();
+	Log("Initing filesystem");
 	fileSystem->Init();
 //	settings->Init();
+	Log("Initing systeminfo");
 	systemInfo->Init();
+	Log("Initing time");
 	time->Init();
+	Log("Initing physics");
 	physics->Init();
 	renderer->Init();
-	userInterface->Init();
 	scene->Init();
 	input->Init();
 //	audio->Init();
-	network->Init();
+//	network->Init();
 	scriptSystem->Init();
+//	userInterface->Init();
 
 	Log("Window callback set.");
 
@@ -118,15 +104,32 @@ void Game::Init()
 
 void Game::Update()
 {
-	PreUpdate();
 	time->Update();
 	physics->Update();
 	scene->Update();
 	input->Update();
-	renderer->Update();
 //	userInterface->Update();
-	network->Update();
-	PostUpdate();
+	renderer->Update();
+//	network->Update();
+}
+
+
+/*******************************************************************************
+*
+*		Loading/Saving
+*
+*******************************************************************************/
+
+void Game::Load(Properties* prop)
+{
+	prop->Get("orgName", orgName);
+	prop->Get("gameName", gameName);
+}
+
+void Game::Save(Properties* prop)
+{
+	prop->Set("orgName", orgName);
+	prop->Set("gameName", gameName);
 }
 
 /*******************************************************************************
@@ -135,14 +138,9 @@ void Game::Update()
 *
 *******************************************************************************/
 
-void Game::LoadScene(string scene)
-{
-}
-
 void Game::Destroy()
 {
 	fileSystem->Destroy();
-	settings->Destroy();
 	systemInfo->Destroy();
 	time->Destroy();
 	physics->Destroy();
@@ -159,6 +157,11 @@ void Game::Destroy()
 void Game::Exit()
 {
 	destroy = true;
+}
+
+bool Game::IsExited()
+{
+	return destroy;
 }
 
 }

@@ -20,17 +20,24 @@
 
 #include <lfant/ChatClient.h>
 
-// External
-
 // Internal
-#include <lfant/network/Client.h>
 #include <lfant/Network.h>
 #include <lfant/Console.h>
+#include <lfant/SystemInfo.h>
+#include <lfant/ChatServer.h>
+
+// External
 
 namespace lfant
 {
 
 ChatClient::ChatClient()
+{
+	name = game->systemInfo->computerName;
+}
+
+ChatClient::ChatClient(asio::io_service& new_io) :
+	net::tcp::Client(new_io)
 {
 }
 
@@ -40,20 +47,66 @@ ChatClient::~ChatClient()
 
 void ChatClient::Init()
 {
-	connection = game->network->NewConnection<Client>("Chat", "www.google.com", 80, "");
-	Connect(SENDER(connection, Connect), RECEIVER(this, OnConnect));
-	Connect(SENDER(connection, GetData), RECEIVER(this, OnGetData));
 }
 
-void ChatClient::OnConnect()
+void ChatClient::SendData(string msg)
 {
-	Log("Connected! 2");
-	connection->GetData(2);
+	if(msg[0] == '/')
+	{
+		// Parse as command
+	}
+
+	msg = name+":"+msg;
+	Client::SendData(msg);
+	messages.push_back(msg);
+	Log("Message sent: '"+msg+"'.");
 }
 
-void ChatClient::OnGetData(char data[], uint size)
+void ChatClient::Disconnect()
 {
-	Log("ChatClient::OnGetData: Received data:\n\t", data, "\n");
+	SendData("[RemoveClient "+name+"]");
+	Client::Disconnect();
+}
+
+void ChatClient::OnDestroy()
+{
+	Disconnect();
+}
+
+void ChatClient::OnConnect(const boost::system::error_code &error)
+{
+	Client::OnConnect(error);
+	Log("ChatClient::OnConnect: Success.");
+	SendData("[AddClient "+name+" "+socket.remote_endpoint().address().to_string()+"]");
+//	GetData();
+}
+
+void ChatClient::OnGetData(const boost::system::error_code &error)
+{
+	Client::OnGetData(error);
+
+	string data = lastData;
+
+	// Receive normal message
+	string sender = "";
+	uint pos = data.find_first_of(':');
+	if(pos != -1)
+	{
+		for(uint i = 0; i < pos; ++i)
+		{
+			sender.push_back(data[i]);
+		}
+		data.erase(data.begin(), data.begin()+pos+1);
+	}
+	TriggerEvent("ReceiveMessage", sender, data);
+	Log("Received message: '"+data+"' from '"+sender+"'.\n");
+	messages.push_back(data);
+}
+
+void ChatClient::OnSendData(const boost::system::error_code &error, size_t bytes)
+{
+	Log("ChatClient::OnSendData: Touch.");
+	Client::OnSendData(error, bytes);
 }
 
 }

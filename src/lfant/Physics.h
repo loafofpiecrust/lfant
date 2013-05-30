@@ -51,14 +51,16 @@ class Joint;
 
 struct GravPoint
 {
-	string name;
-	vec3* point;
-	float force;
+	string name = "";
+	vec3* point = nullptr;
+	float force = 1.0f;
 
 	GravPoint(string name, vec3* pt, float fc) :
 		name(name), point(pt), force(fc)
 	{
 	}
+
+	GravPoint() {}
 };
 
 /**
@@ -80,6 +82,9 @@ public:
 	Physics();
 	virtual ~Physics();
 
+	void Save(Properties* prop);
+	void Load(Properties* prop);
+
 	virtual void Init();
 	virtual void Update();
 	virtual void OnDestroy();
@@ -90,6 +95,9 @@ public:
 
 	void AddRigidbody(Rigidbody* ent);
 	void RemoveRigidbody(Rigidbody* ent, bool destroy = false);
+
+	vec3 GetGravity();
+	void SetGravity(vec3 grav);
 
 	/**
 	 *	Returns the gravity point with the given name.
@@ -107,7 +115,7 @@ public:
 	 *	@param force The gravitational force of this point.
 	 */
 	void SetGravityPoint(string name, vec3 point, float force);
-	void SetGravityPoint(string name, vec3& point, float force);
+	void SetGravityPoint(string name, vec3* point, float force);
 	void SetGravityPoint(string name, float force);
 
 	/**
@@ -124,7 +132,7 @@ public:
 	 *	@param direction The direction to cast the ray.
 	 *	@param distance The distance to cast the ray. Defaults to infinity as 0.0f.
 	 */
-	vector<RaycastHit> RaycastAll(vec3 origin, vec3 direction, float distance = 0.0f);
+	deque<RaycastHit> RaycastAll(vec3 origin, vec3 direction, float distance = 0.0f);
 
 protected:
 	virtual void ApplyGravity()
@@ -133,22 +141,23 @@ protected:
 
 private:
 	static bool OnCollide(string func, btManifoldPoint& cp, const btCollisionObjectWrapper* colObj0, int partId0, int index0,
-	                      const btCollisionObjectWrapper* colObj1, int partId1, int index1);
+						  const btCollisionObjectWrapper* colObj1, int partId1, int index1);
 
 	static bool OnCollideEnter(btManifoldPoint& cp, const btCollisionObjectWrapper* colObj0, int partId0, int index0,
-	                           const btCollisionObjectWrapper* colObj1, int partId1, int index1);
+							   const btCollisionObjectWrapper* colObj1, int partId1, int index1);
 
 	static bool OnCollideStay(btManifoldPoint& cp, void* body0, void* body1);
 
 	static bool OnCollideExit(void* userPersistentData);
 
-	btDiscreteDynamicsWorld* world;
-	btBroadphaseInterface* broadphase;
-	btCollisionDispatcher* dispatcher;
-	btConstraintSolver* solver;
-	btDefaultCollisionConfiguration* collisionConfig;
+	ptr<btDiscreteDynamicsWorld> world;
+	ptr<btBroadphaseInterface> broadphase;
+	ptr<btCollisionDispatcher> dispatcher;
+	ptr<btConstraintSolver> solver;
+	ptr<btDefaultCollisionConfiguration> collisionConfig;
 
-	vector<GravPoint> gravityPoints;
+	deque<GravPoint> gravityPoints;
+	vec3 initGravity = vec3(0, -9.81, 0);
 };
 
 /** @} */

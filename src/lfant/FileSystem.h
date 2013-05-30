@@ -22,13 +22,11 @@
 #include <lfant/stdafx.h>
 
 // External
-#include <boost/filesystem.hpp>
 
 // Internal
-
+#include <lfant/util/Path.h>
 #include <lfant/Subsystem.h>
 
-using namespace boost::filesystem;
 
 namespace lfant
 {
@@ -54,12 +52,12 @@ public:
 	path GetUserPath(string name);
 	path GetGamePath(string name);
 
-	vector<path> GetGameFiles(string dir);
+	deque<path> GetGameFiles(string dir);
 
 protected:
 
 public:
-	string gameFolder = absolute(path("../..")).string();
+	string gameFolder = "../..";
 	string userFolder;
 };
 

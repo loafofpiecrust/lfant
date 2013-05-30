@@ -18,20 +18,12 @@
 *
 ******************************************************************************/
 #pragma once
-
-//#include <lfant/stdafx.h>
+#include <lfant/stdafx.h>
 
 // External
 
 // Internal
-
 #include <lfant/Subsystem.h>
-
-namespace FMOD
-{
-class System;
-class Sound;
-}
 
 namespace lfant
 {
@@ -58,9 +50,7 @@ public:
 	 *	Plays a 2D sound at global volume.
 	 *	@param file The audio file to load and play.
 	 */
-	FMOD::Sound* PlaySound(string file, bool loop = false);
-
-	FMOD::Sound* PlaySound3d(string file, vec3 position = vec3(0), bool loop = false);
+//	 PlaySound(string file, bool loop = false);
 
 	uint8_t maxChannels = 10;
 
@@ -68,7 +58,6 @@ protected:
 	virtual void Update();
 	virtual void OnDestroy();
 
-	FMOD::System* soundSystem;
 
 private:
 };

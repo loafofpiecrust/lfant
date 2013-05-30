@@ -35,7 +35,6 @@ class Renderer;
 class Input;
 class Time;
 class Physics;
-class Settings;
 class Audio;
 class Scene;
 class FileSystem;
@@ -64,46 +63,35 @@ public:
 	Game();
 	virtual ~Game();
 
-	/**	This function is called right when the game is launched.
+	void Load(Properties *prop);
+	void Save(Properties *prop);
+
+	/**
+	 *	This function is called right when the game is launched.
 	 */
 	virtual void Init();
 
-	/**	Called every frame to update the game and its subsystems
+	/**
+	 *	Called every frame to update the game and its subsystems
 	 */
 	virtual void Update();
-	virtual void PreUpdate()
-	{
-	}
-	virtual void PostUpdate()
-	{
-	}
-
-	/**
-	 * Destroys the game instance. Never call manually.
-	 */
-	virtual void Destroy();
 
 	/**
 	 *	Schedules the game to be exited at the end of this frame.
 	 */
 	virtual void Exit();
 
-	/**	Loads a scene. Automatically appends the given scene with an
-	 *	extension. That extension is assigned via the ResourceManager,
-	 *	along with file paths.
-	 *	@param scene The name of the scene to load, without the file extension.
-	 */
-	void LoadScene(string scene);
-
-	/** Adds the given function to a new or existing thread.
+	/**
+	 *	Adds the given function to a new or existing thread.
 	 *	@param func The function to execute.
 	 */
 	void AddThread(boost::function<void()> func);
 
+	bool IsExited();
+
 	// Subsystems
 	ptr<Console> console;
 	ptr<FileSystem> fileSystem;
-	ptr<Settings> settings;
 	ptr<SystemInfo> systemInfo;
 	ptr<Time> time;
 	ptr<Physics> physics;
@@ -115,15 +103,21 @@ public:
 	ptr<Network> network;
 	ptr<ScriptSystem> scriptSystem;
 	//boost::scoped_ptr<AISystem>			aiSystem;
-	//boost::scoped_ptr<ScriptSystem>		scriptSystem;
 	//boost::scoped_ptr<FGSystem>			flowgraph;
 
 	bool standAlone = true;
-	bool destroy = false;
+
+	string orgName = "lazyfox";
+	string gameName = "lfant";
 
 protected:
+	/**
+	 *	Destroys the game instance. Never call manually.
+	 */
+	virtual void Destroy();
 
 private:
+	bool destroy = false;
 };
 
 extern Game* game;

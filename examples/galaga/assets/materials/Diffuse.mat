@@ -1,4 +1,4 @@
-
+// Diffuse defaulr
 material Diffuse
 {
 	texture Diffuse

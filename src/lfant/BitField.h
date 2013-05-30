@@ -18,7 +18,6 @@
 *
 ******************************************************************************/
 #pragma once
-
 #include <lfant/stdafx.h>
 
 // External
@@ -48,17 +47,22 @@ public:
 	{
 	}
 
-	void add(const TEnum flag)
+	void set(const TEnum& flag)
+	{
+		value = flag;
+	}
+
+	void add(const TEnum& flag)
 	{
 		value |= flag;
 	}
 
-	bool check(const TEnum flag)
+	bool check(const TEnum& flag)
 	{
 		return value & flag;
 	}
 
-	void remove(const TEnum flag)
+	void remove(const TEnum& flag)
 	{
 		value &= ~flag;
 	}
@@ -68,17 +72,22 @@ public:
 		value = 0;
 	}
 
-	void operator+=(const TEnum flag)
+	TType& operator=(const TEnum& flag)
+	{
+		set(flag);
+	}
+
+	void operator+=(const TEnum& flag)
 	{
 		add(flag);
 	}
 
-	void operator-=(const TEnum flag)
+	void operator-=(const TEnum& flag)
 	{
 		remove(flag);
 	}
 
-	bool operator==(const TEnum flag)
+	bool operator==(const TEnum& flag)
 	{
 		return check(flag);
 	}

@@ -25,7 +25,7 @@ string DemangleType(string type)
 
 string RemoveScoping(string type)
 {
-	vector<string> toks = Split(type, ":");
+	deque<string> toks = Split(type, ":");
 	return toks[toks.size()-1];
 }
 

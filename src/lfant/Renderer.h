@@ -31,11 +31,6 @@
 
 #include <lfant/Subsystem.h>
 
-namespace sf
-{
-class RenderWindow;
-}
-
 namespace lfant
 {
 class Mesh;
@@ -74,8 +69,8 @@ public:
 	 *	@param close Whether or not to close the current window. Leave at true unless you really know what you're doing.
 	 */
 	bool OpenWindow();
-	static GLFWCALL int WindowClosed();
-	static GLFWCALL void WindowResized(int x, int y);
+	static GLFWCALL int OnCloseWindow();
+	static GLFWCALL void OnSetResolution(int x, int y);
 
 	/// Sets the version property
 	void SetVersion(byte major, byte minor);
@@ -85,8 +80,8 @@ public:
 
 
 	// Shaders
-	Shader& GetShader(string name);
-	void AddShader(Shader& shader);
+	Shader* GetShader(string name);
+	void AddShader(Shader* shader);
 
 	/**
 	 *	Hides, shows, or toggles the mouse cursor.
@@ -133,12 +128,11 @@ protected:
 	bool hideMouse = false;
 	bool windowResizable = false;
 
-	deque<Shader> shaders;
+	deque< ptr<Shader> > shaders;
 
 public:
 
 private:
-	sf::RenderWindow* window;
 	ivec2 resolution = ivec2(1280, 720);
 	ivec2 windowPos = ivec2(0);
 	string windowTitle = "lfant";

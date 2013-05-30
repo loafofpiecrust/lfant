@@ -1,0 +1,10 @@
+
+gui Default
+{
+	window Frame
+	{
+		type = TaharezLook/FrameWindow
+		Text = Console
+//		TitlebarFont = DejaVuSans-10
+	}
+}

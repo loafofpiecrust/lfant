@@ -29,6 +29,9 @@
 
 namespace lfant
 {
+namespace random
+{
+
 /** @addtogroup Game
  *	 @{
  */
@@ -39,12 +42,10 @@ namespace lfant
 extern boost::random::mt19937 randfast;
 extern boost::random::mt19937_64 randfast64;
 
-void seedrand() __attribute__((constructor));
-
 /// These use mt19937 or mt19937_64, when the bool is true, it uses truly random numbers (20x slower)
 
 template<typename T>
-T Random(T min, T max)
+T Range(T min, T max)
 {
 	boost::random::uniform_int_distribution<T> d(min, max);
 	if(sizeof(T) >= 8)
@@ -54,13 +55,13 @@ T Random(T min, T max)
 	return d(randfast);
 }
 
-float Random(float min, float max);
-double Random(double min, double max);
-
-rgba Random(rgba min, rgba max);
-
-vec3 Random(vec3 min, vec3 max);
+float Range(float min, float max);
+double Range(double min, double max);
+rgba Range(rgba min, rgba max);
+vec3 Range(vec3 min, vec3 max);
 
 /** @} */
 /** @} */
+
+}
 }

@@ -31,6 +31,8 @@
 
 #include <lfant/Console.h>
 
+using namespace boost::filesystem;
+
 namespace lfant
 {
 
@@ -45,13 +47,15 @@ FileSystem::~FileSystem()
 void FileSystem::Init()
 {
 	// Use default settings
-	gameFolder = "../..";
+//	gameFolder = "../..";
 #if WINDOWS
 	const string home = getenv("USERPROFILE");
 #elif UNIX
 	const string home = getenv("HOME");
 #endif
-	userFolder = home + "/Documents/My Games/" + game->settings->orgName + "/" + game->settings->gameName;
+	userFolder = home + "/Documents/My Games/" + game->orgName + "/" + game->gameName;
+
+	Subsystem::Init();
 }
 
 path FileSystem::GetGamePath(string name)
@@ -75,9 +79,9 @@ path FileSystem::GetUserPath(string name)
 	return result;
 }
 
-vector<path> FileSystem::GetGameFiles(string dir)
+deque<path> FileSystem::GetGameFiles(string dir)
 {
-	vector<path> result;
+	deque<path> result;
 	if(exists(dir) && is_directory(dir))
 	{
 		copy(directory_iterator(dir), directory_iterator(), back_inserter(result));

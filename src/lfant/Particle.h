@@ -1,3 +1,6 @@
+#ifndef HEADER_7D74F070FA65C82
+#define HEADER_7D74F070FA65C82
+
 /******************************************************************************
 *
 *	LFANT Source
@@ -41,7 +44,7 @@ class ParticleSystem;
 /**
  *	Particle
  */
-class Particle : public Object
+class Particle
 {
 public:
 	Particle();
@@ -76,7 +79,7 @@ public:
 	/// Converts the velocity vector into a speed float.
 	float GetSpeed();
 
-	Transform* transform;
+	Range<float> size;
 	float speed;
 	vec3 velocity;
 	Range<vec3> velRange;
@@ -84,13 +87,13 @@ public:
 	vec3 gravity;
 	float lifetime;
 	float age;
-	Range<float> size;
 	float sizeDiff;
 	Range<rgba> color;
 	rgba colorDiff;
 	bool active = true;
 
 	ParticleSystem* system;
+	Transform* transform;
 
 protected:
 
@@ -100,3 +103,5 @@ private:
 /** @} */
 /** @} */
 }
+
+#endif // header guard 

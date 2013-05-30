@@ -2,32 +2,37 @@ project "lfant"
 	basedir "."
 	kind "SharedLib"
 	language "C++"
-	pchheader "stdafx.h"
-	pchsource "stdafx.cpp"
+--	pchheader "stdafx.h"
+--	pchsource "stdafx.cpp"
 	files { "**.h", "**.cpp" }
-	includedirs { 
-		"..",
-		"../external/glm",
-		"../external/boost",
-		"../external/bullet/src",
-		"../external/glew/include",
-		"../external/glfw/include",
-		"../external/rocket/Include",
-		"../external/fmod/api/inc",
-		"../external/angelscript/include",
-		"../external/angelscript/add_on"
+
+	includedirs {
+		ROOT.."/src",
+		EXTERNAL.."/glm",
+		EXTERNAL.."/assimp/include",
+		EXTERNAL.."/boost",
+		EXTERNAL.."/bullet/src",
+		EXTERNAL.."/glew/include",
+		EXTERNAL.."/glfw/include",
+		EXTERNAL.."/rocket/Include",
+		EXTERNAL.."/fmod/api/inc",
+		EXTERNAL.."/angelscript/include",
+		EXTERNAL.."/angelscript/add_on",
+		EXTERNAL.."/devil/include"
 	}
 	
 	links {
+		"angelscript",
+		"assimp",
 		"glew",
 		"glfw",
+		"fmod",
 		"boost",
 		"bullet",
-		"fmod",
 		"rocket",
 		"png",
 		"z",
-		"squirrel"
+		"rt"
 	}
 	
 	if(os.is("linux")) then

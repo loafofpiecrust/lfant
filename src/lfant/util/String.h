@@ -36,14 +36,14 @@ namespace lfant
  *	 @{
  */
 
-vector<string> Split(string str, string dropDelim = " ", string keepDelim = "");
-vector<string> Split(vector<string> str, string dropDelim = " ", string keepDelim = "");
+deque<string> Split(string str, string dropDelim = " ", string keepDelim = "");
+deque<string> Split(deque<string> str, string dropDelim = " ", string keepDelim = "");
 
 string Extension(string path);
 string Replace(string str, string find, string replace);
 string ReplaceAll(string str, string find, string replace);
 
-vector<string> SplitParens(string str, string dropDelim = " ", string keepDelim = "");
+deque<string> SplitParens(string str, string dropDelim = " ", string keepDelim = "");
 
 /** @} */
 /** @} */

@@ -15,17 +15,14 @@ ifeq ($(config),release_x64)
   TARGET     = $(TARGETDIR)/liblfant.so
   OBJDIR     = obj/x64
   DEFINES   += -D__STRICT_ANSI__
-  INCLUDES  += -I.. -I../external/glm -I../external/boost -I../external/bullet/src -I../external/glew/include -I../external/glfw/include -I../external/rocket/Include -I../external/fmod/api/inc -I../external/angelscript/include -I../external/angelscript/add_on
+  INCLUDES  += -I.. -I../../external/glm -I../../external/assimp/include -I../../external/boost -I../../external/bullet/src -I../../external/glew/include -I../../external/glfw/include -I../../external/rocket/Include -I../../external/fmod/api/inc -I../../external/angelscript/include -I../../external/angelscript/add_on -I../../external/devil/include
   ALL_CPPFLAGS += $(CPPFLAGS) -MMD -MP $(DEFINES) $(INCLUDES)
   ALL_CFLAGS   += $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH) -m64 -fPIC -std=gnu++11 -O3 -Wall -Wno-invalid-offsetof -Wno-overloaded-virtual
   ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CFLAGS)
   ALL_RESFLAGS += $(RESFLAGS) $(DEFINES) $(INCLUDES)
-  PCH        = stdafx.h
-  GCH        = $(OBJDIR)/stdafx.h.gch
-  ALL_CPPFLAGS += -I$(OBJDIR) -include $(OBJDIR)/stdafx.h
   ALL_LDFLAGS  += $(LDFLAGS) -L../../bin64/linux -s -shared -m64 -L/usr/lib64 -Wl,-rpath,$ORIGIN -Wl,-z,origin -Wl,--no-undefined
-  LIBS      += -lglew -lglfw -lboost -lbullet -lfmod -lrocket -lpng -lz -lsquirrel -lpthread
-  LDDEPS    +=
+  LIBS      += ../../bin64/linux/libangelscript.a -lassimp -lglew -lglfw ../../bin64/linux/libboost.a -lfmod -lbullet -lrocket -lpng -lz -lrt -lpthread
+  LDDEPS    += ../../bin64/linux/libangelscript.a ../../bin64/linux/libassimp.so ../../bin64/linux/libglew.so ../../bin64/linux/libglfw.so ../../bin64/linux/libboost.a
   LINKCMD    = $(CXX) -o $(TARGET) $(OBJECTS) $(RESOURCES) $(ARCH) $(LIBS) $(ALL_LDFLAGS)
   define PREBUILDCMDS
   endef
@@ -43,17 +40,14 @@ ifeq ($(config),release_x32)
   TARGET     = $(TARGETDIR)/liblfant.so
   OBJDIR     = obj/x32
   DEFINES   += -D__STRICT_ANSI__
-  INCLUDES  += -I.. -I../external/glm -I../external/boost -I../external/bullet/src -I../external/glew/include -I../external/glfw/include -I../external/rocket/Include -I../external/fmod/api/inc -I../external/angelscript/include -I../external/angelscript/add_on
+  INCLUDES  += -I.. -I../../external/glm -I../../external/assimp/include -I../../external/boost -I../../external/bullet/src -I../../external/glew/include -I../../external/glfw/include -I../../external/rocket/Include -I../../external/fmod/api/inc -I../../external/angelscript/include -I../../external/angelscript/add_on -I../../external/devil/include
   ALL_CPPFLAGS += $(CPPFLAGS) -MMD -MP $(DEFINES) $(INCLUDES)
   ALL_CFLAGS   += $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH) -m32 -fPIC -std=gnu++11 -O3 -Wall -Wno-invalid-offsetof -Wno-overloaded-virtual
   ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CFLAGS)
   ALL_RESFLAGS += $(RESFLAGS) $(DEFINES) $(INCLUDES)
-  PCH        = stdafx.h
-  GCH        = $(OBJDIR)/stdafx.h.gch
-  ALL_CPPFLAGS += -I$(OBJDIR) -include $(OBJDIR)/stdafx.h
   ALL_LDFLAGS  += $(LDFLAGS) -L../../bin32/linux -s -shared -m32 -L/usr/lib32 -Wl,-rpath,$ORIGIN -Wl,-z,origin -Wl,--no-undefined
-  LIBS      += -lglew -lglfw -lboost -lbullet -lfmod -lrocket -lpng -lz -lsquirrel -lpthread
-  LDDEPS    +=
+  LIBS      += ../../bin32/linux/libangelscript.a -lassimp -lglew -lglfw ../../bin32/linux/libboost.a -lfmod -lbullet -lrocket -lpng -lz -lrt -lpthread
+  LDDEPS    += ../../bin32/linux/libangelscript.a ../../bin32/linux/libassimp.so ../../bin32/linux/libglew.so ../../bin32/linux/libglfw.so ../../bin32/linux/libboost.a
   LINKCMD    = $(CXX) -o $(TARGET) $(OBJECTS) $(RESOURCES) $(ARCH) $(LIBS) $(ALL_LDFLAGS)
   define PREBUILDCMDS
   endef
@@ -83,6 +77,7 @@ OBJECTS := \
 	$(OBJDIR)/Input.o \
 	$(OBJDIR)/Joint.o \
 	$(OBJDIR)/Light.o \
+	$(OBJDIR)/Material.o \
 	$(OBJDIR)/Mesh.o \
 	$(OBJDIR)/MeshLoader.o \
 	$(OBJDIR)/Network.o \
@@ -90,6 +85,7 @@ OBJECTS := \
 	$(OBJDIR)/Particle.o \
 	$(OBJDIR)/ParticleSystem.o \
 	$(OBJDIR)/Physics.o \
+	$(OBJDIR)/Properties.o \
 	$(OBJDIR)/Random.o \
 	$(OBJDIR)/Renderable.o \
 	$(OBJDIR)/Renderer.o \
@@ -99,7 +95,6 @@ OBJECTS := \
 	$(OBJDIR)/Settings.o \
 	$(OBJDIR)/Shader.o \
 	$(OBJDIR)/Sprite.o \
-	$(OBJDIR)/String.o \
 	$(OBJDIR)/Subsystem.o \
 	$(OBJDIR)/SystemInfo.o \
 	$(OBJDIR)/Texture.o \
@@ -117,7 +112,8 @@ OBJECTS := \
 	$(OBJDIR)/PeerClient.o \
 	$(OBJDIR)/Server.o \
 	$(OBJDIR)/stdafx.o \
-	$(OBJDIR)/tinyxml2.o \
+	$(OBJDIR)/String.o \
+	$(OBJDIR)/lexical_cast.o \
 
 RESOURCES := \
 
@@ -225,6 +221,9 @@ $(OBJDIR)/Joint.o: Joint.cpp
 $(OBJDIR)/Light.o: Light.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) -o "$@" -MF $(@:%.o=%.d) -c "$<"
+$(OBJDIR)/Material.o: Material.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) -o "$@" -MF $(@:%.o=%.d) -c "$<"
 $(OBJDIR)/Mesh.o: Mesh.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) -o "$@" -MF $(@:%.o=%.d) -c "$<"
@@ -244,6 +243,9 @@ $(OBJDIR)/ParticleSystem.o: ParticleSystem.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) -o "$@" -MF $(@:%.o=%.d) -c "$<"
 $(OBJDIR)/Physics.o: Physics.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) -o "$@" -MF $(@:%.o=%.d) -c "$<"
+$(OBJDIR)/Properties.o: Properties.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) -o "$@" -MF $(@:%.o=%.d) -c "$<"
 $(OBJDIR)/Random.o: Random.cpp
@@ -271,9 +273,6 @@ $(OBJDIR)/Shader.o: Shader.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) -o "$@" -MF $(@:%.o=%.d) -c "$<"
 $(OBJDIR)/Sprite.o: Sprite.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(ALL_CXXFLAGS) -o "$@" -MF $(@:%.o=%.d) -c "$<"
-$(OBJDIR)/String.o: String.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) -o "$@" -MF $(@:%.o=%.d) -c "$<"
 $(OBJDIR)/Subsystem.o: Subsystem.cpp
@@ -327,7 +326,10 @@ $(OBJDIR)/Server.o: network/Server.cpp
 $(OBJDIR)/stdafx.o: stdafx.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) -o "$@" -MF $(@:%.o=%.d) -c "$<"
-$(OBJDIR)/tinyxml2.o: tinyxml2.cpp
+$(OBJDIR)/String.o: util/String.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) -o "$@" -MF $(@:%.o=%.d) -c "$<"
+$(OBJDIR)/lexical_cast.o: util/lexical_cast.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) -o "$@" -MF $(@:%.o=%.d) -c "$<"
 

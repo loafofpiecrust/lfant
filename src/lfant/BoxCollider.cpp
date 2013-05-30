@@ -28,9 +28,23 @@
 namespace lfant
 {
 
-void BoxCollider::OnSetScale(vec3 scale)
+IMPLEMENT_COMP(BoxCollider)
+
+void BoxCollider::Init()
 {
-	shape->setLocalScaling(vec3_cast<btVector3>(scale));
+	shape = new btBoxShape(vec3_cast<btVector3>(size));
+	Collider::Init();
+}
+
+btCollisionShape *BoxCollider::GetShape()
+{
+	return shape;
+}
+
+void BoxCollider::SetSize(vec3 size)
+{
+	Collider::SetSize(size);
+	shape->setLocalScaling(vec3_cast<btVector3>(size));
 }
 
 }

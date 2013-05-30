@@ -38,13 +38,18 @@ namespace lfant
  *	 @{
  */
 
-extern map<string, uint16_t> Key;
+//extern map<string, uint16_t> Key;
 
 class Key_Initializer
 {
 public:
 	Key_Initializer();
+	uint16 operator[](string in);
+private:
+	map<string, uint16> _key;
 };
+
+extern Key_Initializer Key;
 
 /*
 enum class Key : uint16_t
@@ -195,7 +200,7 @@ public:
 	virtual void Init();
 	virtual void Update();
 
-	void Load();
+	void Load(Properties *prop);
 
 	/** Called when any key is pressed or released.
 	 *	@param key The key that was used.
@@ -206,7 +211,7 @@ public:
 	static void GLFWCALL OnMouseButton(int btn, int mode);
 	static void GLFWCALL OnCharPress(int key, int mode);
 
-	void AddAxis(string name, uint16_t positive, uint16_t negative = Key["\n"], uint16_t altpos = Key["\n"], uint16_t altneg = Key["\n"], float sens = 3.0f, float dead = 0.001f, bool snap = true, byte joyNum = 0);
+	void AddAxis(string name, string positive = "null", string negative = "null", string altpos = "null", string altneg = "null", float sens = 3.0f, float dead = 0.001f, bool snap = true, byte joyNum = 0);
 
 	// Axes
 	float GetAxis(string name);
@@ -218,13 +223,13 @@ public:
 
 	ivec2 GetMousePos();
 	void SetMousePos(ivec2 pos);
-	void SetMousePos(int32_t x, int32_t y);
+	void SetMousePos(int32 x, int32 y);
 
 	bool lockMouse;
 	float mouseSpeed;
 
 protected:
-	vector<Axis> axes;
+	deque<Axis> axes;
 
 	/// The string of input this frame.
 	string inputString;

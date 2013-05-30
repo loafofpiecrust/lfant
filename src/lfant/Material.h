@@ -45,15 +45,13 @@ public:
 	Material();
 	Material(string texture, string shader);
 
-	Material& operator()(Texture texture, Shader shader);
-
 	void Load(Properties *prop);
 	void Save(Properties *prop);
 
 	// Path and name for the texture file.
-	Texture texture;
+	ptr<Texture> texture;
 	uint32_t textureUnif;
-	Shader shader;
+	ptr<Shader> shader;
 	vec2 tiling { 1, 1 };
 	vec2 offset { 0, 0 };
 	rgba color { 255, 255, 255, 255 };

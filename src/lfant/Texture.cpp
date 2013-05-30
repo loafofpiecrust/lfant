@@ -22,6 +22,7 @@
 // External
 #include <GL/glew.h>
 #include <lfant/lodepng.h>
+#include <lfant/CImg.h>
 
 // Internal
 #include <lfant/TextureLoader.h>
@@ -35,6 +36,7 @@ namespace lfant
 void Texture::Load(Properties *prop)
 {
 	prop->Get("path", path);
+	Log("Tex path: '"+path+"'.");
 	prop->Get("anisoLevel", anisoLevel);
 
 	LoadFile(path);
@@ -48,6 +50,16 @@ void Texture::Save(Properties *prop)
 	prop->Set("anisoLevel", anisoLevel);
 }
 
+uint32 Texture::GetId()
+{
+	return id;
+}
+
+void Texture::OnDestroy()
+{
+	glDeleteTextures(1, &id);
+}
+
 void Texture::LoadFile(string path, int mode)
 {
 	if(path == "")
@@ -58,40 +70,21 @@ void Texture::LoadFile(string path, int mode)
 	{
 		mode = GL_TEXTURE_2D;
 	}
-	Log("Want to load an image file");
+
 	this->path = game->fileSystem->GetGamePath(path).string();
-	vector<string> tokens = Split(this->path, ".", "");
-	string ext = tokens[tokens.size()-1];
-	to_lower(ext);
-	Log("Loading an image file of type " + ext);
-	vector<byte> data;
-	if (ext == "bmp")
-	{
-		Log("Texture::LoadFile: Unsupported image format, bitch.");
-		//	return LoadBMP(name, buffer);
-	}
-	else if (ext == "jpeg" || ext == "jpg")
-	{
-		LoadJPEG(mode);
-	}
-	else if (ext == "png")
-	{
-		Log("About to load a png");
-		LoadPNG(mode);
-	}
-	else if (ext == "dds")
-	{
-		LoadDDS(mode);
-	}
-	else
-	{
-		Log("Texture::LoadFile: Unsupported image format, bitch.");
-		return;
-	}
 
+	cimg_library::CImg<byte> img(this->path.c_str());
+	Log("Texture loaded...");
+	size.x = img.width();
+	size.y = img.height();
 
-	// Send texture to opengl
+	glGenTextures(1, &id);
+	glBindTexture(mode, id);
+	glTexImage2D(mode, 0, GL_RGBA, size.x, size.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, img.data());
+	glTexParameteri(mode, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(mode, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
+	glBindTexture(mode, 0);
 }
 
 void Texture::LoadPNG(int mode)

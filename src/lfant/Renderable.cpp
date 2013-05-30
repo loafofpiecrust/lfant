@@ -1,9 +1,10 @@
 
 #include <lfant/Renderable.h>
 
-// External
-
 // Internal
+#include <lfant/Console.h>
+
+// External
 
 namespace lfant
 {

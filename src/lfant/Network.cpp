@@ -27,7 +27,7 @@
 #include <lfant/Console.h>
 #include <lfant/Thread.h>
 
-#include <lfant/network/Connection.h>
+#include <lfant/net/Connection.h>
 
 namespace lfant
 {
@@ -44,6 +44,8 @@ Network::~Network()
 void Network::Init()
 {
 	Log("Network::Init: Touch.");
+	
+	Subsystem::Init();
 }
 
 void Network::Update()
@@ -54,7 +56,26 @@ void Network::Update()
 	}
 }
 
-Connection* Network::GetConnection(string name)
+void Network::Save(Properties *prop)
+{
+	for(auto& con : connections)
+	{
+		con->Save(prop->AddChild());
+	}
+}
+
+void Network::Load(Properties *prop)
+{
+	deque<Properties*> cons = prop->GetChildren("connection");
+	for(auto& pcon : cons)
+	{
+	//	net::Connection* con = new net::Connection;
+	//	con->Load(pcon);
+	//	connections.push_front(con);
+	}
+}
+
+net::Connection* Network::GetConnection(string name)
 {
 	for(auto& con : connections)
 	{

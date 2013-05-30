@@ -28,7 +28,8 @@
 namespace lfant
 {
 
-Particle::Particle()
+Particle::Particle() :
+	transform(new Transform)
 {
 }
 

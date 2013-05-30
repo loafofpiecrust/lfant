@@ -42,6 +42,34 @@ Physics::~Physics()
 {
 }
 
+void Physics::Save(Properties* prop)
+{
+	Subsystem::Save(prop);
+
+	prop->Set("gravity", GetGravity());
+
+	for(auto& gpt : gravityPoints)
+	{
+		Properties* pgpt = prop->AddChild("gravityPoint");
+		pgpt->id = gpt.name;
+		pgpt->Set("force", gpt.force);
+	}
+}
+
+void Physics::Load(Properties* prop)
+{
+	Subsystem::Load(prop);
+
+	prop->Get("gravity", initGravity);
+
+	for(auto& pgpt : prop->GetChildren("gravityPoint"))
+	{
+		GravPoint* gpt = new GravPoint;
+		gpt->name = pgpt->id;
+		pgpt->Get("force", gpt->force); 
+	}
+}
+
 /*******************************************************************************
 *
 *		Game Loop
@@ -50,6 +78,8 @@ Physics::~Physics()
 
 void Physics::Init()
 {
+	Subsystem::Init();
+
 	collisionConfig = new btDefaultCollisionConfiguration();
 	Log("Physics::Init: Collision config created.");
 	dispatcher = new btCollisionDispatcher(collisionConfig);
@@ -63,7 +93,10 @@ void Physics::Init()
 	gContactAddedCallback = &Physics::OnCollideEnter;
 	gContactProcessedCallback = &Physics::OnCollideStay;
 	gContactDestroyedCallback = &Physics::OnCollideExit;
+
 	Log("Physics::Init: Contact callbacks set.");
+
+	SetGravity(initGravity);
 }
 
 void Physics::Update()
@@ -89,6 +122,16 @@ void Physics::OnDestroy()
 *
 *******************************************************************************/
 
+vec3 Physics::GetGravity()
+{
+	return vec3_cast<vec3>(world->getGravity());
+}
+
+void Physics::SetGravity(vec3 grav)
+{
+	world->setGravity(vec3_cast<btVector3>(grav));
+}
+
 GravPoint* Physics::GetGravityPoint(string name)
 {
 	for(GravPoint& grav : gravityPoints)
@@ -112,15 +155,15 @@ void Physics::SetGravityPoint(string name, vec3 point, float force)
 	gravityPoints.push_back(GravPoint(name, new vec3(point), force));
 }
 
-void Physics::SetGravityPoint(string name, vec3& point, float force)
+void Physics::SetGravityPoint(string name, vec3 *point, float force)
 {
 	if(GravPoint* grav = GetGravityPoint(name))
 	{
-		grav->point = &point;
+		grav->point = point;
 		grav->force = force;
 		return;
 	}
-	gravityPoints.push_back(GravPoint(name, &point, force));
+	gravityPoints.push_back(GravPoint(name, point, force));
 }
 
 void Physics::SetGravityPoint(string name, float force)
@@ -139,7 +182,7 @@ void Physics::SetGravityPoint(string name, float force)
 *******************************************************************************/
 
 bool Physics::OnCollide(string func, btManifoldPoint& cp, const btCollisionObjectWrapper* colObj0, int partId0, int index0,
-                        const btCollisionObjectWrapper* colObj1, int partId1, int index1)
+						const btCollisionObjectWrapper* colObj1, int partId1, int index1)
 {
 	/*Rigidbody* body0 = nullptr;
 	   Rigidbody* body1 = nullptr;
@@ -166,9 +209,9 @@ bool Physics::OnCollide(string func, btManifoldPoint& cp, const btCollisionObjec
 	   col.point = vec3_cast<vec3>( cp.pointA ); //fix
 	   col.normal = vec3_cast<vec3>( cp.normalA ); //fix
 
-	   if (body1->isTrigger)
+	   if (body1->isTriggerEvent)
 	   {
-	   body0->collider->trigger( "OnTrigger" + func, col );
+	   body0->collider->trigger( "OnTriggerEvent" + func, col );
 	   }
 	   else
 	   {
@@ -181,9 +224,9 @@ bool Physics::OnCollide(string func, btManifoldPoint& cp, const btCollisionObjec
 	   col.point = vec3_cast<vec3>( cp.pointB ); //fix
 	   col.normal = vec3_cast<vec3>( cp.normalB ); //fix
 
-	   if (body0->isTrigger)
+	   if (body0->isTriggerEvent)
 	   {
-	   body1->collider->trigger( "OnTrigger" + func, col );
+	   body1->collider->trigger( "OnTriggerEvent" + func, col );
 	   }
 	   else
 	   {
@@ -194,7 +237,7 @@ bool Physics::OnCollide(string func, btManifoldPoint& cp, const btCollisionObjec
 }
 
 bool Physics::OnCollideEnter(btManifoldPoint& cp, const btCollisionObjectWrapper* colObj0, int partId0, int index0,
-                             const btCollisionObjectWrapper* colObj1, int partId1, int index1)
+							 const btCollisionObjectWrapper* colObj1, int partId1, int index1)
 {
 	return OnCollide("Enter", cp, colObj0, partId0, index0, colObj1, partId1, index1);
 }
@@ -213,6 +256,7 @@ bool Physics::OnCollideExit(void* userPersistentData)
 
 void Physics::AddRigidbody(Rigidbody* ent)
 {
+	Log("Adding rigidbody..");
 	world->addRigidBody(ent->body);
 }
 

@@ -55,31 +55,35 @@ class Mesh;
 class Rigidbody : public Component
 {
 	friend class Physics;
-
+	DECLARE_COMP(Rigidbody)
 public:
-	// ctor and dtor
-	Rigidbody();
-	virtual ~Rigidbody();
 
 	// Nested classes
-	enum class PhysicsMode : byte
+	enum class Mode : byte
 	{
-		DISCRETE,
-		CONTINUOUS,
-		CONTINUOUS_DYNAMIC
+		Discrete,
+		Continuous,
+		ContinuousDynamic
 	};
 
 	enum class ColliderType : byte
 	{
-		MESH,
-		BOX,
-		CYLINDER,
-		CAPSULE
+		Mesh,
+		Box,
+		Cylinder,
+		Capsule
 	};
 
+	// ctor and dtor
+	Rigidbody();
+	virtual ~Rigidbody();
+
+	virtual void Load(Properties* prop);
+	virtual void Save(Properties* prop);
+
 	// Methods
-	btTypedConstraint* GetConstraint(uint16_t idx);
-	void RemoveConstraint(uint16_t idx);
+	btTypedConstraint* GetConstraint(uint16 idx);
+	void RemoveConstraint(uint16 idx);
 
 	void AddForce(float force);
 	void AddForceAtPosition(float force, vec3 pos);
@@ -121,7 +125,7 @@ public:
 	float GetSpeed();
 
 	// Variables
-	PhysicsMode physicsMode;
+	Mode mode;
 
 	bool useWorldGravity;
 	bool usePointGravity;
@@ -142,14 +146,15 @@ protected:
 	void OnSetRot(vec3 rot);
 	void OnSetScale(vec3 scale);
 	void OnSetMesh(Mesh* mesh);
+	void OnSetCollider(Collider* collider);
 
 	/// The current mass of this object, in kg.
-	float mass = 0.0f;
+	float mass = 1.0f;
 
 	btRigidBody* body;
 	btMotionState* motionState;
-	btCollisionShape* collider;
-	vec3 inertia;
+	Collider* collider = nullptr;
+	vec3 inertia = vec3(0);
 };
 
 /** @} */

@@ -1,3 +1,6 @@
+#ifndef HEADER_9E8987571FCBFB72
+#define HEADER_9E8987571FCBFB72
+
 /******************************************************************************
 *
 *	LFANT Source
@@ -27,6 +30,7 @@
 #include <lfant/Range.h>
 #include <lfant/Material.h>
 #include <lfant/Vertex.h>
+#include <lfant/Mesh.h>
 
 namespace lfant
 {
@@ -51,7 +55,7 @@ class Particle;
  *		Having the ParticleSystem Component send a call to render itself.
  *		Integrate with Bullet Physics for collision detection, bounciness, friction, and maybe buoyancy.
  */
-class ParticleSystem : public Component
+class ParticleSystem : public Mesh
 {
 	friend class Renderer;
 public:
@@ -69,7 +73,7 @@ public:
 	/**
 	 *	Supported emitter types.
 	 */
-	enum class EmitterType
+	enum class EmitterType : byte
 	{
 		Point,
 		Box,
@@ -77,7 +81,7 @@ public:
 		Cone
 	};
 
-	enum class DisplayType
+	enum class DisplayType : byte
 	{
 		Point,
 		Billboard
@@ -90,6 +94,10 @@ public:
 	virtual void Update();
 	virtual void OnDestroy();
 
+	void BeginRender();
+	void Render();
+	void EndRender();
+
 	void Save(Properties* prop);
 	void Load(Properties *prop);
 
@@ -97,8 +105,8 @@ public:
 	 *	Emits a specific amount of particles
 	 *	@param amount The amount of particles to emit.
 	 */
-	void Emit(uint32_t amount = 1);
-	void Emit(Particle* pt, bool old = false);
+	void Emit(uint32_t amount);
+	void Emit(Particle* pt = nullptr);
 	void Recycle(Particle* pt);
 	void Clear();
 	uint32_t GetCount();
@@ -129,23 +137,26 @@ public:
 	DisplayType displayType;
 	EmitterType emitterType;
 
-	deque< ptr<Particle> > particles;
-	vector<Burst> bursts;
+//	deque< ptr<Particle> > particles;
+	Buffer<Particle> particles;
+	deque<Burst> bursts;
 
-	Material material;
+//	Material material;
 
 protected:
 	float toEmit = 0.0f;
 
 private:
-	vector<vec3> points;
-	vector<Vertex> vertices;
-	vector<uint32_t> indices;
+//	vector<vec3> points;
+//	vector<Vertex> vertices;
+//	vector<uint32_t> indices;
 
-	uint32_t vertexBuffer;
-	uint32_t indexBuffer;
+//	uint32_t vertexBuffer;
+//	uint32_t indexBuffer;
 };
 
 /** @} */
 /** @} */
 }
+
+#endif // header guard
