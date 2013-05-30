@@ -264,6 +264,7 @@ void Properties::LoadStream(istream& stream)
 		else
 		{
 			stream.seekg(-1, ios_base::cur);
+			
 		}
 
 		if((line[0] == '}' || stream.get() == '}'))
@@ -374,10 +375,12 @@ map<string, string>& Properties::GetValues()
 	return values;
 }
 
-Properties* Properties::AddChild(string type)
+Properties* Properties::AddChild(string type, string id)
 {
 	Properties* result = new Properties;
 	result->parent = this;
+	result->type = type;
+	result->id = id;
 	children.push_back(ptr<Properties>(result));
 	return result;
 }

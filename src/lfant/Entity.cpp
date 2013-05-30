@@ -35,6 +35,7 @@
 #include <lfant/Component.h>
 #include <lfant/ScriptSystem.h>
 #include <lfant/Camera.h>
+#include <lfant/Random.h>
 
 // External
 #include <stdarg.h>
@@ -69,6 +70,12 @@ void Entity::Init()
 	if(lifeTime <= 0.0f)
 	{
 		useLifeTime = false;
+	}
+
+	if(id == 0)
+	{
+		// Generate new id?
+		id = random::Range<uint64_t>(0, ULLONG_MAX);
 	}
 }
 
@@ -199,10 +206,10 @@ Entity* Entity::Clone(string name, Entity* parent)
 
 Component* Entity::GetComponent(string type)
 {
-	deque<string> spl = Split(type, ".: ", "");
+	string unscoped = RemoveScoping(type);
 	for(auto& comp : components)
 	{
-		if(Type(comp) == type || Type(comp) == spl[spl.size()-1])
+		if(Type(comp) == type || Type(comp) == unscoped || RemoveScoping(Type(comp)).find(unscoped) != -1)
 		{
 			return comp;
 		}
@@ -315,6 +322,7 @@ void Entity::Save(Properties* prop)
 	prop->type = "entity";
 	prop->id = name;
 
+	prop->Set("id", id);
 	prop->Set("tags", tags);
 	prop->Set("layer", layer);
 	prop->Set("active", active);
@@ -333,6 +341,7 @@ void Entity::Save(Properties* prop)
 
 void Entity::Load(Properties* prop)
 {
+	prop->Get("id", id);
 	prop->Get("tags", tags);
 	prop->Get("layer", layer);
 	prop->Get("active", active);
@@ -375,8 +384,8 @@ void Entity::Load(Properties* prop)
 	Entity* ent = nullptr;
 	for(auto& child : c)
 	{
-		ent = game->scene->Spawn(child->id, this);
-		ent->Load(child);
+		ent = game->scene->SpawnAndLoad(child, child->id, this);
+	//	ent->Load(child);
 	}
 
 	Log("Entity::Load: Finished.");

@@ -61,7 +61,7 @@ public:
 
 	map<string, string>& GetValues();
 
-	Properties* AddChild(string type = "");
+	Properties* AddChild(string type = "", string id = "");
 
 	template<typename T>
 	void Set(string name, const T& value)

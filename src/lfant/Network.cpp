@@ -43,9 +43,9 @@ Network::~Network()
 
 void Network::Init()
 {
-	Subsystem::Init();
-
 	Log("Network::Init: Touch.");
+	
+	Subsystem::Init();
 }
 
 void Network::Update()

@@ -46,8 +46,6 @@ FileSystem::~FileSystem()
 
 void FileSystem::Init()
 {
-	Subsystem::Init();
-
 	// Use default settings
 //	gameFolder = "../..";
 #if WINDOWS
@@ -56,6 +54,8 @@ void FileSystem::Init()
 	const string home = getenv("HOME");
 #endif
 	userFolder = home + "/Documents/My Games/" + game->orgName + "/" + game->gameName;
+
+	Subsystem::Init();
 }
 
 path FileSystem::GetGamePath(string name)

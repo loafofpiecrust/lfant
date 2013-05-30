@@ -111,11 +111,9 @@ void Scene::Save(Properties* prop)
 
 void Scene::Load(Properties *prop)
 {
-	Log("Scene::Load: Loaded scene node");
-	deque<Properties*> ents = prop->GetChildren("entity");
-	Log("Scene::Load: Filled entity list");
+	Log("Scene::Load: Loading scene node");
 	Entity* ent = nullptr;
-	for(auto& i : ents)
+	for(auto& i : prop->GetChildren("entity"))
 	{
 		ent = Spawn(i->id);
 		Log("Spawned the entity!");
@@ -137,6 +135,27 @@ Entity* Scene::Spawn(string name, Entity* parent)
 
 	ent->Init();
 	Log("Scene::Spawn: Initialised, ", ent);
+	if(!parent)
+	{
+		entities.push_front(ent);
+		Log("Scene::Spawn: pushed in.");
+	}
+	else
+	{
+		parent->AddChild(ent);
+	}
+	return ent;
+}
+
+Entity* Scene::SpawnAndLoad(Properties* prop, string name, Entity* parent)
+{
+	Entity* ent = new Entity;
+	ent->parent = parent;
+	ent->name = name;
+	ent->active = true;
+	ent->Load(prop);
+	ent->Init();
+	
 	if(!parent)
 	{
 		entities.push_front(ent);

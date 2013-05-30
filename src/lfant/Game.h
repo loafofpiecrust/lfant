@@ -75,12 +75,6 @@ public:
 	 *	Called every frame to update the game and its subsystems
 	 */
 	virtual void Update();
-	virtual void PreUpdate()
-	{
-	}
-	virtual void PostUpdate()
-	{
-	}
 
 	/**
 	 *	Schedules the game to be exited at the end of this frame.

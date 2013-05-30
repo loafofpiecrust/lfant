@@ -95,6 +95,8 @@ void UserInterface::Init()
 
 
 //	root = new Movie("root", player->get_root());
+
+	Subsystem::Init();
 }
 
 void UserInterface::Update()

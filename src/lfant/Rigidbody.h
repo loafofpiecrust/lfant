@@ -57,9 +57,6 @@ class Rigidbody : public Component
 	friend class Physics;
 	DECLARE_COMP(Rigidbody)
 public:
-	// ctor and dtor
-	Rigidbody();
-	virtual ~Rigidbody();
 
 	// Nested classes
 	enum class Mode : byte
@@ -76,6 +73,13 @@ public:
 		Cylinder,
 		Capsule
 	};
+
+	// ctor and dtor
+	Rigidbody();
+	virtual ~Rigidbody();
+
+	virtual void Load(Properties* prop);
+	virtual void Save(Properties* prop);
 
 	// Methods
 	btTypedConstraint* GetConstraint(uint16 idx);

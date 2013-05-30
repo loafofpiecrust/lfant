@@ -57,7 +57,11 @@ void Camera::Init()
 void Camera::Update()
 {
 //	Log("Updating cam view");
-	UpdateView();
+	view = glm::lookAt(
+				owner->transform->GetWorldPosition(),
+				owner->transform->GetWorldPosition() + owner->transform->direction,
+				owner->transform->up
+				);
 	//	UpdateProjection();
 }
 
@@ -72,37 +76,39 @@ void Camera::OnDestroy()
 *
 *******************************************************************************/
 
-void Camera::SetProjection(float fov, float aspect, float min, float max)
+void Camera::UpdateProjection()
 {
-	switch(projectionMode)
+	switch(mode)
 	{
 		case Mode::Perspective:
 		{
-			projection = perspective(fov, aspect, min, max);
+			Log("Setting cam projection to perspective");
+			projection = perspective(fov, aspectRatio, viewRange.min, viewRange.max);
+			Log("projection: ", lexical_cast<string>(vec3(projection[0].xyz)), lexical_cast<string>(vec3(projection[1].xyz)), lexical_cast<string>(vec3(projection[2].xyz)));
 			break;
 		}
 		case Mode::Orthographic:
 		{
-			projection = ortho(-fov / 2 * aspect, fov / 2 * aspect, -fov / 2 / aspect, fov / 2 / aspect, min, max);
+			projection = ortho(0.0f, fov * aspectRatio, 0.0f, fov / aspectRatio, viewRange.min, viewRange.max);
 			break;
 		}
 	}
-	this->fov = fov;
-	this->aspectRatio = aspect;
-	this->viewRange.min = min;
-	this->viewRange.max = max;
 }
 
-void Camera::UpdateProjection()
+mat4 Camera::GetProjection()
 {
-	SetProjection(fov, aspectRatio, viewRange.min, viewRange.max);
+	return projection;
+}
+
+mat4 Camera::GetView()
+{
+	return view;
 }
 
 void Camera::UpdateView()
 {
-//	Log("Camera pos: ", lexical_cast<string>(owner->transform->GetWorldPosition()));
 //	Log("Camera direction: ", lexical_cast<string>(owner->transform->direction), ", up: ", lexical_cast<string>(owner->transform->up));
-	view = lookAt(
+	view = glm::lookAt(
 				owner->transform->GetWorldPosition(),
 				owner->transform->GetWorldPosition() + owner->transform->direction,
 				owner->transform->up

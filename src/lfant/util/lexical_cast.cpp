@@ -76,6 +76,24 @@ long lexical_cast<long, string>(const string& src)
 }
 
 template<>
+unsigned long lexical_cast<unsigned long, string>(const string& src)
+{
+	return strtoul(src.c_str(), 0, 0);
+}
+
+template<>
+long long lexical_cast<long long, string>(const string& src)
+{
+	return atoll(src.c_str());
+}
+
+template<>
+unsigned long long lexical_cast<unsigned long long, string>(const string& src)
+{
+	return strtoull(src.c_str(), 0, 0);
+}
+
+template<>
 float lexical_cast<float, string>(const string& src)
 {
 	return strtof(src.c_str(), 0);
@@ -138,6 +156,17 @@ string lexical_cast<string, unsigned int>(const unsigned int& src)
 }
 
 template<>
+string lexical_cast<string, unsigned long>(const unsigned long& src)
+{
+	return to_string(src);
+}
+
+template<>
+string lexical_cast<string, unsigned long long>(const unsigned long long& src)
+{
+	return to_string(src);
+}
+template<>
 string lexical_cast<string, bool>(const bool& src)
 {
 	if(src)
@@ -167,10 +196,44 @@ string lexical_cast<string, vec3>(const vec3& src)
 }
 
 template<>
+string lexical_cast<string, vec4>(const vec4& src)
+{
+	return "("+lexical_cast<string>(src.x)+","+lexical_cast<string>(src.y)+","+
+			lexical_cast<string>(src.z)+","+lexical_cast<string>(src.w)+")";
+}
+
+template<>
 string lexical_cast<string, rgba>(const rgba& src)
 {
 	return "("+lexical_cast<string>(src.r)+","+lexical_cast<string>(src.g)+","+
 			lexical_cast<string>(src.b)+","+lexical_cast<string>(src.a)+")";
+}
+
+template<>
+string lexical_cast<string, mat4>(const mat4& src)
+{
+	string result = "\n[";
+	for(uint i=0; i<4; ++i)
+	{
+		if(i != 0)
+		{
+			result.append(" ");
+		}
+		for(uint k=0; k<4; ++k)
+		{
+			result.append(lexical_cast<string>(src[i][k]));
+			if(k != 3)
+			{
+				result.append(",");
+			}
+		}
+		if(i != 3)
+		{
+			result.append("\n");
+		}
+	}
+	result.append("]");
+	return result;
 }
 
 template<>

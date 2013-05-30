@@ -75,6 +75,8 @@ void Mesh::Save(Properties *prop)
 	Component::Save(prop);
 
 	prop->Set("path", file);
+
+	material->Save(prop->AddChild("material"));
 }
 
 void Mesh::SetShape(string preset)
@@ -122,9 +124,12 @@ void Mesh::BeginRender()
 
 	if(material->shader->GetId() != 0)
 	{
+		Log("Adding uniforms..");
 		material->shader->AddUniform("MVP");
 		material->shader->AddUniform("textureSampler");
 	}
+
+//	IndexVBO();
 
 	CreateBuffer(vertexBuffer, GL_ARRAY_BUFFER);
 	CreateBuffer(uvBuffer, GL_ARRAY_BUFFER);
@@ -150,8 +155,20 @@ void Mesh::Render()
 
 //	Log("mainCamera = ", game->scene->mainCamera);
 
-	mat4 mvp = game->scene->mainCamera->projection * game->scene->mainCamera->view * owner->transform->GetMatrix();
+	mat4 mvp; //= game->scene->mainCamera->projection;
+/*
+	Log("mesh p: ", lexical_cast<string>(mvp));
+	mvp = game->scene->mainCamera->view;
+	Log("mesh v: ", lexical_cast<string>(mvp));
+	mvp = owner->transform->GetMatrix();
+	Log("mesh m: ", lexical_cast<string>(mvp));
+*/
+//	Log("Mesh MVP uniform = ", material->shader->GetUniform("MVP"));
+	mvp = game->scene->mainCamera->GetProjection() * game->scene->mainCamera->GetView() * owner->transform->GetMatrix();
 	glUniformMatrix4fv(material->shader->GetUniform("MVP"), 1, GL_FALSE, &mvp[0][0]);
+
+//	Log("mesh mvp: ", lexical_cast<string>(mvp));
+
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, material->texture->GetId());
@@ -249,18 +266,20 @@ void Mesh::LoadFile(string path)
 	BeginRender();
 }
 
+/// @fixme Something is horribly wrong.
 void Mesh::IndexVBO()
 {
 	indexBuffer.data.clear();
 //	vector<uint32> indices;
 	bool found = false;
 
-	/*
+	Log("INDEXING VBO.");
+	
 	for(uint i = 0; i < vertexBuffer.size(); ++i)
 	{
 		for(uint k = 0; k < indexBuffer.size(); ++k)
 		{
-			if(vertexBuffer[k] == vertexBuffer[i])
+			if(vertexBuffer[indexBuffer[k]] == vertexBuffer[i])
 			{
 				indexBuffer.push_back(indexBuffer[k]);
 				found = true;
@@ -271,13 +290,18 @@ void Mesh::IndexVBO()
 			found = false;
 			continue;
 		}
-		indexBuffer.push_back(i);
+		else
+		{
+			indexBuffer.push_back(i);
+		}
 	}
-	*/
+	
+	/*
 	for(uint i = 0; i < vertexBuffer.size(); ++i)
 	{
 		indexBuffer.push_back(i);
 	}
+	*/
 }
 
 void BufferBase::Destroy()

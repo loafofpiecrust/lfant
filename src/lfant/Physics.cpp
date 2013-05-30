@@ -42,6 +42,34 @@ Physics::~Physics()
 {
 }
 
+void Physics::Save(Properties* prop)
+{
+	Subsystem::Save(prop);
+
+	prop->Set("gravity", GetGravity());
+
+	for(auto& gpt : gravityPoints)
+	{
+		Properties* pgpt = prop->AddChild("gravityPoint");
+		pgpt->id = gpt.name;
+		pgpt->Set("force", gpt.force);
+	}
+}
+
+void Physics::Load(Properties* prop)
+{
+	Subsystem::Load(prop);
+
+	prop->Get("gravity", initGravity);
+
+	for(auto& pgpt : prop->GetChildren("gravityPoint"))
+	{
+		GravPoint* gpt = new GravPoint;
+		gpt->name = pgpt->id;
+		pgpt->Get("force", gpt->force); 
+	}
+}
+
 /*******************************************************************************
 *
 *		Game Loop
@@ -68,7 +96,7 @@ void Physics::Init()
 
 	Log("Physics::Init: Contact callbacks set.");
 
-	world->setGravity(btVector3(0,0.0f,0));
+	SetGravity(initGravity);
 }
 
 void Physics::Update()
@@ -93,6 +121,16 @@ void Physics::OnDestroy()
 *		Point Gravity
 *
 *******************************************************************************/
+
+vec3 Physics::GetGravity()
+{
+	return vec3_cast<vec3>(world->getGravity());
+}
+
+void Physics::SetGravity(vec3 grav)
+{
+	world->setGravity(vec3_cast<btVector3>(grav));
+}
 
 GravPoint* Physics::GetGravityPoint(string name)
 {

@@ -198,12 +198,14 @@ void Transform::SetWorldScale(vec3 scl)
 
 void Transform::Update()
 {
+//	Log("Transform updating");
 	SetDirection();
-	SetMatrix();
+//	SetMatrix();
 }
 
 void Transform::SetMatrix()
 {
+	/*
 //	mat4 matrix;
 	matrix = mat4(1.0f);
 	matrix = glm::translate(mat4(1.0f), GetWorldPosition());
@@ -217,10 +219,43 @@ void Transform::SetMatrix()
 	matrix = glm::scale(matrix, GetWorldScale());
 //	return matrix;
 //	Log("Transform position: ", lexical_cast<string>(vec3(matrix[3].xyz)));
+*/
 }
 
-const mat4& Transform::GetMatrix()
+mat4 Transform::GetMatrix()
 {
+	vec3 scl = GetWorldScale();
+	if(scl == vec3(0))
+	{
+		return mat4(0);
+	}
+	
+	vec3 pos = GetWorldPosition();
+	vec3 rot = radians(GetWorldRotation());
+	mat4 matrix = mat4(1.0f);
+	
+	if(pos != vec3(0))
+	{
+	//	Log("pos = ", lexical_cast<string>(pos));
+		matrix = glm::translate(matrix, pos);
+	//	Log("matrix = ", lexical_cast<string>(matrix));
+	}
+	
+	if(rot != vec3(0))
+	{
+	//	Log("rot = ", lexical_cast<string>(rot));
+		matrix = glm::rotate(matrix, rot.x, vec3(1,0,0));
+		matrix = glm::rotate(matrix, rot.y, vec3(0,1,0));
+		matrix = glm::rotate(matrix, rot.z, vec3(0,0,1));
+	//	Log("matrix = ", lexical_cast<string>(matrix));
+	}
+	
+	if(scl != vec3(1))
+	{
+		matrix = glm::scale(matrix, scl);
+	//	Log("matrix = ", lexical_cast<string>(matrix));
+	}
+	
 	return matrix;
 }
 
@@ -235,12 +270,13 @@ void Transform::SetDirection()
 		);
 
 	right = vec3(
-		sin(rot.y - 3.14f / 2.0f),
+		sin(rot.y - pi / 2.0f),
 		0,
-		cos(rot.y - 3.14f / 2.0f)
+		cos(rot.y - pi / 2.0f)
 		);
 
 	up = cross(right, direction);
+//	right.x *= -1;
 }
 
 vec3 Transform::GetWorldRotatedPosition()
@@ -261,6 +297,7 @@ vec3 Transform::GetWorldRotatedPosition()
 
 void Transform::Translate(vec3 pos)
 {
+//	Log("Translating by ", lexical_cast<string>(pos));
 	SetPosition(position + pos);
 }
 

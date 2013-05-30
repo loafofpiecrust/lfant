@@ -104,9 +104,9 @@ public:
 	{
 		for(auto& comp : components)
 		{
-			if(Type(comp) == Type<C>())
+			if(C* c = dynamic_cast<C*>(comp.get()))
 			{
-				return dynamic_cast<C*>(comp.get());
+				return c;
 			}
 		}
 		return nullptr;
@@ -132,13 +132,12 @@ public:
 
 	bool HasTag(string tag);
 
+	uint64_t GetId() { return id; }
+
 	Transform* transform = nullptr;
 
 	/// Whether to update this Entity or not.
 	bool active = true;
-
-	/// 9-digit scene-unique identifier.
-	const boost::uuids::uuid id = boost::uuids::random_generator() ();
 
 	string name = "Entity";
 
@@ -171,6 +170,9 @@ private:
 	deque< ptr<Entity, Object::Delete> > children;
 	deque< ptr<Component, Object::Delete> > components;
 	bool useLifeTime = false;
+
+	/// 64-bit scene-unique identifier.
+	uint64_t id = 0;
 };
 
 /** @} */

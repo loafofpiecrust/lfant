@@ -21,12 +21,11 @@
 
 #include <lfant/Audio.h>
 
-// External
-#include <fmod.hpp>
-
 // Internal
-
 #include <lfant/Console.h>
+
+// External
+#include <bass.h>
 
 namespace lfant
 {
@@ -44,9 +43,6 @@ Audio::~Audio()
 void Audio::Init()
 {
 	Subsystem::Init();
-
-	FMOD::System_Create(&soundSystem);
-	soundSystem->init(maxChannels, FMOD_INIT_NORMAL, 0);
 }
 
 void Audio::Update()
@@ -58,19 +54,14 @@ void Audio::OnDestroy()
 {
 }
 
-FMOD::Sound* Audio::PlaySound(string file, bool loop)
+/*
+ Audio::PlaySound(string file, bool loop)
 {
-	FMOD::Sound* snd;
-	soundSystem->createSound(file.c_str(), FMOD_SOFTWARE | FMOD_2D, 0, &snd);
-	if(loop)
-	{
-		snd->setMode(FMOD_LOOP_NORMAL);
-	}
-	return snd;
 }
 
-FMOD::Sound* Audio::PlaySound3d(string file, vec3 position, bool loop)
+ Audio::PlaySound3d(string file, vec3 position, bool loop)
 {
 }
+*/
 
 }

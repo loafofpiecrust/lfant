@@ -160,6 +160,7 @@ uint32 Shader::GetUniform(string name)
 
 void Shader::AddUniform(string name)
 {
+	uniforms[name] = 0;
 	uniforms[name] = glGetUniformLocation(id, name.c_str());
 	Log("Adding uniform '"+name+"' as ", uniforms[name]);
 }

@@ -1,3 +1,6 @@
+#ifndef HEADER_F10FF25176ACD9D0
+#define HEADER_F10FF25176ACD9D0
+
 /******************************************************************************
 *
 *	LFANT Source
@@ -292,7 +295,7 @@ public:
 		TriggerEvent(name, arg, arg2);
 	}
 
-	bool ConnectEvented(string name)
+	bool EventConnected(string name)
 	{
 		erase_all(name, " ");
 		name = Type(this) + "::" + name;
@@ -354,3 +357,5 @@ private:
 /// @}
 
 } /* namespace lfant */
+
+#endif // header guard 

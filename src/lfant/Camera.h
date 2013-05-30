@@ -1,3 +1,6 @@
+#ifndef HEADER_62C981C59A7F3A65
+#define HEADER_62C981C59A7F3A65
+
 /******************************************************************************
 *
 *	LFANT Source
@@ -57,17 +60,13 @@ public:
 	virtual void Update();
 	virtual void OnDestroy();
 
-	/**	Sets the projection of this Camera for viewing.
-	 *	@param fov The FoV to use, eg. 70
-	 *	@param aspect Aspect ratio to use, eg. 16/10 or 16/9
-	 *	@param min The closest distance to render.
-	 *	@param max The farthest distance to render.
-	 */
-	void SetProjection(float fov, float aspect, float min, float max);
-
-	/**	Updates the projection to use the current settings
+	/**
+	 *	Updates the projection to use the current settings
 	 */
 	void UpdateProjection();
+
+	mat4 GetProjection();
+	mat4 GetView();
 
 	void UpdateView();
 	void OnViewChange(vec3 change)
@@ -93,10 +92,6 @@ public:
 	/// Aspect ratio, eg. 16.0f/9.0f
 	float aspectRatio = 16 / 9;
 
-	/// The projection matrix for rendering the projection.
-	mat4 projection = mat4(1);
-	mat4 view = mat4(1);
-
 	/// The viewing range (near and far) of this camera's view, eg. (0.1f, 1000.0f)
 	Range<float> viewRange = { 0.1f, 1000.0f };
 
@@ -109,11 +104,17 @@ public:
 		Perspective,
 		Orthographic
 	};
-	Mode projectionMode = Mode::Perspective;
+	Mode mode = Mode::Perspective;
 
 //		PROP_RW(Camera, viewport, GetViewport, SetViewport)
 
 protected:
+
+	/// Matrix for specific projection.
+	mat4 projection = mat4(1);
+
+	/// Matrix for transformations.
+	mat4 view = mat4(1);
 
 private:
 
@@ -122,3 +123,5 @@ private:
 /** @} */
 /** @} */
 }
+
+#endif // header guard

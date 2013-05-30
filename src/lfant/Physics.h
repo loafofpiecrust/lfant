@@ -51,14 +51,16 @@ class Joint;
 
 struct GravPoint
 {
-	string name;
-	vec3* point;
-	float force;
+	string name = "";
+	vec3* point = nullptr;
+	float force = 1.0f;
 
 	GravPoint(string name, vec3* pt, float fc) :
 		name(name), point(pt), force(fc)
 	{
 	}
+
+	GravPoint() {}
 };
 
 /**
@@ -80,6 +82,9 @@ public:
 	Physics();
 	virtual ~Physics();
 
+	void Save(Properties* prop);
+	void Load(Properties* prop);
+
 	virtual void Init();
 	virtual void Update();
 	virtual void OnDestroy();
@@ -90,6 +95,9 @@ public:
 
 	void AddRigidbody(Rigidbody* ent);
 	void RemoveRigidbody(Rigidbody* ent, bool destroy = false);
+
+	vec3 GetGravity();
+	void SetGravity(vec3 grav);
 
 	/**
 	 *	Returns the gravity point with the given name.
@@ -149,6 +157,7 @@ private:
 	ptr<btDefaultCollisionConfiguration> collisionConfig;
 
 	deque<GravPoint> gravityPoints;
+	vec3 initGravity = vec3(0, -9.81, 0);
 };
 
 /** @} */

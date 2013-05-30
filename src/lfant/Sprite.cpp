@@ -107,7 +107,7 @@ void Sprite::Render()
 //	glUseProgram(material->shader->GetId());
 	material->shader->Use();
 
-	mat4 mvp = game->scene->mainCamera->projection * game->scene->mainCamera->view * owner->transform->GetMatrix();
+	mat4 mvp = game->scene->mainCamera->GetProjection() * game->scene->mainCamera->GetView() * owner->transform->GetMatrix();
 	glUniformMatrix4fv(material->shader->GetUniform("MVP"), 1, GL_FALSE, &mvp[0][0]);
 
 	glActiveTexture(GL_TEXTURE0);

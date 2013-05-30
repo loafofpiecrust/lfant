@@ -18,8 +18,8 @@ link_directories(
 file(GLOB_RECURSE SRC_FILES "${SOURCE_DIR}/*.cpp")
 file(GLOB_RECURSE HEADER_FILES "${INCLUDE_DIR}/lfant/*.h")
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ggdb")
-set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -g")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ggdb")
+#set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -g")
 
 # Output Library Info
 add_library(${PROJECT_NAME} SHARED ${SRC_FILES} ${HEADER_FILES})
@@ -31,7 +31,10 @@ add_dependencies(${PROJECT_NAME} ${ROOT}/external)
 # Includes Info
 include_directories(
 	"../"
-	"${ROOT}/external/fmod/api/inc"
+	"${ROOT}/external/png"
+	"${ROOT}/external/jpeg"
+	"${ROOT}/external/zlib"
+	"${ROOT}/external/bass"
 	"${ROOT}/external/assimp/include"
 	"${ROOT}/external/glm"
 	"${ROOT}/external/boost"
@@ -52,9 +55,9 @@ target_link_libraries(${PROJECT_NAME}
 	glfw
 	boost
 	bullet
-	fmod
+#	bass
 	CEGUI
-	:libpng.a
+	png
 	z
 	angelscript
 	rt

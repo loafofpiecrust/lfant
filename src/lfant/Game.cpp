@@ -104,7 +104,6 @@ void Game::Init()
 
 void Game::Update()
 {
-	PreUpdate();
 	time->Update();
 	physics->Update();
 	scene->Update();
@@ -112,7 +111,6 @@ void Game::Update()
 //	userInterface->Update();
 	renderer->Update();
 //	network->Update();
-	PostUpdate();
 }
 
 

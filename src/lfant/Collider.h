@@ -55,20 +55,23 @@ protected:
 	virtual ~Collider()
 	{
 	}
-//		using Component::Component;
-//		using Component::~Component;
+
+	void Save(Properties* prop);
+	void Load(Properties* prop);
 
 	virtual void Init();
-	virtual void OnAddComponent(Component* comp);
+	virtual void OnSetRigidbody(Rigidbody* rb);
 	virtual void OnSetScale(vec3 scale);
 
-	virtual btCollisionShape* GetShape();
+	virtual btCollisionShape* GetShape() = 0;
+
+	virtual vec3 GetSize() { return size; }
+	virtual void SetSize(vec3 size) { this->size = size; }
 
 	Rigidbody* rigidbody;
+	vec3 size = vec3(1);
 
 private:
-
-public:
 
 };
 

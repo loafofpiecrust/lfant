@@ -45,6 +45,23 @@ Rigidbody::~Rigidbody()
 {
 }
 
+void Rigidbody::Save(Properties* prop)
+{
+	Component::Save(prop);
+
+	prop->Set("mass", mass);
+	prop->Set("velocity", GetVelocity());
+}
+
+void Rigidbody::Load(Properties* prop)
+{
+	Component::Load(prop);
+
+	prop->Get("mass", mass);
+
+//	SetVelocity(prop->Get<vec3>("velocity"));
+}
+
 /*******************************************************************************
 *		General functions
 *		\area General
@@ -52,10 +69,10 @@ Rigidbody::~Rigidbody()
 
 void Rigidbody::Init()
 {
-	Log("Rigidbody::Init: Touch.");
+	Log("Rigidbody::Init: Touch. Entity name: ", owner->name);
 	motionState = new btDefaultMotionState;
 	Log("Rigidbody::Init: Spawning underlying btRigidBody.");
-	if(collider)
+	if((collider = owner->GetComponent<Collider>()))
 	{
 		Log("Rigidbody::Init: With collider.");
 		body = new btRigidBody(mass, motionState, collider->GetShape(), vec3_cast<btVector3>(inertia));
@@ -76,6 +93,7 @@ void Rigidbody::Init()
 	ConnectEvent(SENDER(owner, SetCollider), RECEIVER(this, OnSetCollider));
 
 	body->getWorldTransform().setOrigin(vec3_cast<btVector3>(owner->transform->GetPosition()));
+	body->forceActivationState(DISABLE_DEACTIVATION);
 }
 
 void Rigidbody::Update()
@@ -85,7 +103,7 @@ void Rigidbody::Update()
 	if(pos != owner->transform->GetPosition())
 	{
 		owner->transform->SetPosition(pos);
-		Log("Rigidbody position: ", lexical_cast<string>(pos));
+	//	Log("Rigidbody position: ", lexical_cast<string>(pos));
 	}
 }
 
@@ -104,6 +122,7 @@ void Rigidbody::OnSetPos( vec3 pos )
 	{
 		return;
 	}
+//	Log("OnSetPos: Touch.");
 	body->getWorldTransform().setOrigin(vec3_cast<btVector3>(pos));
 }
 
@@ -177,10 +196,13 @@ void Rigidbody::OnSetCollider(Collider *collider)
 	if(!collider)
 	{
 		body->setCollisionShape(new btEmptyShape);
+		this->collider = nullptr;
 	}
 	else
 	{
+		Log("Collider set for entity, setting for rigidbody, type: '", Type(collider), "'.");
 		body->setCollisionShape(collider->GetShape());
+		this->collider = collider;
 	}
 	body->getWorldTransform().setOrigin(vec3_cast<btVector3>(owner->transform->GetPosition()));
 }

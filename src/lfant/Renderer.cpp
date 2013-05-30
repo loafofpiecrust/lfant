@@ -133,25 +133,25 @@ void Renderer::Init()
 
 	// Fragment depth testing
 	glDepthFunc(GL_LESS);
-	//glDepthMask(GL_TRUE);
+	//glDepthMask(GL_FALSE);
 	//glDepthRange(0.0f, 1.0f);
 
 	// Backface culling
-//	glEnable(GL_CULL_FACE);
-//	glCullFace(GL_BACK);
-//	glFrontFace(GL_CCW);
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
+	glFrontFace(GL_CCW);
 
 	// Texture and shading
 	glEnable(GL_TEXTURE_2D);
 	glShadeModel(GL_SMOOTH);
-//	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
 	// Point sprites
-	//glEnable(GL_POINT_SPRITE);
-	//glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
-	//glEnable(GL_BLEND);
+	glEnable(GL_POINT_SPRITE);
+	glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
+	glEnable(GL_BLEND);
 
-	//glfwSwapInterval(vsync);
+	glfwSwapInterval(vsync);
 
 	glfwSetWindowCloseCallback(&Renderer::OnCloseWindow);
 	glfwSetWindowSizeCallback(&Renderer::OnSetResolution);

@@ -112,11 +112,11 @@ protected:
 
 	virtual void TriggerEvent(string name) final;
 
-	template<typename P1, typename ... P>
-	void TriggerEvent(string name, P1 arg, P ... args)
+	template<typename P1, typename... P>
+	void TriggerEvent(string name, P1 arg, P... args)
 	{
-		owner->TriggerEvent(name, arg, args ...);
-		Object::TriggerEvent(name, arg, args ...);
+		owner->TriggerEvent(name, arg, args...);
+		Object::TriggerEvent(name, arg, args...);
 	}
 
 private:

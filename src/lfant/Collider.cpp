@@ -29,27 +29,35 @@
 namespace lfant
 {
 
+void Collider::Save(Properties* prop)
+{
+	Component::Save(prop);
+
+	prop->Set("size", GetSize());
+}
+
+void Collider::Load(Properties* prop)
+{
+	Component::Load(prop);
+
+	prop->Get("size", size);
+}
+
 void Collider::Init()
 {
 	TriggerEvent("SetCollider", this);
 	ConnectEvent(SENDER(owner, SetScale), RECEIVER(this, OnSetScale));
+	ConnectEvent(SENDER(owner, SetRigidbody), RECEIVER(this, OnSetRigidbody));
 }
 
-void Collider::OnAddComponent(Component* comp)
+void Collider::OnSetRigidbody(Rigidbody* rb)
 {
-	if(CheckType<Rigidbody>(comp))
-	{
-		//	rigidbody = dynamic_cast<Rigidbody*>( comp );
-	}
+	rigidbody = rb;
 }
 
 void Collider::OnSetScale(vec3 scale)
 {
 	GetShape()->setLocalScaling(vec3_cast<btVector3>(scale));
-}
-
-btCollisionShape* Collider::GetShape()
-{
 }
 
 }

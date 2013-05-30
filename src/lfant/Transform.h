@@ -64,7 +64,7 @@ public:
 
 	void SetDirection();
 	void SetMatrix();
-	const mat4& GetMatrix();
+	mat4 GetMatrix();
 
 	vec3 up;
 	vec3 right;
@@ -73,11 +73,11 @@ public:
 protected:
 	vec3 GetWorldRotatedPosition();
 
-	vec3 position;
-	vec3 rotation;
-	vec3 scale;
+	vec3 position = vec3(0.0f);
+	vec3 rotation = vec3(0.0f);
+	vec3 scale = vec3(1.0f);
 	quat rotationQuat;
-	mat4 matrix = mat4(1.0f);
+//	mat4 matrix = mat4(1.0f);
 
 	Transform* parent = nullptr;
 
