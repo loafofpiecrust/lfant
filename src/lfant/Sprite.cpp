@@ -52,21 +52,21 @@ void Sprite::BeginRender()
 
 	Log("Sprite vert arr bound");
 
-	if(material.shader.id == 0)
+	if(material->shader->GetId() == 0)
 	{
-		material.shader.LoadFile();
+		material->shader->LoadFile();
 	}
 
-	if(material.texture.id == 0)
+	if(material->texture->GetId() == 0)
 	{
-		material.texture.LoadFile();
+		material->texture->LoadFile();
 	}
 
-	if(material.shader.id != 0)
+	if(material->shader->GetId() != 0)
 	{
 		// Get any uniforms here
-		matrixId = material.shader.GetUniform("MVP");
-		material.texture.uniformId = material.shader.GetUniform("textureSampler");
+		material->shader->AddUniform("MVP");
+		material->shader->AddUniform("textureSampler");
 	}
 
 	vertexBuffer.push_back(vec3(0, 0, 0));
@@ -84,38 +84,42 @@ void Sprite::BeginRender()
 	indexBuffer.push_back(2);
 	indexBuffer.push_back(3);
 
-	vertexBuffer.id = CreateBuffer(GL_ARRAY_BUFFER, vertexBuffer.data);
-	uvBuffer.id = CreateBuffer(GL_ARRAY_BUFFER, uvBuffer.data);
-	indexBuffer.id = CreateBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer.data);
+	CreateBuffer(vertexBuffer, GL_ARRAY_BUFFER);
+	CreateBuffer(uvBuffer, GL_ARRAY_BUFFER);
+	CreateBuffer(indexBuffer, GL_ELEMENT_ARRAY_BUFFER);
 
 	Renderable::BeginRender();
 }
 
 void Sprite::Render()
 {
-	if(material.shader.id == 0 || material.texture.id == 0)
+	if(!material->shader->GetId() || !material->texture->GetId())
 	{
+		printf("Failing sprite rendering...\n");
 	//	BeginRender();
 		return;
 	}
 
+	printf("Rendering sprite...\n");
+
 	glBindVertexArray(vertexArray);
 
-	glUseProgram(material.shader.id);
+//	glUseProgram(material->shader->GetId());
+	material->shader->Use();
 
-	mat4 mvp = game->scene->mainCamera->projection * game->scene->mainCamera->view * owner->GetComponent<Transform>()->GetMatrix();
-	glUniformMatrix4fv(matrixId, 1, GL_FALSE, &mvp[0][0]);
+	mat4 mvp = game->scene->mainCamera->GetProjection() * game->scene->mainCamera->GetView() * owner->transform->GetMatrix();
+	glUniformMatrix4fv(material->shader->GetUniform("MVP"), 1, GL_FALSE, &mvp[0][0]);
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, material.texture.id);
-	glUniform1i(material.texture.uniformId, 0);
+	glBindTexture(GL_TEXTURE_2D, material->texture->id);
+	glUniform1i(material->shader->GetUniform("textureSampler"), 0);
 
 	glEnableVertexAttribArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer.id);
+	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
 	glEnableVertexAttribArray(1);
-	glBindBuffer(GL_ARRAY_BUFFER, uvBuffer.id);
+	glBindBuffer(GL_ARRAY_BUFFER, uvBuffer);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
 	/*
@@ -124,13 +128,13 @@ void Sprite::Render()
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 	*/
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer.id);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
 	glDrawElements(GL_QUADS, indexBuffer.size(), GL_UNSIGNED_INT, (void*)0);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-	//glDisableVertexAttribArray(2);
+//	glDisableVertexAttribArray(2);
 	glDisableVertexAttribArray(1);
 	glDisableVertexAttribArray(0);
 
@@ -231,20 +235,23 @@ void Sprite::Update()
 void Sprite::Load(Properties *props)
 {
 	Log("Loading a sprite from props");
-	Mesh::Load(props);
-
+//	Mesh::Load(props);
+	string mat = "materials/Diffuse.mat";
+	props->Get("material", mat);
+	material->LoadFile(mat);
 	// Register Animation::Mode enum
 	props->SetEnum("Mode::Loop", Animation::Mode::Loop);
 	props->SetEnum("Mode::Bounce", Animation::Mode::Bounce);
 	props->SetEnum("Mode::Once", Animation::Mode::Once);
 	props->SetEnum("Mode::Default", Animation::Mode::Default);
 
-	vector<Properties*> panims = props->GetChildren("animation");
+	deque<Properties*> panims = props->GetChildren("animation");
 	for(Properties*& pa : panims)
 	{
 		Animation anim;
 		anim.name = pa->id;
-		anim.material.LoadFile(pa->Get<string>("material", "materials/Diffuse.mat"));
+		string mat = "materials/Diffuse.mat";
+		anim.material.LoadFile(pa->Get("material", mat));
 		pa->Get("frameRate", anim.frameRate);
 		pa->GetEnum("playMode", anim.mode);
 	}
@@ -255,7 +262,7 @@ void Sprite::EndRender()
 	glDeleteBuffers(1, &vertexBuffer.id);
 	glDeleteBuffers(1, &uvBuffer.id);
 	glDeleteBuffers(1, &indexBuffer.id);
-	glDeleteTextures(1, &material.texture.id);
+	glDeleteTextures(1, &material->texture->id);
 	glDeleteVertexArrays(1, &vertexArray);
 
 	Renderable::EndRender();

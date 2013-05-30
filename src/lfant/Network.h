@@ -32,7 +32,9 @@
 namespace lfant
 {
 
+namespace net {
 class Connection;
+}
 
 /**	@addtogroup Game
  *	@{
@@ -57,22 +59,24 @@ public:
 	virtual void Init();
 	virtual void Update();
 
+	void Save(Properties *prop);
+	void Load(Properties *prop);
+
 	template<typename C>
-	C* NewConnection(string name, string host, uint16_t port, string password)
+	C* AddConnection(string name = "")
 	{
-		C* con = new C(name, host, port, password);
-		connections.push_front(ptr<Connection>(con));
-		con->Init();
+		C* con = new C;
+		connections.push_back(con);
 		return con;
 	}
 
-	Connection* GetConnection(string name);
+	net::Connection* GetConnection(string name);
 
 protected:
 //	byte GetPacketId(RakNet::Packet* p);
 
 public:
-	forward_list< ptr<Connection> > connections;
+	deque< ptr<net::Connection> > connections;
 
 };
 

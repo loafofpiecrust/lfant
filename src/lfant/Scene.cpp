@@ -67,13 +67,13 @@ void Scene::OnDestroy()
 
 void Scene::RemoveEntity(Entity* ent)
 {
-	for(auto& ep : entities)
+	for(uint i = 0; i < entities.size(); ++i)
 	{
-		if(ep == ent)
+		if(entities[i] == ent)
 		{
-			Log("Scene::RemoveEntity: Removing '", ep->name, "'.");
-			entities.remove(ep);
-			break;
+			Log("Scene::RemoveEntity: Touch.");
+			entities.erase(entities.begin()+i);
+			return;
 		}
 	}
 	Log("Scene::RemoveEntity: Finished.");
@@ -111,11 +111,9 @@ void Scene::Save(Properties* prop)
 
 void Scene::Load(Properties *prop)
 {
-	Log("Scene::Load: Loaded scene node");
-	vector<Properties*> ents = prop->GetChildren("entity");
-	Log("Scene::Load: Filled entity list");
+	Log("Scene::Load: Loading scene node");
 	Entity* ent = nullptr;
-	for(auto& i : ents)
+	for(auto& i : prop->GetChildren("entity"))
 	{
 		ent = Spawn(i->id);
 		Log("Spawned the entity!");
@@ -139,7 +137,7 @@ Entity* Scene::Spawn(string name, Entity* parent)
 	Log("Scene::Spawn: Initialised, ", ent);
 	if(!parent)
 	{
-		entities.push_front(ptr<Entity>(ent));
+		entities.push_front(ent);
 		Log("Scene::Spawn: pushed in.");
 	}
 	else
@@ -147,6 +145,40 @@ Entity* Scene::Spawn(string name, Entity* parent)
 		parent->AddChild(ent);
 	}
 	return ent;
+}
+
+Entity* Scene::SpawnAndLoad(Properties* prop, string name, Entity* parent)
+{
+	Entity* ent = new Entity;
+	ent->parent = parent;
+	ent->name = name;
+	ent->active = true;
+	ent->Load(prop);
+	ent->Init();
+	
+	if(!parent)
+	{
+		entities.push_front(ent);
+		Log("Scene::Spawn: pushed in.");
+	}
+	else
+	{
+		parent->AddChild(ent);
+	}
+	return ent;
+}
+
+deque<Entity*> Scene::GetEntities(string tag)
+{
+	deque<Entity*> result;
+	for(auto& ent : entities)
+	{
+		if(ent->HasTag(tag))
+		{
+			result.push_back(ent);
+		}
+	}
+	return result;
 }
 
 }

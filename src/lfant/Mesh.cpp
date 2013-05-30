@@ -22,6 +22,9 @@
 
 // External
 #include <GL/glew.h>
+#include <assimp/scene.h>
+#include <assimp/cimport.h>
+#include <assimp/postprocess.h>
 
 // Internal
 #include <lfant/util/String.h>
@@ -31,9 +34,12 @@
 #include <lfant/MeshLoader.h>
 #include <lfant/Scene.h>
 #include <lfant/Camera.h>
+#include <lfant/FileSystem.h>
 
 namespace lfant
 {
+
+IMPLEMENT_COMP(Mesh)
 
 Mesh::Mesh()
 {
@@ -43,18 +49,40 @@ Mesh::~Mesh()
 {
 }
 
-void Mesh::Load(Properties *props)
+void Mesh::Load(Properties *prop)
 {
-	Component::Load(props);
+	Component::Load(prop);
 
-	if(Properties* pmat = props->GetChild("material"))
+	prop->Get("path", file);
+
+	if(Properties* pmat = prop->GetChild("material"))
 	{
-		material.Load(pmat);
+		material->Load(pmat);
 	}
 	else
 	{
 		Log("Loading material from file");
-		material.LoadFile(props->Get<string>("material", "materials/Diffuse.mat"));
+		string mat = "materials/Diffuse.mat";
+		prop->Get("material", mat);
+		material->LoadFile(mat);
+	}
+
+	LoadFile(file);
+}
+
+void Mesh::Save(Properties *prop)
+{
+	Component::Save(prop);
+
+	prop->Set("path", file);
+
+	material->Save(prop->AddChild("material"));
+}
+
+void Mesh::SetShape(string preset)
+{
+	if(preset == "Cube")
+	{
 	}
 }
 
@@ -83,73 +111,83 @@ void Mesh::BeginRender()
 	glGenVertexArrays(1, &vertexArray);
 	glBindVertexArray(vertexArray);
 
-	if(material.shader.id == 0)
+	if(material->shader->GetId() == 0)
 	{
-		material.shader.LoadFile();
+		material->shader->LoadFile();
 	}
 
-	if(material.texture.id == 0)
+	if(material->texture->GetId() == 0)
 	{
-		material.texture.LoadFile();
+		Log("Manually loading texture.");
+		material->texture->LoadFile();
 	}
 
-	if(material.shader.id != 0)
+	if(material->shader->GetId() != 0)
 	{
-		// Get any uniforms here
-		matrixId = material.shader.GetUniform("MVP");
-		material.texture.uniformId = material.shader.GetUniform("textureSampler");
+		Log("Adding uniforms..");
+		material->shader->AddUniform("MVP");
+		material->shader->AddUniform("textureSampler");
 	}
 
-	vector<uint32_t> indices;
-	vector<vec3> indexed_vertices;
-	vector<vec2> indexed_uvs;
-	vector<vec3> indexed_normals;
-	IndexVBO(vertexBuffer.data, uvBuffer.data, normalBuffer.data, indices, indexed_vertices, indexed_uvs, indexed_normals);
+//	IndexVBO();
 
-	vertexBuffer.data = indexed_vertices;
-	uvBuffer.data = indexed_uvs;
-	normalBuffer.data = indexed_normals;
-	indexBuffer.data = indices;
-
-	vertexBuffer.id = CreateBuffer(GL_ARRAY_BUFFER, vertexBuffer.data);
-	uvBuffer.id = CreateBuffer(GL_ARRAY_BUFFER, uvBuffer.data);
-	normalBuffer.id = CreateBuffer(GL_ARRAY_BUFFER, normalBuffer.data);
-	indexBuffer.id = CreateBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer.data);
+	CreateBuffer(vertexBuffer, GL_ARRAY_BUFFER);
+	CreateBuffer(uvBuffer, GL_ARRAY_BUFFER);
+	CreateBuffer(normalBuffer, GL_ARRAY_BUFFER);
+	CreateBuffer(indexBuffer, GL_ELEMENT_ARRAY_BUFFER);
 
 	loaded = true;
 }
 
 void Mesh::Render()
 {
-	if(material.shader.id == 0 || material.texture.id == 0)
+	if(!material->shader->GetId() || !material->texture->GetId())
 	{
 		return;
 	}
 
+//	Log("Rendering mesh..");
+
 	glBindVertexArray(vertexArray);
 
-	glUseProgram(material.shader.id);
+	glUseProgram(material->shader->GetId());
+//	Log("Shader id: ", material->shader->GetId());
 
-	mat4 mvp = game->scene->mainCamera->projection * game->scene->mainCamera->view * owner->GetComponent<Transform>()->GetMatrix();
-	glUniformMatrix4fv(matrixId, 1, GL_FALSE, &mvp[0][0]);
+//	Log("mainCamera = ", game->scene->mainCamera);
+
+	mat4 mvp; //= game->scene->mainCamera->projection;
+/*
+	Log("mesh p: ", lexical_cast<string>(mvp));
+	mvp = game->scene->mainCamera->view;
+	Log("mesh v: ", lexical_cast<string>(mvp));
+	mvp = owner->transform->GetMatrix();
+	Log("mesh m: ", lexical_cast<string>(mvp));
+*/
+//	Log("Mesh MVP uniform = ", material->shader->GetUniform("MVP"));
+	mvp = game->scene->mainCamera->GetProjection() * game->scene->mainCamera->GetView() * owner->transform->GetMatrix();
+	glUniformMatrix4fv(material->shader->GetUniform("MVP"), 1, GL_FALSE, &mvp[0][0]);
+
+//	Log("mesh mvp: ", lexical_cast<string>(mvp));
+
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, material.texture.id);
-	glUniform1i(material.texture.uniformId, 0);
+	glBindTexture(GL_TEXTURE_2D, material->texture->GetId());
+	glUniform1i(material->shader->GetUniform("textureSampler"), 0);
+//	Log("Texture id: ", material->texture->GetId());
 
 	glEnableVertexAttribArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer.id);
+	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
 	glEnableVertexAttribArray(1);
-	glBindBuffer(GL_ARRAY_BUFFER, uvBuffer.id);
+	glBindBuffer(GL_ARRAY_BUFFER, uvBuffer);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
 	glEnableVertexAttribArray(2);
-	glBindBuffer(GL_ARRAY_BUFFER, normalBuffer.id);
+	glBindBuffer(GL_ARRAY_BUFFER, normalBuffer);
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer.id);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
 	glDrawElements(GL_TRIANGLES, indexBuffer.size(), GL_UNSIGNED_INT, (void*)0);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -162,26 +200,28 @@ void Mesh::Render()
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	glBindVertexArray(0);
+
+	glUseProgram(0);
 }
 
 void Mesh::EndRender()
 {
-	glDeleteBuffers(1, &vertexBuffer.id);
-	glDeleteBuffers(1, &uvBuffer.id);
-	glDeleteBuffers(1, &normalBuffer.id);
-	glDeleteBuffers(1, &indexBuffer.id);
-	glDeleteTextures(1, &material.texture.id);
+	vertexBuffer.Destroy();
+	uvBuffer.Destroy();
+	normalBuffer.Destroy();
+	indexBuffer.Destroy();
+	material->texture->Destroy();
 	glDeleteVertexArrays(1, &vertexArray);
 	loaded = false;
 }
 
-uint32_t Mesh::CreateBuffer(int target, void* data, uint32_t size, int mode)
+uint32 Mesh::CreateBuffer(void* data, uint32 size, int target, int mode)
 {
 	if(mode == 0)
 	{
 		mode = GL_STATIC_DRAW;
 	}
-	uint32_t id;
+	uint32 id = 0;
 	glGenBuffers(1, &id);
 	glBindBuffer(target, id);
 	glBufferData(target, size, data, mode);
@@ -190,119 +230,83 @@ uint32_t Mesh::CreateBuffer(int target, void* data, uint32_t size, int mode)
 
 void Mesh::LoadFile(string path)
 {
-	string ext = Extension(path);
-	if(ext == "obj")
+	Log("Loading mesh file '"+path+"'.");
+	path = game->fileSystem->GetGamePath(path).string();
+
+	const aiScene* scene = aiImportFile(path.c_str(), aiProcessPreset_TargetRealtime_MaxQuality);
+	Log("Loaded mesh.. filling buffers");
+	for(uint i = 0; i < scene->mNumMeshes; ++i)
 	{
-		LoadOBJ(path);
+		const aiMesh* mesh = scene->mMeshes[i];
+		vertexBuffer.data.reserve(vertexBuffer.size()+mesh->mNumVertices);
+		uvBuffer.data.reserve(uvBuffer.size()+mesh->mNumVertices);
+		normalBuffer.data.reserve(normalBuffer.size()+mesh->mNumVertices);
+		indexBuffer.data.reserve(indexBuffer.size()+mesh->mNumFaces*3);
+
+		for(uint k = 0; k < mesh->mNumVertices; ++k)
+		{
+			vertexBuffer.push_back(vec3_cast<vec3>(mesh->mVertices[k]));
+			if(mesh->mTextureCoords[0] && mesh->mTextureCoords[0][k][0])
+			{
+				uvBuffer.push_back(vec2_cast<vec2>(mesh->mTextureCoords[0][k]));
+			}
+			normalBuffer.push_back(vec3_cast<vec3>(mesh->mNormals[k]));
+		}
+		for(uint k = 0; k < mesh->mNumFaces; ++k)
+		{
+			for(uint j = 0; j < mesh->mFaces[k].mNumIndices; ++j)
+			{
+				indexBuffer.push_back(mesh->mFaces[k].mIndices[j]);
+			}
+		}
 	}
-	else
-	{
-		Log("Mesh::LoadFile: File type not supported.");
-		return;
-	}
+	aiReleaseImport(scene);
+//	scene->mMeshes[0]->
+
 	BeginRender();
 }
 
-void Mesh::LoadOBJ(string path)
+/// @fixme Something is horribly wrong.
+void Mesh::IndexVBO()
 {
-	std::vector<glm::vec3> out_vertices;
-	std::vector<glm::vec2> out_uvs;
-	std::vector<glm::vec3> out_normals;
-	std::vector<uint32_t> vertexIndices, uvIndices, normalIndices;
-	std::vector<glm::vec3> temp_vertices;
-	std::vector<glm::vec2> temp_uvs;
-	std::vector<glm::vec3> temp_normals;
+	indexBuffer.data.clear();
+//	vector<uint32> indices;
+	bool found = false;
 
-
-	FILE* file = fopen(path.c_str(), "r");
-	if( file == NULL )
+	Log("INDEXING VBO.");
+	
+	for(uint i = 0; i < vertexBuffer.size(); ++i)
 	{
-		Log("Impossible to open the file! Are you in the right path?");
-		return;
-	}
-
-	while( 1 ) {
-
-		char lineHeader[128];
-		// read the first word of the line
-		int res = fscanf(file, "%s", lineHeader);
-		if (res == EOF)
-			break;             // EOF = End Of File. Quit the loop.
-
-		// else : parse lineHeader
-
-		if ( strcmp( lineHeader, "v" ) == 0 )
+		for(uint k = 0; k < indexBuffer.size(); ++k)
 		{
-			glm::vec3 vertex;
-			fscanf(file, "%f %f %f\n", &vertex.x, &vertex.y, &vertex.z );
-			temp_vertices.push_back(vertex);
-		}
-		else if ( strcmp( lineHeader, "vt" ) == 0 )
-		{
-			glm::vec2 uv;
-			fscanf(file, "%f %f\n", &uv.x, &uv.y );
-			uv.y = -uv.y;             // Invert V coordinate since we will only use DDS texture, which are inverted. Remove if you want to use TGA or BMP loaders.
-			temp_uvs.push_back(uv);
-		}
-		else if ( strcmp( lineHeader, "vn" ) == 0 )
-		{
-			glm::vec3 normal;
-			fscanf(file, "%f %f %f\n", &normal.x, &normal.y, &normal.z );
-			temp_normals.push_back(normal);
-		}
-		else if ( strcmp( lineHeader, "f" ) == 0 )
-		{
-			std::string vertex1, vertex2, vertex3;
-			unsigned int vertexIndex[3], uvIndex[3], normalIndex[3];
-			int matches = fscanf(file, "%d/%d/%d %d/%d/%d %d/%d/%d\n", &vertexIndex[0], &uvIndex[0], &normalIndex[0], &vertexIndex[1], &uvIndex[1], &normalIndex[1], &vertexIndex[2], &uvIndex[2], &normalIndex[2] );
-			if (matches != 9)
+			if(vertexBuffer[indexBuffer[k]] == vertexBuffer[i])
 			{
-				printf("File can't be read by our simple parser :-( Try exporting with other options\n");
-				return;
+				indexBuffer.push_back(indexBuffer[k]);
+				found = true;
 			}
-			vertexIndices.push_back(vertexIndex[0]);
-			vertexIndices.push_back(vertexIndex[1]);
-			vertexIndices.push_back(vertexIndex[2]);
-			uvIndices.push_back(uvIndex[0]);
-			uvIndices.push_back(uvIndex[1]);
-			uvIndices.push_back(uvIndex[2]);
-			normalIndices.push_back(normalIndex[0]);
-			normalIndices.push_back(normalIndex[1]);
-			normalIndices.push_back(normalIndex[2]);
+		}
+		if(found)
+		{
+			found = false;
+			continue;
 		}
 		else
 		{
-			// Probably a comment, eat up the rest of the line
-			char stupidBuffer[1000];
-			fgets(stupidBuffer, 1000, file);
+			indexBuffer.push_back(i);
 		}
-
 	}
-
-	// For each vertex of each triangle
-	for( unsigned int i=0; i<vertexIndices.size(); i++ ) {
-
-		// Get the indices of its attributes
-		unsigned int vertexIndex = vertexIndices[i];
-		unsigned int uvIndex = uvIndices[i];
-		unsigned int normalIndex = normalIndices[i];
-
-		// Get the attributes thanks to the index
-		glm::vec3 vertex = temp_vertices[ vertexIndex-1 ];
-		glm::vec2 uv = temp_uvs[ uvIndex-1 ];
-		glm::vec3 normal = temp_normals[ normalIndex-1 ];
-
-		// Put the attributes in buffers
-		out_vertices.push_back(vertex);
-		out_uvs.push_back(uv);
-		out_normals.push_back(normal);
-
+	
+	/*
+	for(uint i = 0; i < vertexBuffer.size(); ++i)
+	{
+		indexBuffer.push_back(i);
 	}
+	*/
+}
 
-	vertexBuffer.data = out_vertices;
-	uvBuffer.data = out_uvs;
-	normalBuffer.data = out_normals;
-	//indexBuffer.data = vertexIndices;
+void BufferBase::Destroy()
+{
+	glDeleteBuffers(1, &id);
 }
 
 }

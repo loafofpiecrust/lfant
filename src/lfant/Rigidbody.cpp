@@ -29,11 +29,13 @@
 #include <lfant/Transform.h>
 #include <lfant/Game.h>
 #include <lfant/Mesh.h>
-
+#include <lfant/Console.h>
 #include <lfant/Rigidbody.h>
 
 namespace lfant
 {
+
+IMPLEMENT_COMP(Rigidbody)
 
 Rigidbody::Rigidbody()
 {
@@ -43,6 +45,23 @@ Rigidbody::~Rigidbody()
 {
 }
 
+void Rigidbody::Save(Properties* prop)
+{
+	Component::Save(prop);
+
+	prop->Set("mass", mass);
+	prop->Set("velocity", GetVelocity());
+}
+
+void Rigidbody::Load(Properties* prop)
+{
+	Component::Load(prop);
+
+	prop->Get("mass", mass);
+
+//	SetVelocity(prop->Get<vec3>("velocity"));
+}
+
 /*******************************************************************************
 *		General functions
 *		\area General
@@ -50,19 +69,42 @@ Rigidbody::~Rigidbody()
 
 void Rigidbody::Init()
 {
-	motionState = new btDefaultMotionState();
+	Log("Rigidbody::Init: Touch. Entity name: ", owner->name);
+	motionState = new btDefaultMotionState;
+	Log("Rigidbody::Init: Spawning underlying btRigidBody.");
+	if((collider = owner->GetComponent<Collider>()))
+	{
+		Log("Rigidbody::Init: With collider.");
+		body = new btRigidBody(mass, motionState, collider->GetShape(), vec3_cast<btVector3>(inertia));
+	}
+	else
+	{
+		Log("Rigidbody::Init: Without collider.");
+		body = new btRigidBody(mass, motionState, new btEmptyShape, vec3_cast<btVector3>(inertia));
+	}
+	Log("Rigidbody::Init: Setting mass.");
 	SetMass(mass);
-	body = new btRigidBody(mass, motionState, collider, vec3_cast<btVector3>(inertia));
 
+	Log("Rigidbody::Init: Adding Rigidbody to physics system.");
 	game->physics->AddRigidbody(this);
 
-	Connect(SENDER(owner, SetMesh), RECEIVER(this, OnSetMesh));
-	Connect(SENDER(owner->GetComponent<Transform>(), SetPosition), RECEIVER(this, OnSetPos));
-	Connect(SENDER(owner->GetComponent<Transform>(), SetRotation), RECEIVER(this, OnSetRot));
+	ConnectEvent(SENDER(owner, SetPosition), RECEIVER(this, OnSetPos));
+	ConnectEvent(SENDER(owner, SetRotation), RECEIVER(this, OnSetRot));
+	ConnectEvent(SENDER(owner, SetCollider), RECEIVER(this, OnSetCollider));
+
+	body->getWorldTransform().setOrigin(vec3_cast<btVector3>(owner->transform->GetPosition()));
+	body->forceActivationState(DISABLE_DEACTIVATION);
 }
 
 void Rigidbody::Update()
 {
+//	body->applyCentralForce(btVector3(0, -0.01, 0));
+	vec3 pos = vec3_cast<vec3>(body->getWorldTransform().getOrigin());
+	if(pos != owner->transform->GetPosition())
+	{
+		owner->transform->SetPosition(pos);
+	//	Log("Rigidbody position: ", lexical_cast<string>(pos));
+	}
 }
 
 void Rigidbody::OnDestroy()
@@ -76,12 +118,21 @@ void Rigidbody::OnDestroy()
 *******************************************************************************/
 void Rigidbody::OnSetPos( vec3 pos )
 {
+	if(pos == vec3_cast<vec3>(body->getWorldTransform().getOrigin()))
+	{
+		return;
+	}
+//	Log("OnSetPos: Touch.");
 	body->getWorldTransform().setOrigin(vec3_cast<btVector3>(pos));
 }
 
 void Rigidbody::OnSetRot( vec3 rot )
 {
-//	body->getWorldTransform().setRotation( vec3_cast<btVector3>( rot ) );
+	if(rot == eulerAngles(quat_cast<quat>(body->getWorldTransform().getRotation())))
+	{
+		return;
+	}
+	body->getWorldTransform().setRotation(quat_cast<btQuaternion>(quat(rot)));
 }
 
 /*******************************************************************************
@@ -96,10 +147,17 @@ float Rigidbody::GetMass()
 
 void Rigidbody::SetMass(float mass)
 {
+	btVector3 temp;
+	if(collider)
+	{
+		collider->GetShape()->calculateLocalInertia( mass, temp );
+	}
+	body->setMassProps(mass, temp);
+
 	this->mass = mass;
-	Trigger("SetMass", mass, inertia);
-//	collider->shape->calculateLocalInertia( mass, inertia );
-	body->setMassProps(mass, vec3_cast<btVector3>(inertia));
+	inertia = vec3_cast<vec3>(temp);
+
+	TriggerEvent("SetMass", mass, inertia);
 }
 
 /*******************************************************************************
@@ -107,14 +165,14 @@ void Rigidbody::SetMass(float mass)
 *		\area Constraints
 *******************************************************************************/
 
-btTypedConstraint* Rigidbody::GetConstraint(uint16_t idx)
+btTypedConstraint* Rigidbody::GetConstraint(uint16 idx)
 {
 	return body->getConstraintRef(idx);
 }
 
-void Rigidbody::RemoveConstraint(uint16_t idx)
+void Rigidbody::RemoveConstraint(uint16 idx)
 {
-	//	game->physics->RemoveConstraint( GetConstraint( idx ) );
+//	game->physics->RemoveConstraint( GetConstraint( idx ) );
 }
 
 float Rigidbody::GetSpeed()
@@ -129,12 +187,24 @@ vec3 Rigidbody::GetVelocity()
 
 void Rigidbody::SetVelocity(vec3 vel)
 {
-	btVector3 gg;
 	body->setLinearVelocity(vec3_cast<btVector3>(vel));
 }
 
-void Rigidbody::OnSetMesh(Mesh* mesh)
+void Rigidbody::OnSetCollider(Collider *collider)
 {
+	delete body->getCollisionShape();
+	if(!collider)
+	{
+		body->setCollisionShape(new btEmptyShape);
+		this->collider = nullptr;
+	}
+	else
+	{
+		Log("Collider set for entity, setting for rigidbody, type: '", Type(collider), "'.");
+		body->setCollisionShape(collider->GetShape());
+		this->collider = collider;
+	}
+	body->getWorldTransform().setOrigin(vec3_cast<btVector3>(owner->transform->GetPosition()));
 }
 
 }

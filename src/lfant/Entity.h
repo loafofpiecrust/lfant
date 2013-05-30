@@ -34,8 +34,8 @@
 #include <lfant/ptr.h>
 #include <lfant/Properties.h>
 
-namespace lfant
-{
+namespace lfant {
+
 class Component;
 class Item;
 class Transform;
@@ -63,9 +63,6 @@ class Entity : public Object
 	friend class Scene;
 
 public:
-	Entity();
-	Entity(Entity* parent);
-	virtual ~Entity();
 
 	void Destroy();
 
@@ -78,18 +75,16 @@ public:
 	 *	@tparam C The class of component to add.
 	 */
 	template<typename C>
-	C* AddComponent()
+	C* AddComponent(Properties* prop = nullptr)
 	{
 		C* comp = new C();
-		comp->owner = this;
-		comp->Init();
-		AddComponent(comp);
+		AddComponent(comp, prop);
 		return comp;
 	}
 
-	Component* AddComponent(string type);
+	Component* AddComponent(string type, Properties* prop = nullptr);
 
-	void AddComponent(Component* comp);
+	void AddComponent(Component* comp, Properties* prop = nullptr);
 
 	/**
 	 *	Removes a component from this Entity
@@ -109,9 +104,9 @@ public:
 	{
 		for(auto& comp : components)
 		{
-			if(Type(comp) == Type<C>())
+			if(C* c = dynamic_cast<C*>(comp.get()))
 			{
-				return dynamic_cast<C*>(comp.get());
+				return c;
 			}
 		}
 		return nullptr;
@@ -120,9 +115,9 @@ public:
 	Component* GetComponent(string type);
 
 	template<typename C>
-	vector<C*> GetComponents()
+	deque<C*> GetComponents()
 	{
-		vector<C*> comps;
+		deque<C*> comps;
 		for(auto& comp : components)
 		{
 			if(Type(comp) == Type<C>())
@@ -135,23 +130,26 @@ public:
 
 	Entity* GetChild(string name, bool recursive = false);
 
-	Transform* transform;
+	bool HasTag(string tag);
+
+	uint64_t GetId() { return id; }
+
+	Transform* transform = nullptr;
 
 	/// Whether to update this Entity or not.
 	bool active = true;
 
-	/// 9-digit scene-unique identifier.
-	const boost::uuids::uuid id = boost::uuids::random_generator() ();
-
 	string name = "Entity";
 
-	/// The identifying tag. as a group.
-	string tag = "Tag";
+	/// The identifying tags used for grouping.
+	deque<string> tags;
 
 	/// The layer of this entity for primarily display filtering
 	string layer = "Default";
 
 	float lifeTime = 0.0f;
+
+	Entity* parent;
 
 protected:
 
@@ -166,16 +164,15 @@ protected:
 	void UnsafeDestroy();
 
 private:
+	Entity();
+	virtual ~Entity();
 
-	forward_list< ptr<Entity> > children;
-	forward_list< ptr<Component> > components;
-	bool useLifeTime = true;
-	uint32_t componentCount = 0;
-	uint32_t childCount = 0;
+	deque< ptr<Entity, Object::Delete> > children;
+	deque< ptr<Component, Object::Delete> > components;
+	bool useLifeTime = false;
 
-public:
-	// Properties
-	Entity* parent;
+	/// 64-bit scene-unique identifier.
+	uint64_t id = 0;
 };
 
 /** @} */

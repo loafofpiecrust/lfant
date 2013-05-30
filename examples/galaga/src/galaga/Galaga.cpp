@@ -43,6 +43,9 @@
 
 #include <galaga/Player.h>
 
+#include <lfant/network/Server.h>
+#include <lfant/network/Client.h>
+
 namespace lfant
 {
 
@@ -52,15 +55,8 @@ extern "C" void Launch()
 	game = new Galaga();
 	game->standAlone = true;
 	game->Init();
-	// game->destroy gets set true when game->Exit() is called. Prevents mid-frame destruction, for safety.
-	game->destroy = false;
 	Log("Game initialised");
-	while (!game->destroy)
-	{
-		game->Update();
-	}
-	Log("About to destroy game");
-	game->Destroy();
+	game->Update();
 	Log("Game ending");
 	delete game;
 }
@@ -69,67 +65,76 @@ Galaga::Galaga()
 {
 }
 
+void Galaga::OnHost()
+{
+	Log("Galaga::OnHost/OnConnect: Touch.");
+	//	client->SendData("12345678");
+	//	client->SendFile("scenes/init.scene", "scenes/new.scene");
+}
+
 void Galaga::Init()
 {
 	Game::Init();
 
 	scene->LoadFile("scenes/main.scene");
+	scene->SaveFile("scenes/init.scene");
 	Log("Finished loading scene");
-	scene->SaveFile("scenes/saved.scene");
 
-	//Range<int> ver = game->settings->GetValue("gl.version");
-	//renderer->version = ver;
+	userInterface->LoadFile("gui/MainMenu.gui");
 
-	//ivec2 res = game->settings->GetValue("window.resolution").i2();
-	//renderer->SetResolution(res);
-	//ivec2 pos = game->settings->GetValue("window.position").i2();
-	//renderer->SetPosition(pos);
-
-	// Look at Player.cpp
+	//	server = network->AddConnection<network::Server>();
 	/*
-	input->AddAxis("Horizontal", Key["D"], Key["A"]);
-	input->AddAxis("Vertical", Key["W"], Key["S"]);
-	input->AddAxis("VRotation", Key["Up"], Key["Down"]);
-	input->AddAxis("HRotation", Key["Right"], Key["Left"]);
-	input->AddAxis("ShowLoc", Key["E"]);
-	input->AddAxis("ShowRot", Key["R"]);
-	input->AddAxis("ShowFPS", Key["Q"]);
-	input->AddAxis("Fire", Key["Space"]);
-	input->AddAxis("TesterSetVar", Key["X"]);
-	input->AddAxis("TesterGetVar", Key["Z"]);
-	input->AddAxis("TesterHelpMe", Key["H"]);
-	input->AddAxis("Exit", Key["Esc"]);
+	Log("Setting up client...");
+	client = new network::Client;
+	client->Host(22222);
+
+	Log("Setting up client2...");
+	client2 = new network::Client;
+	client2->Connect("127.0.0.1", 22222);
+
+	client2->GetDataAsync(256);
 	*/
+	ent = scene->Spawn();
+//	ent2 = scene->Spawn();
+	client = ent->AddComponent<ChatClient>();
+//	client2 = ent2->AddComponent<ChatClient>();
 
-	// Just tests SystemInfo (very minimal on Linux, nothing on OSX, some on Windows)
-	Log("Computer name: " + systemInfo->computerName);
-	Log("Username: " + systemInfo->username);
-	Log("Running OS: " + systemInfo->OS);
-	Log("CPU: " + systemInfo->cpu.name + " with ", systemInfo->cpu.cores, " cores");
+	client->Connect("74.177.199.145");
+//	client2->Connect();
 
-	// Fairly self-explanitory. Check above input axes for keys to press. Will implement better with GUI.
-	game->settings->SetValue("Tester", "5.0f", "This is my var");
+	ConnectEvent(SENDER(client, Host), RECEIVER(this, OnHost));
+	ConnectEvent(SENDER(client, Connect), RECEIVER(this, OnHost));
+
+	//	client->SendData("12345678");
+
+	//	client->GetDataAsync(8);
 
 
-//	ent = scene->Spawn("ChatClientObj", nullptr);
-//	ent->AddComponent<ChatClient>();
 }
 
 void Galaga::Update()
 {
-	PreUpdate();
-	time->Update();
-	physics->Update();
-	scene->Update();
-	input->Update();
-	userInterface->Update();
-	network->Update();
-	renderer->Update();
-	PostUpdate();
+	while(!IsExited())
+	{
+		Game::Update();
+	}
+	Destroy();
 }
 
 void Galaga::Destroy()
 {
+	scene->SaveFile("scenes/final.scene");
+
+//	client->SendMessage("Hello my friend.");
+//	client2->SendMessage("Hello yourself.");
+	/*
+	for(uint i = 0; i < 10; ++i)
+	{
+		client->Update();
+		client2->Update();
+	}
+	*/
+
 	Game::Destroy();
 }
 
@@ -139,8 +144,8 @@ void Galaga::AddMesh(string name)
 	ent->GetComponent<Transform>()->SetPosition(vec3(1, 1, 1));
 	Mesh* mesh = ent->AddComponent<Mesh>();
 	mesh->LoadFile("suzanne.obj");
-	mesh->material.texture.LoadFile("player.png");
-//	mesh->material.shader.path = "shaders/Diffuse";
+	mesh->material->texture->LoadFile("player.png");
+	//	mesh->material->shader->path = "shaders/Diffuse";
 }
 
 }

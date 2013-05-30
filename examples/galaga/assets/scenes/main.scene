@@ -1,11 +1,10 @@
- 
-// Main Scene container
+ // Main Scene container
 scene Galaga
 {
 	entity Camera
 	{
 		layer = Entities
-		tag = MainCamera
+		tags = {Player,MainCamera}
 
 		component Camera
 		{
@@ -13,23 +12,55 @@ scene Galaga
 
 		component Player
 		{
+			mouseLook = false
+			movementSpeed = 4
+			lookSpeed = 0.10
+		}
+		
+		component Transform
+		{
+			position = (1,1,1)
+			scale = (0.1,0.1,0.1)
+		}
+
+		component Mesh
+		{
+			path = meshes/suzanne.obj
+			material = materials/Diffuse.mat
 		}
 	}
 
 	entity StarShip
 	{
 		layer = Entities
-		tag = Player
-
+		tags = { Entity, Player}
+		
+		/*
 		component Sprite
 		{
 			material = materials/Diffuse.mat
 		}
+		*/
+		
+		component Mesh
+		{
+			path = meshes/suzanne.obj
+			material = materials/Diffuse.mat
+		}
+		/*
+		component Rigidbody
+		{
+		}
+		
+		component BoxCollider
+		{
+		}
+		*/
 	}
 	
 	entity BlasterMinor
 	{
 		layer = Entities
-		tag = Enemy
+		tags = {Entity,Enemy}
 	}
 }

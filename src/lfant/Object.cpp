@@ -40,18 +40,21 @@ void Object::Init()
 	Bind();
 }
 
+void Object::Update()
+{
+}
+
 void Object::Destroy()
 {
 	OnDestroy();
-}
-
-void Object::Destroy(Object* obj)
-{
 	for(auto& evt : events)
 	{
 		delete evt;
 	}
-	obj->Destroy();
+}
+
+void Object::OnDestroy()
+{
 }
 
 void Object::Bind()

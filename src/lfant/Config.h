@@ -3,7 +3,7 @@
  */
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 1
-//#define VERSION_PATCH 
+//#define VERSION_PATCH
 #define VERSION #VERSION_MAJOR "." #VERSION_MINOR
 
 #define HAVE_VERSION(major,minor) (VERSION_MINOR >= minor && VERSION_MAJOR == major) || (VERSION_MAJOR > major)
@@ -30,7 +30,7 @@
 #	include <conio.h>
 #	define GLFWCALL __stdcall
 #elif UNIX
-#	define SFEXP extern "C++"
+#	define ROOTXP extern "C++"
 #	define GLFWCALL
 #	include <unistd.h>
 #endif
@@ -43,8 +43,10 @@
  *	@todo Make this a class so type specification is not needed.
  */
 #define null(type) *((type*)nullptr)
-#define GLM_SWIZZLE
+#define GLM_SWIZZLE 1
+#define GLM_FORCE_RADIANS 1
 #define BOOST_EXCEPTION_DISABLE
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#define __GXX_EXPERIMENTAL_CXX0X__ 1
+#if __GXX_EXPERIMENTAL_CXX0X__
 #	define GLM_FORCE_CXX11
 #endif

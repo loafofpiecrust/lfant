@@ -25,28 +25,45 @@
 
 // Internal
 
-#include <lfant/Component.h>
+#include <lfant/net/tcp/Server.h>
 
 namespace lfant
 {
 
+class ChatClient;
+
+struct Peer
+{
+	string name = "client";
+	string ip = "127.0.0.1";
+};
+
 /**
  *
  */
-class ChatServer : public Component
+class ChatServer : public net::tcp::Server
 {
 public:
-
-protected:
 	ChatServer();
 	virtual ~ChatServer();
 
 	virtual void Init();
-	virtual void Update();
 
-	void SendMessage(string msg);
+//	void SendMessage(string msg);
+	void SendData(string msg, string sender);
+	void SendData(string msg);
+	void GetData();
+
+protected:
+	virtual void OnGetData(const boost::system::error_code& error);
+	virtual void OnGetData(const boost::system::error_code &error, asio::ip::tcp::socket* sock);
+	void OnAccept(const boost::system::error_code &error);
+	void Accept(asio::ip::tcp::socket& sock);
+	void OnAddClient(string name, string ip);
 
 private:
+	deque< ptr<ChatClient> > clients;
+	deque<string> messages;
 };
 
 }

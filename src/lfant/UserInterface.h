@@ -19,23 +19,22 @@
 ******************************************************************************/
 #pragma once
 
-// External
-#include <forward_list>
-
 // Internal
 #include <lfant/ptr.h>
 #include <lfant/Subsystem.h>
 
-/*
-   namespace CEGUI
-   {
-   class OpenGL3Renderer;
-   class Window;
-   class WindowManager;
-   class System;
-   class GUIContext;
-   }
- */
+// External
+#include <deque>
+
+namespace CEGUI
+{
+class OpenGL3Renderer;
+class Window;
+class WindowManager;
+class System;
+class GUIContext;
+class EventArgs;
+}
 
 /*
    namespace Rocket
@@ -50,6 +49,13 @@
    }
  */
 
+namespace gameswf
+{
+struct player;
+struct root;
+struct render_handler;
+}
+
 namespace lfant
 {
 
@@ -63,6 +69,20 @@ class FileSystem;
 class UserInterface : public Subsystem
 {
 public:
+	class Movie
+	{
+	public:
+		Movie(string name, gameswf::root* swf);
+		~Movie();
+
+		void Play();
+		void Pause();
+
+		string name = "";
+		ptr<gameswf::root> swf; //= nullptr;
+		bool active = true;
+	};
+
 	UserInterface();
 	virtual ~UserInterface();
 
@@ -70,32 +90,48 @@ public:
 	virtual void Update();
 	virtual void OnDestroy();
 
-	virtual void CreateWindow(string fileName);
-	virtual void RemoveWindow(string fileName);
+	void Load(Properties *prop);
+	void Save(Properties *prop);
 
-	virtual void OnKey(int key, int mode);
+//	virtual void CreateWindow(Properties* prop, CEGUI::Window *parent = nullptr);
+//	virtual void RemoveWindow(string fileName);
+
+	virtual void OnKey(uint16 key, int mode);
 	virtual void OnChar(char key);
-	virtual void OnMouseButton(int btn, int pressed);
+	virtual void OnMouseButton(uint16 btn, int mode);
 	virtual void OnMouseMove(int x, int y);
 	virtual void OnWindowResize(uint width, uint height);
 
+	bool OnClickButton(const CEGUI::EventArgs &evt);
+	bool OnCloseWindow(const CEGUI::EventArgs &evt);
+
+	Movie* LoadMovie(string name, string path);
+	Movie* GetMovie(string name);
+
+//	CEGUI::Window* rootWindow;
+
 protected:
+
 	/*
-	   CEGUI::OpenGL3Renderer* renderer;
-	   CEGUI::Window* rootWindow;
-	   CEGUI::WindowManager* windowManager;
-	   vector<CEGUI::Window*> windows;
-	   CEGUI::System* system;
-	   CEGUI::GUIContext* context;
-	 */
+	CEGUI::OpenGL3Renderer* renderer;
+	CEGUI::WindowManager* windowManager;
+	deque<CEGUI::Window*> windows;
+	CEGUI::System* system;
+	CEGUI::GUIContext* context;
+	*/
 
 	/*
 	   ptr<Rocket::Core::Context> context;
 	   ptr<gui::Renderer> renderer;
 	   ptr<gui::System> system;
 	   ptr<gui::FileSystem> fileSystem;
-	   forward_list< ptr<Rocket::Core::ElementDocument> > documents;
+	   deque< ptr<Rocket::Core::ElementDocument> > documents;
 	 */
+
+	ptr<gameswf::player> player;
+	ptr<gameswf::render_handler> renderer;
+	deque< ptr<Movie> > movies;
+	ptr<Movie> root;
 
 	bool resized = false;
 	uvec2 size;

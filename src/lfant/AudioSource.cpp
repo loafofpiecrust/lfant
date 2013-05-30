@@ -21,7 +21,7 @@
 #include <lfant/AudioSource.h>
 
 // External
-#include <fmod.hpp>
+//#include <fmod.hpp>
 
 // Internal
 #include <lfant/Transform.h>
@@ -29,6 +29,8 @@
 
 namespace lfant
 {
+
+//IMPLEMENT_COMP(AudioSource)
 
 AudioSource::AudioSource()
 {
@@ -46,7 +48,8 @@ void AudioSource::Init()
 	{
 		SetSource(inputFile);
 	}
-	Connect(owner->GetComponent<Transform>(), "SetPosition", this, &AudioSource::OnSetPosition);
+
+	ConnectEvent(SENDER(owner, SetPosition), RECEIVER(this, OnSetPosition));
 }
 
 void AudioSource::SetSource(string file)

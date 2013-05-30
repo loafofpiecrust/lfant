@@ -42,8 +42,10 @@ IMPLEMENT_COMP(Player)
 
 void Player::Init()
 {
-	//	Connect(SENDER(game->input, Horizontal), this, &Player::Move);
-	//	Connect(SENDER(game->input, Vertical), this, &Player::Move);
+	Component::Init();
+	Log("Initing a player.");
+	//	ConnectEvent(SENDER(game->input, Horizontal), this, &Player::Move);
+	//	ConnectEvent(SENDER(game->input, Vertical), this, &Player::Move);
 }
 
 void Player::Move(string axis, float value)
@@ -54,10 +56,12 @@ void Player::Move(string axis, float value)
 void Player::Load(Properties *prop)
 {
 	Component::Load(prop);
-
+	Log("Loading from player, '"+prop->type+" "+prop->id+"'.");
 	prop->Get("movementSpeed", movementSpeed);
 	prop->Get("lookSpeed", lookSpeed);
 	prop->Get("mouseLook", mouseLook);
+
+	Log("The setting of lookSpeed is ", prop->Get<float>("lookSpeed"));
 }
 
 void Player::Save(Properties *prop)
@@ -73,10 +77,11 @@ void Player::Update()
 {
 	if(mouseLook)
 	{
-		ivec2 mousePos = game->input->GetMousePos();
+		ivec2 mousePos = game->input->GetMousePos()-lastMouse;
 		ivec2 screenRes = game->renderer->GetResolution();
-		owner->transform->Rotate(radians(vec3(lookSpeed * float(screenRes.y/2-mousePos.y), 0, lookSpeed * float(screenRes.x/2-mousePos.x))) * (float)game->time->deltaTime);
-		game->input->SetMousePos(screenRes.x/2, screenRes.y/2);
+		owner->transform->Rotate(vec3(lookSpeed * -mousePos.y, 0, lookSpeed * -mousePos.x) * (float)game->time->deltaTime);
+	//	game->input->SetMousePos(screenRes.x/2, screenRes.y/2);
+		lastMouse = game->input->GetMousePos();
 	}
 
 	if (game->input->GetButtonDown("ShowLoc"))
@@ -104,7 +109,8 @@ void Player::Update()
 	float hrot = game->input->GetAxis("HRotation");
 	if (hrot != 0.0f)
 	{
-		owner->transform->Rotate(radians(vec3(0, 0, -hrot*lookSpeed*game->time->deltaTime)));
+		float input = hrot * lookSpeed;
+		owner->transform->Rotate(vec3(0, 0, input * game->time->deltaTime));
 	}
 	float vrot = game->input->GetAxis("VRotation");
 	if (vrot != 0.0f)
@@ -118,8 +124,8 @@ void Player::Update()
 		Entity* ent = Entity::Spawn("TestMesh"+lexical_cast<string>(meshCount), nullptr, transform->GetPosition());
 		Mesh* mesh = ent->AddComponent<Mesh>();
 		mesh->LoadFile("suzanne.obj");
-		mesh->material.texture.name = "player.png";
-		mesh->material.shader.path = "Diffuse";
+		mesh->material->texture.name = "player.png";
+		mesh->material->shader->path = "Diffuse";
 		*/
 		dynamic_cast<Galaga*>(game)->AddMesh("TestMesh"+lexical_cast<string>(meshCount));
 		++meshCount;

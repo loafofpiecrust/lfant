@@ -27,36 +27,53 @@
 
 namespace lfant
 {
-	class Entity;
+namespace network
+{
+class Server;
+class Client;
+}
 
-	/** \addtogroup Galaga
-	 *	 \{
-	 */
+class Entity;
+class ChatClient;
 
-	/**
-	 *
-	 *	\details
-	 *	\todo
-	 */
-	class Galaga : public Game
+/** @addtogroup Galaga
+ *	@{
+ */
+
+/**
+ *
+ *	@todo
+ */
+class Galaga : public Game
+{
+public:
+	Galaga();
+	virtual ~Galaga()
 	{
-	public:
-		Galaga();
-		virtual ~Galaga()
-		{
-		}
+	}
 
-		virtual void Init();
-		virtual void Update();
-		virtual void Destroy();
+	virtual void Init();
+	virtual void Update();
+	virtual void Destroy();
 
-		void AddMesh(string name);
+	void AddMesh(string name);
 
-	protected:
+protected:
 
-	private:
-		Entity* player;
-	};
+private:
+
+	void OnHost();
+
+	Entity* player;
+	/*
+	network::Client* client;
+	network::Client* client2;
+	*/
+	Entity* ent;
+	Entity* ent2;
+	ChatClient* client;
+	ChatClient* client2;
+};
 
 /// \}
 }

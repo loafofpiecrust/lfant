@@ -30,41 +30,36 @@
 namespace lfant
 {
 
-Material::Material()
+Material::Material() :
+	texture(new Texture),
+	shader(new Shader)
 {
 }
 
 Material::Material(string texture, string shader)
 {
-	this->texture.LoadFile(texture);
-	this->shader.LoadFile(shader);
-}
-
-Material& Material::operator()(Texture texture, Shader shader)
-{
-	this->texture = texture;
-	this->shader = shader;
-	return *this;
+	this->texture->LoadFile(texture);
+	this->shader->LoadFile(shader);
 }
 
 void Material::Load(Properties* prop)
 {
 	if(Properties* tex = prop->GetChild("texture"))
 	{
-		texture.Load(tex);
+		texture->Load(tex);
 	}
 
 	if(Properties* sh = prop->GetChild("shader"))
 	{
-		shader.Load(sh);
+		shader->Load(sh);
 	}
 }
 
 void Material::Save(Properties *prop)
 {
 	Object::Save(prop);
-	texture.Save(prop->AddChild());
-	shader.Save(prop->AddChild());
+	texture->Save(prop->AddChild());
+	shader->Save(prop->AddChild());
 }
 
 }

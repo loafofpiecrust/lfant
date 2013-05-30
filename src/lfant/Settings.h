@@ -118,7 +118,7 @@ protected:
 	string userFile = "settings.cfg";
 	string defaultFile = "settings.cfg";
 
-	vector<Var> variables;
+	deque<Var> variables;
 
 
 };

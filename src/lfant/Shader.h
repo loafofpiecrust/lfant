@@ -46,7 +46,7 @@ public:
 	struct Uniform
 	{
 		string name = "";
-		uint32_t id = 0;
+		uint32 id = 0;
 	};
 
 	Shader()
@@ -57,20 +57,22 @@ public:
 	void Save(Properties* prop);
 	void LoadFile(string file = "");
 
-	uint32_t GetUniform(string name);
+	uint32 GetUniform(string name);
+	void AddUniform(string name);
 
-	operator uint32_t()
-	{
-		return id;
-	}
+	void Use();
+	void Unuse();
 
-	string vertex = "";
-	string fragment = "";
-	uint32_t id = 0;
+	uint32 GetId();
 
 protected:
 
-	forward_list<Uniform> uniforms;
+	static uint32 Compile(uint32 type, const string& path);
+
+	string vertex = "";
+	string fragment = "";
+	uint32 id = 0;
+	map<string, uint32> uniforms;
 };
 
 /// @}

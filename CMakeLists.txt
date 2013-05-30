@@ -1,6 +1,6 @@
 
-set(CMAKE_C_COMPILER "/home/taylorsnead/bin/clang")
-set(CMAKE_CXX_COMPILER "/home/taylorsnead/bin/clang++")
+set(CMAKE_C_COMPILER "clang-3.1")
+set(CMAKE_CXX_COMPILER "clang++-3.1")
 
 cmake_minimum_required(VERSION 2.8)
 project(lfroot)

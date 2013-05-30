@@ -26,6 +26,7 @@
 #include <lfant/Transform.h>
 #include <lfant/util/Math.h>
 #include <lfant/Console.h>
+#include <lfant/Scene.h>
 
 namespace lfant
 {
@@ -48,13 +49,25 @@ Camera::~Camera()
 
 void Camera::Init()
 {
+	Log("Updated projection");
 	UpdateProjection();
+	Log("mainCamera = ", game->scene->mainCamera);
 }
 
 void Camera::Update()
 {
-	UpdateView();
-	UpdateProjection();
+//	Log("Updating cam view");
+	view = glm::lookAt(
+				owner->transform->GetWorldPosition(),
+				owner->transform->GetWorldPosition() + owner->transform->direction,
+				owner->transform->up
+				);
+	//	UpdateProjection();
+}
+
+void Camera::OnDestroy()
+{
+	Log("mainCamera = ", game->scene->mainCamera);
 }
 
 /*******************************************************************************
@@ -63,31 +76,43 @@ void Camera::Update()
 *
 *******************************************************************************/
 
-void Camera::SetProjection(float fov, float aspect, float min, float max)
-{
-	switch(projectionMode)
-	{
-	case PM_PERSPECTIVE:
-		projection = perspective(fov, aspect, min, max);
-		break;
-	case PM_ORTHO:
-		projection = ortho(-fov / 2 * aspect, fov / 2 * aspect, -fov / 2 / aspect, fov / 2 / aspect, min, max);
-		break;
-	}
-	this->fov = fov;
-	this->aspectRatio = aspect;
-	this->viewRange.min = min;
-	this->viewRange.max = max;
-}
-
 void Camera::UpdateProjection()
 {
-	SetProjection(fov, aspectRatio, viewRange.min, viewRange.max);
+	switch(mode)
+	{
+		case Mode::Perspective:
+		{
+			Log("Setting cam projection to perspective");
+			projection = perspective(fov, aspectRatio, viewRange.min, viewRange.max);
+			Log("projection: ", lexical_cast<string>(vec3(projection[0].xyz)), lexical_cast<string>(vec3(projection[1].xyz)), lexical_cast<string>(vec3(projection[2].xyz)));
+			break;
+		}
+		case Mode::Orthographic:
+		{
+			projection = ortho(0.0f, fov * aspectRatio, 0.0f, fov / aspectRatio, viewRange.min, viewRange.max);
+			break;
+		}
+	}
+}
+
+mat4 Camera::GetProjection()
+{
+	return projection;
+}
+
+mat4 Camera::GetView()
+{
+	return view;
 }
 
 void Camera::UpdateView()
 {
-	view = lookAt(owner->transform->GetWorldPosition(), owner->transform->GetWorldPosition() + owner->transform->direction, owner->transform->up);
+//	Log("Camera direction: ", lexical_cast<string>(owner->transform->direction), ", up: ", lexical_cast<string>(owner->transform->up));
+	view = glm::lookAt(
+				owner->transform->GetWorldPosition(),
+				owner->transform->GetWorldPosition() + owner->transform->direction,
+				owner->transform->up
+				);
 }
 
 void Camera::SetFOV(float fov)

@@ -29,47 +29,55 @@
 
 namespace lfant
 {
+namespace random
+{
 
 boost::random::mt19937 randfast;
 boost::random::mt19937_64 randfast64;
 
 boost::random::random_device randomizer;
 
+namespace
+{
+__attribute__((constructor))
 void seedrand()
 {
 	printf("Seeding randoms.\n");
 	randfast.seed(time(0));
 	randfast64.seed(time(0));
 }
+}
 
-double Random(double min, double max)
+double Range(double min, double max)
 {
 	boost::random::uniform_real_distribution<double> d(min, max);
 	return d(randfast64);
 }
 
-float Random(float min, float max)
+float Range(float min, float max)
 {
 	boost::random::uniform_real_distribution<float> d(min, max);
 	return d(randfast);
 }
 
-rgba Random(rgba min, rgba max)
+rgba Range(rgba min, rgba max)
 {
 	rgba result;
-	result.r = Random(min.r, max.r);
-	result.g = Random(min.g, max.g);
-	result.b = Random(min.b, max.b);
-	result.a = Random(min.a, max.a);
+	result.r = Range(min.r, max.r);
+	result.g = Range(min.g, max.g);
+	result.b = Range(min.b, max.b);
+	result.a = Range(min.a, max.a);
 	return result;
 }
 
-vec3 Random(vec3 min, vec3 max)
+vec3 Range(vec3 min, vec3 max)
 {
 	vec3 result;
-	result.x = Random(min.x, max.x);
-	result.y = Random(min.y, max.y);
-	result.z = Random(min.z, max.z);
+	result.x = Range(min.x, max.x);
+	result.y = Range(min.y, max.y);
+	result.z = Range(min.z, max.z);
 	return result;
+}
+
 }
 }

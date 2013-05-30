@@ -72,6 +72,8 @@ float Time::GetTimer(string name)
 
 void Time::Init()
 {
+	Subsystem::Init();
+
 	ResetTime();
 	UpdateTimes();
 }
@@ -88,7 +90,7 @@ void Time::Update()
 		}
 		else
 		{
-			Trigger(t.first);
+			TriggerEvent(t.first);
 			timers.erase(t.first);
 		}
 	}

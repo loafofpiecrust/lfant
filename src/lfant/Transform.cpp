@@ -35,7 +35,33 @@ Transform::Transform()
 {
 }
 
-vec3& Transform::GetPosition()
+Transform::~Transform()
+{
+
+}
+
+void Transform::Save(Properties *prop)
+{
+	Component::Save(prop);
+
+	prop->Set("position", position);
+	prop->Set("rotation", rotation);
+	prop->Set("scale", scale);
+}
+
+void Transform::Load(Properties *prop)
+{
+	Log("Loading transform from type '"+prop->type+"', id '"+prop->id+"'.");
+	Component::Load(prop);
+
+	prop->Get("position", position);
+	prop->Get("rotation", rotation);
+	prop->Get("scale", scale);
+
+	Log("Loaded position: "+lexical_cast<string>(position));
+}
+
+vec3 Transform::GetPosition()
 {
 	return position;
 }
@@ -43,7 +69,7 @@ vec3& Transform::GetPosition()
 void Transform::SetPosition(vec3 pos)
 {
 	position = pos;
-	Trigger("SetPosition", position);
+	TriggerEvent("SetPosition", position);
 }
 
 quat Transform::GetRotationQuat()
@@ -54,26 +80,30 @@ quat Transform::GetRotationQuat()
 void Transform::SetRotationQuat(quat rot)
 {
 	rotationQuat = rot;
-	rotation = eulerAngles(rot);
-	//	Trigger("SetRotation", rotation);
+	rotation = degrees(eulerAngles(rot));
+	TriggerEvent("SetRotation", rotation);
 }
 
 vec3 Transform::GetRotation()
 {
-	return degrees(rotation);
+	return rotation;
 }
 
 void Transform::SetRotation(vec3 rot)
 {
-	//rot.x = rollover(rot.x, 0.0f, 360.0f);
-	//rot.y = rollover(rot.y, 0.0f, 360.0f);
-	//rot.z = rollover(rot.z, 0.0f, 360.0f);
-	rotation = radians(rot);
-	//rotation = rot;
-	rotationQuat = quat(rotation);
+	rollover(rot.x, 0.0f, 360.0f);
+	rollover(rot.y, 0.0f, 360.0f);
+	rollover(rot.z, 0.0f, 360.0f);
+
+	rotation = rot;
+//	rotationQuat = quat(rotation);
+//	Log("Setting rotation to ", lexical_cast<string>(rotation));
+
+	TriggerEvent("SetRotation", rot);
+//	TriggerEvent("SetRotation", rotationQuat);
 }
 
-vec3& Transform::GetScale()
+vec3 Transform::GetScale()
 {
 	return scale;
 }
@@ -81,7 +111,7 @@ vec3& Transform::GetScale()
 void Transform::SetScale(vec3 scl)
 {
 	scale = scl;
-	Trigger("SetScale", scale);
+	TriggerEvent("SetScale", scale);
 }
 
 vec3 Transform::GetWorldPosition()
@@ -98,7 +128,14 @@ vec3 Transform::GetWorldPosition()
 
 void Transform::SetWorldPosition(vec3 pos)
 {
-	SetPosition(pos - parent->GetWorldPosition());
+	if(owner->parent)
+	{
+		SetPosition(pos - owner->parent->transform->GetWorldPosition());
+	}
+	else
+	{
+		SetPosition(pos);
+	}
 }
 
 quat Transform::GetWorldRotationQuat()
@@ -125,7 +162,14 @@ vec3 Transform::GetWorldRotation()
 
 void Transform::SetWorldRotation(vec3 rot)
 {
-	SetRotation(rot - parent->GetWorldRotation());
+	if(owner->parent)
+	{
+		SetRotation(rot - owner->parent->transform->GetWorldRotation());
+	}
+	else
+	{
+		SetRotation(rot);
+	}
 }
 
 vec3 Transform::GetWorldScale()
@@ -142,56 +186,136 @@ vec3 Transform::GetWorldScale()
 
 void Transform::SetWorldScale(vec3 scl)
 {
-	SetScale(scl - parent->GetWorldScale());
+	if(owner->parent)
+	{
+		SetScale(scl - owner->parent->transform->GetWorldScale());
+	}
+	else
+	{
+		SetScale(scl);
+	}
+}
+
+void Transform::Update()
+{
+//	Log("Transform updating");
+	SetDirection();
+//	SetMatrix();
+}
+
+void Transform::SetMatrix()
+{
+	/*
+//	mat4 matrix;
+	matrix = mat4(1.0f);
+	matrix = glm::translate(mat4(1.0f), GetWorldPosition());
+//	matrix *= glm::mat4_cast(GetWorldRotationQuat());
+	vec3 rot = radians(GetWorldRotation());
+	matrix = glm::rotate(matrix, rot.x, vec3(1,0,0));
+	matrix = glm::rotate(matrix, rot.y, vec3(0,1,0));
+	matrix = glm::rotate(matrix, rot.z, vec3(0,0,1));
+//	matrix *= mat4_cast(rotationQuat);
+//	glm::rotate
+	matrix = glm::scale(matrix, GetWorldScale());
+//	return matrix;
+//	Log("Transform position: ", lexical_cast<string>(vec3(matrix[3].xyz)));
+*/
 }
 
 mat4 Transform::GetMatrix()
 {
-	mat4 matrix;
-	matrix = glm::translate(mat4(1.0f), GetWorldPosition());
-	matrix *= glm::mat4_cast(GetWorldRotationQuat());
-	matrix = glm::scale(matrix, GetWorldScale());
+	vec3 scl = GetWorldScale();
+	if(scl == vec3(0))
+	{
+		return mat4(0);
+	}
+	
+	vec3 pos = GetWorldPosition();
+	vec3 rot = radians(GetWorldRotation());
+	mat4 matrix = mat4(1.0f);
+	
+	if(pos != vec3(0))
+	{
+	//	Log("pos = ", lexical_cast<string>(pos));
+		matrix = glm::translate(matrix, pos);
+	//	Log("matrix = ", lexical_cast<string>(matrix));
+	}
+	
+	if(rot != vec3(0))
+	{
+	//	Log("rot = ", lexical_cast<string>(rot));
+		matrix = glm::rotate(matrix, rot.x, vec3(1,0,0));
+		matrix = glm::rotate(matrix, rot.y, vec3(0,1,0));
+		matrix = glm::rotate(matrix, rot.z, vec3(0,0,1));
+	//	Log("matrix = ", lexical_cast<string>(matrix));
+	}
+	
+	if(scl != vec3(1))
+	{
+		matrix = glm::scale(matrix, scl);
+	//	Log("matrix = ", lexical_cast<string>(matrix));
+	}
+	
 	return matrix;
 }
 
 void Transform::SetDirection()
 {
-	vec3 rot = GetWorldRotation();
+	vec3 rot = radians(GetWorldRotation());
+//	Log("Cam rotation: ", lexical_cast<string>(rot));
 	direction = vec3(
-	    cos(rot.x) * sin(rot.z),
-	    sin(rot.x),
-	    cos(rot.x) * cos(rot.z)
-	    );
+		cos(rot.x) * sin(rot.y),
+		sin(rot.x),
+		cos(rot.x) * cos(rot.y)
+		);
 
 	right = vec3(
-	    sin(rot.z - 3.14f / 2.0f),
-	    0,
-	    cos(rot.z - 3.14f / 2.0f)
-	    );
+		sin(rot.y - pi / 2.0f),
+		0,
+		cos(rot.y - pi / 2.0f)
+		);
 
 	up = cross(right, direction);
+//	right.x *= -1;
+}
+
+vec3 Transform::GetWorldRotatedPosition()
+{
+	if(!owner->parent)
+	{
+		return vec3(0);
+	}
+
+	vec3 newpos(0);
+	vec3 parrot = owner->parent->transform->GetWorldRotation();
+
+	newpos.x = position.x*cos(parrot.x) - position.y*sin(parrot.y);
+	newpos.y = position.y*cos(parrot.y) - position.x*sin(parrot.x);
+
+	return newpos;
 }
 
 void Transform::Translate(vec3 pos)
 {
+//	Log("Translating by ", lexical_cast<string>(pos));
 	SetPosition(position + pos);
 }
 
 void Transform::Rotate(vec3 rot)
 {
-	rotation += radians(rot);
-	rotationQuat = quat(rotation);
+	SetRotation(rotation + rot);
+
 	//rotationQuat = quat(rotation);
 	//_rotationQuat = rotate( _rotationQuat, rot.x, xdir );
 	//_rotationQuat = rotate( _rotationQuat, rot.y, ydir );
 	//_rotationQuat = rotate( _rotationQuat, rot.z, zdir );
-	//	Trigger("SetRotation", rotation);
+//	TriggerEvent("SetRotation", rotation);
 }
 
 void Transform::Scale(vec3 scl)
 {
 	SetScale(scale * scl);
-	//	Trigger("SetScale", scale);
+//	TriggerEvent("SetScale", scale);
 }
 
 }

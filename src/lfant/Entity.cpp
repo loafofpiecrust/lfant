@@ -35,6 +35,7 @@
 #include <lfant/Component.h>
 #include <lfant/ScriptSystem.h>
 #include <lfant/Camera.h>
+#include <lfant/Random.h>
 
 // External
 #include <stdarg.h>
@@ -44,12 +45,6 @@ namespace lfant
 
 Entity::Entity()
 {
-}
-
-Entity::Entity(Entity* parent) :
-	parent(parent)
-{
-
 }
 
 Entity::~Entity()
@@ -67,13 +62,20 @@ void Entity::Init()
 	Log("Entity::Init: Touch.");
 	Object::Init();
 
-	Log("Entity::Init: Touch.");
-
-	transform = AddComponent<Transform>();
+	if(!transform)
+	{
+		transform = AddComponent<Transform>();
+	}
 
 	if(lifeTime <= 0.0f)
 	{
 		useLifeTime = false;
+	}
+
+	if(id == 0)
+	{
+		// Generate new id?
+		id = random::Range<uint64_t>(0, ULLONG_MAX);
 	}
 }
 
@@ -92,8 +94,6 @@ void Entity::Update()
 		}
 	}
 
-	GetComponent<Transform>()->SetDirection();
-
 	for(auto& comp : components)
 	{
 		if(comp->IsEnabled())
@@ -101,7 +101,6 @@ void Entity::Update()
 			comp->Update();
 		}
 	}
-
 	for(auto& comp : components)
 	{
 		if(comp->IsEnabled())
@@ -121,43 +120,48 @@ void Entity::Update()
 
 void Entity::AddChild(Entity* ent)
 {
-	children.push_front(ptr<Entity>(ent));
-	++childCount;
+	children.push_front(ent);
 }
 
 void Entity::RemoveChild(Entity* ent)
 {
-	children.remove(ptr<Entity>(ent));
-	--childCount;
+	//	children.remove(ptr<Entity>(ent));
+	for(uint i = 0; i < children.size(); ++i)
+	{
+		if(children[i] == ent)
+		{
+			children.erase(children.begin()+i);
+			return;
+		}
+	}
 }
 
-void Entity::AddComponent(Component* comp)
+void Entity::AddComponent(Component* comp, Properties *prop)
 {
-	components.push_front(ptr<Component>(comp));
-	++componentCount;
+	components.push_back(comp);
+	comp->owner = this;
+	if(prop)
+	{
+		comp->Load(prop);
+	}
+	comp->Init();
+	TriggerEvent("AddComponent", comp);
 }
 
 void Entity::UnsafeDestroy()
 {
 	Object::Destroy();
 
-
-	if(componentCount > 0)
+	Log("Entity::Destroy: Destroying ", components.size()," components.");
+	for(auto& compo : components)
 	{
-		Log("Entity::Destroy: Destroying ", componentCount,"components.");
-		for(auto& compo : components)
-		{
-			compo->Destroy();
-		}
+		compo->Destroy();
 	}
 
-	if(childCount > 0)
+	Log("Entity::Destroy: Destroying ", children.size()," children.");
+	for(auto& child : children)
 	{
-		Log("Entity::Destroy: Destroying ", childCount,"children.");
-		for(auto& child : children)
-		{
-			child->UnsafeDestroy();
-		}
+		child->UnsafeDestroy();
 	}
 }
 
@@ -167,24 +171,16 @@ void Entity::Destroy()
 	Object::Destroy();
 	Log("Entity::Destroy: super called.");
 
-	if(componentCount > 0)
+	for(auto& compo : components)
 	{
-		Log("Entity::Destroy: Destroying ", componentCount,"components.");
-		for(auto& compo : components)
-		{
-			compo->Destroy();
-		}
+		compo->Destroy();
 	}
 	//	components.clear();
 	Log("Entity::Destroy: Components destroyed.");
 
-	if(childCount > 0)
+	for(auto& child : children)
 	{
-		Log("Entity::Destroy: Destroying ", childCount,"children.");
-		for(auto& child : children)
-		{
-			child->Destroy();
-		}
+		child->Destroy();
 	}
 
 	if(!parent)
@@ -210,10 +206,10 @@ Entity* Entity::Clone(string name, Entity* parent)
 
 Component* Entity::GetComponent(string type)
 {
-	vector<string> spl = Split(type, ".: ", "");
+	string unscoped = RemoveScoping(type);
 	for(auto& comp : components)
 	{
-		if(Type(comp) == type || Type(comp) == spl[spl.size()-1])
+		if(Type(comp) == type || Type(comp) == unscoped || RemoveScoping(Type(comp)).find(unscoped) != -1)
 		{
 			return comp;
 		}
@@ -230,33 +226,29 @@ Component* Entity::GetComponent(string type)
 void Entity::RemoveComponent(Component* comp)
 {
 	Log("About to remove comp '", comp, "'.");
-//	components.remove(ptr<Component>(comp));
-	for(auto& cp : components)
+	for(uint i = 0; i < components.size(); ++i)
 	{
-		if(cp == comp)
+		if(components[i] == comp)
 		{
-			components.remove(cp);
+			TriggerEvent("RemoveComponent", comp);
+			components.erase(components.begin()+i);
 			break;
 		}
 	}
-	--componentCount;
-	printf("Removed component\n");
+	Log("Removed component");
 }
 
 template<class T>
 void Entity::RemoveComponent()
 {
-	for(auto& comp : components)
+	for(uint i = 0; i < components.size(); ++i)
 	{
-		if(CheckType<T>(comp))
+		Component* comp = components[i];
+		if(Type<T>() == Type(comp))
 		{
-			for(auto& comp2 : components)
-			{
-				comp2->OnRemoveComponent(comp);
-			}
+			TriggerEvent("RemoveComponent", comp);
 			comp->Destroy();
-			components.remove(comp);
-			--componentCount;
+			components.erase(components.begin()+i);
 		}
 	}
 }
@@ -289,6 +281,18 @@ Entity* Entity::GetChild(string name, bool recursive)
 	return nullptr;
 }
 
+bool Entity::HasTag(string tag)
+{
+	for(auto& str : tags)
+	{
+		if(str == tag)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
 /*******************************************************************************
 *
 *		Scripting
@@ -318,7 +322,8 @@ void Entity::Save(Properties* prop)
 	prop->type = "entity";
 	prop->id = name;
 
-	prop->Set("tag", tag);
+	prop->Set("id", id);
+	prop->Set("tags", tags);
 	prop->Set("layer", layer);
 	prop->Set("active", active);
 	prop->Set("lifeTime", lifeTime);
@@ -336,21 +341,42 @@ void Entity::Save(Properties* prop)
 
 void Entity::Load(Properties* prop)
 {
-	tag =		prop->Get<string>("tag");
-	layer =		prop->Get<string>("layer");
-	active =	prop->Get<bool>("active");
-	lifeTime =	prop->Get<float>("lifeTime");
+	prop->Get("id", id);
+	prop->Get("tags", tags);
+	prop->Get("layer", layer);
+	prop->Get("active", active);
+	prop->Get("lifeTime", lifeTime);
 
 	Log("Entity::Load: Loaded basic properties.");
 
-	vector<Properties*> c;
-	c = prop->GetChildren("component");
+	deque<Properties*> c = prop->GetChildren("component");
 	Log("Entity::Load: Component nodes loaded.");
 	Component* component = nullptr;
 	for(auto& comp : c)
 	{
-		component = AddComponent(comp->id);
-		component->Load(comp);
+		Log("Loading component props, '"+comp->type+" "+comp->id+"'.");
+		if(comp->id != "Transform")
+		{
+			component = AddComponent(comp->id, comp);
+			Log("Entity::Load: Added component, owner = ", component->owner);
+			if(comp->id == "Camera")
+			{
+				game->scene->mainCamera = dynamic_cast<Camera*>(component);
+			}
+		}
+		else
+		{
+			if(transform)
+			{
+				component = transform;
+				component->Load(comp);
+			}
+			else
+			{
+				component = AddComponent("Transform", comp);
+			}
+		}
+		//	component->Load(comp);
 	}
 
 	c = prop->GetChildren("entity");
@@ -358,29 +384,33 @@ void Entity::Load(Properties* prop)
 	Entity* ent = nullptr;
 	for(auto& child : c)
 	{
-		ent = game->scene->Spawn(child->id, this);
-		ent->Load(child);
+		ent = game->scene->SpawnAndLoad(child, child->id, this);
+	//	ent->Load(child);
 	}
 
 	Log("Entity::Load: Finished.");
-
+	Init();
 }
 
-Component *Entity::AddComponent(string type)
+Component *Entity::AddComponent(string type, Properties *prop)
 {
 	printf("Adding comp via string of type\n");
 	auto val = Component::componentRegistry[type];
 	Component* result = nullptr;
 	if(val == nullptr)
 	{
+		Log("No function for this component type.");
 		result = nullptr;
 	}
 	else
 	{
-		result = (this->*val)();
+		Log("Found function for this type.");
+		result = (this->*val)(prop);
+		Log("Added component owner ptr: '", result->owner, "'.");
+		result->owner = this;
 	}
 
-	if(type == "Camera")
+	if(type == "Camera" && result)
 	{
 		game->scene->mainCamera = dynamic_cast<Camera*>(result);
 	}

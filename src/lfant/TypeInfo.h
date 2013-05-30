@@ -64,31 +64,31 @@ string DemangleType(string type);
 string RemoveScoping(string type);
 
 template<typename T>
-auto Type()->typename is_not_ptr<T, string>::type
+auto Type()->typename enable_if<!is_ptr<T>::value, string>::type
 {
 	return DemangleType(typeid(T).name());
 }
 
 template<typename T>
-auto Type()->typename is_ptr<T, string>::type
+auto Type()->typename enable_if<is_ptr<T>::value, string>::type
 {
 	return DemangleType(typeid(T::value_type).name());
 }
 
 template<typename T>
-auto Type(T p1)->typename is_not_ptr<T, string>::type
+auto Type(T p1)->typename enable_if<!is_ptr<T>::value && !is_pointer<T>::value, string>::type
 {
 	return DemangleType(typeid(p1).name());
 }
 
 template<typename T>
-auto Type(T& p1)->typename is_ptr<T, string>::type
+auto Type(T& p1)->typename enable_if<is_ptr<T>::value, string>::type
 {
 	return DemangleType(typeid(*(p1.get())).name());
 }
 
 template<typename T>
-string Type(T* p1)
+auto Type(T p1) -> typename enable_if<is_pointer<T>::value, string>::type
 {
 	return DemangleType(typeid(*p1).name());
 }

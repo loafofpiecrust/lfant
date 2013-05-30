@@ -7,11 +7,11 @@ uniform sampler2D textureSampler;
 in vec2 UV;
 
 // outputs
-out vec3 color;
+out vec4 color;
 
 void main()
 {
-    // Modify color here.
-    color = texture2D( textureSampler, UV ).rgb;
-    //color = vec3(0.6, 0.2, 0);
+	// Modify color here.
+	color = texture2D( textureSampler, UV ).rgba;
+//	color = vec3(0.6, 0.2, 0);
 }

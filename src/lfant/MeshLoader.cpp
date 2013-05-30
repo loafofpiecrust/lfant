@@ -27,9 +27,9 @@
 namespace lfant
 {
 
-Mesh LoadMesh(string name)
+Mesh* LoadMesh(string name)
 {
-	vector<string> tokens = Split(name, ".", "");
+	deque<string> tokens = Split(name, ".", "");
 	string ext = tokens[tokens.size()-1];
 	to_lower(ext);
 	if(ext == "obj")
@@ -38,7 +38,7 @@ Mesh LoadMesh(string name)
 	}
 }
 
-Mesh LoadObj(string name)
+Mesh *LoadObj(string name)
 {
 
 
@@ -54,10 +54,10 @@ struct PackedVertex {
 };
 
 bool getSimilarVertexIndex_fast(
-    PackedVertex& packed,
-    std::map<PackedVertex, uint32_t>& VertexToOutIndex,
-    uint32_t& result
-    ){
+	PackedVertex& packed,
+	std::map<PackedVertex, uint32_t>& VertexToOutIndex,
+	uint32_t& result
+	){
 	std::map<PackedVertex, uint32_t>::iterator it = VertexToOutIndex.find(packed);
 	if ( it == VertexToOutIndex.end() ) {
 		return false;
@@ -68,12 +68,12 @@ bool getSimilarVertexIndex_fast(
 }
 
 void IndexVBO(std::vector<glm::vec3>& in_vertices,
-              std::vector<glm::vec2>& in_uvs,
-              std::vector<glm::vec3>& in_normals,
-              std::vector<uint32_t>& out_indices,
-              std::vector<glm::vec3>& out_vertices,
-              std::vector<glm::vec2>& out_uvs,
-              std::vector<glm::vec3>& out_normals)
+			  std::vector<glm::vec2>& in_uvs,
+			  std::vector<glm::vec3>& in_normals,
+			  std::vector<uint32_t>& out_indices,
+			  std::vector<glm::vec3>& out_vertices,
+			  std::vector<glm::vec2>& out_uvs,
+			  std::vector<glm::vec3>& out_normals)
 {
 	std::map<PackedVertex, uint32_t> VertexToOutIndex;
 
@@ -102,10 +102,10 @@ void IndexVBO(std::vector<glm::vec3>& in_vertices,
 }
 
 void IndexVBO(std::vector<glm::vec3>& in_vertices,
-              std::vector<glm::vec2>& in_uvs,
-              std::vector<uint32_t>& out_indices,
-              std::vector<glm::vec3>& out_vertices,
-              std::vector<glm::vec2>& out_uvs)
+			  std::vector<glm::vec2>& in_uvs,
+			  std::vector<uint32_t>& out_indices,
+			  std::vector<glm::vec3>& out_vertices,
+			  std::vector<glm::vec2>& out_uvs)
 {
 	std::map<PackedVertex, uint32_t> VertexToOutIndex;
 
@@ -133,8 +133,8 @@ void IndexVBO(std::vector<glm::vec3>& in_vertices,
 }
 
 void IndexVBO(std::vector<glm::vec3>& in_vertices,
-              std::vector<uint32_t>& out_indices,
-              std::vector<glm::vec3>& out_vertices)
+			  std::vector<uint32_t>& out_indices,
+			  std::vector<glm::vec3>& out_vertices)
 {
 	std::map<PackedVertex, uint32_t> VertexToOutIndex;
 
