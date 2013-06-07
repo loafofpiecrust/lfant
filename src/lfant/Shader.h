@@ -68,11 +68,14 @@ public:
 protected:
 
 	static uint32 Compile(uint32 type, const string& path);
+	void CheckErrors();
 
 	string vertex = "";
 	string fragment = "";
 	uint32 id = 0;
 	map<string, uint32> uniforms;
+
+	static deque<Shader*> shaders;
 };
 
 /// @}

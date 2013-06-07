@@ -82,11 +82,16 @@ public:
 	virtual void Save(Properties* prop);
 
 	// Methods
-	btTypedConstraint* GetConstraint(uint16 idx);
-	void RemoveConstraint(uint16 idx);
+	btTypedConstraint* GetConstraint(uint16_t idx);
+	void RemoveConstraint(uint16_t idx);
 
-	void AddForce(float force);
-	void AddForceAtPosition(float force, vec3 pos);
+	void ApplyForce(vec3 force, vec3 pos);
+	void ApplyCentralForce(vec3 force);
+
+	/**
+	 *	Applies a constant acceleration.
+	 */
+	void Accelerate(vec3 force);
 
 	/**
 	 *	Returns the (current) mass of this Rigidbody.
@@ -124,6 +129,9 @@ public:
 	 */
 	float GetSpeed();
 
+	void SetMaxSpeed(float speed) { maxSpeed = speed; }
+	float GetMaxSpeed() { return maxSpeed; }
+
 	// Variables
 	Mode mode;
 
@@ -150,6 +158,8 @@ protected:
 
 	/// The current mass of this object, in kg.
 	float mass = 1.0f;
+
+	float maxSpeed = 0.0f;
 
 	btRigidBody* body;
 	btMotionState* motionState;

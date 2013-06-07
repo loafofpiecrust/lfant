@@ -55,6 +55,7 @@ public:
 	vec2 tiling { 1, 1 };
 	vec2 offset { 0, 0 };
 	rgba color { 255, 255, 255, 255 };
+	bool loaded = false;
 };
 
 /// @}

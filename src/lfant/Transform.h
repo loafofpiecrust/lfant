@@ -66,9 +66,9 @@ public:
 	void SetMatrix();
 	mat4 GetMatrix();
 
-	vec3 up;
-	vec3 right;
-	vec3 direction;
+	vec3 GetDirection();
+	vec3 GetRight();
+	vec3 GetUp();
 
 protected:
 	vec3 GetWorldRotatedPosition();
@@ -78,6 +78,10 @@ protected:
 	vec3 scale = vec3(1.0f);
 	quat rotationQuat;
 //	mat4 matrix = mat4(1.0f);
+
+	vec3 up;
+	vec3 right;
+	vec3 direction;
 
 	Transform* parent = nullptr;
 

@@ -121,9 +121,9 @@ void Renderer::Init()
 			// Window opening failed
 			game->Exit();
 		}
-	}
 
-	HideMouse(hideMouse);
+		HideMouse(hideMouse);
+	}
 
 	// Background color
 	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
@@ -133,8 +133,8 @@ void Renderer::Init()
 
 	// Fragment depth testing
 	glDepthFunc(GL_LESS);
-	//glDepthMask(GL_FALSE);
-	//glDepthRange(0.0f, 1.0f);
+//	glDepthMask(GL_FALSE);
+//	glDepthRange(0.0f, 1.0f);
 
 	// Backface culling
 	glEnable(GL_CULL_FACE);
@@ -147,14 +147,19 @@ void Renderer::Init()
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
 	// Point sprites
-	glEnable(GL_POINT_SPRITE);
-	glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
-	glEnable(GL_BLEND);
+//	glEnable(GL_POINT_SPRITE);
+//	glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
+//	glEnable(GL_BLEND);
 
-	glfwSwapInterval(vsync);
+//	glEnable(GL_TEXTURE_RECTANGLE);
 
-	glfwSetWindowCloseCallback(&Renderer::OnCloseWindow);
-	glfwSetWindowSizeCallback(&Renderer::OnSetResolution);
+	if(game->standAlone)
+	{
+		glfwSwapInterval(vsync);
+
+		glfwSetWindowCloseCallback(&Renderer::OnCloseWindow);
+		glfwSetWindowSizeCallback(&Renderer::OnSetResolution);
+	}
 
 	Log("Renderer: Initialized");
 
@@ -173,6 +178,15 @@ void Renderer::Update()
 {
 	glfwSwapBuffers();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glDisable(GL_BLEND);
+	glEnable(GL_CULL_FACE);
+	glEnable(GL_DEPTH_TEST);
+}
+
+void Renderer::OnDestroy()
+{
+	Log("Renderer::OnDestroy(): Touch");
+	glfwTerminate();
 }
 
 /*******************************************************************************
@@ -183,6 +197,8 @@ void Renderer::Update()
 
 bool Renderer::OpenWindow()
 {
+//	if(game->standAlone)
+//	{
 	Log("Renderer::OpenWindow: About to set window hints.");
 	glfwOpenWindowHint(GLFW_FSAA_SAMPLES, fsaa);
 	glfwOpenWindowHint(GLFW_OPENGL_VERSION_MAJOR, version.major);
@@ -209,6 +225,11 @@ bool Renderer::OpenWindow()
 	}
 	Log("Renderer::OpenWindow: Window opened.");
 
+	SetWindowTitle(windowTitle);
+	SetWindowPos(windowPos);
+	Log("Renderer::OpenWindow: Window successfully opened.");
+//	}
+
 	glewExperimental = true;     // Needed for core profile
 	if (glewInit() != GLEW_OK)
 	{
@@ -216,11 +237,6 @@ bool Renderer::OpenWindow()
 		return false;
 	}
 	Log("Renderer::OpenWindow: GLEW Initialised.");
-
-	SetWindowTitle(windowTitle);
-	SetWindowPos(windowPos);
-
-	Log("Renderer::OpenWindow: Window successfully opened.");
 
 	return true;
 }
@@ -289,7 +305,7 @@ void Renderer::SetWindowPos(ivec2 pos)
 
 Shader *Renderer::GetShader(string name)
 {
-	for(auto& shader : shaders)
+//	for(auto& shader : shaders)
 	{
 //		if(shader->path == name)
 		{
@@ -306,7 +322,7 @@ void Renderer::AddShader(Shader *shader)
 //		s->id = shader->id;
 //		return;
 	}
-	shaders.push_back(ptr<Shader>(shader));
+//	shaders.push_back(ptr<Shader>(shader));
 }
 
 void Renderer::HideMouse(bool hide)

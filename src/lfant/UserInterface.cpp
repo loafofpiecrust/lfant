@@ -34,15 +34,15 @@
 #include <lfant/Renderer.h>
 
 // External
-/*
-//#include <Rocket/Core.h>
+
 #include <CEGUI/CEGUI.h>
-#include <CEGUI/RendererModules/OpenGL3/Renderer.h>
+#include <CEGUI/RendererModules/OpenGL/GL3Renderer.h>
 #include <CEGUI/SchemeManager.h>
 #include <CEGUI/DefaultResourceProvider.h>
 #include <CEGUI/ImageManager.h>
 #include <CEGUI/XMLParserModules/TinyXML/XMLParser.h>
-*/
+
+/*
 #include <gameswf/gameswf.h>
 #include <base/tu_file.h>
 #include <base/tu_types.h>
@@ -50,6 +50,7 @@
 #include <gameswf/gameswf_player.h>
 #include <gameswf/gameswf_root.h>
 
+*/
 namespace lfant
 {
 
@@ -63,7 +64,7 @@ UserInterface::~UserInterface()
 
 
 // gameswf
-
+/*
 static tu_file*	file_opener(const char* url)
 // Callback function.  This opens files for the gameswf library.
 {
@@ -256,21 +257,23 @@ void UserInterface::Movie::Pause()
 {
 	swf->set_play_state(gameswf::character::STOP);
 }
-
+*/
 
 // CEGUI
-/*
+
 void UserInterface::CreateWindow(Properties* prop, CEGUI::Window* parent)
 {
 	CEGUI::Window* win = windowManager->createWindow(prop->Get<string>("type"), prop->id);
 
-	string type = Split(prop->Get<string>("type"), "/")[1];
-	if(type == "Button")
+	string type = RemoveScoping(Type(win));
+	if(type == "PushButton")
 	{
 		win->subscribeEvent(CEGUI::PushButton::EventClicked, &UserInterface::OnClickButton, this);
 	}
 	else if(type == "FrameWindow")
-	win->subscribeEvent(CEGUI::FrameWindow::EventCloseClicked, &UserInterface::OnCloseWindow, this);
+	{
+	//	win->subscribeEvent(CEGUI::FrameWindow::EventCloseClicked, &UserInterface::OnCloseWindow, this);
+	}
 
 	if(!parent)
 	{
@@ -331,6 +334,11 @@ void UserInterface::Load(Properties *prop)
 	{
 		CreateWindow(pw);
 	}
+}
+
+void UserInterface::Save(Properties* prop)
+{
+	Subsystem::Save(prop);
 }
 
 void UserInterface::Init()
@@ -513,10 +521,12 @@ void UserInterface::OnWindowResize(uint width, uint height)
 
 bool UserInterface::OnClickButton(const CEGUI::EventArgs &evt)
 {
-	const CEGUI::WindowEventArgs* args = dynamic_cast<const CEGUI::WindowEventArgs*>(&evt);
-	if(!args) return false;
+	Log("BUTTON CLICKED!");
+//	const CEGUI::WindowEventArgs* args = dynamic_cast<const CEGUI::WindowEventArgs*>(&evt);
+//	if(!args) return false;
 
-	TriggerEvent("ClickButton", args->window);
+//	TriggerEvent("ClickButton", args->window);
+	Log("Triggad");
 }
 
 bool UserInterface::OnCloseWindow(const CEGUI::EventArgs &evt)
@@ -528,6 +538,6 @@ bool UserInterface::OnCloseWindow(const CEGUI::EventArgs &evt)
 
 	args->window->destroy();
 }
-*/
+
 
 }

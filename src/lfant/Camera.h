@@ -1,6 +1,3 @@
-#ifndef HEADER_62C981C59A7F3A65
-#define HEADER_62C981C59A7F3A65
-
 /******************************************************************************
 *
 *	LFANT Source
@@ -60,6 +57,9 @@ public:
 	virtual void Update();
 	virtual void OnDestroy();
 
+	void Save(Properties* prop);
+	void Load(Properties* prop);
+
 	/**
 	 *	Updates the projection to use the current settings
 	 */
@@ -77,36 +77,28 @@ public:
 	/**	Sets the Field Of View for this Camera's perspective.
 	 */
 	void SetFOV(float fov);
+	float GetFOV();
 
 	/**	Sets the Aspect Ratio to use.
 	 */
-	void SetRatio(float ratio);
+	void SetAspectRatio(float ratio);
+	float GetAspectRatio();
 
 	/**	Sets the viewing range to use (near and far).
 	 */
-	void SetRange(float near, float far);
-
-	/// Field of view, eg. 40.0f
-	float fov = 45.0f;
-
-	/// Aspect ratio, eg. 16.0f/9.0f
-	float aspectRatio = 16 / 9;
-
-	/// The viewing range (near and far) of this camera's view, eg. (0.1f, 1000.0f)
-	Range<float> viewRange = { 0.1f, 1000.0f };
+	void SetViewRange(float near, float far);
+	Range<float> GetViewRange();
 
 	vec3 lastPos;
 
-	Rect<uint32_t> _viewport;
+	Rect viewport;
 
-	enum class Mode : byte
+	enum class Mode : short
 	{
-		Perspective,
-		Orthographic
+		Perspective = 0,
+		Orthographic = 1
 	};
 	Mode mode = Mode::Perspective;
-
-//		PROP_RW(Camera, viewport, GetViewport, SetViewport)
 
 protected:
 
@@ -116,6 +108,15 @@ protected:
 	/// Matrix for transformations.
 	mat4 view = mat4(1);
 
+	/// Field of view, eg. 40.0f
+	float fov = 50.0f;
+
+	/// Aspect ratio, eg. 16.0f/9.0f
+	float aspectRatio = 16.0f / 9.0f;
+
+	/// The viewing range (near and far) of this camera's view, eg. (0.1f, 1000.0f)
+	Range<float> viewRange = { 0.01f, 1000.0f };
+
 private:
 
 };
@@ -123,5 +124,3 @@ private:
 /** @} */
 /** @} */
 }
-
-#endif // header guard

@@ -41,6 +41,28 @@ Camera::~Camera()
 {
 }
 
+void Camera::Save(Properties* prop)
+{
+	Component::Save(prop);
+
+	prop->Set("fov", fov);
+	prop->Set("aspectRatio", aspectRatio);
+	prop->Set("viewRange", viewRange);
+//	prop->Set("mode", (short)mode);
+}
+
+void Camera::Load(Properties* prop)
+{
+	Component::Load(prop);
+
+	prop->Get("fov", fov);
+	prop->Get("aspectRatio", aspectRatio);
+	prop->Get("viewRange", viewRange);
+//	mode = (Mode)prop->Get<short>("mode");
+
+	UpdateProjection();
+}
+
 /*******************************************************************************
 *
 *		Generic Entity functions
@@ -59,8 +81,8 @@ void Camera::Update()
 //	Log("Updating cam view");
 	view = glm::lookAt(
 				owner->transform->GetWorldPosition(),
-				owner->transform->GetWorldPosition() + owner->transform->direction,
-				owner->transform->up
+				owner->transform->GetWorldPosition() + owner->transform->GetDirection(),
+				owner->transform->GetUp()
 				);
 	//	UpdateProjection();
 }
@@ -83,8 +105,11 @@ void Camera::UpdateProjection()
 		case Mode::Perspective:
 		{
 			Log("Setting cam projection to perspective");
-			projection = perspective(fov, aspectRatio, viewRange.min, viewRange.max);
-			Log("projection: ", lexical_cast<string>(vec3(projection[0].xyz)), lexical_cast<string>(vec3(projection[1].xyz)), lexical_cast<string>(vec3(projection[2].xyz)));
+			Log(lexical_cast<string>(fov));
+			Log(lexical_cast<string>(aspectRatio));
+			Log(lexical_cast<string>(viewRange));
+			projection = glm::perspective(fov, aspectRatio, viewRange.min, viewRange.max);
+			Log("projection: ", lexical_cast<string>(projection));
 			break;
 		}
 		case Mode::Orthographic:
@@ -107,11 +132,11 @@ mat4 Camera::GetView()
 
 void Camera::UpdateView()
 {
-//	Log("Camera direction: ", lexical_cast<string>(owner->transform->direction), ", up: ", lexical_cast<string>(owner->transform->up));
+//	Log("Camera direction: ", lexical_cast<string>(owner->transform->GetDirection()), ", up: ", lexical_cast<string>(owner->transform->GetUp()));
 	view = glm::lookAt(
 				owner->transform->GetWorldPosition(),
-				owner->transform->GetWorldPosition() + owner->transform->direction,
-				owner->transform->up
+				owner->transform->GetWorldPosition() + owner->transform->GetDirection(),
+				owner->transform->GetUp()
 				);
 }
 
@@ -121,17 +146,33 @@ void Camera::SetFOV(float fov)
 	UpdateProjection();
 }
 
-void Camera::SetRatio(float ratio)
+float Camera::GetFOV()
+{
+	return fov;
+}
+
+void Camera::SetAspectRatio(float ratio)
 {
 	aspectRatio = ratio;
 	UpdateProjection();
+	TriggerEvent("SetAspectRatio", aspectRatio);
 }
 
-void Camera::SetRange(float min, float max)
+float Camera::GetAspectRatio()
+{
+	return aspectRatio;
+}
+
+void Camera::SetViewRange(float min, float max)
 {
 	viewRange.min = min;
 	viewRange.max = max;
 	UpdateProjection();
+}
+
+Range<float> Camera::GetViewRange()
+{
+	return viewRange;
 }
 
 }
