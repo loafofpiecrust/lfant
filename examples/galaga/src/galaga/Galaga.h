@@ -25,16 +25,18 @@
 // Internal
 #include <lfant/Game.h>
 
-namespace lfant
+namespace CEGUI
 {
-namespace network
-{
-class Server;
-class Client;
+class Window;
 }
+
+namespace lfant {
 
 class Entity;
 class ChatClient;
+class ChatServer;
+
+namespace galaga {
 
 /** @addtogroup Galaga
  *	@{
@@ -48,9 +50,7 @@ class Galaga : public Game
 {
 public:
 	Galaga();
-	virtual ~Galaga()
-	{
-	}
+	virtual ~Galaga();
 
 	virtual void Init();
 	virtual void Update();
@@ -63,17 +63,18 @@ protected:
 private:
 
 	void OnHost();
+	void OnClickButton(CEGUI::Window* window);
+	void OnReceiveMessage(string sender, string msg);
 
 	Entity* player;
 	/*
-	network::Client* client;
-	network::Client* client2;
+	net::Client* client;
+	net::Client* client2;
 	*/
-	Entity* ent;
-	Entity* ent2;
 	ChatClient* client;
-	ChatClient* client2;
+	ChatServer* server;
 };
 
 /// \}
+}
 }
