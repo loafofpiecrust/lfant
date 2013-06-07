@@ -51,6 +51,7 @@ void Rigidbody::Save(Properties* prop)
 
 	prop->Set("mass", mass);
 	prop->Set("velocity", GetVelocity());
+	prop->Set("maxSpeed", maxSpeed);
 }
 
 void Rigidbody::Load(Properties* prop)
@@ -58,6 +59,7 @@ void Rigidbody::Load(Properties* prop)
 	Component::Load(prop);
 
 	prop->Get("mass", mass);
+	prop->Get("maxSpeed", maxSpeed);
 
 //	SetVelocity(prop->Get<vec3>("velocity"));
 }
@@ -91,6 +93,9 @@ void Rigidbody::Init()
 	ConnectEvent(SENDER(owner, SetPosition), RECEIVER(this, OnSetPos));
 	ConnectEvent(SENDER(owner, SetRotation), RECEIVER(this, OnSetRot));
 	ConnectEvent(SENDER(owner, SetCollider), RECEIVER(this, OnSetCollider));
+	ConnectEvent(SENDER(owner, ApplyForce), RECEIVER(this, ApplyForce));
+	ConnectEvent(SENDER(owner, ApplyCentralForce), RECEIVER(this, ApplyCentralForce));
+	ConnectEvent(SENDER(owner, Accelerate), RECEIVER(this, Accelerate));
 
 	body->getWorldTransform().setOrigin(vec3_cast<btVector3>(owner->transform->GetPosition()));
 	body->forceActivationState(DISABLE_DEACTIVATION);
@@ -98,13 +103,27 @@ void Rigidbody::Init()
 
 void Rigidbody::Update()
 {
-//	body->applyCentralForce(btVector3(0, -0.01, 0));
 	vec3 pos = vec3_cast<vec3>(body->getWorldTransform().getOrigin());
 	if(pos != owner->transform->GetPosition())
 	{
 		owner->transform->SetPosition(pos);
-	//	Log("Rigidbody position: ", lexical_cast<string>(pos));
 	}
+
+	/*
+	vec3 rot = degrees(eulerAngles(quat_cast<quat>(body->getWorldTransform().getRotation())));
+	Log(lexical_cast<string>(rot));
+	if(rot != owner->transform->GetRotation())
+	{
+		owner->transform->SetRotation(rot);
+	}
+	
+	/*
+	quat rot = quat_cast<quat>(body->getWorldTransform().getRotation());
+	if(rot != owner->transform->GetRotationQuat())
+	{
+		owner->transform->SetRotationQuat(rot);
+	}
+	*/
 }
 
 void Rigidbody::OnDestroy()
@@ -112,10 +131,13 @@ void Rigidbody::OnDestroy()
 //	game->physics->RemoveRigidbody(this);
 }
 
+
 /*******************************************************************************
+*
 *		Transform functions
-*		\area Transform
+*
 *******************************************************************************/
+
 void Rigidbody::OnSetPos( vec3 pos )
 {
 	if(pos == vec3_cast<vec3>(body->getWorldTransform().getOrigin()))
@@ -128,11 +150,13 @@ void Rigidbody::OnSetPos( vec3 pos )
 
 void Rigidbody::OnSetRot( vec3 rot )
 {
-	if(rot == eulerAngles(quat_cast<quat>(body->getWorldTransform().getRotation())))
+//	Log("Setting rot");
+	btQuaternion q = quat_cast<btQuaternion>(quat(radians(rot)));
+	if(q == body->getWorldTransform().getRotation())
 	{
 		return;
 	}
-	body->getWorldTransform().setRotation(quat_cast<btQuaternion>(quat(rot)));
+	body->getWorldTransform().setRotation(q);
 }
 
 /*******************************************************************************
@@ -205,6 +229,35 @@ void Rigidbody::OnSetCollider(Collider *collider)
 		this->collider = collider;
 	}
 	body->getWorldTransform().setOrigin(vec3_cast<btVector3>(owner->transform->GetPosition()));
+}
+
+void Rigidbody::ApplyCentralForce(vec3 force)
+{
+	if(maxSpeed > 0.0f)
+	{
+		btVector3 vel = body->getLinearVelocity();
+		if(abs(vel[0]) >= maxSpeed) force.x = 0.0f;
+		if(abs(vel[1]) >= maxSpeed) force.y = 0.0f;
+		if(abs(vel[2]) >= maxSpeed) force.z = 0.0f;
+	}
+	body->applyCentralForce(vec3_cast<btVector3>(force));
+}
+
+void Rigidbody::ApplyForce(vec3 force, vec3 pos)
+{
+	if(maxSpeed > 0.0f)
+	{
+		btVector3 vel = body->getLinearVelocity();
+		if(abs(vel[0]) >= maxSpeed) force.x = 0.0f;
+		if(abs(vel[1]) >= maxSpeed) force.y = 0.0f;
+		if(abs(vel[2]) >= maxSpeed) force.z = 0.0f;
+	}
+	body->applyForce(vec3_cast<btVector3>(force), vec3_cast<btVector3>(pos));
+}
+
+void Rigidbody::Accelerate(vec3 force)
+{
+	ApplyCentralForce(force*GetMass());
 }
 
 }

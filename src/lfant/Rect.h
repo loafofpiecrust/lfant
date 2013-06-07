@@ -37,11 +37,12 @@ namespace lfant
 /**
  *
  */
-template<typename T = uint32_t>
+//template<typename T = uint32_t>
 class Rect
 {
 public:
-	typedef tvec2<T> vec_t;
+	typedef tvec2<float> vec_t;
+	typedef float T;
 
 	Rect()
 	{
@@ -71,10 +72,10 @@ public:
 	{
 	}
 
-	T x;
-	T y;
-	T width;
-	T height;
+	union {T x, left;};
+	union {T y, top;};
+	union {T width, right;};
+	union {T height, bottom;};
 };
 
 /** @} */

@@ -84,7 +84,7 @@ public:
 	/**
 	 *	Enables or disables this component.
 	 */
-	void Enable(bool enable);
+	void Enable(bool enable = true);
 
 
 	/// The owner of this Component.
@@ -117,6 +117,30 @@ protected:
 	{
 		owner->TriggerEvent(name, arg, args...);
 		Object::TriggerEvent(name, arg, args...);
+	}
+
+	template<typename T>
+	void RequireComponent(T** val)
+	{
+		Connect(owner, "SetComponent"+RemoveScoping(Type(**val)), *val);
+		if(T* t = owner->GetComponent<T>())
+		{
+			*val = t;
+			return;
+		}
+		*val = owner->AddComponent<T>();
+	}
+
+	template<typename T>
+	void RequireComponent(string type, T** val)
+	{
+		Connect(owner, "SetComponent"+type, val);
+		if(Component* comp = owner->GetComponent(type))
+		{
+			*val = dynamic_cast<T*>(comp);
+			return;
+		}
+		*val = dynamic_cast<T*>(owner->AddComponent(type));
 	}
 
 private:

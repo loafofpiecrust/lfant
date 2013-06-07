@@ -90,6 +90,7 @@ public:
 
 	virtual void Init();
 	virtual void Update();
+	virtual void OnDestroy();
 
 	void AddLight(Light* light);
 	void RenderLight(Light* light);

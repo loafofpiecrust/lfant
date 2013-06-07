@@ -75,6 +75,9 @@ public:
 
 	uvec2 GetSize();
 
+	void Bind();
+	void Unbind();
+
 	string path = "";
 	WrapMode wrapMode = WrapMode::Repeat;
 	FilterMode filterMode = FilterMode::Bilinear;
@@ -83,6 +86,7 @@ public:
 	uvec2 size;
 	uint32 id = 0;
 	uint32 uniformId = 0;
+	uint32 mode = 0;
 
 private:
 	void LoadPNG(int mode);

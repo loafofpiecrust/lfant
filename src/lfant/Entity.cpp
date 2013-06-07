@@ -146,6 +146,7 @@ void Entity::AddComponent(Component* comp, Properties *prop)
 	}
 	comp->Init();
 	TriggerEvent("AddComponent", comp);
+	TriggerEvent("SetComponent"+RemoveScoping(Type(comp)), comp);
 }
 
 void Entity::UnsafeDestroy()
@@ -155,8 +156,9 @@ void Entity::UnsafeDestroy()
 	Log("Entity::Destroy: Destroying ", components.size()," components.");
 	for(auto& compo : components)
 	{
-		compo->Destroy();
+		compo->OnDestroy();
 	}
+//	components.clear();
 
 	Log("Entity::Destroy: Destroying ", children.size()," children.");
 	for(auto& child : children)
@@ -247,6 +249,7 @@ void Entity::RemoveComponent()
 		if(Type<T>() == Type(comp))
 		{
 			TriggerEvent("RemoveComponent", comp);
+			TriggerEvent("SetComponent"+RemoveScoping(Type(comp)), comp);
 			comp->Destroy();
 			components.erase(components.begin()+i);
 		}

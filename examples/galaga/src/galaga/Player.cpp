@@ -33,10 +33,11 @@
 #include <lfant/Settings.h>
 #include <lfant/Scene.h>
 #include <lfant/Transform.h>
+#include <lfant/Rigidbody.h>
+#include <lfant/Random.h>
 
-
-namespace lfant
-{
+namespace lfant {
+namespace galaga {
 
 IMPLEMENT_COMP(Player)
 
@@ -44,6 +45,12 @@ void Player::Init()
 {
 	Component::Init();
 	Log("Initing a player.");
+	ConnectEvent(SENDER(owner, SetComponentRigidbody), RECEIVER(this, OnSetRigidbody));
+
+	if(Rigidbody* rb = owner->GetComponent<Rigidbody>())
+	{
+		haveRigidbody = true;
+	}
 	//	ConnectEvent(SENDER(game->input, Horizontal), this, &Player::Move);
 	//	ConnectEvent(SENDER(game->input, Vertical), this, &Player::Move);
 }
@@ -53,24 +60,29 @@ void Player::Move(string axis, float value)
 
 }
 
-void Player::Load(Properties *prop)
+void Player::Load(lfant::Properties *prop)
 {
 	Component::Load(prop);
+
 	Log("Loading from player, '"+prop->type+" "+prop->id+"'.");
 	prop->Get("movementSpeed", movementSpeed);
 	prop->Get("lookSpeed", lookSpeed);
 	prop->Get("mouseLook", mouseLook);
+	prop->Get("jumpHeight", jumpHeight);
+	prop->Get("bulletSpeed", bulletSpeed);
 
 	Log("The setting of lookSpeed is ", prop->Get<float>("lookSpeed"));
 }
 
-void Player::Save(Properties *prop)
+void Player::Save(lfant::Properties *prop)
 {
 	Component::Save(prop);
 
 	prop->Set("movementSpeed", movementSpeed);
 	prop->Set("lookSpeed", lookSpeed);
 	prop->Set("mouseLook", mouseLook);
+	prop->Set("jumpHeight", jumpHeight);
+	prop->Set("bulletSpeed", bulletSpeed);
 }
 
 void Player::Update()
@@ -86,11 +98,13 @@ void Player::Update()
 
 	if (game->input->GetButtonDown("ShowLoc"))
 	{
-		Log("Player position: ", owner->transform->GetPosition().x, ", ", owner->transform->GetPosition().y, ", ", owner->transform->GetPosition().z);
+		Log("Player position: ", lexical_cast<string>(owner->transform->GetPosition()));
+		Entity* ent = game->scene->GetEntity("StarShip");
+		Log("Object pos: ", lexical_cast<string>(ent->transform->GetPosition()));
 	}
 	if (game->input->GetButtonDown("ShowRot"))
 	{
-		Log("Player rotation: ", owner->transform->GetRotation().x, ", ", owner->transform->GetRotation().y, ", ", owner->transform->GetRotation().z);
+		Log("Player rotation: ", lexical_cast<string>(owner->transform->GetRotation()));
 	}
 	if(game->input->GetButtonDown("ShowFPS"))
 	{
@@ -99,37 +113,56 @@ void Player::Update()
 	float hor = game->input->GetAxis("Horizontal");
 	if (hor != 0.0f)
 	{
-		owner->transform->Translate(owner->transform->right * float(hor * game->time->deltaTime * movementSpeed));
+	//	Log("Pressing hor axis. Positive? ", hor > 0.0f);
+		if(haveRigidbody)
+		{
+			TriggerEvent("Accelerate", owner->transform->GetRight() * vec3(1,0,1) /* game->time->deltaTime*/ * movementSpeed * hor);
+		}
+		else
+		{
+			owner->transform->Translate(owner->transform->GetRight() * game->time->deltaTime * movementSpeed * hor);
+		}
 	}
 	float ver = game->input->GetAxis("Vertical");
 	if (ver != 0.0f)
 	{
-		owner->transform->Translate(float(game->time->deltaTime) * owner->transform->direction * float(ver * movementSpeed));
+		if(haveRigidbody)
+		{
+			TriggerEvent("Accelerate", owner->transform->GetDirection() * vec3(1,0,1) /* game->time->deltaTime*/ * movementSpeed * ver);
+		}
+		else
+		{
+			owner->transform->Translate(owner->transform->GetDirection() * game->time->deltaTime * movementSpeed * ver);
+		}
 	}
 	float hrot = game->input->GetAxis("HRotation");
 	if (hrot != 0.0f)
 	{
-		float input = hrot * lookSpeed;
-		owner->transform->Rotate(vec3(0, 0, input * game->time->deltaTime));
+		owner->transform->Rotate(vec3(0, -hrot * lookSpeed * game->time->deltaTime, 0));
 	}
 	float vrot = game->input->GetAxis("VRotation");
 	if (vrot != 0.0f)
 	{
 		owner->transform->Rotate(vec3(vrot * lookSpeed * game->time->deltaTime, 0, 0));
 	}
+	if(game->input->GetButtonDown("Jump"))
+	{
+		if(haveRigidbody)
+		{
+			TriggerEvent("Accelerate", vec3(0, jumpHeight / game->time->deltaTime, 0));
+		}
+	}
 	if (game->input->GetButtonDown("Fire"))
 	{
 		Log("Player fired");
-		/*
-		Entity* ent = Entity::Spawn("TestMesh"+lexical_cast<string>(meshCount), nullptr, transform->GetPosition());
-		Mesh* mesh = ent->AddComponent<Mesh>();
-		mesh->LoadFile("suzanne.obj");
-		mesh->material->texture.name = "player.png";
-		mesh->material->shader->path = "Diffuse";
-		*/
-		dynamic_cast<Galaga*>(game)->AddMesh("TestMesh"+lexical_cast<string>(meshCount));
-		++meshCount;
-		Log("Added mesh ", meshCount);
+		Entity* ent = game->scene->Spawn("bullet"+lexical_cast<string>(random::Range(0,200)));
+		ent->transform->SetPosition(owner->transform->GetPosition());
+		ent->transform->SetRotation(owner->transform->GetRotation());
+		Mesh* m = ent->AddComponent<Mesh>();
+		m->material->LoadFile("materials/Diffuse.mat");
+		m->LoadFile("meshes/suzanne.obj");
+		Rigidbody* rb = ent->AddComponent<Rigidbody>();
+		rb->Accelerate(owner->transform->GetDirection() * bulletSpeed / game->time->deltaTime);
 	}
 	if (game->input->GetButtonDown("TesterSetVar"))
 	{
@@ -150,4 +183,18 @@ void Player::Update()
 	}
 }
 
+void Player::OnSetRigidbody(Component* comp)
+{
+	if(comp)
+	{
+		haveRigidbody = true;
+		dynamic_cast<Rigidbody*>(comp)->SetMaxSpeed(20.0f);
+	}
+	else
+	{
+		haveRigidbody = false;
+	}
+}
+
+}
 }

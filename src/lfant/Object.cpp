@@ -20,9 +20,11 @@
 
 #include <lfant/Object.h>
 
-// External
-
 // Internal
+#include <lfant/Game.h>
+#include <lfant/Time.h>
+
+// External
 
 namespace lfant
 {
@@ -42,15 +44,29 @@ void Object::Init()
 
 void Object::Update()
 {
+	for(uint i = 0; i < timers.size(); ++i)
+	{
+		if(timers[i]->time <= 0.0f)
+		{
+			string name = timers[i]->name;
+			timers.erase(timers.begin()+i);
+			--i;
+			TriggerEvent(name);
+			continue;
+		}
+		timers[i]->time -= game->time->deltaTime;
+	}
 }
 
 void Object::Destroy()
 {
 	OnDestroy();
+	/*
 	for(auto& evt : events)
 	{
 		delete evt;
 	}
+	*/
 }
 
 void Object::OnDestroy()

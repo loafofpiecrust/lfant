@@ -110,19 +110,18 @@ public:
 	virtual void Update();
 	virtual void OnDestroy();
 
-	virtual void BeginRender();
-	virtual void Render();
-	virtual void EndRender();
-
 	void SetInput(string path);
 	void SetTexture(string name);
 
 	void LoadFile(string path);
 
-
 	ptr<Material> material = new Material;
 
 protected:
+
+	virtual void BeginRender();
+	virtual void Render();
+	virtual void EndRender();
 
 	// Raw Rendering Functions not to be used outside.
 
