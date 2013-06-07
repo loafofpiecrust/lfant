@@ -24,6 +24,7 @@
 // Internal
 #include <lfant/Mesh.h>
 #include <lfant/Material.h>
+#include <lfant/Rect.h>
 
 namespace lfant
 {
@@ -106,7 +107,8 @@ protected:
 	/// The currently playing animation.
 	Animation* currentAnim = nullptr;
 
-	vec2 currentFrame = vec2(0.0f, 0.0f);
+//	vec2 currentFrame = vec2(0.0f, 0.0f);
+	Rect currentFrame;
 
 	double currentTime = 0.0f;
 

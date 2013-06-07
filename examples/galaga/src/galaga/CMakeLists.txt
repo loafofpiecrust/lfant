@@ -29,6 +29,7 @@ include_directories(
 	"${ROOT}/external/boost"
 	"${ROOT}/external/glfw/include"
 	"${ROOT}/external/raknet/Source"
+	"${ROOT}/external/cegui/cegui/include"
 	)
 
 target_link_libraries(${PROJECT_NAME}

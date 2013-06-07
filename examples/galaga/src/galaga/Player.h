@@ -24,50 +24,57 @@
 // Internal
 #include <lfant/Component.h>
 
-namespace lfant
+namespace lfant {
+namespace galaga {
+
+/** @addtogroup Galaga
+ *	@{
+ */
+/** @addtogroup Entities
+ *	@{
+ */
+
+/**
+ *
+ */
+class Player : public lfant::Component
 {
-	/** \addtogroup Galaga
-	 *	 \{
-	 */
-	/** \addtogroup Entities
-	 *	 \{
-	 */
-
-	/**
-	 *
-	 */
-	class Player : public Component
+	DECLARE_COMP(Player)
+public:
+	Player()
 	{
-		DECLARE_COMP(Player)
-	public:
-		Player()
-		{
-		}
-		virtual ~Player()
-		{
-		}
+	}
+	virtual ~Player()
+	{
+	}
 
-		virtual void Init();
-		virtual void Update();
+	virtual void Init();
+	virtual void Update();
 
-		virtual void Move(string axis, float value);
+	virtual void Move(string axis, float value);
 
-		void Load(Properties* prop);
-		void Save(Properties *prop);
+	void Load(Properties* prop);
+	void Save(Properties *prop);
 
-	protected:
+	void OnSetRigidbody(Component* comp);
 
-		float movementSpeed = 3.0f;
-		float lookSpeed = 0.01f;
-		bool mouseLook = true;
+protected:
 
-		int meshCount = 0;
-		ivec2 lastMouse;
+	float movementSpeed = 3.0f;
+	float lookSpeed = 0.01f;
+	float jumpHeight = 2.0f;
+	float bulletSpeed = 5.0f;
+	bool mouseLook = true;
 
-	private:
+	int meshCount = 0;
+	ivec2 lastMouse;
+	bool haveRigidbody = false;
 
-	};
+private:
 
-/// \}
-/// \}
+};
+
+/// @}
+/// @}
+}
 }

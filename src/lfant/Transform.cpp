@@ -82,6 +82,7 @@ void Transform::SetRotationQuat(quat rot)
 	rotationQuat = rot;
 	rotation = degrees(eulerAngles(rot));
 	TriggerEvent("SetRotation", rotation);
+	TriggerEvent("SetRotation", rot);
 }
 
 vec3 Transform::GetRotation()
@@ -316,6 +317,21 @@ void Transform::Scale(vec3 scl)
 {
 	SetScale(scale * scl);
 //	TriggerEvent("SetScale", scale);
+}
+
+vec3 Transform::GetDirection()
+{
+	return direction;
+}
+
+vec3 Transform::GetRight()
+{
+	return right;
+}
+
+vec3 Transform::GetUp()
+{
+	return up;
 }
 
 }

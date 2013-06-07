@@ -36,8 +36,12 @@ class btCollisionDispatcher;
 class btConstraintSolver;
 class btDefaultCollisionConfiguration;
 
-namespace lfant
-{
+namespace lfant {
+
+namespace physics {
+class DebugRenderer;
+}
+
 class Entity;
 class Rigidbody;
 class Joint;
@@ -61,6 +65,23 @@ struct GravPoint
 	}
 
 	GravPoint() {}
+};
+
+struct ContactPoint
+{
+	vec3 point;
+	vec3 normal;
+
+	ContactPoint(vec3 point, vec3 normal) :
+		point(point), normal(normal)
+	{
+	}
+};
+
+struct Collision
+{
+	Rigidbody* other = nullptr;
+	deque<ContactPoint> contacts;
 };
 
 /**
@@ -155,6 +176,9 @@ private:
 	ptr<btCollisionDispatcher> dispatcher;
 	ptr<btConstraintSolver> solver;
 	ptr<btDefaultCollisionConfiguration> collisionConfig;
+
+	deque<Rigidbody*> bodies;
+//	ptr<physics::DebugRenderer> debugRenderer;
 
 	deque<GravPoint> gravityPoints;
 	vec3 initGravity = vec3(0, -9.81, 0);

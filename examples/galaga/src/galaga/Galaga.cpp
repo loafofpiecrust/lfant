@@ -21,6 +21,7 @@
 #include <galaga/Galaga.h>
 
 // External
+#include <CEGUI/Window.h>
 
 // Internal
 #include <lfant/Renderer.h>
@@ -43,17 +44,19 @@
 
 #include <galaga/Player.h>
 
-#include <lfant/network/Server.h>
-#include <lfant/network/Client.h>
+#include <lfant/net/tcp/Server.h>
+#include <lfant/net/tcp/Client.h>
+#include <lfant/ChatServer.h>
 
-namespace lfant
-{
+namespace lfant {
+namespace galaga {
 
 extern "C" void Launch()
 {
-	printf("Launched\n");
+	printf("Launching\n");
 	game = new Galaga();
 	game->standAlone = true;
+	printf("Initing\n");
 	game->Init();
 	Log("Game initialised");
 	game->Update();
@@ -65,6 +68,10 @@ Galaga::Galaga()
 {
 }
 
+Galaga::~Galaga()
+{
+}
+
 void Galaga::OnHost()
 {
 	Log("Galaga::OnHost/OnConnect: Touch.");
@@ -72,38 +79,102 @@ void Galaga::OnHost()
 	//	client->SendFile("scenes/init.scene", "scenes/new.scene");
 }
 
+void Galaga::OnClickButton(CEGUI::Window *window)
+{
+	if(window->getName() == "Submit")
+	{
+		string msg = "";
+		CEGUI::Window* input; //= userInterface->rootWindow->getChild("Console")->getChild("Input");
+		CEGUI::Window* history; //= userInterface->rootWindow->getChild("Console")->getChild("History");
+		if(history && input)
+		{
+			msg = input->getText();
+			history->appendText(msg);
+			input->setText("");
+		}
+
+		if(msg == "host" && !client)
+		{
+			server = network->AddConnection<ChatServer>();
+			server->Host(22222);
+			ConnectEvent(SENDER(server, Host), RECEIVER(this, OnHost));
+			ConnectEvent(SENDER(server, ReceiveMessage), RECEIVER(this, OnReceiveMessage));
+		}
+		else if(msg == "connect" && !server)
+		{
+			client = network->AddConnection<ChatClient>();
+			client->Connect("127.0.0.1", 22222);
+			ConnectEvent(SENDER(client, Connect), RECEIVER(this, OnHost));
+			ConnectEvent(SENDER(client, ReceiveMessage), RECEIVER(this, OnReceiveMessage));
+		}
+		else if(msg == "disconnect")
+		{
+			if(client)
+			{
+				// Client::Destroy calls Disconnect() for us, if a connection is currently established.
+				client->Destroy();
+			}
+			else if(server)
+			{
+				// Close server?
+				server->Destroy();
+			}
+		}
+		else if(msg != "")
+		{
+			if(client)
+			{
+				client->SendData(msg);
+			}
+			else if(server)
+			{
+				server->SendData(msg);
+			}
+		}
+	}
+}
+
+void Galaga::OnReceiveMessage(string sender, string msg)
+{
+	CEGUI::Window* history; //= userInterface->rootWindow->getChild("Console")->getChild("History");
+	if(history)
+	{
+		history->appendText(sender+": "+msg);
+	}
+}
+
 void Galaga::Init()
 {
 	Game::Init();
 
+	Log("Loading scene.");
 	scene->LoadFile("scenes/main.scene");
 	scene->SaveFile("scenes/init.scene");
 	Log("Finished loading scene");
 
 	userInterface->LoadFile("gui/MainMenu.gui");
-
-	//	server = network->AddConnection<network::Server>();
+//	userInterface->LoadMovie("HUD", "gui/hud.swf");
+//	server = network->AddConnection<net::Server>();
 	/*
 	Log("Setting up client...");
-	client = new network::Client;
+	client = new net::Client;
 	client->Host(22222);
 
 	Log("Setting up client2...");
-	client2 = new network::Client;
+	client2 = new net::Client;
 	client2->Connect("127.0.0.1", 22222);
 
 	client2->GetDataAsync(256);
 	*/
-	ent = scene->Spawn();
+//	ent = scene->Spawn();
 //	ent2 = scene->Spawn();
-	client = ent->AddComponent<ChatClient>();
+//	client = ent->AddComponent<ChatClient>();
 //	client2 = ent2->AddComponent<ChatClient>();
 
-	client->Connect("74.177.199.145");
+//	client->Connect("127.0.0.1");
 //	client2->Connect();
 
-	ConnectEvent(SENDER(client, Host), RECEIVER(this, OnHost));
-	ConnectEvent(SENDER(client, Connect), RECEIVER(this, OnHost));
+//	ConnectEvent(SENDER(userInterface, ClickButton), RECEIVER(this, OnClickButton));
 
 	//	client->SendData("12345678");
 
@@ -148,4 +219,6 @@ void Galaga::AddMesh(string name)
 	//	mesh->material->shader->path = "shaders/Diffuse";
 }
 
+
+}
 }

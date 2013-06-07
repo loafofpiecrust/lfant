@@ -150,25 +150,13 @@ void Mesh::Render()
 
 	glBindVertexArray(vertexArray);
 
-	glUseProgram(material->shader->GetId());
-//	Log("Shader id: ", material->shader->GetId());
+//	glUseProgram(material->shader->GetId());
+	material->shader->Use();
 
-//	Log("mainCamera = ", game->scene->mainCamera);
-
-	mat4 mvp; //= game->scene->mainCamera->projection;
-/*
-	Log("mesh p: ", lexical_cast<string>(mvp));
-	mvp = game->scene->mainCamera->view;
-	Log("mesh v: ", lexical_cast<string>(mvp));
-	mvp = owner->transform->GetMatrix();
-	Log("mesh m: ", lexical_cast<string>(mvp));
-*/
-//	Log("Mesh MVP uniform = ", material->shader->GetUniform("MVP"));
-	mvp = game->scene->mainCamera->GetProjection() * game->scene->mainCamera->GetView() * owner->transform->GetMatrix();
+	mat4 mvp = game->scene->mainCamera->GetProjection() * game->scene->mainCamera->GetView() * owner->transform->GetMatrix();
 	glUniformMatrix4fv(material->shader->GetUniform("MVP"), 1, GL_FALSE, &mvp[0][0]);
 
 //	Log("mesh mvp: ", lexical_cast<string>(mvp));
-
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, material->texture->GetId());
@@ -230,6 +218,11 @@ uint32 Mesh::CreateBuffer(void* data, uint32 size, int target, int mode)
 
 void Mesh::LoadFile(string path)
 {
+	if(!material->loaded)
+	{
+		material->LoadFile("materials/Diffuse.mat");
+	}
+	
 	Log("Loading mesh file '"+path+"'.");
 	path = game->fileSystem->GetGamePath(path).string();
 

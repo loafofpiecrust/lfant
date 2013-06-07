@@ -30,7 +30,7 @@
 #include "CEGUI/RenderQueue.h"
 #include "CEGUI/GeometryBuffer.h"
 
-#include "CEGUI/RendererModules/OpenGL/Renderer.h"
+#include "CEGUI/RendererModules/OpenGL/RendererBase.h"
 #include "CEGUI/RendererModules/OpenGL/Texture.h"
 
 #include <iostream>
@@ -55,7 +55,7 @@ int pbAttrs[] =
 };
 
 //----------------------------------------------------------------------------//
-OpenGLGLXPBTextureTarget::OpenGLGLXPBTextureTarget(OpenGLRenderer& owner) :
+OpenGLGLXPBTextureTarget::OpenGLGLXPBTextureTarget(OpenGLRendererBase& owner) :
     OpenGLTextureTarget(owner),
     d_pbuffer(0)
 {
@@ -158,8 +158,8 @@ void OpenGLGLXPBTextureTarget::initialisePBuffer()
 {
     int creation_attrs[] =
     {
-        GLX_PBUFFER_WIDTH, d_area.getWidth(),
-        GLX_PBUFFER_HEIGHT, d_area.getHeight(),
+        GLX_PBUFFER_WIDTH, (int)d_area.getWidth(),
+        GLX_PBUFFER_HEIGHT, (int)d_area.getHeight(),
         GLX_LARGEST_PBUFFER, True,
         GLX_PRESERVED_CONTENTS, True,
         None

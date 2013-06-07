@@ -60,13 +60,23 @@ void Texture::OnDestroy()
 	glDeleteTextures(1, &id);
 }
 
+void Texture::Bind()
+{
+	glBindTexture(mode, id);
+}
+
+void Texture::Unbind()
+{
+	glBindTexture(mode, 0);
+}
+
 void Texture::LoadFile(string path, int mode)
 {
 	if(path == "")
 	{
 		path = this->path;
 	}
-	if(mode == 0)
+	if(mode == 0 && !(mode = this->mode))
 	{
 		mode = GL_TEXTURE_2D;
 	}

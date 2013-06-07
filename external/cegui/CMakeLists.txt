@@ -53,7 +53,7 @@ file(GLOB SRC_FILES
 	"cegui/src/WindowRendererSets/Core/*.cpp"
 	"cegui/src/XMLParserModules/TinyXML/*.cpp"
 	"cegui/src/ImageCodecModules/STB/*.cpp"
-	"cegui/src/RendererModules/OpenGL3/*.cpp"
+	"cegui/src/RendererModules/OpenGL/*.cpp"
 	"cegui/include/CEGUI/tinyxml/*.cpp"
 	"cegui/src/CommonDialogs/*.cpp"
 	"cegui/src/CommonDialogs/ColourPicker/*.cpp"
@@ -67,10 +67,20 @@ file(GLOB HEADER_FILES
 
 # Remove unneeded source files
 list(REMOVE_ITEM SRC_FILES FribidiVisualMapping.cpp)
-if(WIN32)
+if(PLATFORM STREQUAL "windows")
 	list(REMOVE_ITEM SRC_FILES "${PROJECT_SOURCE_DIR}/cegui/src/IconvStringTranscoder.cpp")
 else()
-	list(REMOVE_ITEM SRC_FILES "${PROJECT_SOURCE_DIR}/cegui/src/Win32StringTranscoder.cpp")
+	list(REMOVE_ITEM SRC_FILES
+		${PROJECT_SOURCE_DIR}/cegui/src/Win32StringTranscoder.cpp
+		${PROJECT_SOURCE_DIR}/cegui/src/RendererModules/OpenGL/WGLPBTextureTarget.cpp
+		)
+endif()
+
+if(PLATFORM STREQUAL "osx")
+else()
+	list(REMOVE_ITEM SRC_FILES
+		${PROJECT_SOURCE_DIR}/cegui/src/RendererModules/OpenGL/ApplePBTextureTarget.cpp
+		)
 endif()
 
 # Output Library Info

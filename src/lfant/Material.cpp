@@ -53,6 +53,12 @@ void Material::Load(Properties* prop)
 	{
 		shader->Load(sh);
 	}
+	else
+	{
+		
+	}
+
+	loaded = true;
 }
 
 void Material::Save(Properties *prop)

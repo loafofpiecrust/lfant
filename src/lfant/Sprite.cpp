@@ -47,52 +47,32 @@ Sprite::~Sprite()
 
 void Sprite::BeginRender()
 {
-	glGenVertexArrays(1, &vertexArray);
-	glBindVertexArray(vertexArray);
-
-	Log("Sprite vert arr bound");
-
-	if(material->shader->GetId() == 0)
-	{
-		material->shader->LoadFile();
-	}
-
-	if(material->texture->GetId() == 0)
-	{
-		material->texture->LoadFile();
-	}
-
-	if(material->shader->GetId() != 0)
-	{
-		// Get any uniforms here
-		material->shader->AddUniform("MVP");
-		material->shader->AddUniform("textureSampler");
-	}
 
 	vertexBuffer.push_back(vec3(0, 0, 0));
 	vertexBuffer.push_back(vec3(1, 0, 0));
 	vertexBuffer.push_back(vec3(1, 1, 0));
 	vertexBuffer.push_back(vec3(0, 1, 0));
 
-	uvBuffer.push_back(vec2(0, 0));
-	uvBuffer.push_back(vec2(1, 0));
-	uvBuffer.push_back(vec2(1, 1));
 	uvBuffer.push_back(vec2(0, 1));
+	uvBuffer.push_back(vec2(1, 1));
+	uvBuffer.push_back(vec2(1, 0));
+	uvBuffer.push_back(vec2(0, 0));
 
 	indexBuffer.push_back(0);
 	indexBuffer.push_back(1);
 	indexBuffer.push_back(2);
 	indexBuffer.push_back(3);
+	
+	currentFrame.x = 0;
+	currentFrame.y = 0;
+	currentFrame.width = 50;
+	currentFrame.height = 50;
 
-	CreateBuffer(vertexBuffer, GL_ARRAY_BUFFER);
-	CreateBuffer(uvBuffer, GL_ARRAY_BUFFER);
-	CreateBuffer(indexBuffer, GL_ELEMENT_ARRAY_BUFFER);
-
-	Renderable::BeginRender();
+	Mesh::BeginRender();
 }
 
 void Sprite::Render()
-{
+{/*
 	if(!material->shader->GetId() || !material->texture->GetId())
 	{
 		printf("Failing sprite rendering...\n");
@@ -106,14 +86,15 @@ void Sprite::Render()
 
 //	glUseProgram(material->shader->GetId());
 	material->shader->Use();
-
-	mat4 mvp = game->scene->mainCamera->GetProjection() * game->scene->mainCamera->GetView() * owner->transform->GetMatrix();
-	glUniformMatrix4fv(material->shader->GetUniform("MVP"), 1, GL_FALSE, &mvp[0][0]);
+	*/
+//	mat4 mvp = game->scene->mainCamera->GetProjection() /*game->scene->mainCamera->GetView()*/ * owner->transform->GetMatrix();
+/*	glUniformMatrix4fv(material->shader->GetUniform("MVP"), 1, GL_FALSE, &mvp[0][0]);
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, material->texture->id);
+	material->texture->Bind();
 	glUniform1i(material->shader->GetUniform("textureSampler"), 0);
 
+	
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
@@ -121,12 +102,11 @@ void Sprite::Render()
 	glEnableVertexAttribArray(1);
 	glBindBuffer(GL_ARRAY_BUFFER, uvBuffer);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
-
-	/*
+	
 	glEnableVertexAttribArray(2);
 	glBindBuffer(GL_ARRAY_BUFFER, normalBuffer.id);
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-	*/
+	
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
 	glDrawElements(GL_QUADS, indexBuffer.size(), GL_UNSIGNED_INT, (void*)0);
@@ -138,9 +118,11 @@ void Sprite::Render()
 	glDisableVertexAttribArray(1);
 	glDisableVertexAttribArray(0);
 
-	glBindTexture(GL_TEXTURE_2D, 0);
+	material->texture->Unbind();
 
 	glBindVertexArray(0);
+	*/
+	Mesh::Render();
 }
 
 void Sprite::Update()
@@ -238,6 +220,7 @@ void Sprite::Load(Properties *props)
 //	Mesh::Load(props);
 	string mat = "materials/Diffuse.mat";
 	props->Get("material", mat);
+//	material->texture->mode = GL_TEXTURE_RECTANGLE;
 	material->LoadFile(mat);
 	// Register Animation::Mode enum
 	props->SetEnum("Mode::Loop", Animation::Mode::Loop);

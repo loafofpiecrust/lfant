@@ -106,6 +106,31 @@ class Object
 			sig.connect(func);
 		}
 	};
+
+	template<typename T>
+	class EventVar : public Event
+	{
+	public:
+		T* var;
+
+		EventVar(string name, T* var) :
+			Event(name), var(var)
+		{
+		}
+	};
+
+	class Timer
+	{
+	public:
+		string name;
+		float time;
+
+		Timer(string name, float time) :
+			name(name), time(time)
+		{
+		}
+	};
+
 public:
 
 	/**
@@ -146,8 +171,8 @@ public:
 				if(con)
 				{
 					con->sig.connect(boost::bind(func, receiver));
+					return;
 				}
-				return;
 			}
 		}
 		con = new Event0(name, boost::bind(func, receiver));
@@ -168,8 +193,8 @@ public:
 				if(con)
 				{
 					con->sig.connect(boost::bind(func, receiver, _1));
+					return;
 				}
-				return;
 			}
 		}
 		con = new EventP<P1>(name, boost::bind(func, receiver, _1));
@@ -190,12 +215,12 @@ public:
 				if(con)
 				{
 					con->sig.connect(boost::bind(func, receiver, _1, _2));
+					return;
 				}
-				return;
 			}
 		}
 		con = new EventP<P1, P2>(name, boost::bind(func, receiver, _1, _2));
-		sender->events.push_front(ptr<Event>(con));
+		sender->events.push_front(con);
 	}
 
 	template<typename R, typename P1, typename P2, typename P3>
@@ -212,12 +237,35 @@ public:
 				if(con)
 				{
 					con->sig.connect(boost::bind(func, receiver, _1, _2, _3));
+					return;
 				}
-				return;
 			}
 		}
 		con = new EventP<P1, P2, P3>(name, boost::bind(func, receiver, _1, _2, _3));
-		sender->events.push_front(ptr<Event>(con));
+		sender->events.push_front(con);
+	}
+
+	template<typename T>
+	void ConnectEvent(Object* sender, string name, T& var)
+	{
+		erase_all(name, " ");
+		name = Type(sender) + "::" + name + "(" + Type<T>() + ")";
+		EventVar<T>* con = nullptr;
+		for(auto& event : sender->events)
+		{
+			if(event->name == name)
+			{
+				con = dynamic_cast<EventVar<T>*>(event.get());
+				if(con)
+				{
+					con->var = &var;
+					return;
+				}
+			}
+		}
+		con = new EventVar<T>(name, &var);
+		sender->events.push_front(con);
+
 	}
 
 
@@ -247,10 +295,17 @@ public:
 		{
 			if(event->name == type)
 			{
-				auto con = dynamic_cast<EventP<P1>*>(event.get());
+				EventP<P1>* con = dynamic_cast<EventP<P1>*>(event.get());
 				if(con)
 				{
 					con->sig(arg);
+					continue;
+				}
+				EventVar<P1>* conv = dynamic_cast<EventVar<P1>*>(event.get());
+				if(conv)
+				{
+					*conv->var = arg;
+					continue;
 				}
 			}
 		}
@@ -309,6 +364,44 @@ public:
 		return false;
 	}
 
+	void SetTimer(string name, float time)
+	{
+	//	name = "Timer_"+name;
+		for(auto& t : timers)
+		{
+			if(t->name == name)
+			{
+				t->time = time;
+				return;
+			}
+		}
+		timers.push_back(new Timer(Type(this) + "::" + name + "()", time));
+	}
+
+	void CancelTimer(string name)
+	{
+	//	name = "Timer_"+name;
+		for(uint i = 0; i < timers.size(); ++i)
+		{
+			if(timers[i]->name == name)
+			{
+				timers.erase(timers.begin()+i);
+				return;
+			}
+		}
+	}
+
+	float* GetTimer(string name)
+	{
+		for(auto& t : timers)
+		{
+			if(t->name == name)
+			{
+				return &t->time;
+			}
+		}
+	}
+
 	/**
 	 *	Called when the object is initialised. Used instead of
 	 *	constructor to ensure that all subsystems are created as well.
@@ -351,6 +444,7 @@ protected:
 private:
 
 	deque< ptr<Event> > events;
+	deque< ptr<Timer> > timers;
 };
 
 /// @}

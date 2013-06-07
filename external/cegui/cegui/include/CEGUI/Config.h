@@ -41,13 +41,6 @@ setting CMake options and regenerating, rather than editing directly.
 #   define DEBUG 1
 #endif
 
-/* #undef CEGUI_HAS_VERSION_SUFFIX */
-#ifdef CEGUI_HAS_VERSION_SUFFIX
-#   ifndef CEGUI_VERSION_SUFFIX
-#       define CEGUI_VERSION_SUFFIX ""
-#   endif
-#endif
-
 /* #undef CEGUI_HAS_BUILD_SUFFIX */
 #ifdef CEGUI_HAS_BUILD_SUFFIX
 #   ifndef CEGUI_BUILD_SUFFIX
@@ -174,6 +167,14 @@ setting CMake options and regenerating, rather than editing directly.
 // from locations within .zip files.
 //////////////////////////////////////////////////////////////////////////
 /* #undef CEGUI_HAS_MINIZIP_RESOURCE_PROVIDER */
+
+// Define the default place where cegui will look for loadable modules
+// this can be changed at runtime via the CEGUI_MODULE_DIR environment var.
+#if defined(_WIN32) || defined(__WIN32__)
+#   define CEGUI_MODULE_DIR "/home/taylorsnead/lazyfox/lfant/build/bin/"
+#else
+#   define CEGUI_MODULE_DIR "/usr/local//"
+#endif
 
 #endif	// end of guard _CEGUIConfig_h_
 

@@ -90,7 +90,7 @@ void Time::Update()
 		}
 		else
 		{
-			TriggerEvent(t.first);
+			TriggerEvent("OnTimer_"+t.first);
 			timers.erase(t.first);
 		}
 	}
