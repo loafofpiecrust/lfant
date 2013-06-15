@@ -37,38 +37,39 @@ namespace lfant
 /**
  *
  */
-//template<typename T = uint32_t>
-class Rect
+template<typename T>
+class TRect
 {
 public:
-	typedef tvec2<float> vec_t;
-	typedef float T;
+//	typedef float T;
+	typedef tvec2<T> vec_t;
 
-	Rect()
+	TRect() :
+		x(0), y(0), width(0), height(0)
 	{
 	}
 
-	Rect(T x, T y, T width, T height) :
+	TRect(T x, T y, T width, T height) :
 		x(x), y(y), width(width), height(height)
 	{
 	}
 
-	Rect(vec_t pos, T width, T height) :
-		Rect(pos.x, pos.y, width, height)
+	TRect(vec_t pos, T width, T height) :
+		TRect(pos.x, pos.y, width, height)
 	{
 	}
 
-	Rect(T x, T y, vec_t size) :
-		Rect(x, y, size.x, size.y)
+	TRect(T x, T y, vec_t size) :
+		TRect(x, y, size.x, size.y)
 	{
 	}
 
-	Rect(vec_t pos, vec_t size) :
-		Rect(pos.x, pos.y, size.x, size.y)
+	TRect(vec_t pos, vec_t size) :
+		TRect(pos.x, pos.y, size.x, size.y)
 	{
 	}
 
-	~Rect()
+	~TRect()
 	{
 	}
 
@@ -77,6 +78,10 @@ public:
 	union {T width, right;};
 	union {T height, bottom;};
 };
+
+typedef TRect<float> Rect;
+typedef TRect<int32_t> IRect;
+typedef TRect<uint32_t> URect;
 
 /** @} */
 /** @} */

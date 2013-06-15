@@ -18,16 +18,15 @@
 *
 ******************************************************************************/
 #pragma once
-
 #include <lfant/stdafx.h>
-
-// External
-#include <list>
-#include <forward_list>
 
 // Internal
 #include <lfant/ptr.h>
 #include <lfant/Subsystem.h>
+
+// External
+#include <list>
+#include <forward_list>
 
 namespace lfant
 {

@@ -70,6 +70,12 @@ int lexical_cast<int, string>(const string& src)
 }
 
 template<>
+unsigned int lexical_cast<unsigned int, string>(const string& src)
+{
+	return (unsigned int)strtoul(src.c_str(), 0, 0);
+}
+
+template<>
 long lexical_cast<long, string>(const string& src)
 {
 	return atol(src.c_str());
@@ -212,19 +218,19 @@ string lexical_cast<string, rgba>(const rgba& src)
 template<>
 string lexical_cast<string, mat4>(const mat4& src)
 {
-	string result = "\n[";
+	string result = "\n[\n";
 	for(uint i=0; i<4; ++i)
 	{
-		if(i != 0)
+		//if(i != 0)
 		{
 			result.append(" ");
 		}
 		for(uint k=0; k<4; ++k)
 		{
-			result.append(lexical_cast<string>(src[i][k]));
+			result.append(lexical_cast<string>(src[k][i]));
 			if(k != 3)
 			{
-				result.append(",");
+				result.append(", ");
 			}
 		}
 		if(i != 3)
@@ -232,7 +238,7 @@ string lexical_cast<string, mat4>(const mat4& src)
 			result.append("\n");
 		}
 	}
-	result.append("]");
+	result.append("\n]");
 	return result;
 }
 
@@ -322,7 +328,7 @@ vec3 lexical_cast<vec3, string>(const string& val)
 {
 	vec3 result(0);
 	deque<string> str = lfant::Split(val, " x:,()");
-	Log("Lexcast vec3("+str[0]+","+str[1]+","+str[2]+")");
+	Log("Lexcasting vec3, size: ", str.size());
 	result.x = lexical_cast<float>(str[0]);
 	if(str.size() > 1)
 	{
@@ -332,6 +338,7 @@ vec3 lexical_cast<vec3, string>(const string& val)
 			result.z = lexical_cast<float>(str[2]);
 		}
 	}
+	Log("Lexcast vec3(", result.x, ",", result.y, ",", result.z, ")");
 	return result;
 }
 

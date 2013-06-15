@@ -1,6 +1,3 @@
-#ifndef HEADER_18132041CEC9AF45
-#define HEADER_18132041CEC9AF45
-
 /******************************************************************************
 *
 *	LFANT Source
@@ -73,5 +70,3 @@ public:
 /// @}
 
 } /* namespace lfant */
-
-#endif // header guard 

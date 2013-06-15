@@ -95,7 +95,9 @@ void Game::Init()
 //	audio->Init();
 //	network->Init();
 	scriptSystem->Init();
-	userInterface->Init();
+//	userInterface->Init();
+
+	if(defaultScene != "") scene->LoadFile(defaultScene);
 
 	Log("Window callback set.");
 
@@ -108,7 +110,7 @@ void Game::Update()
 	physics->Update();
 	scene->Update();
 	input->Update();
-	userInterface->Update();
+//	userInterface->Update();
 	renderer->Update();
 //	network->Update();
 }
@@ -124,12 +126,14 @@ void Game::Load(Properties* prop)
 {
 	prop->Get("orgName", orgName);
 	prop->Get("gameName", gameName);
+	prop->Get("defaultScene", defaultScene);
 }
 
 void Game::Save(Properties* prop)
 {
 	prop->Set("orgName", orgName);
 	prop->Set("gameName", gameName);
+	prop->Set("defaultScene", defaultScene);
 }
 
 /*******************************************************************************

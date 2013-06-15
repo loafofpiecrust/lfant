@@ -1,0 +1,10 @@
+// Diffuse default
+material Lines
+{
+	shader Main
+	{
+		vertex = shaders/lines/Default.vert
+		fragment = shaders/lines/Default.frag
+	//	geometry = shaders/Diffuse.geom
+	}
+}

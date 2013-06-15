@@ -1,6 +1,3 @@
-#ifndef HEADER_9E8987571FCBFB72
-#define HEADER_9E8987571FCBFB72
-
 /******************************************************************************
 *
 *	LFANT Source
@@ -158,5 +155,3 @@ private:
 /** @} */
 /** @} */
 }
-
-#endif // header guard

@@ -71,13 +71,11 @@ public:
 	vec3 GetUp();
 
 protected:
-	vec3 GetWorldRotatedPosition();
-
-	vec3 position = vec3(0.0f);
-	vec3 rotation = vec3(0.0f);
-	vec3 scale = vec3(1.0f);
+	vec3 position = vec3(0);
+	vec3 rotation = vec3(0);
+	vec3 scale = vec3(1);
 	quat rotationQuat;
-//	mat4 matrix = mat4(1.0f);
+	mat4 matrix = mat4(1);
 
 	vec3 up;
 	vec3 right;

@@ -109,6 +109,7 @@ public:
 
 	string orgName = "lazyfox";
 	string gameName = "lfant";
+	string defaultScene = "";
 
 protected:
 	/**

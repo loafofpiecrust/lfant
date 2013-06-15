@@ -45,6 +45,7 @@ namespace lfant
 
 Entity::Entity()
 {
+	transform = AddComponent<Transform>();
 }
 
 Entity::~Entity()
@@ -62,10 +63,10 @@ void Entity::Init()
 	Log("Entity::Init: Touch.");
 	Object::Init();
 
-	if(!transform)
-	{
-		transform = AddComponent<Transform>();
-	}
+//	if(!transform)
+//	{
+	//	transform = AddComponent<Transform>();
+//	}
 
 	if(lifeTime <= 0.0f)
 	{
@@ -219,6 +220,24 @@ Component* Entity::GetComponent(string type)
 	return nullptr;
 }
 
+string Entity::GetLayer()
+{
+	if(layer == "Main" && parent)
+	{
+		return parent->GetLayer();
+	}
+	else
+	{
+		return layer;
+	}
+}
+
+void Entity::SetLayer(string layer)
+{
+	this->layer = layer;
+}
+
+
 /*******************************************************************************
 *
 *		Component System functions
@@ -344,6 +363,7 @@ void Entity::Save(Properties* prop)
 
 void Entity::Load(Properties* prop)
 {
+	prop->GetId(name);
 	prop->Get("id", id);
 	prop->Get("tags", tags);
 	prop->Get("layer", layer);
@@ -389,6 +409,13 @@ void Entity::Load(Properties* prop)
 	{
 		ent = game->scene->SpawnAndLoad(child, child->id, this);
 	//	ent->Load(child);
+	}
+	
+	string file = "";
+	prop->Get("file", file);
+	if(file != "")
+	{
+		LoadFile(file);
 	}
 
 	Log("Entity::Load: Finished.");

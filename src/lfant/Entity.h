@@ -22,8 +22,8 @@
 #include <lfant/stdafx.h>
 
 // External
-#include <boost/uuid/uuid.hpp>
-#include <boost/uuid/uuid_generators.hpp>
+//#include <boost/uuid/uuid.hpp>
+//#include <boost/uuid/uuid_generators.hpp>
 #include <forward_list>
 
 // Internal
@@ -61,6 +61,7 @@ class Transform;
 class Entity : public Object
 {
 	friend class Scene;
+	friend class Component;
 
 public:
 
@@ -79,6 +80,7 @@ public:
 	{
 		C* comp = new C();
 		AddComponent(comp, prop);
+		TriggerEvent("SetComponent"+RemoveScoping(Type(comp)), comp);
 		return comp;
 	}
 
@@ -134,6 +136,9 @@ public:
 
 	uint64_t GetId() { return id; }
 
+	string GetLayer();
+	void SetLayer(string layer);
+
 	Transform* transform = nullptr;
 
 	/// Whether to update this Entity or not.
@@ -143,9 +148,6 @@ public:
 
 	/// The identifying tags used for grouping.
 	deque<string> tags;
-
-	/// The layer of this entity for primarily display filtering
-	string layer = "Default";
 
 	float lifeTime = 0.0f;
 
@@ -163,6 +165,26 @@ protected:
 	void RemoveChild(Entity* ent);
 	void UnsafeDestroy();
 
+	template<typename... P>
+	void TriggerEventWithChildren(string name, P... args)
+	{
+		TriggerEvent(name, args...);
+		for(auto& c : children)
+		{
+			c->TriggerEventWithChildren(name, args...);
+		}
+	}
+
+	template<typename... P>
+	void TriggerEventWithParent(string name, P... args)
+	{
+		TriggerEvent(name, args...);
+		if(parent)
+		{
+			parent->TriggerEvent(name, args...);
+		}
+	}
+
 private:
 	Entity();
 	virtual ~Entity();
@@ -173,6 +195,9 @@ private:
 
 	/// 64-bit scene-unique identifier.
 	uint64_t id = 0;
+
+	/// The layer of this entity for primarily display filtering
+	string layer = "Main";
 };
 
 /** @} */

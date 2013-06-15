@@ -1,0 +1,123 @@
+scene Scene
+{
+	entity Player
+	{
+		active = true
+		id = 13109570281517897720
+		layer = Main
+		lifeTime = 0
+		tags = {  }
+		component Transform
+		{
+			enabled = true
+			position = (-2.46793389,3.43140073e-07,-1.08518386)
+			rotation = (360,343.425964,0)
+			scale = (1,1,1)
+		}
+		component Movement
+		{
+			enabled = true
+			jumpHeight = 2
+			movementSpeed = 2.5
+			usePhysics = false
+		}
+		component Player
+		{
+			bulletSpeed = 5
+			enabled = true
+		}
+		entity Camera
+		{
+			active = true
+			id = 17462938647148434322
+			layer = Main
+			lifeTime = 0
+			tags = {  }
+			component Transform
+			{
+				enabled = true
+				position = (0,0,0)
+				rotation = (5.48771095,0,0)
+				scale = (1,1,1)
+			}
+			component Camera
+			{
+				aspectRatio = 1.77777779
+				enabled = true
+				fov = 45
+				viewRange = 0.00999999978-1000
+			}
+			component MouseLook
+			{
+				enabled = false
+				lookSpeed = 85
+			}
+		}
+	}
+	entity FBOQuad
+	{
+		active = false
+		id = 4620546740167642908
+		layer = Main
+		lifeTime = 0
+		tags = {  }
+		component Transform
+		{
+			enabled = true
+			position = (0.100000001,0.100000001,1)
+			rotation = (0,0,0)
+			scale = (1,1,1)
+		}
+		component Mesh
+		{
+			enabled = false
+			path = 
+			material 
+			{
+				texture 
+				{
+					anisoLevel = 1
+					path = 
+				}
+				 
+				{
+					fragment = shaders/FrameBuffer.frag
+					vertex = shaders/FrameBuffer.vert
+				}
+			}
+		}
+	}
+	entity Lala
+	{
+		active = true
+		id = 14514284786278117030
+		layer = Main
+		lifeTime = 0
+		tags = {  }
+		component Transform
+		{
+			enabled = true
+			position = (0,0,0)
+			rotation = (0,0,0)
+			scale = (1,1,1)
+		}
+		component Mesh
+		{
+			enabled = true
+			path = 
+			material 
+			{
+				texture 
+				{
+					anisoLevel = 1
+					path = ../../assets/textures/Default.png
+				}
+				 
+				{
+					fragment = shaders/simple/Diffuse.frag
+					vertex = shaders/simple/Diffuse.vert
+				}
+			}
+		}
+	}
+}

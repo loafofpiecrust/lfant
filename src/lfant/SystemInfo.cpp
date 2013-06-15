@@ -213,6 +213,7 @@ void SystemInfo::Init()
 	computerName = result_spl[1];
 
 	// GPU currently in use
+	/*
 	cmd = popen("inxi -G", "r");
 	uint cnt = 0;
 	deque<string> line;
@@ -284,6 +285,7 @@ void SystemInfo::Init()
 		++cnt;
 	}
 	pclose(cmd);
+	*/
 
 }
 #endif

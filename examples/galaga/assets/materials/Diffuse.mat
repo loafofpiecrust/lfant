@@ -13,8 +13,8 @@ material Diffuse
 
 	shader Main
 	{
-		vertex = shaders/Diffuse.vert
-		fragment = shaders/Diffuse.frag
+		vertex = shaders/simple/Diffuse.vert
+		fragment = shaders/simple/Diffuse.frag
 	//	geometry = shaders/Diffuse.geom
 	}
 }

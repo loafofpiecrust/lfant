@@ -23,22 +23,22 @@
 
 // Internal
 
-namespace lfant
-{
+namespace lfant {
+namespace thread {
 
 #if WINDOWS
-
-void sleep(uint32_t milli)
+void Sleep(uint32_t milli)
 {
-	Sleep(milli);
+	::Sleep(milli);
 }
 
 #elif UNIX
 
-void sleep(uint32_t milli)
+void Sleep(uint32_t milli)
 {
 	usleep(milli * 1000);
 }
-
 #endif
+
+}
 }

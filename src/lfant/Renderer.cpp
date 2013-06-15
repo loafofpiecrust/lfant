@@ -27,7 +27,7 @@
 #include <GL/glew.h>
 //#include <GL/gl.h>
 //#include <SFML/Graphics.hpp>
-#include <GL/glfw.h>
+#include <GLFW/glfw3.h>
 
 #include <glm/gtc/type_ptr.hpp>
 
@@ -53,6 +53,9 @@
 #include <lfant/TextureLoader.h>
 #include <lfant/MeshLoader.h>
 #include <lfant/Properties.h>
+#include <lfant/FrameBuffer.h>
+#include <lfant/Transform.h>
+#include <lfant/Thread.h>
 
 #define OFFSET(i) ((byte*)0 + (i))
 
@@ -125,6 +128,7 @@ void Renderer::Init()
 		HideMouse(hideMouse);
 	}
 
+
 	// Background color
 	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
 
@@ -132,14 +136,14 @@ void Renderer::Init()
 	glEnable(GL_DEPTH_TEST);
 
 	// Fragment depth testing
-	glDepthFunc(GL_LESS);
+	glDepthFunc(GL_LEQUAL);
 //	glDepthMask(GL_FALSE);
 //	glDepthRange(0.0f, 1.0f);
 
 	// Backface culling
 	glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
-	glFrontFace(GL_CCW);
+//	glCullFace(GL_BACK);
+//	glFrontFace(GL_CCW);
 
 	// Texture and shading
 	glEnable(GL_TEXTURE_2D);
@@ -149,7 +153,8 @@ void Renderer::Init()
 	// Point sprites
 //	glEnable(GL_POINT_SPRITE);
 //	glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
-//	glEnable(GL_BLEND);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 //	glEnable(GL_TEXTURE_RECTANGLE);
 
@@ -157,12 +162,53 @@ void Renderer::Init()
 	{
 		glfwSwapInterval(vsync);
 
-		glfwSetWindowCloseCallback(&Renderer::OnCloseWindow);
-		glfwSetWindowSizeCallback(&Renderer::OnSetResolution);
+		glfwSetWindowCloseCallback(window, &Renderer::OnCloseWindow);
+		glfwSetWindowSizeCallback(window, &Renderer::OnSetResolution);
 	}
 
 	Log("Renderer: Initialized");
 
+	{
+		Mesh* mesh = game->scene->Spawn("Lala")->AddComponent<Mesh>();
+		mesh->LoadFile("meshes/suzanne.obj");
+		mesh->material->LoadFile("materials/Diffuse.mat");
+	}
+	
+	
+	fboEntity = game->scene->Spawn("FBOQuad");
+	fboEntity->transform->SetPosition(vec3(0.1,0.1,1));
+	fboEntity->active = false;
+//	fboEntity->transform->SetScale()
+
+	fboQuad = fboEntity->AddComponent<Mesh>();
+	fboQuad->Enable(false);
+//	fboQuad = new Mesh;
+	fboQuad->usingCamera = false;
+//	fboQuad->Init();
+	fboShader = fboQuad->material->shader;
+	fboQuad->material->loaded = true;
+	fboShader->LoadFile("shaders/FrameBuffer");
+	Log("Shader for fbo: ", fboShader->GetId());
+	fboQuad->LoadFile("meshes/quad.obj");
+	Log("Shader for fbo: ", fboShader->GetId());
+//	fboQuad->material->texture->LoadFile("textures/Default.png");
+//	fboQuad->material->texture->size = uvec2(1024,768);
+//	fboQuad->material->shader->AddUniform("matrix");
+	
+	frameBuffer = new FrameBuffer();
+	frameBuffer->AddTexture("textureSampler", fboQuad->material->texture);
+	Log("Shader for fbo: ", fboShader->GetId());
+//	fboQuad->material->texture->Init();
+//	frameBuffer->AddTexture("texThreshold");
+	frameBuffer->SetRect({0,0,resolution.x, resolution.y});
+	frameBuffer->hasDepth = true;
+	frameBuffer->Init();
+	Log("Shader for fbo: ", fboShader->GetId());
+
+	frameBuffer->Bind();
+	glViewport(0,0,1920, 1080);
+	frameBuffer->Clear();
+	
 	// Load all shaders
 	/*
 	   auto shs = game->fileSystem->GetGameFiles("shaders", "vert");
@@ -174,17 +220,60 @@ void Renderer::Init()
 	   }*/
 }
 
+static bool fboDrawn = false;
+
 void Renderer::Update()
 {
-	glfwSwapBuffers();
+
+//	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+//	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+//	glEnable(GL_CULL_FACE);
+//	glEnable(GL_DEPTH_TEST);
+//	glDepthFunc(GL_LESS);
+
+//	fboQuad->Render();
+
+	// Rendering to the framebuffer
+	
+//	frameBuffer->Bind();
+	if(!fboDrawn)
+	{
+//		thread::Sleep(1000);
+//		frameBuffer->Render();
+//		Log("fbo drawn once.");
+//		thread::Sleep(1000);
+		fboDrawn = true;
+	}
+
+	glfwSwapBuffers(window);
+	glfwPollEvents();
+
+	frameBuffer->Unbind();
+//	glViewport(0,0,1024, 768);
+	glViewport(0,0,resolution.x,resolution.y);
+//	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glDisable(GL_BLEND);
-	glEnable(GL_CULL_FACE);
-	glEnable(GL_DEPTH_TEST);
+//	frameBuffer->GetTextures(fboShader);
+
+//	fboQuad->material->shader->Bind();
+	fboQuad->Render();
+//	fboQuad->material->shader->Unbind();
+
+	frameBuffer->Bind();
+//	glViewport(0,0,1024, 768);
+//	glViewport(0,0,resolution.x,resolution.y);
+//	glClearColor(0.0f, 0.4f, 0.0f, 0.0f);
+	frameBuffer->Clear();
+
+//	fboQuad->Render();
+//	frameBuffer->Unbind();
 }
 
 void Renderer::OnDestroy()
 {
+//	fboQuad->OnDestroy();
+//	delete fboQuad;
 	Log("Renderer::OnDestroy(): Touch");
 	glfwTerminate();
 }
@@ -200,32 +289,25 @@ bool Renderer::OpenWindow()
 //	if(game->standAlone)
 //	{
 	Log("Renderer::OpenWindow: About to set window hints.");
-	glfwOpenWindowHint(GLFW_FSAA_SAMPLES, fsaa);
-	glfwOpenWindowHint(GLFW_OPENGL_VERSION_MAJOR, version.major);
-	glfwOpenWindowHint(GLFW_OPENGL_VERSION_MINOR, version.minor);
-	glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	glfwOpenWindowHint(GLFW_WINDOW_NO_RESIZE, !windowResizable);
+	glfwWindowHint(GLFW_SAMPLES, fsaa);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, version.major);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, version.minor);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	glfwWindowHint(GLFW_RESIZABLE, windowResizable);
 
 	Log("Renderer::OpenWindow: Window hints set.");
 
-	int mode = GLFW_WINDOW;
-	if(fullscreen)
-	{
-		mode = GLFW_FULLSCREEN;
-	}
-
-	Log("Renderer::OpenWindow: Window mode determined.");
-
 	ivec2 res = GetResolution();
-	if( !glfwOpenWindow( res.x, res.y, 0, 0, 0, 0, 32, 0, mode ) )
+	if( !(window = glfwCreateWindow( res.x, res.y, windowTitle.c_str(), nullptr, nullptr )) )
 	{
 		Log( "Renderer::OpenWindow: Failed to open GLFW window." );
 		glfwTerminate();
 		return false;
 	}
+	glfwMakeContextCurrent(window);
 	Log("Renderer::OpenWindow: Window opened.");
 
-	SetWindowTitle(windowTitle);
+//	SetWindowTitle(windowTitle);
 	SetWindowPos(windowPos);
 	Log("Renderer::OpenWindow: Window successfully opened.");
 //	}
@@ -241,18 +323,26 @@ bool Renderer::OpenWindow()
 	return true;
 }
 
-int Renderer::OnCloseWindow()
+void Renderer::OnCloseWindow(GLFWwindow* win)
 {
 	Log("Renderer::WindowClosed: Touch.");
 	game->Exit();
-	return 1;
 }
 
-void Renderer::OnSetResolution(int x, int y)
+void Renderer::OnSetResolution(GLFWwindow* win, int x, int y)
 {
-	Log("Renderer::OnSetResolution: Touch.");
+//	Log("Renderer::OnSetResolution: Touch.");
 	game->renderer->resolution = ivec2(x, y);
+	/*
+	game->renderer->frameBuffer->Unbind();
 	glViewport(0, 0, x, y);
+	game->renderer->frameBuffer->Bind();
+	glViewport(0, 0, x, y);
+	game->renderer->frameBuffer->rect.width = x;
+	game->renderer->frameBuffer->rect.height = y;
+	game->renderer->frameBuffer->Render();
+//	frameBuffer->ResizeViewport();
+	*/
 	game->renderer->TriggerEvent("SetResolution", (uint32)x, (uint32)y);
 }
 
@@ -270,13 +360,13 @@ ivec2 Renderer::GetResolution()
 void Renderer::SetWindowTitle(string title)
 {
 	windowTitle = title;
-	glfwSetWindowTitle(title.c_str());
+	glfwSetWindowTitle(window, title.c_str());
 }
 
 void Renderer::SetResolution(ivec2 res)
 {
 	resolution = res;
-	glfwSetWindowSize(res.x, res.y);
+	glfwSetWindowSize(window, res.x, res.y);
 }
 
 void Renderer::SetVersion(byte major, byte minor)
@@ -300,7 +390,7 @@ void Renderer::SetRendering(bool render)
 void Renderer::SetWindowPos(ivec2 pos)
 {
 	windowPos = pos;
-	glfwSetWindowPos(pos.x, pos.y);
+	glfwSetWindowPos(window, pos.x, pos.y);
 }
 
 Shader *Renderer::GetShader(string name)
@@ -327,14 +417,7 @@ void Renderer::AddShader(Shader *shader)
 
 void Renderer::HideMouse(bool hide)
 {
-	if(hide == true)
-	{
-		glfwDisable(GLFW_MOUSE_CURSOR);
-	}
-	else
-	{
-		glfwEnable(GLFW_MOUSE_CURSOR);
-	}
+	glfwSetInputMode(window, GLFW_CURSOR, !hide);
 }
 
 }

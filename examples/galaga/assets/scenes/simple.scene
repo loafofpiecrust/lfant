@@ -1,0 +1,52 @@
+
+scene Simple
+{
+	entity Player
+	{
+		component Transform
+		{
+			position = (0,0,0)
+		}
+
+		component Movement
+		{
+			movementSpeed = 2.5
+			jumpSpeed = 5
+			usePhysics = false
+		}
+		component Player
+		{
+
+		}
+
+		entity Camera
+		{
+			component Camera
+			{
+				mode = 0
+				fov = 45
+			}
+			component MouseLook
+			{
+				enabled = false
+				lookSpeed = 85
+			}
+
+		}
+	}
+	/*
+	entity Powa
+	{
+		component Transform
+		{
+			position = (0,0,3)
+		}
+
+		component Mesh
+		{
+			path = meshes/suzanne.obj
+			material = materials/Diffuse.mat
+		}
+	}
+	*/
+}

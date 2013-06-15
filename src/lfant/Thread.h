@@ -25,8 +25,8 @@
 
 // Internal
 
-namespace lfant
-{
+namespace lfant {
+namespace thread {
 /** @addtogroup Game
  *	 @{
  */
@@ -34,8 +34,9 @@ namespace lfant
  *	 @{
  */
 
-void sleep(uint32_t milli);
+void Sleep(uint32_t milli);
 
 /** @} */
 /** @} */
+}
 }

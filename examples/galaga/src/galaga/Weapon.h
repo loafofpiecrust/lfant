@@ -50,7 +50,7 @@ public:
 	virtual void Init();
 	virtual void Update();
 
-	void Fire();
+	void Fire(byte mode = 0);
 	void Reload();
 	void EndReload();
 
@@ -58,16 +58,27 @@ public:
 	bool CanReload();
 
 protected:
+	void EndFire();
+
 	uint32_t currentAmmo = 25;
 	uint32_t maxAmmo = 25;
+	uint32_t ammoPool = 100;
 	uint32_t shotCost = 1;
+	uint32_t projectiles = 1;
 	float fireRate = 10.0f;
 	float reloadTime = 1.0f;
 	float meleeDamage = 10.0f;
+	float bulletSpeed = 110.0f;
 
 	float lastFire = 0.0f;
 
 	bool reloading = false;
+	bool automatic = false;
+	bool released = true;
+
+	vec3 direction = vec3(1);
+
+	string projectilePath = "entities/items/projectiles/Bullet.ent";
 
 
 private:

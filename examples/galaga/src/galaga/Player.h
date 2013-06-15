@@ -51,24 +51,22 @@ public:
 	virtual void Init();
 	virtual void Update();
 
-	virtual void Move(string axis, float value);
+	void Jump(float value);
+	void Fire(float value);
+	void NextItem();
+	void PreviousItem();
 
 	void Load(Properties* prop);
-	void Save(Properties *prop);
-
-	void OnSetRigidbody(Component* comp);
+	void Save(Properties* prop);
 
 protected:
 
-	float movementSpeed = 3.0f;
 	float lookSpeed = 0.01f;
-	float jumpHeight = 2.0f;
 	float bulletSpeed = 5.0f;
 	bool mouseLook = true;
 
 	int meshCount = 0;
 	ivec2 lastMouse;
-	bool haveRigidbody = false;
 
 private:
 

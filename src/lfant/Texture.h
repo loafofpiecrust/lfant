@@ -55,9 +55,7 @@ public:
 		Compressed, Bit16, TrueColor
 	};
 
-	Texture()
-	{
-	}
+	Texture();
 
 	Texture& operator=(string name)
 	{
@@ -65,6 +63,7 @@ public:
 		return *this;
 	}
 
+	void InitData(byte* data);
 	void OnDestroy();
 
 	void LoadFile(string path = "", int mode = 0);
@@ -72,21 +71,32 @@ public:
 	void Save(Properties *prop);
 
 	uint32 GetId();
+	uint32 GetMode();
 
 	uvec2 GetSize();
 
 	void Bind();
 	void Unbind();
 
+	static Texture* GetCurrent();
+
+	uint32 GetIndex();
+	void SetIndex(uint32 idx);
+
 	string path = "";
 	WrapMode wrapMode = WrapMode::Repeat;
 	FilterMode filterMode = FilterMode::Bilinear;
 	uint16 anisoLevel = 1;
-	Format format = Format::Compressed;
-	uvec2 size;
-	uint32 id = 0;
-	uint32 uniformId = 0;
-	uint32 mode = 0;
+//	Format format = Format::Compressed;
+	int internalFormat;
+	int format;
+	uvec2 size = uvec2(0);
+	vec2 tiling = vec2(1);
+	uint32 index = -1;
+	byte msaa = 0;
+	uint32 mode;
+	uint16 magFilter;
+//	uint32 uniformId = 0;
 
 private:
 	void LoadPNG(int mode);
@@ -94,6 +104,11 @@ private:
 	void LoadBMP(int mode);
 	void LoadDDS(int mode);
 
+	uint32 id = -1;
+//	vector<byte> data;
+
+	static deque<Texture*> textures;
+	static Texture* current;
 };
 
 /** @} */

@@ -1,0 +1,67 @@
+// C++
+userinterface HUD
+{
+	schemes = {
+		Generic,
+		TaharezLook,
+		VanillaSkin
+	}
+	
+	font = DejaVuSans-12
+	
+	cursor = TaharezLook/MouseArrow
+	tooltip = TaharezLook/Tooltip
+	
+	window Console
+	{
+		type = Vanilla/FrameWindow
+		AlwaysOnTop = True
+		MinSize = {{0.2,0},{0.2,0}}
+		MaxSize = {{0.8,0},{0.8,0}}
+		Position = {{0.5,0},{0.5,0}}
+		Size = {{0.5,0},{0.45,0}}
+		Text = Console
+	//	CloseButtonEnabled = False
+
+		window Submit
+		{
+			type = Vanilla/Button
+			Text = Submit
+		//	ID = 1
+			VerticalAlignment = Bottom
+			HorizontalAlignment = Right
+			MaxSize = {{1,0},{1,0}}
+			Position = {{0,-7},{0,-7}}
+			Size = {{0.25,0},{0,30}}
+		}
+
+		window Input
+		{
+			type = Vanilla/Editbox
+		//	ID = 2
+			VerticalAlignment = Bottom
+			MaxSize = {{1,0},{1,0}}
+			Position = {{0,7},{0,-7}}
+			Size = {{0.75,-21},{0,30}}
+			Text = 
+		}
+
+		window History
+		{
+			type = Vanilla/MultiLineEditbox
+		//	ID = 3
+		//	ReadOnly = True
+			MaxSize = {{1,0},{1,0}}
+			Position = {{0,7},{0,7}}
+			Size = {{1,-14},{1,-47}}
+			Text = ChatBox
+		}
+	}
+
+	/*
+	window Main
+	{
+		type = TaharezLook/FrameWindow
+	}
+	*/
+}

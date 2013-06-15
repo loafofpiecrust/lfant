@@ -1,6 +1,3 @@
-#ifndef HEADER_F10FF25176ACD9D0
-#define HEADER_F10FF25176ACD9D0
-
 /******************************************************************************
 *
 *	LFANT Source
@@ -32,6 +29,7 @@
 // External
 #include <boost/signals2.hpp>
 #include <boost/bind.hpp>
+#include <boost/bind/placeholders.hpp>
 #include <boost/function.hpp>
 #include <typeinfo>
 #include <forward_list>
@@ -366,7 +364,8 @@ public:
 
 	void SetTimer(string name, float time)
 	{
-	//	name = "Timer_"+name;
+		erase_all(name, " ");
+	//	name = Type(this) + "::" + name + "()";
 		for(auto& t : timers)
 		{
 			if(t->name == name)
@@ -375,12 +374,13 @@ public:
 				return;
 			}
 		}
-		timers.push_back(new Timer(Type(this) + "::" + name + "()", time));
+		timers.push_back(new Timer(name, time));
 	}
 
 	void CancelTimer(string name)
 	{
-	//	name = "Timer_"+name;
+		erase_all(name, " ");
+	//	name = Type(this) + "::" + name + "()";
 		for(uint i = 0; i < timers.size(); ++i)
 		{
 			if(timers[i]->name == name)
@@ -393,6 +393,8 @@ public:
 
 	float* GetTimer(string name)
 	{
+		erase_all(name, " ");
+	//	name = Type(this) + "::" + name + "()";
 		for(auto& t : timers)
 		{
 			if(t->name == name)
@@ -400,6 +402,7 @@ public:
 				return &t->time;
 			}
 		}
+		return nullptr;
 	}
 
 	/**
@@ -451,5 +454,3 @@ private:
 /// @}
 
 } /* namespace lfant */
-
-#endif // header guard 

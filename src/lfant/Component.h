@@ -112,35 +112,42 @@ protected:
 
 	virtual void TriggerEvent(string name) final;
 
-	template<typename P1, typename... P>
-	void TriggerEvent(string name, P1 arg, P... args)
+	template<typename... P>
+	void TriggerEvent(string name, P... args)
 	{
-		owner->TriggerEvent(name, arg, args...);
-		Object::TriggerEvent(name, arg, args...);
+		owner->TriggerEvent(name, args...);
+		Object::TriggerEvent(name, args...);
+	}
+
+	template<typename... P>
+	void TriggerEventWithChildren(string name, P... args)
+	{
+		TriggerEvent(name, args...);
+		owner->TriggerEventWithChildren(name, args...);
 	}
 
 	template<typename T>
-	void RequireComponent(T** val)
+	void RequireComponent(T*& val)
 	{
-		Connect(owner, "SetComponent"+RemoveScoping(Type(**val)), *val);
+		ConnectEvent(owner, "SetComponent"+RemoveScoping(Type(*val)), val);
 		if(T* t = owner->GetComponent<T>())
 		{
-			*val = t;
+			val = t;
 			return;
 		}
-		*val = owner->AddComponent<T>();
+		val = owner->AddComponent<T>();
 	}
 
 	template<typename T>
-	void RequireComponent(string type, T** val)
+	void RequireComponent(string type, T*& val)
 	{
-		Connect(owner, "SetComponent"+type, val);
+		ConnectEvent(owner, "SetComponent"+type, val);
 		if(Component* comp = owner->GetComponent(type))
 		{
-			*val = dynamic_cast<T*>(comp);
+			val = dynamic_cast<T*>(comp);
 			return;
 		}
-		*val = dynamic_cast<T*>(owner->AddComponent(type));
+		val = dynamic_cast<T*>(owner->AddComponent(type));
 	}
 
 private:

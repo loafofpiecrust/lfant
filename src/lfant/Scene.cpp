@@ -48,6 +48,11 @@ void Scene::Update()
 {
 	for(auto& ent : entities)
 	{
+		if(!ent)
+		{
+			continue;
+		}
+		
 		if(ent->active)
 		{
 			ent->Update();
