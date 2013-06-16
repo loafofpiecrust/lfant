@@ -54,10 +54,7 @@ unsigned int unitFromIndex(unsigned int index)
 }
 
 Texture::Texture() :
-	internalFormat(GL_RGBA),
-	format(GL_RGBA),
-	mode(GL_TEXTURE_2D),
-	magFilter(GL_NEAREST)
+	mode(GL_TEXTURE_2D)
 {
 }
 
@@ -93,6 +90,12 @@ uint32 Texture::GetIndex()
 	return index;
 }
 
+void Texture::SetFormat(Texture::Format input, Texture::Format output)
+{
+	internalFormat = input;
+	format = output;
+}
+
 void Texture::InitData(byte* data)
 {
 	if(id == -1)
@@ -109,20 +112,18 @@ void Texture::InitData(byte* data)
 	Log("Texture mode is ", mode, ". GL_TEXTURE_2D = ", GL_TEXTURE_2D);
 	if(msaa == 0)
 	{
-		glTexImage2D(mode, 0, internalFormat, size.x, size.y, 0, format, GL_UNSIGNED_BYTE, data);
+		glTexImage2D(mode, 0, (uint)internalFormat, size.x, size.y, 0, (uint)format, GL_UNSIGNED_BYTE, data);
 	}
 	else
 	{
-		glTexImage2DMultisample(mode, msaa, internalFormat, size.x, size.y, true);
+		glTexImage2DMultisample(mode, msaa, (uint)internalFormat, size.x, size.y, true);
 	}
 
-	glTexParameteri(mode, GL_TEXTURE_MAG_FILTER, magFilter);
-	glTexParameteri(mode, GL_TEXTURE_MIN_FILTER, magFilter);
-	if(!data)
-	{
-		glTexParameteri(mode, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(mode, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	}
+	glTexParameteri(mode, GL_TEXTURE_MAG_FILTER, (uint)scaleFilter);
+	glTexParameteri(mode, GL_TEXTURE_MIN_FILTER, (uint)scaleFilter);
+
+	glTexParameteri(mode, GL_TEXTURE_WRAP_S, (uint)wrapMode);
+	glTexParameteri(mode, GL_TEXTURE_WRAP_T, (uint)wrapMode);
 
 	Unbind();
 }

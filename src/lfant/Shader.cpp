@@ -18,6 +18,12 @@ namespace lfant
 deque<Shader*> Shader::shaders;
 Shader* Shader::current;
 
+void Shader::Destroy()
+{
+	Object::Destroy();
+	delete this;
+}
+
 void Shader::Load(Properties *prop)
 {
 	prop->Get("vertex", vertex);
@@ -38,6 +44,10 @@ void Shader::LoadFile(string file)
 	{
 		vertex = file+".vert";
 		fragment = file+".frag";
+	}
+	else if(id != 0)
+	{
+		return;
 	}
 	for(auto& sh : shaders)
 	{
@@ -191,7 +201,7 @@ void Shader::SetUniform(string name, Texture* val)
 {
 	val->Bind();
 	glUniform1i(GetUniform(name), 0);
-//	val->Unbind();
+	val->Unbind();
 }
 
 }

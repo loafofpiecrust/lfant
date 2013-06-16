@@ -24,6 +24,7 @@
 #include <lfant/Object.h>
 
 // External
+//#include <GL/glew.h>
 
 namespace lfant
 {
@@ -45,14 +46,26 @@ public:
 		Point, Bilinear, Trilinear
 	};
 
-	enum class WrapMode : byte
+	enum class WrapMode : uint16
 	{
-		Clamp, Repeat
+		Clamp = 0x812F,
+		Repeat = 0x2901
 	};
 
-	enum class Format : byte
+	enum class Format : uint16
 	{
-		Compressed, Bit16, TrueColor
+		Rgb = 0x1907,
+		Rgba = 0x1908,
+		CompressedRgb = 0x84ED,
+		CompressedRgba = 0x84EE,
+		Rgb32f = 0x8815,
+		Rgba32f = 0x8814
+	};
+
+	enum class ScaleFilter : uint16
+	{
+		Nearest = 0x2600,
+		Linear = 0x2601
 	};
 
 	Texture();
@@ -83,19 +96,21 @@ public:
 	uint32 GetIndex();
 	void SetIndex(uint32 idx);
 
+	void SetFormat(Format input = Format::Rgba, Format output = Format::Rgba);
+
 	string path = "";
 	WrapMode wrapMode = WrapMode::Repeat;
 	FilterMode filterMode = FilterMode::Bilinear;
-	uint16 anisoLevel = 1;
+	uint8 anisoLevel = 1;
 //	Format format = Format::Compressed;
-	int internalFormat;
-	int format;
+	Format internalFormat = Format::Rgba;
+	Format format = Format::Rgba;
 	uvec2 size = uvec2(0);
 	vec2 tiling = vec2(1);
 	uint32 index = -1;
 	byte msaa = 0;
 	uint32 mode;
-	uint16 magFilter;
+	ScaleFilter scaleFilter = ScaleFilter::Nearest;
 //	uint32 uniformId = 0;
 
 private:

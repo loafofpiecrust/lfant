@@ -61,13 +61,12 @@ void FrameBuffer::Init()
 		//	Texture* tex = Texture::newFromNextUnit();
 		//	tex->setupForFramebuffer(size.x, size.y, GL_RGB32F);
 		//	if(linearFilter) tex->SetFilters(GL_LINEAR, GL_LINEAR);
-			tex->internalFormat = GL_RGB32F;
-			tex->format = GL_RGBA;
-			tex->magFilter = GL_LINEAR;
+			tex->SetFormat(Texture::Format::Rgb32f, Texture::Format::Rgba);
+			tex->scaleFilter = Texture::ScaleFilter::Linear;
+			tex->wrapMode = Texture::WrapMode::Clamp;
 		//	tex->mode = GL_TEXTURE_2D_MULTISAMPLE;
 		//	tex->msaa = 2;
-			tex->size.x = rect.width;
-			tex->size.y = rect.height;
+			tex->size = uvec2(rect.width, rect.height);
 			tex->SetIndex(i);
 			tex->InitData(nullptr);
 

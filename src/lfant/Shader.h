@@ -55,10 +55,12 @@ public:
 	{
 	}
 
+	void Destroy();
+
 	void Load(Properties *prop);
 	void Save(Properties* prop);
+//	void LoadFile(string file = "");
 	void LoadFile(string file = "");
-//	static Shader* LoadFile(string file = "");
 
 	void Bind();
 	void Unbind();

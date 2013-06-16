@@ -1,20 +1,15 @@
 
 #include <editor/gui/App.h>
 
-// External
-#include <wx/wx.h>
-
 // Internal
-#include <editor/gui/Frame.h>
+#include <editor/gui/Window.h>
+#include <lfant/Rect.h>
 
-namespace lfant
-{
-namespace editor
-{
-namespace gui
-{
+// External
 
-IMPLEMENT_APP(App)
+namespace lfant {
+namespace editor {
+namespace gui {
 
 App::App()
 {
@@ -22,18 +17,21 @@ App::App()
 
 App::~App()
 {
+
 }
 
 bool App::OnInit()
 {
-	frame = new Frame( "Hello World", ivec2(50, 50), ivec2(450, 350));
-
-	frame->Connect( Frame::ID_Quit, wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction) &Frame::OnQuit );
-	frame->Connect( Frame::ID_About, wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction) &Frame::OnAbout );
-
-	frame->Show(true);
-	SetTopWindow(frame);
+	window = new Window("lfant", Rect(100, 50, 450, 340));
+	window->Show(true);
+	window->Init();
+	SetTopWindow(window);
 	return true;
+}
+
+int App::MainLoop()
+{
+	
 }
 
 }

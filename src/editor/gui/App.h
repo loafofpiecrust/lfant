@@ -2,37 +2,29 @@
 #pragma once
 #include <lfant/stdafx.h>
 
+// Internal
+#include <lfant/ptr.h>
+
 // External
 #include <wx/app.h>
 
-// Internal
-#include <editor/gui/Types.h>
-#include <lfant/Object.h>
-#include <lfant/ptr.h>
+namespace lfant {
+namespace editor {
+namespace gui {
 
-namespace lfant
-{
-namespace editor
-{
-namespace gui
-{
+class Window;
 
-class Frame;
-
-/**
- *
- */
-class App : public AppBase
+class App : public wxApp
 {
 public:
 	App();
 	virtual ~App();
 
 	virtual bool OnInit();
+	virtual int MainLoop();
 
 protected:
-
-	ptr<Frame> frame;
+	ptr<Window> window;
 
 private:
 };
