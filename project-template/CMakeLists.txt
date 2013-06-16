@@ -5,7 +5,7 @@ set(CMAKE_CXX_COMPILER "clang++")
 endif()
 
 cmake_minimum_required(VERSION 2.8)
-project(galaga)
+project(projectName)
 
 get_filename_component(ROOT "./" REALPATH)
 set(LFANT ${ROOT}/lfant)
@@ -41,8 +41,6 @@ include_directories(
 	"${LFANT}/external/glm"
 	"${LFANT}/external/boost"
 	"${LFANT}/external/glfw/include"
-	"${LFANT}/external/raknet/Source"
-	"${LFANT}/external/cegui/cegui/include"
 	)
 
 target_link_libraries(launcher

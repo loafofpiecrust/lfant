@@ -76,7 +76,7 @@ scene Scene
 			{
 				texture 
 				{
-					anisoLevel = 1
+					anisoLevel = 
 					path = 
 				}
 				 
@@ -109,7 +109,7 @@ scene Scene
 			{
 				texture 
 				{
-					anisoLevel = 1
+					anisoLevel = 
 					path = ../../assets/textures/Default.png
 				}
 				 

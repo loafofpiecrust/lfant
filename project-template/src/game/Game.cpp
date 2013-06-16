@@ -1,76 +1,62 @@
 
-#include "projectTitle.hpp"
+#include <projectName/projectTitle.h>
 
 // External
 
 // Internal
-#include "Renderer.hpp"
-#include "Time.hpp"
-#include "Console.hpp"
-#include "SystemInfo.hpp"
-#include "Physics.hpp"
-#include "Scene.hpp"
-#include "Entity.hpp"
-#include "Player.hpp"
-#include "Input.hpp"
-#include "Sprite.hpp"
-#include "Camera.hpp"
-#include "Type.hpp"
+#include <lfant/Renderer.h>
+#include <lfant/Time.h>
+#include <lfant/Console.h>
+#include <lfant/SystemInfo.h>
+#include <lfant/Physics.h>
+#include <lfant/Scene.h>
+#include <lfant/Entity.h>
+#include <lfant/Input.h>
 
-#include "TextureLoader.hpp"
-#include "ShaderLoader.hpp"
+using namespace lfant;
 
-using namespace sfs;
+namespace projectName {
 
 extern "C" void Launch()
 {
+	// Called from the launcher
 	game = new projectTitle();
 	game->standAlone = true;
 	game->Init();
-	game->destroy = false;
-	Log("Game initialised");
-	while (!game->destroy)
-	{
-		game->Update();
-	}
-	Log("About to destroy game");
-	game->Destroy();
+	game->Update();
+	delete game;
+}
+
+projectTitle::projectTitle()
+{
+}
+
+projectTitle::~projectTitle()
+{
 }
 
 void projectTitle::Init()
 {
-	console = new Console;
-	console->Init();
+	Game::Init();
 
-	Log("ShadowFox Engine launched.");
-
-	systemInfo = new SystemInfo;
-	time = new Time;
-	physics = new Physics;
-	scene = new Scene;
-	renderer = new Renderer;
-	input = new Input;
-
-	renderer->SetVersion(3, 3);
-
-	Log("Subsystems instantiated.");
-
-	systemInfo->Init();
-	time->Init();
-	//physics->Init();
-	renderer->Init();
-	scene->Init();
-	input->Init();
-
-	Log("Subsystems initialized");
+	// Do some stuff.
 }
 
 void projectTitle::Update()
 {
-	renderer->PreUpdate();
-	time->Update();
-	//physics->Update();
-	scene->Update();
-	input->Update();
-	renderer->Update();
+	// Allows for custom loop setups
+	while(!IsExited())
+	{
+		Game::Update();
+		// Add more systems here.
+	}
+	Game::Destroy();
+	// Code here is equivalent to OnDestroy()
+}
+
+void projectTitle::OnDestroy()
+{
+	// Called at the end of Destroy()
+}
+
 }

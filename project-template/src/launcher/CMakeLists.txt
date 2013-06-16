@@ -6,7 +6,7 @@ file(GLOB SRC_FILES
 	)
 
 file(GLOB HEADER_FILES
-	"./*.h"
+	"./*.hpp"
 	)
 
 # Library Search Paths
@@ -20,10 +20,7 @@ add_executable(${PROJECT_NAME} ${SRC_FILES} ${HEADER_FILES})
 # Includes
 include_directories(
 	"."
-	"${ROOT}/external/boost"
-	"../"
-	"${ROOT}/src"
-	"${ROOT}/external/glm"
+	"${SFE}/src/external/boost"
 	)
 
 target_link_libraries(${PROJECT_NAME}

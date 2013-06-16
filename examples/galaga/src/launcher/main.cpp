@@ -1,63 +1,43 @@
-//#pragma once
 
 #include <iostream>
-#include <functional>
 #include <string>
 #include <boost/extension/shared_library.hpp>
 #include <boost/function.hpp>
 
-#if WIN32
-#	define EXT ".dll"
-#	include <windows.h>
-#elif __APPLE__
-#	define EXT ".dylib"
-#	define UNIX 1
-#elif __linux
-#	define EXT ".so"
-#	define UNIX 1
-#endif
-
-#if UNIX
-#	include <unistd.h>
-#endif
-
-using namespace boost::extensions;
 using namespace std;
+using namespace boost::extensions;
 
-shared_library loadlib( std::string name )
+#if defined(WIN32)
+const string ext = ".dll";
+#elif defined(__linux)
+const string ext = ".so";
+#elif defined(__APPLE__)
+const string ext = ".dylib";
+#endif
+
+shared_library LoadLibrary(string name)
 {
-	shared_library lib( name, true );
-	if (!lib.open())
+	shared_library lib {name.c_str()};
+	lib.open();
+	if(!lib.is_open())
 	{
-		cout << "Failed to load " << name << "\n" << dlerror() << "\n";
+		std::cout << "Couldn't load library.\n";
+		exit(0);
 	}
 	return lib;
 }
 
-/*
-#include <galaga/Galaga.h>
-
 int main()
 {
-	Launch();
-	return 0;
-}
-*/
-
-int main( void )
-{
-	//Launch();
-	shared_library lib = loadlib( "/home/taylorsnead/lazyfox/lfant/examples/galaga/bin64/linux/libgalaga" EXT );
-	boost::function<void()> func = lib.get<void>( "Launch" );
-	if (func)
+	shared_library lib = LoadLibrary("libgalaga"+ext);
+	boost::function<void()> func = lib.get<void>("Launch");
+	if(!func)
 	{
-		cout << "Succeeded to load game\n";
-		func();
+		std::cout << "Couldn't find function.\n";
 	}
 	else
 	{
-		cout << "Couldn't find Launch function\n";
+		func();
 	}
-
 	return 0;
 }
