@@ -25,6 +25,7 @@
 
 // Internal
 #include <lfant/Rigidbody.h>
+#include <lfant/Transform.h>
 
 namespace lfant
 {
@@ -48,6 +49,7 @@ void Collider::Init()
 	TriggerEvent("SetCollider", this);
 	ConnectEvent(SENDER(owner, SetScale), RECEIVER(this, OnSetScale));
 	ConnectEvent(SENDER(owner, SetRigidbody), RECEIVER(this, OnSetRigidbody));
+	OnSetScale(vec3());
 }
 
 void Collider::OnSetRigidbody(Rigidbody* rb)
@@ -57,7 +59,7 @@ void Collider::OnSetRigidbody(Rigidbody* rb)
 
 void Collider::OnSetScale(vec3 scale)
 {
-	GetShape()->setLocalScaling(vec3_cast<btVector3>(scale));
+	GetShape()->setLocalScaling(vec3_cast<btVector3>(owner->transform->GetWorldScale()));
 }
 
 }

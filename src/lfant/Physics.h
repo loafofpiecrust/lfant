@@ -19,14 +19,13 @@
 ******************************************************************************/
 #pragma once
 
-// External
-
 // Internal
-
 #include <lfant/Subsystem.h>
 #include <lfant/Joint.h>
 #include <lfant/Vertex.h>
 #include <lfant/Rigidbody.h>
+
+// External
 
 class btManifoldPoint;
 struct btCollisionObjectWrapper;

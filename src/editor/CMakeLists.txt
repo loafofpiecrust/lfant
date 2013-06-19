@@ -1,8 +1,5 @@
 project(editor)
 
-set(INCLUDE_DIR "${SFE}/src")
-set(SOURCE_DIR ".")
-
 # Library Search Paths
 link_directories(
 	"${LIBRARY_OUTPUT_PATH}"
@@ -10,32 +7,32 @@ link_directories(
 
 # Source Info
 file(GLOB_RECURSE SRC_FILES
-	"${SOURCE_DIR}/*.cpp"
+	"*.cpp"
 	)
 
 file(GLOB_RECURSE HEADER_FILES
-	"${INCLUDE_DIR}/editor/*.h"
+	"*.h"
 	)
 
 # Output Library Info
 #add_library(${PROJECT_NAME} SHARED ${SRC_FILES} ${HEADER_FILES})
-add_executable(${PROJECT_NAME} ${SRC_FILES} ${HEADER_FILES})
+add_executable(${PROJECT_NAME} ${SRC_FILES})
 
 # Dependencies
-add_dependencies(${PROJECT_NAME} ../external)
+#add_dependencies(${PROJECT_NAME} ${ROOT}/external)
 
 # Includes Info
 include_directories(
-	"${INCLUDE_DIR}"
-	"${SFE}/src/external/fmod/api/inc"
-	"${SFE}/src/external/glm"
-	"${SFE}/src/external/boost"
-	"../external/bullet/src"
-	"${SFE}/src/external/raknet/Source"
-	"../external/glew/include"
-	"../external/glfw/include"
-	"../external/rocket/Include"
-	"../external/wxwidgets/include"
+	"${ROOT}/src"
+	"${ROOT}/external/fmod/api/inc"
+	"${ROOT}/external/glm"
+	"${ROOT}/external/boost"
+	"${ROOT}/external/bullet/src"
+	"${ROOT}/external/raknet/Source"
+	"${ROOT}/external/glew/include"
+	"${ROOT}/external/glfw/include"
+	"${ROOT}/external/rocket/Include"
+	"${ROOT}/external/wxwidgets/include"
 	)
 
 add_definitions(
@@ -50,10 +47,7 @@ target_link_libraries(${PROJECT_NAME}
 	boost
 	bullet
 	fmod
-	rocket
-	:libpng.a
+	png
 	z
-	squirrel
-	yaml
 	wxwidgets
 	)

@@ -59,6 +59,7 @@ float Range(float min, float max);
 double Range(double min, double max);
 rgba Range(rgba min, rgba max);
 vec3 Range(vec3 min, vec3 max);
+vec4 Range(vec4 min, vec4 max);
 
 /** @} */
 /** @} */

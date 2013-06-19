@@ -33,6 +33,31 @@
 namespace lfant
 {
 
+deque<Texture*> Texture::textures;
+Texture* Texture::current;
+
+unsigned int unitFromIndex(unsigned int index)
+{
+    switch(index)
+    {
+        case 1: return GL_TEXTURE1;
+        case 2: return GL_TEXTURE2;
+        case 3: return GL_TEXTURE3;
+        case 4: return GL_TEXTURE4;
+        case 5: return GL_TEXTURE5;
+        case 6: return GL_TEXTURE6;
+        case 7: return GL_TEXTURE7;
+        case 8: return GL_TEXTURE8;
+        case 9: return GL_TEXTURE9;
+        default: return GL_TEXTURE0;
+    }
+}
+
+Texture::Texture() :
+	mode(GL_TEXTURE_2D)
+{
+}
+
 void Texture::Load(Properties *prop)
 {
 	prop->Get("path", path);
@@ -55,13 +80,75 @@ uint32 Texture::GetId()
 	return id;
 }
 
+uint32 Texture::GetMode()
+{
+	return mode;
+}
+
+uint32 Texture::GetIndex()
+{
+	return index;
+}
+
+void Texture::SetFormat(Texture::Format input, Texture::Format output)
+{
+	internalFormat = input;
+	format = output;
+}
+
+void Texture::InitData(byte* data)
+{
+	if(id == -1)
+	{
+		glGenTextures(1, &id);
+		Log("Generating tex id, ", id);
+	}
+	if(index == -1)
+	{
+		SetIndex(0);
+	}
+	Bind();
+
+	Log("Texture mode is ", mode, ". GL_TEXTURE_2D = ", GL_TEXTURE_2D);
+	Log("internalFormat = ", (uint)internalFormat, ". GL_RGBA = ", GL_RGBA, ", GL_RGB32F = ", GL_RGB32F);
+	Log("format = ", (uint)format, ". GL_RGBA = ", GL_RGBA, ", GL_RGB32F = ", GL_RGB32F);
+	
+	glTexImage2D(mode, 0, (uint)internalFormat, size.x, size.y, 0, (uint)format, GL_UNSIGNED_BYTE, data);
+
+	Log("scaleFilter = ", (uint)scaleFilter, ", GL_LINEAR = ", GL_LINEAR, ", GL_NEAREST = ", GL_NEAREST);
+	glTexParameteri(mode, GL_TEXTURE_MAG_FILTER, (uint)scaleFilter);
+	glTexParameteri(mode, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+	Log("wrapMode = ", (uint)wrapMode, ", GL_CLAMP_TO_EDGE = ", GL_CLAMP_TO_EDGE, ", GL_REPEAT = ", GL_REPEAT);
+	if(wrapMode != WrapMode::Repeat)
+	{
+		glTexParameteri(mode, GL_TEXTURE_WRAP_S, (uint)wrapMode);
+		glTexParameteri(mode, GL_TEXTURE_WRAP_T, (uint)wrapMode);
+	}
+
+	Unbind();
+}
+
 void Texture::OnDestroy()
 {
+	for(uint i = 0; i < textures.size(); ++i)
+	{
+		if(textures[i] == this)
+		{
+			textures.erase(textures.begin()+i);
+		}
+	}
 	glDeleteTextures(1, &id);
+}
+
+void Texture::SetIndex(uint32 idx)
+{
+	index = idx;
 }
 
 void Texture::Bind()
 {
+	glActiveTexture(GL_TEXTURE0 + index);
 	glBindTexture(mode, id);
 }
 
@@ -76,25 +163,32 @@ void Texture::LoadFile(string path, int mode)
 	{
 		path = this->path;
 	}
-	if(mode == 0 && !(mode = this->mode))
+
+	if(mode != 0)
 	{
-		mode = GL_TEXTURE_2D;
+		this->mode = mode;
 	}
 
 	this->path = game->fileSystem->GetGamePath(path).string();
 
-	cimg_library::CImg<byte> img(this->path.c_str());
-	Log("Texture loaded...");
-	size.x = img.width();
-	size.y = img.height();
-
-	glGenTextures(1, &id);
-	glBindTexture(mode, id);
-	glTexImage2D(mode, 0, GL_RGBA, size.x, size.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, img.data());
-	glTexParameteri(mode, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(mode, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-
-	glBindTexture(mode, 0);
+	for(auto& tex : textures)
+	{
+		if(!tex)
+		{
+			break;
+		}
+		if(tex->path == this->path && tex->mode == mode)
+		{
+			id = tex->id;
+			size = tex->size;
+			return;
+		}
+	}
+//	data.clear();
+//	data.resize(0);
+//	cimg_library::CImg<byte> img(this->path.c_str());
+	LoadPNG(this->mode);
+	textures.push_back(this);
 }
 
 void Texture::LoadPNG(int mode)
@@ -106,22 +200,8 @@ void Texture::LoadPNG(int mode)
 		Log("LoadPNG: Error, ", lodepng_error_text(error));
 		return;
 	}
+	InitData(&data[0]);
 	Log("Texture::LoadPNG: Image size: (", size.x, ", ", size.y, ").");
-	if(id == 0)
-	{
-		glGenTextures(1, &this->id);
-		Log("Texture::LoadPNG: GL Texture generated");
-	}
-	glBindTexture(mode, this->id);
-	Log("Texture::LoadPNG: GL Texture bound");
-	glTexImage2D(mode, 0, GL_RGBA, size.x, size.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, &data[0]);
-	Log("Texture::LoadPNG: texture data sent");
-
-	glTexParameteri(mode, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(mode, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	Log("Texture::LoadPNG: texture filtering set");
-
-	glBindTexture(mode, 0);
 }
 
 void Texture::LoadJPEG(int mode)

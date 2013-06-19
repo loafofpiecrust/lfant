@@ -1,0 +1,20 @@
+scene Voxels
+{
+	entity Main
+	{
+		component Transform
+		{
+
+		}
+
+		component Player
+		{
+
+		}
+
+		component Movement
+		{
+			
+		}
+	}
+}

@@ -36,8 +36,8 @@
 
 #include <boost/assign/std/vector.hpp>
 #include <boost/assign/std/deque.hpp>
-#include <boost/function.hpp>
-#include <boost/bind.hpp>
+//#include <boost/function.hpp>
+//#include <boost/bind.hpp>
 #include <boost/type_traits.hpp>
 #include <boost/config.hpp>
 #include <boost/algorithm/string.hpp>
@@ -70,8 +70,8 @@ typedef uint32_t uint32;
 typedef int64_t int64;
 typedef uint64_t uint64;
 
-typedef tvec2<int32> ivec2;
-typedef tvec3<int32> ivec3;
+typedef tvec2<int32_t> ivec2;
+typedef tvec3<int32_t> ivec3;
 typedef tvec2<uint32_t> uvec2;
 typedef tvec3<uint32_t> uvec3;
 

@@ -34,6 +34,7 @@
 #include <lfant/Renderer.h>
 
 // External
+#include <GLFW/glfw3.h>
 
 #include <CEGUI/CEGUI.h>
 #include <CEGUI/RendererModules/OpenGL/GL3Renderer.h>
@@ -303,6 +304,7 @@ void UserInterface::CreateWindow(Properties* prop, CEGUI::Window* parent)
 
 void UserInterface::Load(Properties *prop)
 {
+	Log("UserInterface::Load: Touch.");
 	deque<string> schemes;
 	string pfont = "";
 	string pcursor = "";

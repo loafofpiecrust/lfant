@@ -1,0 +1,209 @@
+scene Scene
+{
+	entity Player
+	{
+		active = true
+		id = 1
+		layer = Player
+		lifetime = 0
+		tags = {  }
+		component Transform
+		{
+			enabled = true
+			position = (0,0,0)
+			rotation = (0,0,0)
+			scale = (1,1,1)
+		}
+		component Mesh
+		{
+			enabled = true
+			path = meshes/plane.obj
+			material 
+			{
+				texture 
+				{
+					anisoLevel = 
+					path = /home/taylorsnead/lazyfox/lfant/examples/galaga/bin64/linux/../../assets/textures/StarShip.png
+				}
+				 
+				{
+					fragment = shaders/simple/Diffuse.frag
+					geometry = 
+					vertex = shaders/simple/Diffuse.vert
+				}
+			}
+		}
+		component Movement
+		{
+			enabled = true
+			jumpHeight = 2
+			movementSpeed = 2.5
+			usePhysics = false
+		}
+		component BoxCollider
+		{
+			enabled = true
+			size = (1,1,1)
+		}
+		component Rigidbody
+		{
+			enabled = true
+			mass = 1
+			maxSpeed = 0
+			trigger = true
+			velocity = (0,0,0)
+		}
+		component Player
+		{
+			bulletSpeed = 5
+			enabled = true
+		}
+		entity Bay
+		{
+			active = true
+			id = 3
+			layer = Main
+			lifetime = 0
+			tags = {  }
+			component Transform
+			{
+				enabled = true
+				position = (0,0,0)
+				rotation = (0,0,0)
+				scale = (1,1,1)
+			}
+			component Inventory
+			{
+				enabled = true
+				equippedItem = 0
+				itemLimit = 0
+				mass = 8
+				massLimit = 0
+			}
+			entity Laser
+			{
+				active = true
+				id = 2
+				layer = Main
+				lifetime = 0
+				tags = {  }
+				component Transform
+				{
+					enabled = true
+					position = (-0.899999976,0,0.5)
+					rotation = (0,0,0)
+					scale = (1,1,1)
+				}
+				component Item
+				{
+					enabled = true
+					equipped = true
+					equippedPosition = (-0.899999976,0,0.5)
+					initialPosition = (0,0,0)
+					mass = 8
+				}
+				component Weapon
+				{
+					automatic = false
+					bulletSpeed = 3
+					currentAmmo = 25
+					direction = (1,1,1)
+					enabled = true
+					fireRate = 0.200000003
+					maxAmmo = 25
+					meleeDamage = 10
+					projectilePath = entities/items/projectiles/Laser.ent
+					projectiles = 1
+					reloadTime = 2
+					shotCost = 1
+				}
+			}
+		}
+	}
+	entity Blamo
+	{
+		active = true
+		id = 4
+		layer = Enemy
+		lifetime = 0
+		tags = {  }
+		component Transform
+		{
+			enabled = true
+			position = (0,0,7)
+			rotation = (0,180,0)
+			scale = (1,1,1)
+		}
+		component Mesh
+		{
+			enabled = true
+			path = meshes/plane.obj
+			material 
+			{
+				texture 
+				{
+					anisoLevel = 
+					path = /home/taylorsnead/lazyfox/lfant/examples/galaga/bin64/linux/../../assets/textures/StarShip.png
+				}
+				 
+				{
+					fragment = shaders/simple/Diffuse.frag
+					geometry = 
+					vertex = shaders/simple/Diffuse.vert
+				}
+			}
+		}
+		component Movement
+		{
+			enabled = true
+			jumpHeight = 2
+			movementSpeed = 2.5
+			usePhysics = true
+		}
+		component BoxCollider
+		{
+			enabled = true
+			size = (1,1,1)
+		}
+		component Rigidbody
+		{
+			enabled = true
+			mass = 1
+			maxSpeed = 0
+			trigger = true
+			velocity = (0,0,0)
+		}
+	}
+	entity Cam
+	{
+		active = true
+		id = 5
+		layer = Main
+		lifetime = 0
+		tags = {  }
+		component Transform
+		{
+			enabled = true
+			position = (0,15,3)
+			rotation = (90,0,0)
+			scale = (1,1,1)
+		}
+		component Camera
+		{
+			aspectRatio = 1.77777779
+			enabled = true
+			fov = 45
+			viewRange = 0.00999999978-1000
+		}
+		component FollowEntity
+		{
+			damping = 1.25
+			enabled = true
+			entity = 1
+			speed = 1
+			x = true
+			y = false
+			z = true
+		}
+	}
+}

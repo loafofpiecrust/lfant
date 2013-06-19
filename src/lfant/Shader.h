@@ -27,8 +27,10 @@
 // External
 #include <forward_list>
 
-namespace lfant
-{
+namespace lfant {
+
+class Texture;
+
 /** @addtogroup Game
  *	@{
  */
@@ -53,17 +55,31 @@ public:
 	{
 	}
 
+	void Destroy();
+
 	void Load(Properties *prop);
 	void Save(Properties* prop);
-	void LoadFile(string file = "");
+//	void LoadFile(string file = "");
+	void LoadFile(string file);
+	void LoadFile(string vert, string frag, string geom = "");
+	void Compile();
+
+	void Bind();
+	void Unbind();
+
+	static Shader* GetCurrent();
+
+	uint32 GetId();
 
 	uint32 GetUniform(string name);
 	void AddUniform(string name);
-
-	void Use();
-	void Unuse();
-
-	uint32 GetId();
+	
+	void SetUniform(string name, float val);
+	void SetUniform(string name, const vec2& val);
+	void SetUniform(string name, const vec3& val);
+	void SetUniform(string name, const vec4& val);
+	void SetUniform(string name, const mat4& val);
+	void SetUniform(string name, Texture* val);
 
 protected:
 
@@ -72,10 +88,12 @@ protected:
 
 	string vertex = "";
 	string fragment = "";
-	uint32 id = 0;
+	string geometry = "";
+	uint32 id = -1;
 	map<string, uint32> uniforms;
 
 	static deque<Shader*> shaders;
+	static Shader* current;
 };
 
 /// @}

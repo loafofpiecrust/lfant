@@ -49,12 +49,14 @@ class EventArgs;
    }
  */
 
+/*
 namespace gameswf
 {
 struct player;
 struct root;
 struct render_handler;
 }
+*/
 
 namespace lfant
 {
@@ -72,14 +74,14 @@ public:
 	class Movie
 	{
 	public:
-		Movie(string name, gameswf::root* swf);
+	//	Movie(string name, gameswf::root* swf);
 		~Movie();
 
 		void Play();
 		void Pause();
 
 		string name = "";
-		ptr<gameswf::root> swf; //= nullptr;
+	//	ptr<gameswf::root> swf; //= nullptr;
 		bool active = true;
 	};
 

@@ -70,6 +70,12 @@ int lexical_cast<int, string>(const string& src)
 }
 
 template<>
+unsigned int lexical_cast<unsigned int, string>(const string& src)
+{
+	return (unsigned int)strtoul(src.c_str(), 0, 0);
+}
+
+template<>
 long lexical_cast<long, string>(const string& src)
 {
 	return atol(src.c_str());
@@ -212,19 +218,19 @@ string lexical_cast<string, rgba>(const rgba& src)
 template<>
 string lexical_cast<string, mat4>(const mat4& src)
 {
-	string result = "\n[";
+	string result = "\n[\n";
 	for(uint i=0; i<4; ++i)
 	{
-		if(i != 0)
+		//if(i != 0)
 		{
 			result.append(" ");
 		}
 		for(uint k=0; k<4; ++k)
 		{
-			result.append(lexical_cast<string>(src[i][k]));
+			result.append(lexical_cast<string>(src[k][i]));
 			if(k != 3)
 			{
-				result.append(",");
+				result.append(", ");
 			}
 		}
 		if(i != 3)
@@ -232,7 +238,7 @@ string lexical_cast<string, mat4>(const mat4& src)
 			result.append("\n");
 		}
 	}
-	result.append("]");
+	result.append("\n]");
 	return result;
 }
 
@@ -258,6 +264,30 @@ template<>
 string lexical_cast<string, Range<rgba> >(const Range<rgba>& src)
 {
 	return "("+lexical_cast<string>(src.min)+")-("+lexical_cast<string>(src.max)+")";
+}
+
+template<>
+string lexical_cast<string, Range<vec3>>(const Range<vec3>& src)
+{
+	return "("+lexical_cast<string>(src.min)+")-("+lexical_cast<string>(src.max)+")";
+}
+
+template<>
+string lexical_cast<string, Range<Range<vec3>>>(const Range<Range<vec3>>& src)
+{
+	return "("+lexical_cast<string>(src.start)+")-("+lexical_cast<string>(src.end)+")";
+}
+
+template<>
+string lexical_cast<string, Range<vec4>>(const Range<vec4>& src)
+{
+	return "("+lexical_cast<string>(src.min)+")-("+lexical_cast<string>(src.max)+")";
+}
+
+template<>
+string lexical_cast<string, Range<Range<vec4>>>(const Range<Range<vec4>>& src)
+{
+	return "("+lexical_cast<string>(src.start)+")-("+lexical_cast<string>(src.end)+")";
 }
 
 
@@ -322,7 +352,7 @@ vec3 lexical_cast<vec3, string>(const string& val)
 {
 	vec3 result(0);
 	deque<string> str = lfant::Split(val, " x:,()");
-	Log("Lexcast vec3("+str[0]+","+str[1]+","+str[2]+")");
+	Log("Lexcasting vec3, size: ", str.size());
 	result.x = lexical_cast<float>(str[0]);
 	if(str.size() > 1)
 	{
@@ -332,6 +362,12 @@ vec3 lexical_cast<vec3, string>(const string& val)
 			result.z = lexical_cast<float>(str[2]);
 		}
 	}
+	else
+	{
+		result.y = result.x;
+		result.z = result.x;
+	}
+	Log("Lexcast vec3(", result.x, ",", result.y, ",", result.z, ")");
 	return result;
 }
 
@@ -339,7 +375,7 @@ template<>
 rgba lexical_cast<rgba, string>(const string& src)
 {
 	rgba result(0);
-	deque<string> str = lfant::Split(src, " x.,()");
+	deque<string> str = lfant::Split(src, " x,()");
 	result.r = lexical_cast<byte>(str[0]);
 	if(str.size() > 1)
 	{
@@ -357,6 +393,29 @@ rgba lexical_cast<rgba, string>(const string& src)
 }
 
 
+template<>
+vec4 lexical_cast<vec4, string>(const string& src)
+{
+	vec4 result(0);
+	Log("lexcasting vec4 '", src, "'");
+	deque<string> str = lfant::Split(src, " x,()");
+	result.r = lexical_cast<float>(str[0]);
+	if(str.size() > 1)
+	{
+		result.g = lexical_cast<float>(str[1]);
+		if(str.size() > 2)
+		{
+			result.b = lexical_cast<float>(str[2]);
+			if(str.size() > 3)
+			{
+				result.a = lexical_cast<float>(str[3]);
+			}
+		}
+	}
+	return result;
+}
+
+
 /*
  *	Lfant Types from string
  */
@@ -365,7 +424,7 @@ template<>
 Range<int> lexical_cast<Range<int>, string>(const string& src)
 {
 	Range<int> result(0);
-	deque<string> str = lfant::Split(src, " .-()");
+	deque<string> str = lfant::Split(src, " -()");
 	result.min = lexical_cast<int>(str[0]);
 	if(str.size() > 1)
 	{
@@ -378,7 +437,7 @@ template<>
 Range<float> lexical_cast<Range<float>, string>(const string& src)
 {
 	Range<float> result(0);
-	deque<string> str = lfant::Split(src, " .,-()");
+	deque<string> str = lfant::Split(src, " ,-()");
 	result.min = lexical_cast<float>(str[0]);
 	if(str.size() > 1)
 	{
@@ -387,16 +446,29 @@ Range<float> lexical_cast<Range<float>, string>(const string& src)
 	return result;
 }
 
-/*
 template<>
-Range<rgba> lexical_cast<Range<rgba>, string>(const string &src)
+Range<vec3> lexical_cast<Range<vec3>, string>(const string &src)
 {
-	Range<rgba> result(rgba(0));
-	deque<string> str = lfant::SplitParens(src, " .,-");
-	result.min = lexical_cast<rgba>(str[0]);
+	Range<vec3> result(vec3(0));
+	deque<string> str = lfant::Split(src, " -");
+	result.min = lexical_cast<vec3>(str[0]);
 	if(str.size() > 1)
 	{
-		result.max = lexical_cast<rgba>(str[1]);
+		result.max = lexical_cast<vec3>(str[1]);
+	}
+	return result;
+}
+
+template<>
+Range<vec4> lexical_cast<Range<vec4>, string>(const string &src)
+{
+	Log("lexcasting Range<vec4> '", src, "'");
+	Range<vec4> result(vec4(0));
+	deque<string> str = lfant::Split(src, " -");
+	result.min = lexical_cast<vec4>(str[0]);
+	if(str.size() > 1)
+	{
+		result.max = lexical_cast<vec4>(str[1]);
 	}
 	return result;
 }
@@ -405,7 +477,7 @@ template<>
 Range<Range<float>> lexical_cast<Range<Range<float>>, string>(const string& src)
 {
 	Range<Range<float>> result(0);
-	deque<string> str = lfant::Split(src, " .,-()");
+	deque<string> str = lfant::Split(src, " ,-()");
 	result.min = lexical_cast<Range<float>>(str[0]+"-"+str[1]);
 	if(str.size() > 2)
 	{
@@ -415,18 +487,32 @@ Range<Range<float>> lexical_cast<Range<Range<float>>, string>(const string& src)
 }
 
 template<>
-Range<Range<rgba>> lexical_cast<Range<Range<rgba>>, string>(const string& src)
+Range<Range<vec4>> lexical_cast<Range<Range<vec4>>, string>(const string& src)
 {
-	Range<Range<rgba>> result;
-	deque<string> str = lfant::SplitParens(src, " .,-");
-	result.min = lexical_cast<Range<rgba>>(str[0]+"-"+str[1]);
+	Log("lexcasting Range<Range<vec4>> '", src, "'");
+	Range<Range<vec4>> result;
+	deque<string> str = lfant::Split(src, " -");
+	result.min = lexical_cast<Range<vec4>>(str[0]+"-"+str[1]);
 	if(str.size() > 2)
 	{
-		result.max = lexical_cast<Range<rgba>>(str[2]+"-"+str[3]);
+		result.max = lexical_cast<Range<vec4>>(str[2]+"-"+str[3]);
 	}
 	return result;
 }
-*/
+
+
+template<>
+Range<Range<vec3>> lexical_cast<Range<Range<vec3>>, string>(const string& src)
+{
+	Range<Range<vec3>> result;
+	deque<string> str = lfant::Split(src, " -");
+	result.min = lexical_cast<Range<vec3>>(str[0]+"-"+str[1]);
+	if(str.size() > 2)
+	{
+		result.max = lexical_cast<Range<vec3>>(str[2]+"-"+str[3]);
+	}
+	return result;
+}
 
 /*
  *	String to Containers

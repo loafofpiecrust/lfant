@@ -91,9 +91,9 @@ void Physics::Init()
 	world = new btDiscreteDynamicsWorld( dispatcher, broadphase, solver, collisionConfig );
 //	debugRenderer = new physics::DebugRenderer;
 
-	gContactAddedCallback = &Physics::OnCollideEnter;
-	gContactProcessedCallback = &Physics::OnCollideStay;
-	gContactDestroyedCallback = &Physics::OnCollideExit;
+//	gContactAddedCallback = &Physics::OnCollideEnter;
+//	gContactProcessedCallback = &Physics::OnCollideStay;
+//	gContactDestroyedCallback = &Physics::OnCollideExit;
 
 	Log("Physics::Init: Contact callbacks set.");
 
@@ -113,7 +113,7 @@ void Physics::Update()
 		{
 			manifold = dispatcher->getManifoldByIndexInternal(i);
 
-			Collision col;
+			Collision* col = new Collision;
 			Rigidbody* rb0 = nullptr;
 			Rigidbody* rb1 = nullptr;
 			for (auto& rb : bodies)
@@ -125,9 +125,11 @@ void Physics::Update()
 				else if (rb->body == manifold->getBody1())
 				{
 					rb1 = rb;
-					col.other = rb;
 				}
 			}
+			col->other = rb0;
+
+		//	Log("Collision called, OnCollideEnter on entity ", rb1->owner->name);
 
 			uint numContacts = manifold->getNumContacts();
 			for(uint k = 0; k < numContacts; ++k)
@@ -135,11 +137,12 @@ void Physics::Update()
 				btManifoldPoint& pt = manifold->getContactPoint(k);
 				if(pt.getDistance() <= 0.0f)
 				{
-					col.contacts.push_back(ContactPoint(vec3_cast<vec3>(pt.getPositionWorldOnA()), vec3_cast<vec3>(pt.m_normalWorldOnB)));
+					col->contacts.push_back(ContactPoint(vec3_cast<vec3>(pt.getPositionWorldOnA()), vec3_cast<vec3>(pt.m_normalWorldOnB)));
 				}
 			}
 
-			rb0->TriggerEvent("OnCollideStay", col);
+			rb1->TriggerEvent("CollideEnter", col);
+			rb1->owner->TriggerEvent("CollideEnter", rb1, col);
 		}
 		*/
 	}
@@ -218,57 +221,33 @@ void Physics::SetGravityPoint(string name, float force)
 bool Physics::OnCollide(string func, btManifoldPoint& cp, const btCollisionObjectWrapper* colObj0, int partId0, int index0,
 						const btCollisionObjectWrapper* colObj1, int partId1, int index1)
 {
-	/*
 	Rigidbody *body0 = nullptr;
 	Rigidbody *body1 = nullptr;
 
-	for (uint i = 0; i < game->physics->bodies.size(); ++i)
+	for (auto& rb : game->physics->bodies)
 	{
-		if (game->physics->bodies[i]->body == colObj0)
+		if (rb->body == colObj0->m_collisionObject)
 		{
-			body0 = game->physics->bodies[i];
+			Log("Body zero found.");
+			body0 = rb;
 		}
-		else if (game->physics->bodies[i]->body == colObj1)
+		else if (rb->body == colObj1->m_collisionObject)
 		{
-			body1 = game->physics->bodies[i];
+			Log("Body one found.");
+			body1 = rb;
 		}
 	}
 
-	if (body0 && body1)
-	{
-		CollisionInfo col;
-		col.rigidbody = body1;
-		col.collider = body1->collider;
-		col.entity = body1->owner;
-		col.point = vec3_cast<vec3>( cp.pointA ); //fix
-		col.normal = vec3_cast<vec3>( cp.normalA ); //fix
+	Log("Collision called, OnCollide", func, ", on entity ", body1->owner->name);
 
-		if (body1->isTrigger)
-		{
-			body0->TriggerEvent( "OnTrigger" + func, col );
-		}
-		else
-		{
-			body0->TriggerEvent( "OnCollide" + func, col );
-		}
+	Collision* col = new Collision;
+	col->other = body0;
+	col->contacts.push_back(ContactPoint(vec3_cast<vec3>(cp.getPositionWorldOnA()), vec3_cast<vec3>(cp.m_normalWorldOnB)));
 
-		col.rigidbody = body0;
-		col.collider = body0->collider;
-		col.entity = body0->owner;
-		col.point = vec3_cast<vec3>( cp.pointB ); //fix
-		col.normal = vec3_cast<vec3>( cp.normalB ); //fix
+	body1->TriggerEvent("Collide"+func, col);
+	body1->owner->TriggerEvent("Collide"+func, body1, col);
 
-		if (body0->isTrigger)
-		{
-			body1->TriggerEvent( "OnTrigger" + func, col );
-		}
-		else
-		{
-			body1->TriggerEvent( "OnCollide" + func, col );
-		}
-	}
-	return false;
-	*/
+	return true;
 }
 
 bool Physics::OnCollideEnter(btManifoldPoint& cp, const btCollisionObjectWrapper* colObj0, int partId0, int index0,
@@ -293,6 +272,7 @@ void Physics::AddRigidbody(Rigidbody* ent)
 {
 	Log("Adding rigidbody..");
 	world->addRigidBody(ent->body);
+	bodies.push_back(ent);
 }
 
 }

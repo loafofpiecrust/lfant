@@ -44,6 +44,31 @@ FileSystem::~FileSystem()
 {
 }
 
+#if LINUX
+string GetProgramDir()
+{
+	char tmp[128];
+	uint len = readlink("/proc/self/exe", tmp, sizeof(tmp)-1);
+	if(len != -1)
+	{
+		tmp[len] = '\0';
+	}
+	string result = tmp;
+	if(uint pos = result.find("/launcher"))
+	{
+		result.erase(result.begin()+pos, result.end());
+	}
+	return result;
+}
+#elif WINDOWS
+string GetProgramDir()
+{
+
+}
+#elif MACOSX
+
+#endif
+
 void FileSystem::Init()
 {
 	// Use default settings
@@ -54,6 +79,7 @@ void FileSystem::Init()
 	const string home = getenv("HOME");
 #endif
 	userFolder = home + "/Documents/My Games/" + game->orgName + "/" + game->gameName;
+	gameFolder = GetProgramDir()+"/../..";
 
 	Subsystem::Init();
 }

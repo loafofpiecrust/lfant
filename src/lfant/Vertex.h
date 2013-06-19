@@ -24,8 +24,8 @@
 
 // Internal
 
-namespace lfant
-{
+namespace lfant {
+
 /** @addtogroup Game
  *	 @{
  */
@@ -36,6 +36,7 @@ namespace lfant
 // 56 bytes
 // 5,952 tris/mb
 // 5,952,000 tris/gb
+ /*
 struct Vertex
 {
 	vec3 vert;
@@ -52,6 +53,24 @@ struct Vertex
 	//Vertex(vec3 vert = vec3(0)) : vert(vert)
 	//{
 	//}
+};
+*/
+
+class Vertex
+{
+public:
+	typedef vector<float> Element;
+
+	void Add(const float& value);
+	void Add(const vec2& value);
+	void Add(const vec3& value);
+	void Add(const vec4& value);
+	void Add(const rgba& value);
+
+	const vector<Element>& Get();
+
+protected:
+	vector<Element> elements;
 };
 
 /** @} */

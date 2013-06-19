@@ -79,5 +79,15 @@ vec3 Range(vec3 min, vec3 max)
 	return result;
 }
 
+vec4 Range(vec4 min, vec4 max)
+{
+	vec4 result;
+	result.x = Range(min.x, max.x);
+	result.y = Range(min.y, max.y);
+	result.z = Range(min.z, max.z);
+	result.w = Range(min.w, max.w);
+	return result;
+}
+
 }
 }

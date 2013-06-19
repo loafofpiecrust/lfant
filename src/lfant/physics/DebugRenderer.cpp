@@ -26,7 +26,7 @@ DebugRenderer::DebugRenderer()
 
 	if(material->shader->GetId() == 0)
 	{
-		material->shader->LoadFile();
+		material->shader->LoadFile("shaders/simple/Diffuse.vert", "shaders/simple/Diffuse.frag");
 	}
 	if(material->shader->GetId() != 0)
 	{
@@ -56,7 +56,7 @@ void DebugRenderer::Render()
 	glBufferData(GL_ARRAY_BUFFER, sizeof(uint32_t)*points.size(), &points[0], GL_STATIC_DRAW);
 
 	glBindVertexArray(vertexArray);
-	material->shader->Use();
+	material->shader->Bind();
 
 	mat4 mvp = game->scene->mainCamera->GetProjection() * game->scene->mainCamera->GetView();
 	glUniformMatrix4fv(material->shader->GetUniform("matrix"), 1, GL_FALSE, &mvp[0][0]);
@@ -71,7 +71,7 @@ void DebugRenderer::Render()
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glDisableVertexAttribArray(0);
 	glBindVertexArray(0);
-	glUseProgram(0);
+	material->shader->Unbind();
 
 	points.clear();
 }

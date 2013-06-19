@@ -13,5 +13,5 @@ void main()
 {
 	// Modify color here.
 	color = texture2D( textureSampler, UV ).rgba;
-//	color = vec3(0.6, 0.2, 0);
+//	color = vec4(0.6, 0.2, 0, 1);
 }

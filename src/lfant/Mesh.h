@@ -81,7 +81,31 @@ public:
 		data.push_back(t);
 	}
 
+	void pop_back()
+	{
+		data.pop_back();
+	}
+
+	void Create(int target, int mode = 0)
+	{
+		if(mode == 0)
+		{
+			// @todo Find actual value of GL_STATIC_DRAW
+		//	mode = GL_STATIC_DRAW;
+		}
+		this->target = target;
+	//	glGenBuffers(1, &id);
+	//	glBindBuffer(target, id);
+	//	glBufferData(target, sizeof(T)*size(), &data[0], mode);
+	}
+
+	void Bind()
+	{
+	//	glBindBuffer(target, id);
+	}
+
 	vector<T> data;
+	int target = -1;
 	//vector<uint32_t> index;
 };
 
@@ -116,6 +140,8 @@ public:
 	void LoadFile(string path);
 
 	ptr<Material> material = new Material;
+	bool usingCamera = true;
+	bool fboQuad = false;
 
 protected:
 

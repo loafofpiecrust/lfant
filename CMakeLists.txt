@@ -1,55 +1,18 @@
 
-set(CMAKE_C_COMPILER "clang-3.1")
-set(CMAKE_CXX_COMPILER "clang++-3.1")
+if(UNIX)
+set(CMAKE_C_COMPILER "clang")
+set(CMAKE_CXX_COMPILER "clang++")
+endif()
 
 cmake_minimum_required(VERSION 2.8)
 project(lfroot)
 
-get_filename_component(SFE "./" REALPATH)
+get_filename_component(ROOT "./" REALPATH)
+set(CMAKE_MODULE_PATH "${ROOT}/cmake")
 
-set(ARCH "x64")
-set(ARCH "x64" CACHE STRING "Architecture to build for. (x86/x64)")
+include(Config)
 
 option(BUILD_EXAMPLES "Should the examples be built?" ON)
-
-if(ARCH STREQUAL "x64")
-	set(ARCH "64")
-	set(ARCH_OPTION "x86-64")
-else()
-	set(ARCH "32")
-	set(ARCH_OPTION "x86")
-endif()
-
-set(PLATFORM "")
-if(UNIX)
-	if(APPLE)
-		set(PLATFORM "macosx")
-	else(APPLE)
-		set(PLATFORM "linux")
-	endif(APPLE)
-else()
-	if(WIN32)
-		set(PLATFORM "windows")
-	endif(WIN32)
-endif()
-
-if(PLATFORM STREQUAL "")
-	message(FATAL_ERROR "This platform is not supported.")
-endif()
-
-set(CMAKE_BUILD_TYPE Release)
-set(CMAKE_C_FLAGS "-m${ARCH} -fPIC -O3 -Wall -Wno-overloaded-virtual -D__STRICT_ANSI__")
-set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -std=gnu++11 -Wno-invalid-offsetof -g")
-
-add_definitions(
-#	-D__STRICT_ANSI__
-	-D__GXX_EXPERIMENTAL_CXX0X__
-	)
-
-# RPathing
-set(CMAKE_SKIP_BUILD_RPATH TRUE)
-set(CMAKE_SHARED_LINKER_FLAGS "-Wl,-rpath,$ORIGIN -Wl,-z,origin -Wl,--no-undefined -g")
-set(CMAKE_EXE_LINKER_FLAGS "-Wl,-rpath,$ORIGIN -Wl,-z,origin -g")
 
 # Subdirs
 add_subdirectory(src)
@@ -57,4 +20,5 @@ add_subdirectory(external)
 
 if(BUILD_EXAMPLES)
 	add_subdirectory(examples)
+#	add_subdirectory(tests)
 endif()
