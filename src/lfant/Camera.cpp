@@ -79,9 +79,11 @@ void Camera::Init()
 void Camera::Update()
 {
 //	Log("Updating cam view");
+	vec3 pos = owner->transform->GetWorldPosition();
+//	pos.x = -pos.x;
 	view = glm::lookAt(
-				owner->transform->GetWorldPosition(),
-				owner->transform->GetWorldPosition() + owner->transform->GetDirection(),
+				pos,
+				pos + owner->transform->GetDirection(),
 				owner->transform->GetUp()
 				);
 	//	UpdateProjection();

@@ -20,6 +20,7 @@
 #include <lfant/Transform.h>
 
 // External
+#include <glm/gtx/euler_angles.hpp>
 
 // Internal
 
@@ -74,14 +75,18 @@ void Transform::SetPosition(vec3 pos)
 
 quat Transform::GetRotationQuat()
 {
-	return quat(rotation);
+	vec3 rot = radians(rotation);
+	rot.y = -rot.y;
+	return quat(rot);
+//	return quat(radians(rotation));
 }
 
 void Transform::SetRotationQuat(quat rot)
 {
-	rotationQuat = rot;
-	rotation = degrees(eulerAngles(rot));
-	TriggerEvent("SetRotation", rotation);
+//	rotationQuat = rot;
+//	rotation = degrees(eulerAngles(rot));
+//	TriggerEvent("SetRotation", rotation);
+	SetRotation(degrees(eulerAngles(rot)));
 	TriggerEvent("SetRotation", rot);
 }
 
@@ -117,6 +122,8 @@ void Transform::SetScale(vec3 scl)
 
 vec3 Transform::GetWorldPosition()
 {
+	return matrix[3].xyz;
+	/*
 	if(owner->parent)
 	{
 		return owner->parent->transform->GetWorldPosition() + GetPosition();
@@ -125,6 +132,7 @@ vec3 Transform::GetWorldPosition()
 	{
 		return GetPosition();
 	}
+	*/
 }
 
 void Transform::SetWorldPosition(vec3 pos)
@@ -141,12 +149,20 @@ void Transform::SetWorldPosition(vec3 pos)
 
 quat Transform::GetWorldRotationQuat()
 {
-	return quat(GetWorldRotation());
+	if(owner->parent)
+	{
+		return owner->parent->transform->GetWorldRotationQuat() * GetRotationQuat();
+	//	return GetRotationQuat() * owner->parent->transform->GetWorldRotationQuat();
+	}
+	else
+	{
+		return GetRotationQuat();
+	}
 }
 
 void Transform::SetWorldRotationQuat(quat rot)
 {
-	SetRotation(eulerAngles(rot) - parent->GetWorldRotation());
+	SetRotation(degrees(eulerAngles(rot)) - parent->GetWorldRotation());
 }
 
 vec3 Transform::GetWorldRotation()
@@ -157,7 +173,7 @@ vec3 Transform::GetWorldRotation()
 	}
 	else
 	{
-		return GetRotation();
+		return rotation;
 	}
 }
 
@@ -200,106 +216,104 @@ void Transform::SetWorldScale(vec3 scl)
 void Transform::Update()
 {
 //	Log("Transform updating");
-	SetDirection();
-//	SetMatrix();
+	SetMatrix();
+//	SetDirection();
 }
 
 void Transform::SetMatrix()
 {
-	/*
-//	mat4 matrix;
-	matrix = mat4(1.0f);
-	matrix = glm::translate(mat4(1.0f), GetWorldPosition());
-//	matrix *= glm::mat4_cast(GetWorldRotationQuat());
-	vec3 rot = radians(GetWorldRotation());
-	matrix = glm::rotate(matrix, rot.x, vec3(1,0,0));
-	matrix = glm::rotate(matrix, rot.y, vec3(0,1,0));
-	matrix = glm::rotate(matrix, rot.z, vec3(0,0,1));
-//	matrix *= mat4_cast(rotationQuat);
-//	glm::rotate
-	matrix = glm::scale(matrix, GetWorldScale());
-//	return matrix;
-//	Log("Transform position: ", lexical_cast<string>(vec3(matrix[3].xyz)));
-*/
-}
-
-mat4 Transform::GetMatrix()
-{
-	vec3 scl = GetWorldScale();
+	vec3 scl = GetScale();
 	if(scl == vec3(0))
 	{
-		return mat4(0);
+		matrix = mat4(0);
+		return;
 	}
 	
-	vec3 pos = GetWorldPosition();
-	vec3 rot = radians(GetWorldRotation());
-	mat4 matrix = mat4(1.0f);
+	vec3 pos = GetPosition();
+//	pos.x = -pos.x;
+//	vec3 rot = radians(GetRotation());
+	quat rot = GetRotationQuat();
+	matrix = mat4(1);
+
+	if(owner->parent)
+	{
+		matrix = owner->parent->transform->matrix;
+	}
+	else
+	{
+	//	scl.x = -scl.x;
+	}
+
+//	matrix = glm::translate(mat4(), pos) * mat4_cast(rot) * glm::scale(mat4(), scl);
 	
 	if(pos != vec3(0))
 	{
-	//	Log("pos = ", lexical_cast<string>(pos));
 		matrix = glm::translate(matrix, pos);
-	//	Log("matrix = ", lexical_cast<string>(matrix));
 	}
 	
-	if(rot != vec3(0))
+//	if(rot != vec3(0))
 	{
-	//	Log("rot = ", lexical_cast<string>(rot));
-		matrix = glm::rotate(matrix, rot.x, vec3(1,0,0));
-		matrix = glm::rotate(matrix, rot.y, vec3(0,1,0));
-		matrix = glm::rotate(matrix, rot.z, vec3(0,0,1));
-	//	Log("matrix = ", lexical_cast<string>(matrix));
+	//	matrix = glm::rotate(matrix, rot.x, vec3(1,0,0));
+	//	matrix = glm::rotate(matrix, rot.y, vec3(0,1,0));
+	//	matrix = glm::rotate(matrix, rot.z, vec3(0,0,1));
+		matrix *= mat4_cast(rot);
 	}
 	
 	if(scl != vec3(1))
 	{
 		matrix = glm::scale(matrix, scl);
-	//	Log("matrix = ", lexical_cast<string>(matrix));
 	}
 	
+/*	if(owner->parent)
+	{
+		matrix = owner->parent->transform->GetMatrix() * matrix;
+	//	matrix = matrix * owner->parent->transform->GetMatrix();
+	}*/
+}
+
+mat4 Transform::GetMatrix()
+{
+//	mat4 matrix = this->matrix;
+//	matrix[3].x = -matrix[3].x;
 	return matrix;
 }
 
 void Transform::SetDirection()
 {
+/*
 	vec3 rot = radians(GetWorldRotation());
-//	Log("Cam rotation: ", lexical_cast<string>(rot));
+
+//	rot.y = -rot.y;	
+//	rot.x = -rot.x;
+	
 	direction = vec3(
 		cos(rot.x) * sin(rot.y),
 		sin(rot.x),
 		cos(rot.x) * cos(rot.y)
 		);
-
+//	direction.x = -direction.x;
+	
 	right = vec3(
 		sin(rot.y - pi / 2.0f),
 		0,
 		cos(rot.y - pi / 2.0f)
-		);
+		);	
+*/
+//	mat4 matrix = GetWorldMatrix();
+//	right = vec3(matrix[0].xyz);
+//	up = vec3(matrix[1].xyz);
+//	direction = vec3(matrix[2].xyz);
 
-	up = cross(right, direction);
-//	right.x *= -1;
-}
-
-vec3 Transform::GetWorldRotatedPosition()
-{
-	if(!owner->parent)
-	{
-		return vec3(0);
-	}
-
-	vec3 newpos(0);
-	vec3 parrot = owner->parent->transform->GetWorldRotation();
-
-	newpos.x = position.x*cos(parrot.x) - position.y*sin(parrot.y);
-	newpos.y = position.y*cos(parrot.y) - position.x*sin(parrot.x);
-
-	return newpos;
+//	right = vec3(matrix[0][0], matrix[1][0], matrix[2][0]);
+//	up = vec3(matrix[0][1], matrix[1][1], matrix[2][1]);
+//	direction = vec3(matrix[0][2], matrix[1][2], matrix[2][2]);
+//	up = cross(right, direction);
 }
 
 void Transform::Translate(vec3 pos)
 {
-//	Log("Translating by ", lexical_cast<string>(pos));
-	SetPosition(position + pos);
+//	Log("Translating by ", lexical_cast<string>(vec3(-pos.x, pos.y, pos.z)));
+	SetPosition(GetPosition() + pos);
 }
 
 void Transform::Rotate(vec3 rot)
@@ -321,17 +335,24 @@ void Transform::Scale(vec3 scl)
 
 vec3 Transform::GetDirection()
 {
-	return direction;
+	return matrix[2].xyz;
+//	return vec3(-matrix[2].x, matrix[2].y, -matrix[2].z);
+//	return direction;
 }
 
 vec3 Transform::GetRight()
 {
-	return right;
+//	Log("Getting right, ", lexical_cast<string>(right));
+	return matrix[0].xyz;
+//	return vec3(-matrix[0].x, matrix[0].y, -matrix[0].z);
+//	return right;
 }
 
 vec3 Transform::GetUp()
 {
-	return up;
+	return matrix[1].xyz;
+//	return cross(GetDirection(), GetRight());
+//	return up;
 }
 
 }

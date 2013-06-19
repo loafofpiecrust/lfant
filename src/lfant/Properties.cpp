@@ -25,6 +25,9 @@
 #include <lfant/FileSystem.h>
 #include <lfant/Range.h>
 #include <lfant/util/String.h>
+#include <lfant/Entity.h>
+#include <lfant/Scene.h>
+#include <lfant/Game.h>
 
 // External
 
@@ -40,14 +43,38 @@ Properties::Properties(string path)
 	LoadFile(path);
 }
 
-Properties::Properties(istream &stream, string type, string id, Properties *parent) :
-	type(type), id(id), parent(parent)
+Properties::Properties(istream &stream, string type, string id, Properties *parent, bool first) :
+	type(type), id(id), parent(parent), getFirstLine(first)
 {
 	LoadStream(stream);
 }
 
 Properties::~Properties()
 {
+}
+
+void Properties::Get(string name, Entity*& ref)
+{
+	int id = 0;
+	string entname = "";
+	Get(name, id);
+	if(id == 0)
+	{
+		Get(name, entname);
+		if(entname != "")
+		{
+			ref = game->scene->GetEntity(entname);
+		}
+	}
+	else
+	{
+		ref = game->scene->GetEntityById(id);
+	}
+}
+
+void Properties::Set(string name, Entity* const& value)
+{
+	Set(name, value->GetId());
 }
 
 void Properties::LoadFile(string path)
@@ -60,23 +87,30 @@ void Properties::LoadStream(istream& stream)
 {
 	string line = "";
 	string extline = "";
-	int pos;
-	int pos2;
+	uint pos;
+	uint pos2;
 	deque<string> stack;
 	deque<string> toks;
 	string name = "";
 	string value = "";
 	char c;
+	bool firstLine = true;
 
 //	Set("type", type);
 //	Set("name", id);
+//	if(getFirstLine && stream.good())
+//		getline(stream, line);
 
 	while(stream.good())
 	{
-		getline(stream, line);
+	//	if((firstLine && getFirstLine) || !firstLine)
+		{
+			getline(stream, line);
+		//	firstLine = false;
+		}
 
 		pos = line.find("\\");
-		while( pos != string::npos)
+		while( pos != -1)
 		{
 			getline(stream, extline);
 			line.erase(pos);
@@ -87,13 +121,13 @@ void Properties::LoadStream(istream& stream)
 		line = TrimSpace(line, true);
 
 		pos = line.find("//");
-		if(pos != string::npos)
+		if(pos != -1)
 		{
 			Log("Comment found.");
 			line.erase(line.begin()+pos, line.end());
 		}
 
-		if(line.find("/*") != string::npos)
+		if(line.find("/*") != -1)
 		{
 			while(true)
 			{
@@ -122,10 +156,15 @@ void Properties::LoadStream(istream& stream)
 		//	Preprocess(string(&line[1]));
 			continue;
 		}
-
+		/*
+		if(line[0] == '}')
+		{
+			continue;
+		}
+		*/
 		// Add to value
 		pos = line.find("+=");
-		if(pos != string::npos)
+		if(pos != -1)
 		{
 			for(int i = 0; i < pos; ++i)
 			{
@@ -136,7 +175,7 @@ void Properties::LoadStream(istream& stream)
 				value.push_back(line[i]);
 			}
 		//	name = ;
-			to_lower(name);
+		//	to_lower(name);
 			value = TrimSpace(value, true);
 			AddValue(TrimSpace(name), value);
 			name = "";
@@ -146,7 +185,7 @@ void Properties::LoadStream(istream& stream)
 
 		// Subtract from value
 		pos = line.find("-=");
-		if(pos != string::npos)
+		if(pos != -1)
 		{
 			for(int i = 0; i < pos; ++i)
 			{
@@ -156,7 +195,7 @@ void Properties::LoadStream(istream& stream)
 			{
 				value.push_back(line[i]);
 			}
-			to_lower(name);
+		//	to_lower(name);
 			value = TrimSpace(value, true);
 			SubtractValue(name, value);
 			name = "";
@@ -167,9 +206,9 @@ void Properties::LoadStream(istream& stream)
 		// Set value
 		pos = line.find("=");
 		pos2 = line.find("{");
-		if(pos != string::npos)
+		if(pos != -1)
 		{
-			if(pos2 != string::npos)
+			if(pos2 != -1)
 			{
 				// We have an array on our hands
 				for(int i = 0; i < pos; ++i)
@@ -181,8 +220,8 @@ void Properties::LoadStream(istream& stream)
 					value.push_back(line[i]);
 				}
 
-				int pos3 = value.find("}");
-				if(pos3 == string::npos)
+				uint pos3 = value.find("}");
+				if(pos3 == -1)
 				{
 					while((c = stream.get()) != '}')
 					{
@@ -209,7 +248,7 @@ void Properties::LoadStream(istream& stream)
 				value.push_back(line[i]);
 			}
 		//	to_lower(name);
-			Log("\tSetting, '"+TrimSpace(name)+" = "+TrimSpace(value, true)+"'.");
+			Log("\tSetting, '"+TrimSpace(name)+"' = '"+TrimSpace(value, true)+"'.");
 			Set(name, TrimSpace(value, true));
 			name = "";
 			value = "";
@@ -223,21 +262,57 @@ void Properties::LoadStream(istream& stream)
 		toks = Split(line, " ", "{}");
 		if(toks[0] != "{" && toks[0] != "}")
 		{
+			Log("Setting name.");
 			name = toks[0];
+			to_lower(name);
 		}
 		if(toks.size() > 1 && toks[1] != "{")
 		{
+			Log("Setting value");
 			value = toks[1];
-		}
+			if(toks.size() > 2 && toks[2] == "{")
+			{
+				Log("Namespace brace same line");
+				if(toks.size() > 3 && toks[toks.size()-1] == "}")
+				{
+					Log("One line class");
+					if(toks.size() > 4)
+					{
+						AddChild(stream, name, value, false);
+					}
+					else
+					{
+						Properties* c = new Properties;
+						c->type = name;
+						c->id = value;
+						c->parent = this;
+						children.push_back(c);
+					}
 
+				//	children.push_back(new Properties(stream, name, value, this, false));
+					continue;
+				}
+				else
+				{
+					children.push_back(new Properties(stream, name, value, this));
+				//	continue;
+				}
+			}
+		}
+	//	if(toks.size() > 1 && toks[toks.size()-1] == "{")
+		{
+			Log("Namespace begins same line");
+		//	children.push_back(new Properties(stream, name, value, this));
+		}
+		/*
 		for(int i = 1; i < toks.size(); ++i)
 		{
 			if(toks[i] == "{")
 			{
 				// Begin namespace
 				// @todo Fix this for the ending '}'
-				to_lower(name);
-				children.push_back(ptr<Properties>(new Properties(stream, name, value, this)));
+			//	to_lower(name);
+			//	children.push_back(new Properties(stream, name, value, this));
 
 				if(toks[i+1] == "}")
 				{
@@ -254,12 +329,12 @@ void Properties::LoadStream(istream& stream)
 				continue;
 			}
 		}
-
+		*/
 		// Brace on new line?
 		if(line[0] == '{' || stream.get() == '{')
 		{
 			to_lower(name);
-			children.push_back(ptr<Properties>(new Properties(stream, name, value, this)));
+			children.push_back(new Properties(stream, name, value, this));
 		}
 		else
 		{
@@ -269,6 +344,7 @@ void Properties::LoadStream(istream& stream)
 
 		if((line[0] == '}' || stream.get() == '}'))
 		{
+			Log("First char is finishing brace");
 			// Ends a namespace
 			return;
 		}
@@ -381,8 +457,20 @@ Properties* Properties::AddChild(string type, string id)
 	result->parent = this;
 	result->type = type;
 	result->id = id;
-	children.push_back(ptr<Properties>(result));
+	children.push_back(result);
 	return result;
+}
+
+Properties* Properties::AddChild(istream& stream, string type, string id, bool first)
+{
+	Properties* c = new Properties();
+	c->type = type;
+	c->id = id;
+	c->parent = this;
+	c->getFirstLine = first;
+	c->LoadStream(stream);
+	children.push_back(c);
+	return c;
 }
 
 void Properties::SkipSpace(istream &stream)

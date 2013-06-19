@@ -20,16 +20,18 @@
 
 #include <lfant/Particle.h>
 
-// External
-
 // Internal
 #include <lfant/ParticleSystem.h>
+#include <lfant/Console.h>
+#include <lfant/Time.h>
+#include <lfant/Game.h>
+
+// External
 
 namespace lfant
 {
 
-Particle::Particle() :
-	transform(new Transform)
+Particle::Particle()
 {
 }
 
@@ -39,73 +41,88 @@ Particle::~Particle()
 
 void Particle::Init()
 {
-	//ApplyForce( speed, transform.GetDir() );
 	SetParamDiffs();
 }
 
-void Particle::Update(double delta)
+void Particle::SetPosition(vec3 pos)
 {
-	age += delta;
-	InterpParams(delta);
+	position = pos;
+//	system->UpdatePosition(this);
+}
 
-	if(gravity != vec3(0, 0, 0))
+static vec3 zeroVector = vec3(0);
+
+void Particle::Update()
+{
+//	Log("Updating a particle");
+	InterpParams();
+
+	if(velocity.start != zeroVector)
 	{
-		ApplyForce(gravity);
+		SetPosition(position + velocity.start * game->time->deltaTime);
 	}
-	if(velocity != vec3(0, 0, 0))
+
+	lifetime -= game->time->deltaTime;
+//	if(lifetime <= 0.0f)
 	{
-		transform->Translate(velocity * (float)delta + velRange.min);
-	}
-	if(age >= lifetime)
-	{
-		system->Recycle(this);
+	//	system->Recycle(this);
 	}
 }
 
 void Particle::SetParamDiffs()
 {
 	sizeDiff = 0.0f;
-	colorDiff = rgba(0);
-	velDiff = vec3(0.0f);
+	colorDiff = vec4(0);
+	velocityDiff = vec3(0.0f);
 
-	if(size.max > size.min)
+	if(size.end != size.start)
 	{
-		sizeDiff = (size.max - size.min) / lifetime;
+		sizeDiff = (size.end - size.start) / lifetime;
 	}
-	if(color.max != color.min)
+	if(color.end != color.start)
 	{
-		colorDiff = (color.max - color.min) / lifetime;
+		colorDiff = (color.end - color.start) / lifetime;
 	}
-	if(velRange.max != velRange.min)
+	if(velocity.end != velocity.start)
 	{
-		velDiff = (velRange.max - velRange.min) / lifetime;
+		velocityDiff = (velocity.end - velocity.start) / lifetime;
 	}
 }
 
-void Particle::InterpParams(double delta)
+void Particle::InterpParams()
 {
-	if(colorDiff != rgba(0) && color.min != color.max)
+	if(colorDiff != vec4(0) && color.start != color.end)
 	{
-		color.min += colorDiff * delta;
+		color.start += colorDiff * game->time->deltaTime;
 		// Apply color.
 	}
-	if(sizeDiff != 0.0f && size.min != size.max)
+	if(sizeDiff != 0.0f && size.start != size.end)
 	{
-		size.min += sizeDiff * delta;
-		transform->SetScale(vec3(size.min));
+		size.start += sizeDiff * game->time->deltaTime;
 	}
-	if(velDiff != vec3(0.0f) && velRange.min != velRange.max)
+	if(velocityDiff != vec3(0.0f) && velocity.start != velocity.end)
 	{
-		//ApplyForce(-velRange.x);
-		velRange.min += velDiff * vec3(delta);
-		//ApplyForce(velRange.x);
+		//ApplyForce(-velocity.x);
+		velocity.start += velocityDiff * game->time->deltaTime;
+		//ApplyForce(velocity.x);
 	}
+//	system->UpdatePosition(this);
+}
+
+float Particle::GetSize()
+{
+	return size.start;
+}
+
+vec4 Particle::GetColor()
+{
+	return color.start;
 }
 
 void Particle::StartLife(float life)
 {
 	lifetime = life;
-	age = 0.0f;
+//	age = 0.0f;
 	Init();
 }
 
@@ -133,19 +150,19 @@ void Particle::Destroy()
 	Deactivate();
 }
 
-void Particle::SetSpeed(float speed)
+float Particle::GetSpeed()
 {
-	this->speed = speed;
+	return length(velocity.start);
 }
 
 void Particle::ApplyForce(vec3 force)
 {
-	velocity += force;
+	velocity.start += force * game->time->deltaTime;
 }
 
 void Particle::ApplyForce(float speed, vec3 dir)
 {
-	velocity += dir * speed;
+	velocity.start += dir * speed;
 }
 
 }

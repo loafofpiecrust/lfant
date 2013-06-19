@@ -18,7 +18,6 @@
 *
 ******************************************************************************/
 #pragma once
-
 #include <lfant/stdafx.h>
 
 // External
@@ -31,6 +30,8 @@
 
 #include <lfant/Subsystem.h>
 
+struct GLFWwindow;
+
 namespace lfant
 {
 class Mesh;
@@ -38,6 +39,8 @@ class Sprite;
 class Light;
 class ParticleSystem;
 class Material;
+class FrameBuffer;
+class Entity;
 
 /**	@addtogroup Game
  *	@{
@@ -69,8 +72,8 @@ public:
 	 *	@param close Whether or not to close the current window. Leave at true unless you really know what you're doing.
 	 */
 	bool OpenWindow();
-	static GLFWCALL int OnCloseWindow();
-	static GLFWCALL void OnSetResolution(int x, int y);
+	static void OnCloseWindow(GLFWwindow* win);
+	static void OnSetResolution(GLFWwindow* win, int x, int y);
 
 	/// Sets the version property
 	void SetVersion(byte major, byte minor);
@@ -89,6 +92,7 @@ public:
 	void HideMouse(bool hide = true);
 
 	virtual void Init();
+	virtual void PreUpdate();
 	virtual void Update();
 	virtual void OnDestroy();
 
@@ -103,6 +107,8 @@ public:
 
 	void SetWindowTitle(string title);
 	void SetWindowPos(ivec2 pos);
+
+	GLFWwindow* GetWindowHandle() { return window; }
 
 	/// The multiplier for anti-aliasing. 2, 4, 8.
 	int fsaa = 4;
@@ -129,7 +135,13 @@ protected:
 	bool hideMouse = false;
 	bool windowResizable = false;
 
+	Entity* fboEntity;
 	deque< ptr<Shader> > shaders;
+	Shader* fboShader;
+	Mesh* fboQuad;
+	FrameBuffer* frameBuffer;
+
+	GLFWwindow* window;
 
 public:
 

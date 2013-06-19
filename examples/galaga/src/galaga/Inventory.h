@@ -46,9 +46,17 @@ public:
 	Item();
 	virtual ~Item();
 
+	void Save(Properties* prop);
+	void Load(Properties* prop);
+
+	void Init();
+
 	void Use(byte mode);
 
 protected:
+	void Equip(bool val);
+	void EndUse();
+
 	float mass = 1.0f;
 	vec3 initialPosition {0};
 	vec3 equippedPosition {0};
@@ -76,32 +84,38 @@ public:
 	Inventory();
 	~Inventory();
 
+	void Save(Properties* prop);
+	void Load(Properties* prop);
+
 	void Init();
 
 	void AddItem(Item* item);
 	void RemoveItem(Item* item);
 	void RemoveItem(string name);
-	void RemoveItem(uint idx);
+	void RemoveItem(uint32_t idx);
 
 	Item* GetItem(string name);
-	Item* GetItem(uint idx);
+	Item* GetItem(uint32_t idx);
 
 	void Equip(string name);
-	void Equip(uint idx);
+	void Equip(uint32_t idx);
 	void UseItem(byte mode);
 
 protected:
+
+	void EndUseItem();
+
 	deque<Item*> items;
 
 	/// Maximum amount of items allowed to be held.
-	uint itemLimit = 0;
+	uint32_t itemLimit = 0;
 
 	/// Maximum total weight of items allowed.
 	float massLimit = 0.0f;
 
 	float mass = 0.0f;
 
-	Item* equippedItem = nullptr;
+	uint32_t equippedItem = 0;
 
 private:
 

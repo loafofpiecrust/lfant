@@ -1,12 +1,9 @@
+
 project(galaga)
 
 # Source Dir
 file(GLOB SRC_FILES
-	"./*.cpp"
-	)
-
-file(GLOB HEADER_FILES
-	"./*.h"
+	"*.cpp"
 	)
 
 # Library Search Paths
@@ -17,9 +14,7 @@ link_directories(
 	)
 
 # Output Library Info
-add_library(${PROJECT_NAME} SHARED ${SRC_FILES} ${HEADER_FILES})
-
-add_dependencies(${PROJECT_NAME} sfengine)
+add_executable(${PROJECT_NAME} ${SRC_FILES})
 
 # Includes
 include_directories(

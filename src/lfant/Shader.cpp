@@ -1,75 +1,122 @@
 
 #include <lfant/Shader.h>
 
-// External
-#include <GL/glew.h>
-
 // Internal
 #include <lfant/Console.h>
 #include <lfant/FileSystem.h>
 #include <lfant/Game.h>
 #include <lfant/Renderer.h>
 #include <lfant/FileSystem.h>
+#include <lfant/Texture.h>
+
+// External
+#include <GL/glew.h>
 
 namespace lfant
 {
 
 deque<Shader*> Shader::shaders;
+Shader* Shader::current;
+
+void Shader::Destroy()
+{
+	Object::Destroy();
+	delete this;
+}
 
 void Shader::Load(Properties *prop)
 {
 	prop->Get("vertex", vertex);
 	prop->Get("fragment", fragment);
-	LoadFile();
+	prop->Get("geometry", geometry);
+	LoadFile(vertex, fragment, geometry);
 }
 
 void Shader::Save(Properties *prop)
 {
 	prop->Set("vertex", vertex);
 	prop->Set("fragment", fragment);
+	prop->Set("geometry", geometry);
 }
 
 void Shader::LoadFile(string file)
 {
-	
+	Log("Shader::LoadFile: Touch.");
+	string ext = Extension(file);
+	if(ext == "vert")
+	{
+		vertex = file;
+	}
+	else if(ext == "frag")
+	{
+		fragment = file;
+	}
+	else if(ext == "geom")
+	{
+		geometry = file;
+	}
+	else
+	{
+		Log("Shader file type unknown, not loading.");
+	}
+}
+
+void Shader::LoadFile(string vert, string frag, string geom)
+{
+	LoadFile(vert);
+	LoadFile(frag);
+	LoadFile(geom);
+
+	Compile();
+}
+
+void Shader::Compile()
+{
+	if(vertex == "" && fragment == "" && geometry == "")
+	{
+		return;
+	}
+
 	for(auto& sh : shaders)
 	{
-		if(vertex == sh->vertex && fragment == sh->fragment && sh->id != 0)
+		if(vertex == sh->vertex && fragment == sh->fragment && geometry == sh->geometry && sh->id != -1)
 		{
+			Log("Shader::LoadFile: Found previous shader that's compatible for '", vertex, "'.");
 			id = sh->id;
 			return;
 		}
 	}
-	path vert = game->fileSystem->GetGamePath(vertex);
-	path frag = game->fileSystem->GetGamePath(fragment);
-	Log("LoadShader: Files opened");
-	if (!exists(vert) || !exists(frag))
+
+	uint32 vert = -1;
+	uint32 frag = -1;
+	uint32 geom = -1;
+	id = glCreateProgram();
+
+	if(vertex != "")
 	{
-		Log("Shader::LoadFile: " + file + " could not be loaded");
-		return;
+		vert = Compile(GL_VERTEX_SHADER, game->fileSystem->GetGamePath(vertex).string());
+		glAttachShader(id, vert);
 	}
-	
-	Log("Shader::LoadFile: Compiling shader");
-	uint32 vertId = Compile(GL_VERTEX_SHADER, vert.string());
-	uint32 fragId = Compile(GL_FRAGMENT_SHADER, frag.string());
+	if(fragment != "")
+	{
+		frag = Compile(GL_FRAGMENT_SHADER, game->fileSystem->GetGamePath(fragment).string());
+		glAttachShader(id, frag);
+	}
+	if(geometry != "")
+	{
+		geom = Compile(GL_GEOMETRY_SHADER, game->fileSystem->GetGamePath(geometry).string());
+		glAttachShader(id, geom);
+	}
 
-	// Link the program
-	Log("Shader::LoadFile: Linking shader");
-	uint32_t ProgramID = glCreateProgram();
-	glAttachShader(ProgramID, vertId);
-	glAttachShader(ProgramID, fragId);
-	glLinkProgram(ProgramID);
-	id = ProgramID;
-	Log("Shader::LoadFile: Shader id '", id, "'.");
-
-	// Check the program
+	glLinkProgram(id);
 	CheckErrors();
 
-	glDeleteShader(vertId);
-	glDeleteShader(fragId);
-//	path = file;
+	if(vert) glDeleteShader(vert);
+	if(frag) glDeleteShader(frag);
+	if(geom) glDeleteShader(geom);
 
 	shaders.push_back(this);
+	Unbind();
 }
 
 uint32 Shader::GetUniform(string name)
@@ -79,22 +126,27 @@ uint32 Shader::GetUniform(string name)
 
 void Shader::AddUniform(string name)
 {
-	uniforms[name] = 0;
 	uniforms[name] = glGetUniformLocation(id, name.c_str());
-	Log("Adding uniform '"+name+"' as ", uniforms[name]);
+//	Log("Adding uniform '"+name+"' as ", uniforms[name]);
 }
 
-void Shader::Use()
+void Shader::Bind()
 {
-	if(id != 0)
-	{
-		glUseProgram(id);
-	}
+	glUseProgram(id);
+	Shader::current = this;
+//	Log("Shader, binding ", id);
 }
 
-void Shader::Unuse()
+void Shader::Unbind()
 {
 	glUseProgram(0);
+	Shader::current = nullptr;
+//	Log("Shader, unbinding ", id);
+}
+
+Shader* Shader::GetCurrent()
+{
+	return Shader::current;
 }
 
 uint32 Shader::GetId()
@@ -146,6 +198,38 @@ void Shader::CheckErrors()
 	{
 		Log(ProgramErrorMessage);
 	}
+}
+
+void Shader::SetUniform(string name, float val)
+{
+	glUniform1f(GetUniform(name), val);
+}
+
+void Shader::SetUniform(string name, const vec2& val)
+{
+	glUniform2f(GetUniform(name), val.x, val.y);
+}
+
+void Shader::SetUniform(string name, const vec3& val)
+{
+	glUniform3f(GetUniform(name), val.x, val.y, val.z);
+}
+
+void Shader::SetUniform(string name, const vec4& val)
+{
+	glUniform4f(GetUniform(name), val.x, val.y, val.z, val.w);
+}
+
+void Shader::SetUniform(string name, const mat4& val)
+{
+	glUniformMatrix4fv(GetUniform(name), 1, GL_FALSE, &val[0][0]);
+}
+
+void Shader::SetUniform(string name, Texture* val)
+{
+	val->Bind();
+	glUniform1i(GetUniform(name), 0);
+//	val->Unbind();
 }
 
 }

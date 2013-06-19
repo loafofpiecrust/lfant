@@ -52,6 +52,7 @@ void Rigidbody::Save(Properties* prop)
 	prop->Set("mass", mass);
 	prop->Set("velocity", GetVelocity());
 	prop->Set("maxSpeed", maxSpeed);
+	prop->Set("trigger", IsTrigger());
 }
 
 void Rigidbody::Load(Properties* prop)
@@ -60,6 +61,7 @@ void Rigidbody::Load(Properties* prop)
 
 	prop->Get("mass", mass);
 	prop->Get("maxSpeed", maxSpeed);
+	prop->Get("trigger", isTrigger);
 
 //	SetVelocity(prop->Get<vec3>("velocity"));
 }
@@ -71,6 +73,8 @@ void Rigidbody::Load(Properties* prop)
 
 void Rigidbody::Init()
 {
+	Component::Init();
+
 	Log("Rigidbody::Init: Touch. Entity name: ", owner->name);
 	motionState = new btDefaultMotionState;
 	Log("Rigidbody::Init: Spawning underlying btRigidBody.");
@@ -96,9 +100,13 @@ void Rigidbody::Init()
 	ConnectEvent(SENDER(owner, ApplyForce), RECEIVER(this, ApplyForce));
 	ConnectEvent(SENDER(owner, ApplyCentralForce), RECEIVER(this, ApplyCentralForce));
 	ConnectEvent(SENDER(owner, Accelerate), RECEIVER(this, Accelerate));
+	ConnectEvent(SENDER(owner, SetTrigger), RECEIVER(this, SetTrigger));
 
 	body->getWorldTransform().setOrigin(vec3_cast<btVector3>(owner->transform->GetPosition()));
 	body->forceActivationState(DISABLE_DEACTIVATION);
+	body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
+	Log("Rigidbody is trigger? ", IsTrigger());
+	SetTrigger(IsTrigger());
 }
 
 void Rigidbody::Update()
@@ -233,31 +241,50 @@ void Rigidbody::OnSetCollider(Collider *collider)
 
 void Rigidbody::ApplyCentralForce(vec3 force)
 {
-	if(maxSpeed > 0.0f)
+/*	if(maxSpeed > 0.0f)
 	{
 		btVector3 vel = body->getLinearVelocity();
 		if(abs(vel[0]) >= maxSpeed) force.x = 0.0f;
 		if(abs(vel[1]) >= maxSpeed) force.y = 0.0f;
 		if(abs(vel[2]) >= maxSpeed) force.z = 0.0f;
-	}
+	}*/
+//	Log("Applying central force: ", lexical_cast<string>(force));
 	body->applyCentralForce(vec3_cast<btVector3>(force));
 }
 
 void Rigidbody::ApplyForce(vec3 force, vec3 pos)
 {
-	if(maxSpeed > 0.0f)
+/*	if(maxSpeed > 0.0f)
 	{
 		btVector3 vel = body->getLinearVelocity();
 		if(abs(vel[0]) >= maxSpeed) force.x = 0.0f;
 		if(abs(vel[1]) >= maxSpeed) force.y = 0.0f;
 		if(abs(vel[2]) >= maxSpeed) force.z = 0.0f;
-	}
+	}*/
 	body->applyForce(vec3_cast<btVector3>(force), vec3_cast<btVector3>(pos));
 }
 
 void Rigidbody::Accelerate(vec3 force)
 {
 	ApplyCentralForce(force*GetMass());
+}
+
+void Rigidbody::SetTrigger(bool is)
+{
+	isTrigger = is;
+	if(is)
+	{
+		body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_NO_CONTACT_RESPONSE);
+	}
+	else
+	{
+		body->setCollisionFlags(body->getCollisionFlags() & ~btCollisionObject::CF_NO_CONTACT_RESPONSE);
+	}
+}
+
+bool Rigidbody::IsTrigger()
+{
+	return isTrigger;
 }
 
 }

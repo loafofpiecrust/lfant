@@ -18,13 +18,11 @@
 *
 ******************************************************************************/
 #pragma once
-
 #include <lfant/stdafx.h>
 
 // External
 
 // Internal
-
 #include <lfant/Subsystem.h>
 #include <lfant/Range.h>
 

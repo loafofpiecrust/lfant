@@ -35,6 +35,7 @@
 #include <lfant/Scene.h>
 #include <lfant/Camera.h>
 #include <lfant/FileSystem.h>
+#include <lfant/FrameBuffer.h>
 
 namespace lfant
 {
@@ -62,9 +63,9 @@ void Mesh::Load(Properties *prop)
 	else
 	{
 		Log("Loading material from file");
-		string mat = "materials/Diffuse.mat";
+		string mat = "";
 		prop->Get("material", mat);
-		material->LoadFile(mat);
+		if(mat != "") material->LoadFile(mat);
 	}
 
 	LoadFile(file);
@@ -108,18 +109,26 @@ void Mesh::BeginRender()
 		EndRender();
 	}
 
+	FrameBuffer* fbo = FrameBuffer::GetCurrent();
+	if(fbo && !fboQuad)
+	{
+		Log("Unbinding fbo for mesh init.");
+		fbo->Unbind();
+	}
+
 	glGenVertexArrays(1, &vertexArray);
 	glBindVertexArray(vertexArray);
 
 	if(material->shader->GetId() == 0)
 	{
-		material->shader->LoadFile();
+		Log("Loading default shader.");
+		material->shader->LoadFile("shaders/simple/Diffuse.vert", "shaders/simple/Diffuse.frag");
 	}
 
-	if(material->texture->GetId() == 0)
+//	if(material->texture->GetId() == -1)
 	{
-		Log("Manually loading texture.");
-		material->texture->LoadFile();
+//		Log("Manually loading texture.");
+//		material->texture->LoadFile();
 	}
 
 	if(material->shader->GetId() != 0)
@@ -127,6 +136,8 @@ void Mesh::BeginRender()
 		Log("Adding uniforms..");
 		material->shader->AddUniform("MVP");
 		material->shader->AddUniform("textureSampler");
+		material->shader->AddUniform("tiling");
+	//	material->shader->AddUniform("modelMatrix");
 	}
 
 //	IndexVBO();
@@ -135,33 +146,64 @@ void Mesh::BeginRender()
 	CreateBuffer(uvBuffer, GL_ARRAY_BUFFER);
 	CreateBuffer(normalBuffer, GL_ARRAY_BUFFER);
 	CreateBuffer(indexBuffer, GL_ELEMENT_ARRAY_BUFFER);
+	/*
+	vertexBuffer.Create(GL_ARRAY_BUFFER);
+	uvBuffer.Create(GL_ARRAY_BUFFER);
+	normalBuffer.Create(GL_ARRAY_BUFFER);
+	indexBuffer.Create(GL_ELEMENT_ARRAY_BUFFER);
+	*/
 
 	loaded = true;
+	
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+
+	if(fbo && !fboQuad)
+	{
+		Log("Rebinding fbo after mesh init.");
+		fbo->Bind();
+	}
 }
 
 void Mesh::Render()
 {
-	if(!material->shader->GetId() || !material->texture->GetId())
+	if(!material->shader->GetId() /*|| !material->texture->GetId()*/)
 	{
 		return;
 	}
 
-//	Log("Rendering mesh..");
+//	Log("Rendering mesh '", owner->name, "'.");
 
 	glBindVertexArray(vertexArray);
 
 //	glUseProgram(material->shader->GetId());
-	material->shader->Use();
+//	Log("Binding shader for ", owner->name);
+	material->shader->Bind();
 
-	mat4 mvp = game->scene->mainCamera->GetProjection() * game->scene->mainCamera->GetView() * owner->transform->GetMatrix();
-	glUniformMatrix4fv(material->shader->GetUniform("MVP"), 1, GL_FALSE, &mvp[0][0]);
+//	mat4 mvp = mat4(1);
+	if(owner && usingCamera)
+	{
+		mat4 mvp = game->scene->mainCamera->GetProjection() * game->scene->mainCamera->GetView() * owner->transform->GetMatrix();
+		material->shader->SetUniform("MVP", mvp);
+	}
+
+//	if(material->shader->GetUniform("modelMatrix"))
+	{
+//		material->shader->SetUniform("modelMatrix", );
+	}
 
 //	Log("mesh mvp: ", lexical_cast<string>(mvp));
 
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, material->texture->GetId());
-	glUniform1i(material->shader->GetUniform("textureSampler"), 0);
-//	Log("Texture id: ", material->texture->GetId());
+//	glActiveTexture(GL_TEXTURE0);
+//	glBindTexture(GL_TEXTURE_2D, material->texture->GetId());
+//	glUniform1i(material->shader->GetUniform("textureSampler"), 0);
+	if(material->texture->GetId() != -1)
+	{
+	//	Log("Setting texture uniforms.");
+		material->shader->SetUniform("textureSampler", material->texture);
+		material->shader->SetUniform("tiling", material->texture->tiling);
+	}
 
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
@@ -185,10 +227,11 @@ void Mesh::Render()
 	glDisableVertexAttribArray(1);
 	glDisableVertexAttribArray(0);
 
-	glBindTexture(GL_TEXTURE_2D, 0);
+	glBindTexture(material->texture->GetMode(), 0);
 
 	glBindVertexArray(0);
 
+//	material->shader->Unbind();
 	glUseProgram(0);
 }
 

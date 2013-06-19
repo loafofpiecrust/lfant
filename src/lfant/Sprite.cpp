@@ -234,7 +234,7 @@ void Sprite::Load(Properties *props)
 		Animation anim;
 		anim.name = pa->id;
 		string mat = "materials/Diffuse.mat";
-		anim.material.LoadFile(pa->Get("material", mat));
+		anim.material.LoadFile(pa->Get("material"));
 		pa->Get("frameRate", anim.frameRate);
 		pa->GetEnum("playMode", anim.mode);
 	}
@@ -242,10 +242,10 @@ void Sprite::Load(Properties *props)
 
 void Sprite::EndRender()
 {
-	glDeleteBuffers(1, &vertexBuffer.id);
-	glDeleteBuffers(1, &uvBuffer.id);
-	glDeleteBuffers(1, &indexBuffer.id);
-	glDeleteTextures(1, &material->texture->id);
+	vertexBuffer.Destroy();
+	uvBuffer.Destroy();
+	indexBuffer.Destroy();
+	material->texture->Destroy();
 	glDeleteVertexArrays(1, &vertexArray);
 
 	Renderable::EndRender();

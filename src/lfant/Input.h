@@ -18,16 +18,15 @@
 *
 ******************************************************************************/
 #pragma once
-
 #include <lfant/stdafx.h>
+
+// Internal
+#include <lfant/Subsystem.h>
 
 // External
 #include <bitset>
-#include <GL/glfw.h>
 
-// Internal
-
-#include <lfant/Subsystem.h>
+struct GLFWwindow;
 
 namespace lfant
 {
@@ -44,9 +43,9 @@ class Key_Initializer
 {
 public:
 	Key_Initializer();
-	uint16 operator[](string in);
+	uint16_t operator[](string in);
 private:
-	map<string, uint16> _key;
+	map<string, uint16_t> _key;
 };
 
 extern Key_Initializer Key;
@@ -206,10 +205,10 @@ public:
 	 *	@param key The key that was used.
 	 *	@param mode The way the key was used. 0 = Release; 1 = Press;
 	 */
-	static void GLFWCALL OnKeyPress(int key, int mode);
-	static void GLFWCALL OnMouseMove(int x, int y);
-	static void GLFWCALL OnMouseButton(int btn, int mode);
-	static void GLFWCALL OnCharPress(int key, int mode);
+	static void OnKeyPress(GLFWwindow* win, int key, int scancode, int action, int mods);
+	static void OnMouseMove(GLFWwindow* win, double x, double y);
+	static void OnMouseButton(GLFWwindow* win, int btn, int action, int mods);
+	static void OnCharPress(GLFWwindow* win, uint32_t key);
 
 	void AddAxis(string name, string positive = "null", string negative = "null", string altpos = "null", string altneg = "null", float sens = 3.0f, float dead = 0.001f, bool snap = true, byte joyNum = 0);
 

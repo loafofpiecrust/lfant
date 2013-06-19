@@ -29,8 +29,10 @@
 #include <map>
 #include <iostream>
 
-namespace lfant
-{
+namespace lfant {
+
+class Entity;
+
 /** @addtogroup Game
  *	 @{
  */
@@ -62,6 +64,7 @@ public:
 	map<string, string>& GetValues();
 
 	Properties* AddChild(string type = "", string id = "");
+	Properties* AddChild(istream& stream, string type, string id, bool first = true);
 
 	template<typename T>
 	void Set(string name, const T& value)
@@ -74,17 +77,23 @@ public:
 	void SubtractValue(string name, string value);
 
 	template<typename T>
-	T& Get(string name, T& ref)
+	void Get(string name, T& ref)
 	{
 	//	to_lower(name);
 		string val = values[name];
+		cout << "\tGetting '" << name << "'";
+		cout << " as string '" << val << "'";
 		if(val != "")
 		{
 			ref = lexical_cast<T>(val);
-			cout << "\tGetting '" << lexical_cast<string>(ref) << "'.\n\n";
+			cout << " and value '" << lexical_cast<string>(ref) << "'";
 		}
-		return ref;
+		cout << ".\n\n";
+	//	return ref;
 	}
+
+	void Get(string name, Entity*& ref);
+	void Set(string name, Entity* const& value);
 
 	template<typename T = string>
 	T Get(string name)
@@ -102,14 +111,30 @@ public:
 	}
 
 	template<typename T>
-	T GetEnum(string name, T& ref)
+	void GetEnum(string name, T& ref)
 	{
 		string val = enums[values[name]];
 		if(val != "")
 		{
 			ref = (T)lexical_cast<int>(val);
 		}
-		return ref;
+	//	return ref;
+	}
+
+	void GetType(string& ref)
+	{
+		if(type != "")
+		{
+			ref = type;
+		}
+	}
+
+	void GetId(string& ref)
+	{
+		if(id != "")
+		{
+			ref = id;
+		}
 	}
 
 	string type = "";
@@ -118,8 +143,8 @@ public:
 protected:
 
 private:
-	Properties(istream& stream, string type, string id = "", Properties* parent = nullptr);
-	Properties(ostream& stream, string type, string id = "", Properties* parent = nullptr);
+	Properties(istream& stream, string type, string id = "", Properties* parent = nullptr, bool first = true);
+	Properties(ostream& stream, string type, string id = "", Properties* parent = nullptr, bool first = true);
 
 	void SkipSpace(istream& stream);
 	string TrimSpace(string str, bool onlyIndent = false);
@@ -130,6 +155,7 @@ private:
 	map<string, string> enums;
 	deque< ptr<Properties> > children;
 	Properties* parent = nullptr;
+	bool getFirstLine = true;
 };
 
 /** @} */

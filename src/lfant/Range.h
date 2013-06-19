@@ -1,6 +1,3 @@
-#ifndef HEADER_18132041CEC9AF45
-#define HEADER_18132041CEC9AF45
-
 /******************************************************************************
 *
 *	LFANT Source
@@ -66,6 +63,13 @@ public:
 	{
 	}
 
+	Range<T>& operator=(const Range<T>& other)
+	{
+		min = other.min;
+		max = other.max;
+		return *this;
+	}
+
 	Range() {}
 };
 
@@ -73,5 +77,3 @@ public:
 /// @}
 
 } /* namespace lfant */
-
-#endif // header guard 

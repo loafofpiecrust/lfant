@@ -22,7 +22,7 @@
 
 // External
 #include <iostream>
-#include <GL/glfw.h>
+#include <GLFW/glfw3.h>
 
 // Internal
 
@@ -40,13 +40,23 @@ Key_Initializer Key;
 
 uint16 Key_Initializer::operator [](string in)
 {
-	to_lower(in);
-	return _key[in];
+	if(in.size() == 1)
+	{
+		to_upper(in);
+		return in[0];
+	}
+	else
+	{
+		to_lower(in);
+	//	Log("Key key, ", _key[in], ", Esc: ", GLFW_KEY_ESCAPE);
+		return _key[in];
+	}
 }
 
 Key_Initializer::Key_Initializer()
 {
 	_key[""] = '\0';
+	/*
 	_key["q"] = 'Q';
 	_key["w"] = 'W';
 	_key["e"] = 'E';
@@ -73,6 +83,7 @@ Key_Initializer::Key_Initializer()
 	_key["b"] = 'B';
 	_key["n"] = 'N';
 	_key["m"] = 'M';
+	*/
 	_key["f1"] = GLFW_KEY_F1;
 	_key["f2"] = GLFW_KEY_F2;
 	_key["f3"] = GLFW_KEY_F3;
@@ -85,12 +96,15 @@ Key_Initializer::Key_Initializer()
 	_key["f10"] = GLFW_KEY_F10;
 	_key["f11"] = GLFW_KEY_F11;
 	_key["f12"] = GLFW_KEY_F12;
+	/*
 	_key[","] = ',';
 	_key["."] = '.';
 	_key["/"] = '/';
+	*/
 	_key["!"] = '!';
 	_key["null"] = '\0';
 	_key["\n"] = '\n';
+	/*
 	_key["0"] = '0';
 	_key["1"] = '1';
 	_key["2"] = '2';
@@ -101,33 +115,34 @@ Key_Initializer::Key_Initializer()
 	_key["7"] = '7';
 	_key["8"] = '8';
 	_key["9"] = '9';
+	*/
 	_key["space"] = GLFW_KEY_SPACE;
-	_key[" "] = GLFW_KEY_SPACE;
-	_key["esc"] = GLFW_KEY_ESC;
+//	_key[" "] = GLFW_KEY_SPACE;
+	_key["esc"] = GLFW_KEY_ESCAPE;
 	_key["tab"] = GLFW_KEY_TAB;
 	_key["enter"] = GLFW_KEY_ENTER;
 	_key["return"] = GLFW_KEY_ENTER;
 	_key["backspace"] = GLFW_KEY_BACKSPACE;
 	_key["back"] = GLFW_KEY_BACKSPACE;
-	_key["delete"] = GLFW_KEY_DEL;
-	_key["del"] = GLFW_KEY_DEL;
+	_key["delete"] = GLFW_KEY_DELETE;
+	_key["del"] = GLFW_KEY_DELETE;
 	_key["insert"] = GLFW_KEY_INSERT;
 	_key["home"] = GLFW_KEY_HOME;
 	_key["end"] = GLFW_KEY_END;
-	_key["pageup"] = GLFW_KEY_PAGEUP;
-	_key["pagedown"] = GLFW_KEY_PAGEDOWN;
+	_key["pageup"] = GLFW_KEY_PAGE_UP;
+	_key["pagedown"] = GLFW_KEY_PAGE_DOWN;
 	_key["up"] = GLFW_KEY_UP;
 	_key["down"] = GLFW_KEY_DOWN;
 	_key["right"] = GLFW_KEY_RIGHT;
 	_key["left"] = GLFW_KEY_LEFT;
-	_key["lshift"] = GLFW_KEY_LSHIFT;
-	_key["rshift"] = GLFW_KEY_RSHIFT;
-	_key["rctrl"] = GLFW_KEY_RCTRL;
-	_key["lctrl"] = GLFW_KEY_LCTRL;
-	_key["lalt"] = GLFW_KEY_LALT;
-	_key["ralt"] = GLFW_KEY_RALT;
-	_key["lsuper"] = GLFW_KEY_LSUPER;
-	_key["rsuper"] = GLFW_KEY_RSUPER;
+	_key["lshift"] = GLFW_KEY_LEFT_SHIFT;
+	_key["rshift"] = GLFW_KEY_RIGHT_SHIFT;
+	_key["rctrl"] = GLFW_KEY_RIGHT_CONTROL;
+	_key["lctrl"] = GLFW_KEY_LEFT_CONTROL;
+	_key["lalt"] = GLFW_KEY_LEFT_ALT;
+	_key["ralt"] = GLFW_KEY_RIGHT_ALT;
+	_key["lsuper"] = GLFW_KEY_LEFT_SUPER;
+	_key["rsuper"] = GLFW_KEY_RIGHT_SUPER;
 	_key["numenter"] = GLFW_KEY_KP_ENTER;
 	_key["mouseleft"] = GLFW_MOUSE_BUTTON_LEFT;
 	_key["mouseright"] = GLFW_MOUSE_BUTTON_RIGHT;
@@ -150,10 +165,10 @@ void Input::Init()
 	Subsystem::Init();
 
 	Log("Input::Init: Begin.");
-	glfwSetKeyCallback(OnKeyPress);
-	glfwSetMousePosCallback(OnMouseMove);
-	glfwSetMouseButtonCallback(OnMouseButton);
-	glfwSetCharCallback(OnCharPress);
+	glfwSetKeyCallback(game->renderer->GetWindowHandle(), OnKeyPress);
+	glfwSetCursorPosCallback(game->renderer->GetWindowHandle(), OnMouseMove);
+	glfwSetMouseButtonCallback(game->renderer->GetWindowHandle(), OnMouseButton);
+	glfwSetCharCallback(game->renderer->GetWindowHandle(), OnCharPress);
 
 	Log("Input: Initialized");
 }
@@ -164,6 +179,7 @@ void Input::Update()
 	{
 		if(axis.down || axis.up)
 		{
+			TriggerEvent(axis.name);
 			TriggerEvent(axis.name, axis.value);
 			TriggerEvent(axis.name, axis.name, axis.value);
 			TriggerEvent("All", axis.name, axis.value);
@@ -239,14 +255,14 @@ void Input::Load(Properties* prop)
 *			KeyPress();
 *******************************************************************************/
 
-void GLFWCALL Input::OnKeyPress(int key, int mode)
+void Input::OnKeyPress(GLFWwindow* win, int key, int scancode, int action, int mods)
 {
-	game->input->TriggerEvent("KeyPress", (uint16_t)key, mode);
+	game->input->TriggerEvent("KeyPress", (uint16_t)key, action);
 	for(auto& axis : game->input->axes)
 	{
 		if(key == axis.positive || key == axis.positiveAlt)
 		{
-			if(mode == 1)
+			if(action == GLFW_PRESS)
 			{
 				axis.posHeld = true;
 				axis.down = true;
@@ -262,7 +278,7 @@ void GLFWCALL Input::OnKeyPress(int key, int mode)
 					}
 				}
 			}
-			else
+			else if(action == GLFW_RELEASE)
 			{
 				axis.posHeld = false;
 				axis.up = true;
@@ -281,7 +297,7 @@ void GLFWCALL Input::OnKeyPress(int key, int mode)
 		}
 		else if(key == axis.negative || key == axis.negativeAlt)
 		{
-			if(mode == 1)
+			if(action == GLFW_PRESS)
 			{
 				axis.negHeld = true;
 				if(axis.snap)
@@ -296,7 +312,7 @@ void GLFWCALL Input::OnKeyPress(int key, int mode)
 					}
 				}
 			}
-			else
+			else if(action == GLFW_RELEASE)
 			{
 				axis.negHeld = false;
 				if(axis.snap)
@@ -315,9 +331,10 @@ void GLFWCALL Input::OnKeyPress(int key, int mode)
 	}
 }
 
-void GLFWCALL Input::OnMouseMove(int x, int y)
+void Input::OnMouseMove(GLFWwindow* win, double x, double y)
 {
-	game->input->TriggerEvent("MouseMove", x, y);
+	game->input->TriggerEvent("MouseMove", (int)x, (int)y);
+	game->input->TriggerEvent("MouseMove", ivec2(x, y));
 	if(game->input->lockMouse)
 	{
 		game->input->SetMousePos(game->renderer->GetResolution() / 2);
@@ -325,13 +342,13 @@ void GLFWCALL Input::OnMouseMove(int x, int y)
 //	game->userInterface->OnMouseMove((float)x, (float)y);
 }
 
-void GLFWCALL Input::OnMouseButton(int btn, int mode)
+void Input::OnMouseButton(GLFWwindow* win, int btn, int action, int mods)
 {
-	game->input->TriggerEvent("MouseButton", (uint16)btn, mode);
+	game->input->TriggerEvent("MouseButton", (uint16_t)btn, action);
 //	OnKeyPress(btn, mode);
 }
 
-void GLFWCALL Input::OnCharPress(int key, int mode)
+void Input::OnCharPress(GLFWwindow* win, uint32_t key)
 {
 	game->input->TriggerEvent("CharPress", (char)key);
 }
@@ -435,19 +452,19 @@ bool Input::GetButtonUp(string name, bool positive)
 
 ivec2 Input::GetMousePos()
 {
-	ivec2 result;
-	glfwGetMousePos(&result.x, &result.y);
-	return result;
+	dvec2 result;
+	glfwGetCursorPos(game->renderer->GetWindowHandle(), &result.x, &result.y);
+	return (ivec2)result;
 }
 
 void Input::SetMousePos(int32 x, int32 y)
 {
-	glfwSetMousePos(x, y);
+	glfwSetCursorPos(game->renderer->GetWindowHandle(), x, y);
 }
 
 void Input::SetMousePos(ivec2 pos)
 {
-	glfwSetMousePos(pos.x, pos.y);
+	glfwSetCursorPos(game->renderer->GetWindowHandle(), pos.x, pos.y);
 }
 
 }

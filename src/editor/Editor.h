@@ -6,18 +6,20 @@
 #include <forward_list>
 
 // Internal
-#include <lfant/Engine.h>
+#include <lfant/Game.h>
 
 
-namespace lfant
-{
-namespace editor
-{
+namespace lfant {
+namespace editor {
+
+namespace gui {
+class App;
+}
 
 /**
  *
  */
-class Editor : public Engine
+class Editor : public lfant::Game
 {
 public:
 	Editor();
@@ -29,6 +31,8 @@ public:
 
 
 protected:
+	ptr<gui::App> app;
+	bool playing = false;
 
 private:
 

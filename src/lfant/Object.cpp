@@ -23,6 +23,7 @@
 // Internal
 #include <lfant/Game.h>
 #include <lfant/Time.h>
+#include <lfant/Console.h>
 
 // External
 
@@ -46,11 +47,13 @@ void Object::Update()
 {
 	for(uint i = 0; i < timers.size(); ++i)
 	{
+	//	Log("Timer '", timers[i]->name, "' updated at ", timers[i]->time);
 		if(timers[i]->time <= 0.0f)
 		{
 			string name = timers[i]->name;
 			timers.erase(timers.begin()+i);
 			--i;
+		//	Log("Timer triggered");
 			TriggerEvent(name);
 			continue;
 		}

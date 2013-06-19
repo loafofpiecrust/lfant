@@ -22,6 +22,7 @@
 
 // Internal
 #include <lfant/Transform.h>
+#include <lfant/Console.h>
 
 // External
  
@@ -38,25 +39,59 @@ Inventory::~Inventory()
 {
 }
 
+void Inventory::Save(Properties* prop)
+{
+	Component::Save(prop);
+
+	prop->Set("equippedItem", equippedItem);
+	prop->Set("itemLimit", itemLimit);
+	prop->Set("massLimit", massLimit);
+	prop->Set("mass", mass);
+}
+
+void Inventory::Load(Properties* prop)
+{
+	Component::Load(prop);
+
+	prop->Get("equippedItem", equippedItem);
+	prop->Get("itemLimit", itemLimit);
+	prop->Get("massLimit", massLimit);
+	prop->Get("mass", mass);
+}
+
 void Inventory::Init()
 {
 	ConnectEvent(SENDER(owner, UseItem), RECEIVER(this, UseItem));
+	ConnectEvent(SENDER(owner, EndUseItem), RECEIVER(this, EndUseItem));
+	ConnectEvent(SENDER(owner, EquipItem), this, (void(Inventory::*)(uint32_t))&Inventory::Equip);
 }
 
 void Inventory::UseItem(byte mode)
 {
-	equippedItem->Use(mode);
+	Log("Gonna use item");
+	items[equippedItem]->Use(mode);
+}
+
+void Inventory::EndUseItem()
+{
+	items[equippedItem]->EndUse();
 }
 
 void Inventory::AddItem(Item* item)
 {
-	if(massLimit > 0.0f && mass+item->mass > massLimit)
+	Log("Adding item to inventory");
+	if((massLimit > 0.0f && mass+item->mass > massLimit) || (itemLimit > 0 && items.size() >= itemLimit))
 	{
 		return;
 	}
 	items.push_back(item);
 	mass += item->mass;
 	item->inventory = this;
+
+	if(items.size() == 1)
+	{
+		item->Equip(true);
+	}
 }
 
 void Inventory::RemoveItem(Item* item)
@@ -99,21 +134,26 @@ Item* Inventory::GetItem(string name)
 
 void Inventory::Equip(string name)
 {
-	for(auto& i : items)
+	for(uint i = 0; i < items.size(); ++i)
 	{
-		if(i->owner->name == name)
+		if(items[i]->owner->name == name)
 		{
-			i->owner->active = true;
-			i->Enable(true);
-			i->equipped = true;
-
-			i->owner->transform->SetPosition(i->equippedPosition);
-			equippedItem->owner->transform->SetPosition(equippedItem->initialPosition);
-
-			equippedItem = i;
+			Equip(i);
 			return;
 		}
 	}
+}
+
+void Inventory::Equip(uint32_t idx)
+{
+	if(items.size() <= idx || equippedItem == idx)
+	{
+		return;
+	}
+
+	if(items.size() > equippedItem) items[equippedItem]->Equip(false);
+	equippedItem = idx;
+	items[equippedItem]->Equip(true);
 }
 
 
@@ -127,9 +167,66 @@ Item::~Item()
 {
 }
 
+void Item::Save(Properties* prop)
+{
+	Component::Save(prop);
+
+	prop->Set("mass", mass);
+	prop->Set("initialPosition", initialPosition);
+	prop->Set("equippedPosition", equippedPosition);
+	prop->Set("equipped", equipped);
+}
+
+void Item::Load(Properties* prop)
+{
+	Component::Load(prop);
+
+	prop->Get("mass", mass);
+	Log("Loading, mass: ", mass);
+	prop->Get("initialPosition", initialPosition);
+	prop->Get("equippedPosition", equippedPosition);
+	Log("Loading, equippedPos: ", lexical_cast<string>(equippedPosition));
+	prop->Get("equipped", equipped);
+}
+
+void Item::Init()
+{
+	Inventory* inv = nullptr;
+	if(owner->parent && (inv = owner->parent->GetComponent<Inventory>()))
+	{
+		Log("Adding item to parent inventory");
+		inv->AddItem(this);
+	}
+}
+
+void Item::Equip(bool val)
+{
+	Log("Activating this item");
+	owner->active = val;
+//	Enable(val);
+	Log("Setting equipped");
+	equipped = val;
+	if(val)
+	{
+		Log("Setting position, equippedPos: ", lexical_cast<string>(equippedPosition));
+		owner->transform->SetPosition(equippedPosition);
+	}
+	else
+	{
+		owner->transform->SetPosition(initialPosition);
+	}
+	Log("Done");
+}
+
 void Item::Use(byte mode)
 {
-	TriggerEvent("UseItem", mode);
+	Log("ITEM USED!");
+	TriggerEvent("Use", mode);
+}
+
+void Item::EndUse()
+{
+	TriggerEvent("EndUse");
 }
 
 }

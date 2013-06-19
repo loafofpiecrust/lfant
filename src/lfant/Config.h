@@ -15,12 +15,12 @@
 #	elif __linux
 #		define LINUX 1
 #	elif _APPLE_
-#		define OSX 1
+#		define MACOSX 1
 #	endif
 #endif
 
 // Platform Preprocessor
-#if OSX || LINUX
+#if MACOSX || LINUX
 #	define UNIX 1
 #endif
 

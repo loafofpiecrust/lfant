@@ -19,11 +19,10 @@
 ******************************************************************************/
 #pragma once
 
-// External
-
 // Internal
-
 #include <lfant/Component.h>
+
+// External
 
 class btTypedConstraint;
 class btRigidBody;
@@ -132,6 +131,9 @@ public:
 	void SetMaxSpeed(float speed) { maxSpeed = speed; }
 	float GetMaxSpeed() { return maxSpeed; }
 
+	void SetTrigger(bool is);
+	bool IsTrigger();
+
 	// Variables
 	Mode mode;
 
@@ -158,7 +160,7 @@ protected:
 
 	/// The current mass of this object, in kg.
 	float mass = 1.0f;
-
+	bool isTrigger = false;
 	float maxSpeed = 0.0f;
 
 	btRigidBody* body;
