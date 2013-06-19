@@ -28,7 +28,7 @@
 
 namespace lfant {
 
-FrameBuffer* FrameBuffer::current;
+FrameBuffer* FrameBuffer::current = nullptr;
 
 FrameBuffer::FrameBuffer()
 {
@@ -40,6 +40,7 @@ FrameBuffer::~FrameBuffer()
 
 void FrameBuffer::Clear()
 {
+	Log("Clearing framebuffer");
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
@@ -61,21 +62,21 @@ void FrameBuffer::Init()
 		//	Texture* tex = Texture::newFromNextUnit();
 		//	tex->setupForFramebuffer(size.x, size.y, GL_RGB32F);
 		//	if(linearFilter) tex->SetFilters(GL_LINEAR, GL_LINEAR);
-			tex->SetFormat(Texture::Format::Rgb32f, Texture::Format::Rgba);
+			tex->SetFormat(Texture::Format::Rgba, Texture::Format::Rgba);
 			tex->scaleFilter = Texture::ScaleFilter::Linear;
 			tex->wrapMode = Texture::WrapMode::Clamp;
 		//	tex->mode = GL_TEXTURE_2D_MULTISAMPLE;
 		//	tex->msaa = 2;
 			tex->size = uvec2(rect.width, rect.height);
 			tex->SetIndex(i);
-			tex->InitData(nullptr);
+			tex->InitData(0);
 
 			uint32_t attachment = GetAttachment(i);
-			Log("Setting up textures for FrameBuffer, tex ", i, " gets attachment ", attachment, ". GL_TEXTURE0 = ", GL_COLOR_ATTACHMENT0);
+			Log("Setting up textures for FrameBuffer, tex ", i, " gets attachment ", attachment, ". GL_COLOR_ATTACHMENT0 = ", GL_COLOR_ATTACHMENT0);
 
 			tex->Bind();
-		//	glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, tex->GetMode(), tex->GetId(), 0);
-			glFramebufferTexture(GL_FRAMEBUFFER, attachment, tex->GetId(), 0);
+			glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, tex->GetMode(), tex->GetId(), 0);
+		//	glFramebufferTexture(GL_FRAMEBUFFER, attachment, tex->GetId(), 0);
 		//	tex->Unbind();
 
 			drawBuffers.push_back(attachment);
@@ -145,17 +146,20 @@ void FrameBuffer::GetTextures(Shader* sh)
 
 FrameBuffer* FrameBuffer::GetCurrent()
 {
+//	Log("Getting current fbo, ", FrameBuffer::current);
 	return FrameBuffer::current;
 }
 
 void FrameBuffer::Bind()
 {
+//	Log("Binding FBO ", id);
 	glBindFramebuffer(GL_FRAMEBUFFER, id);
 	FrameBuffer::current = this;
 }
 
 void FrameBuffer::Unbind()
 {
+//	Log("Unbinding FBO");
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	FrameBuffer::current = nullptr;
 }

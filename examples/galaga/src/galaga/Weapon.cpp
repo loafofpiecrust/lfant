@@ -27,6 +27,7 @@
 #include <lfant/Transform.h>
 #include <lfant/Scene.h>
 #include <lfant/Input.h>
+#include <lfant/util/lexical_cast.h>
 
 // external
 
@@ -137,8 +138,9 @@ void Weapon::Fire(byte mode)
 			ent->transform->SetPosition(owner->transform->GetWorldPosition());
 			ent->transform->SetRotation(owner->transform->GetWorldRotation());
 			ent->LoadFile(projectilePath);
-			Log("Weapon bullet speed firing, ", bulletSpeed);
-			ent->TriggerEvent("Accelerate", owner->transform->GetDirection() * direction * bulletSpeed / game->time->deltaTime);
+			vec3 final = owner->transform->GetDirection() * direction * bulletSpeed / game->time->deltaTime;
+			Log("Weapon bullet speed firing, ", bulletSpeed, ", final accel of ", lexical_cast<string>(final));
+			ent->TriggerEvent("Accelerate", final);
 		}
 
 		Log("Finish off firing, ammo: ", currentAmmo);

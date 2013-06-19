@@ -2,13 +2,13 @@
 *
 *	LFANT Source
 *	Copyright (C) 2012-2013 by LazyFox Studios
-*	Created: 2012-09-30 by Taylor Snead
+*	Created: 2013-06-18 by Taylor Snead
 *
 *	Licensed under the Apache License, Version 2.0 (the "License");
 *	you may not use this file except in compliance with the License.
 *	You may obtain a copy of the License at
 *
-*		http://www.apache.org/licenses/LICENSE-2.0
+*	http://www.apache.org/licenses/LICENSE-2.0
 *
 *	Unless required by applicable law or agreed to in writing, software
 *	distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,61 +19,37 @@
 ******************************************************************************/
 #pragma once
 
-#include <lfant/stdafx.h>
+// internal
+#include <lfant/Component.h>
 
 // External
 
-// Internal
+namespace lfant {
+namespace galaga {
 
-namespace lfant
+class FollowEntity : public lfant::Component
 {
-/** @addtogroup Game
- *	@{
- */
-/** @addtogroup Utilities
- *	@{
- */
-
-template<typename T = float>
-class Range
-{
+	DECLARE_COMP(FollowEntity)
 public:
-	union
-	{
-		T min, start, major;
-	};
+	FollowEntity();
+	~FollowEntity();
 
-	union
-	{
-		T max, end, minor;
-	};
+	void Load(Properties* prop);
+	void Save(Properties* prop);
 
-	Range(T min, T max) :
-		min(min), max(max)
-	{
-	}
+	void Init();
+	void Update();
 
-	Range(T both) :
-		min(both), max(both)
-	{
-	}
+	bool useX = true;
+	bool useY = true;
+	bool useZ = true;
+	float speed = 3.5f;
+	float damping = 1.0f;
+	Entity* entity = nullptr;
+protected:
 
-	Range(const Range<T>& other) :
-		min(other.min), max(other.max)
-	{
-	}
-
-	Range<T>& operator=(const Range<T>& other)
-	{
-		min = other.min;
-		max = other.max;
-		return *this;
-	}
-
-	Range() {}
+private:
 };
 
-/// @}
-/// @}
-
-} /* namespace lfant */
+}
+}

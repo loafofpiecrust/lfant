@@ -54,7 +54,9 @@ class Particle;
  */
 class ParticleSystem : public Mesh
 {
+	DECLARE_COMP(ParticleSystem)
 	friend class Renderer;
+	friend class Particle;
 public:
 
 	/**
@@ -62,9 +64,9 @@ public:
 	 */
 	struct Burst
 	{
-		double time;
-		double last;
-		uint32_t particles;
+		float time = 5.0f;
+		float current;
+		uint32_t particles = 10;
 	};
 
 	/**
@@ -72,7 +74,7 @@ public:
 	 */
 	enum class EmitterType : byte
 	{
-		Point,
+		Point = 0,
 		Box,
 		Sphere,
 		Cone
@@ -89,6 +91,7 @@ public:
 
 	virtual void Init();
 	virtual void Update();
+	virtual void PostUpdate();
 	virtual void OnDestroy();
 
 	void BeginRender();
@@ -110,43 +113,50 @@ public:
 	void GenerateVelocity(Particle* pt);
 
 	// Particle properties
-	Range<float> lifetime;
-	Range<Range<rgba> > color;
-	Range<Range<float> > size;
-	Range<Range<float> > speed;
-	Range<Range<vec3> > velocity;
+	Range<float> lifetime = {1.0f, 5.0f};
+	Range<Range<vec4>> color = {{vec4(0), vec4(0.5f)}, {vec4(0.51f), vec4(1)}};
+	Range<Range<float>> size = {{0.1f, 1.0f}, {0.5f, 2.0f}};
+//	Range<Range<float>> speed;
+	Range<Range<vec3>> velocity = {{vec3(0), vec3(5)}, {vec3(2), vec3(10)}};
 
 	// Emitter properties
 	float radius = 1.0f;
-	float angle;
+	float angle = 30.0f;
 	float startDelay;
 	float time;
 	float duration;
-	float timeScale = 1.0f;
-	uint32_t rate = 1;
+//	float timeScale = 1.0f;
+	float rate = 1.5f;
 	uint32_t maxParticles = 1500;
 	vec3 dimensions = vec3(1.0f);
-	vec3 gravity = vec3(0.0f, -9.81f, 0.0f);
+	vec3 gravity = vec3(0.0f, 0.0f, 0.0f);
 	bool pausable = true;
 	bool paused = false;
 	bool looping = true;
+	bool inheritTransform = true;
 
 	DisplayType displayType;
-	EmitterType emitterType;
+	EmitterType emitterType = EmitterType::Cone;
 
-//	deque< ptr<Particle> > particles;
-	Buffer<Particle> particles;
+	deque<ptr<Particle>> particles;
 	deque<Burst> bursts;
+	deque<Particle*> recycle;
 
 //	Material material;
 
 protected:
+
+	void UpdatePosition(Particle* pt);
+
 	float toEmit = 0.0f;
 
 private:
 //	vector<vec3> points;
 //	vector<Vertex> vertices;
 //	vector<uint32_t> indices;
+//	Buffer<vec3> vertexBuffer;
+	Buffer<vec4> colorBuffer;
+	Buffer<float> sizeBuffer;
 
 //	uint32_t vertexBuffer;
 //	uint32_t indexBuffer;

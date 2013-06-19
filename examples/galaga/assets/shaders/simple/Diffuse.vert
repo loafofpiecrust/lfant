@@ -12,7 +12,7 @@ layout(location = 2) in vec3 normal;
 //layout(location = 3) in vec3 bitangent;
 
 // outputs
-out vec2 UV;
+//out vec2 UV;
 
 void main()
 {
@@ -20,5 +20,5 @@ void main()
 	gl_Position = MVP * vec4(position, 1);
 
 	// Sets fragment UV to vertex UV
-	UV = vertexUV;
+	gl_TexCoord[0].xy = vertexUV;
 }

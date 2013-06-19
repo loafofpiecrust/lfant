@@ -241,26 +241,26 @@ void Rigidbody::OnSetCollider(Collider *collider)
 
 void Rigidbody::ApplyCentralForce(vec3 force)
 {
-	if(maxSpeed > 0.0f)
+/*	if(maxSpeed > 0.0f)
 	{
 		btVector3 vel = body->getLinearVelocity();
 		if(abs(vel[0]) >= maxSpeed) force.x = 0.0f;
 		if(abs(vel[1]) >= maxSpeed) force.y = 0.0f;
 		if(abs(vel[2]) >= maxSpeed) force.z = 0.0f;
-	}
+	}*/
 //	Log("Applying central force: ", lexical_cast<string>(force));
 	body->applyCentralForce(vec3_cast<btVector3>(force));
 }
 
 void Rigidbody::ApplyForce(vec3 force, vec3 pos)
 {
-	if(maxSpeed > 0.0f)
+/*	if(maxSpeed > 0.0f)
 	{
 		btVector3 vel = body->getLinearVelocity();
 		if(abs(vel[0]) >= maxSpeed) force.x = 0.0f;
 		if(abs(vel[1]) >= maxSpeed) force.y = 0.0f;
 		if(abs(vel[2]) >= maxSpeed) force.z = 0.0f;
-	}
+	}*/
 	body->applyForce(vec3_cast<btVector3>(force), vec3_cast<btVector3>(pos));
 }
 

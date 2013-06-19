@@ -29,8 +29,10 @@
 #include <map>
 #include <iostream>
 
-namespace lfant
-{
+namespace lfant {
+
+class Entity;
+
 /** @addtogroup Game
  *	 @{
  */
@@ -89,6 +91,9 @@ public:
 		cout << ".\n\n";
 	//	return ref;
 	}
+
+	void Get(string name, Entity*& ref);
+	void Set(string name, Entity* const& value);
 
 	template<typename T = string>
 	T Get(string name)

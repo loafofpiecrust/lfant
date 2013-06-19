@@ -60,7 +60,9 @@ public:
 	void Load(Properties *prop);
 	void Save(Properties* prop);
 //	void LoadFile(string file = "");
-	void LoadFile(string file = "");
+	void LoadFile(string file);
+	void LoadFile(string vert, string frag, string geom = "");
+	void Compile();
 
 	void Bind();
 	void Unbind();
@@ -86,7 +88,8 @@ protected:
 
 	string vertex = "";
 	string fragment = "";
-	uint32 id = 0;
+	string geometry = "";
+	uint32 id = -1;
 	map<string, uint32> uniforms;
 
 	static deque<Shader*> shaders;

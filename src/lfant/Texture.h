@@ -24,7 +24,7 @@
 #include <lfant/Object.h>
 
 // External
-//#include <GL/glew.h>
+#include <GL/glew.h>
 
 namespace lfant
 {
@@ -48,24 +48,34 @@ public:
 
 	enum class WrapMode : uint16
 	{
-		Clamp = 0x812F,
-		Repeat = 0x2901
+	//	Clamp = 0x812F,
+	//	Repeat = 0x2901
+		Clamp = GL_CLAMP_TO_EDGE,
+		Repeat = GL_REPEAT
 	};
 
 	enum class Format : uint16
 	{
+		/*
 		Rgb = 0x1907,
 		Rgba = 0x1908,
 		CompressedRgb = 0x84ED,
 		CompressedRgba = 0x84EE,
 		Rgb32f = 0x8815,
 		Rgba32f = 0x8814
+		*/
+		Rgb = GL_RGB,
+		Rgba = GL_RGBA,
+		Rgb32f = GL_RGB32F,
+		Rgba32f = GL_RGBA32F
 	};
 
 	enum class ScaleFilter : uint16
 	{
-		Nearest = 0x2600,
-		Linear = 0x2601
+	//	Nearest = 0x2600,
+	//	Linear = 0x2601
+		Nearest = GL_NEAREST,
+		Linear = GL_LINEAR
 	};
 
 	Texture();

@@ -9,5 +9,6 @@ layout(location = 0) out vec4 color;
 
 void main()
 {
-	color = vec4(texture(textureSampler, UV).rgb, 1.0f);
+	color = vec4(texture2D(textureSampler, UV).rgb, 1);
+//	color = vec4(0.0f, 1.0f, 0.0f, 1.0f);
 }

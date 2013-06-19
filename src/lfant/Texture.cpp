@@ -110,20 +110,21 @@ void Texture::InitData(byte* data)
 	Bind();
 
 	Log("Texture mode is ", mode, ". GL_TEXTURE_2D = ", GL_TEXTURE_2D);
-	if(msaa == 0)
-	{
-		glTexImage2D(mode, 0, (uint)internalFormat, size.x, size.y, 0, (uint)format, GL_UNSIGNED_BYTE, data);
-	}
-	else
-	{
-		glTexImage2DMultisample(mode, msaa, (uint)internalFormat, size.x, size.y, true);
-	}
+	Log("internalFormat = ", (uint)internalFormat, ". GL_RGBA = ", GL_RGBA, ", GL_RGB32F = ", GL_RGB32F);
+	Log("format = ", (uint)format, ". GL_RGBA = ", GL_RGBA, ", GL_RGB32F = ", GL_RGB32F);
+	
+	glTexImage2D(mode, 0, (uint)internalFormat, size.x, size.y, 0, (uint)format, GL_UNSIGNED_BYTE, data);
 
+	Log("scaleFilter = ", (uint)scaleFilter, ", GL_LINEAR = ", GL_LINEAR, ", GL_NEAREST = ", GL_NEAREST);
 	glTexParameteri(mode, GL_TEXTURE_MAG_FILTER, (uint)scaleFilter);
-	glTexParameteri(mode, GL_TEXTURE_MIN_FILTER, (uint)scaleFilter);
+	glTexParameteri(mode, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
-	glTexParameteri(mode, GL_TEXTURE_WRAP_S, (uint)wrapMode);
-	glTexParameteri(mode, GL_TEXTURE_WRAP_T, (uint)wrapMode);
+	Log("wrapMode = ", (uint)wrapMode, ", GL_CLAMP_TO_EDGE = ", GL_CLAMP_TO_EDGE, ", GL_REPEAT = ", GL_REPEAT);
+	if(wrapMode != WrapMode::Repeat)
+	{
+		glTexParameteri(mode, GL_TEXTURE_WRAP_S, (uint)wrapMode);
+		glTexParameteri(mode, GL_TEXTURE_WRAP_T, (uint)wrapMode);
+	}
 
 	Unbind();
 }
@@ -142,12 +143,12 @@ void Texture::OnDestroy()
 
 void Texture::SetIndex(uint32 idx)
 {
-	index = unitFromIndex(idx);
+	index = idx;
 }
 
 void Texture::Bind()
 {
-	glActiveTexture(index);
+	glActiveTexture(GL_TEXTURE0 + index);
 	glBindTexture(mode, id);
 }
 

@@ -62,6 +62,7 @@ class Entity : public Object
 {
 	friend class Scene;
 	friend class Component;
+	friend class Renderer;
 
 public:
 
@@ -134,12 +135,12 @@ public:
 
 	bool HasTag(string tag);
 
-	uint64_t GetId() { return id; }
+	uint32_t GetId() const { return id; }
 
 	string GetLayer();
 	void SetLayer(string layer);
 
-	Transform* transform = nullptr;
+	Transform* transform;
 
 	/// Whether to update this Entity or not.
 	bool active = true;
@@ -149,7 +150,7 @@ public:
 	/// The identifying tags used for grouping.
 	deque<string> tags;
 
-	float lifeTime = 0.0f;
+	float lifetime = 0.0f;
 
 	Entity* parent;
 
@@ -194,7 +195,7 @@ private:
 	bool useLifeTime = false;
 
 	/// 64-bit scene-unique identifier.
-	uint64_t id = 0;
+	uint32_t id = 0;
 
 	/// The layer of this entity for primarily display filtering
 	string layer = "Main";

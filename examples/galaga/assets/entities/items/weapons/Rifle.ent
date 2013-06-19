@@ -16,10 +16,11 @@ entity Rifle
 
 	component Weapon
 	{
-		bulletSpeed = 115
+		bulletSpeed = 1
 		reloadTime = 2
 		fireRate = 2
 		automatic = true
+		projectilePath = entities/items/projectiles/Laser.ent
 	}
 
 	component Mesh

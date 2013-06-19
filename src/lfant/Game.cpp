@@ -84,18 +84,18 @@ void Game::Init()
 	fileSystem->Init();
 //	settings->Init();
 	Log("Initing systeminfo");
-	systemInfo->Init();
+//	systemInfo->Init();
 	Log("Initing time");
 	time->Init();
 	Log("Initing physics");
 	physics->Init();
 	renderer->Init();
-	scene->Init();
 	input->Init();
 //	audio->Init();
 //	network->Init();
 	scriptSystem->Init();
 //	userInterface->Init();
+	scene->Init();
 
 	if(defaultScene != "") scene->LoadFile(defaultScene);
 
@@ -106,13 +106,14 @@ void Game::Init()
 
 void Game::Update()
 {
+	renderer->PreUpdate();
 	time->Update();
-	physics->Update();
 	scene->Update();
+	physics->Update();
 	input->Update();
 //	userInterface->Update();
-	renderer->Update();
 //	network->Update();
+	renderer->Update();
 }
 
 

@@ -2,13 +2,13 @@
 *
 *	LFANT Source
 *	Copyright (C) 2012-2013 by LazyFox Studios
-*	Created: 2012-09-30 by Taylor Snead
+*	Created: 2013-06-17 by Taylor Snead
 *
 *	Licensed under the Apache License, Version 2.0 (the "License");
 *	you may not use this file except in compliance with the License.
 *	You may obtain a copy of the License at
 *
-*		http://www.apache.org/licenses/LICENSE-2.0
+*	http://www.apache.org/licenses/LICENSE-2.0
 *
 *	Unless required by applicable law or agreed to in writing, software
 *	distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,63 +17,45 @@
 *	limitations under the License.
 *
 ******************************************************************************/
-#pragma once
 
-#include <lfant/stdafx.h>
+#include <lfant/Terrain.h>
 
-// External
+// internal
 
-// Internal
+// external
 
-namespace lfant
+namespace lfant {
+
+Terrain::Terrain()
 {
-/** @addtogroup Game
- *	@{
- */
-/** @addtogroup Utilities
- *	@{
- */
+}
 
-template<typename T = float>
-class Range
+Terrain::~Terrain()
 {
-public:
-	union
-	{
-		T min, start, major;
-	};
+}
 
-	union
-	{
-		T max, end, minor;
-	};
+void Terrain::Init()
+{
+}
 
-	Range(T min, T max) :
-		min(min), max(max)
-	{
-	}
+void Terrain::Update()
+{
+}
 
-	Range(T both) :
-		min(both), max(both)
-	{
-	}
+void Terrain::Generate()
+{
+}
 
-	Range(const Range<T>& other) :
-		min(other.min), max(other.max)
-	{
-	}
+void Terrain::BeginRender()
+{
+}
 
-	Range<T>& operator=(const Range<T>& other)
-	{
-		min = other.min;
-		max = other.max;
-		return *this;
-	}
+void Terrain::Render()
+{
+}
 
-	Range() {}
-};
+void Terrain::EndRender()
+{
+}
 
-/// @}
-/// @}
-
-} /* namespace lfant */
+}

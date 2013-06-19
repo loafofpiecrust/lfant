@@ -19,13 +19,14 @@
 ******************************************************************************/
 #include <lfant/Scene.h>
 
-// External
-
 // Internal
 #include <lfant/Entity.h>
 #include <lfant/Console.h>
 #include <lfant/Camera.h>
 #include <lfant/Properties.h>
+#include <lfant/Time.h>
+
+// External
 
 namespace lfant
 {
@@ -103,8 +104,53 @@ Entity* Scene::GetEntity(string name, bool recursive)
 	return nullptr;
 }
 
+Entity* Scene::GetEntityById(uint32_t id, bool recursive)
+{
+	for(auto& ent : entities)
+	{
+		if(ent->GetId() == id)
+		{
+			return ent;
+		}
+		if(recursive)
+		{
+			for(auto& child : ent->children)
+			{
+				if(child->GetId() == id)
+				{
+					return child;
+				}
+			}
+		}
+	}
+}
+
+uint32_t Scene::GenerateEntityId()
+{
+	/*
+	uint32_t result = 1;
+	for(auto& ent : entities)
+	{
+		if(ent->GetId() == result)
+		{
+			++result;
+		}
+		for(auto& child : ent->children)
+		{
+			if(child->GetId() == result)
+			{
+				++result;
+			}
+		}
+	}
+	return result;
+	*/
+	return ++currentId;
+}
+
 void Scene::Save(Properties* prop)
 {
+	double t = game->time->GetTime();
 	prop->type = "scene";
 	prop->id = name;
 
@@ -112,10 +158,12 @@ void Scene::Save(Properties* prop)
 	{
 		ent->Save(prop->AddChild());
 	}
+	Log("Saving scene took ", game->time->GetTime() - t, " nanoseconds(?)");
 }
 
 void Scene::Load(Properties *prop)
 {
+	currentId = 0;
 	Log("Scene::Load: Loading scene node");
 	Entity* ent = nullptr;
 	for(auto& i : prop->GetChildren("entity"))
@@ -142,7 +190,7 @@ Entity* Scene::Spawn(string name, Entity* parent)
 	Log("Scene::Spawn: Initialised, ", ent);
 	if(!parent)
 	{
-		entities.push_front(ent);
+		entities.push_back(ent);
 		Log("Scene::Spawn: pushed in.");
 	}
 	else
@@ -163,7 +211,7 @@ Entity* Scene::SpawnAndLoad(Properties* prop, string name, Entity* parent)
 	
 	if(!parent)
 	{
-		entities.push_front(ent);
+		entities.push_back(ent);
 		Log("Scene::Spawn: pushed in.");
 	}
 	else

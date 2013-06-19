@@ -28,64 +28,92 @@ void Shader::Load(Properties *prop)
 {
 	prop->Get("vertex", vertex);
 	prop->Get("fragment", fragment);
-	LoadFile();
+	prop->Get("geometry", geometry);
+	LoadFile(vertex, fragment, geometry);
 }
 
 void Shader::Save(Properties *prop)
 {
 	prop->Set("vertex", vertex);
 	prop->Set("fragment", fragment);
+	prop->Set("geometry", geometry);
 }
 
 void Shader::LoadFile(string file)
 {
 	Log("Shader::LoadFile: Touch.");
-	if(file != "")
+	string ext = Extension(file);
+	if(ext == "vert")
 	{
-		vertex = file+".vert";
-		fragment = file+".frag";
+		vertex = file;
 	}
-	else if(id != 0)
+	else if(ext == "frag")
+	{
+		fragment = file;
+	}
+	else if(ext == "geom")
+	{
+		geometry = file;
+	}
+	else
+	{
+		Log("Shader file type unknown, not loading.");
+	}
+}
+
+void Shader::LoadFile(string vert, string frag, string geom)
+{
+	LoadFile(vert);
+	LoadFile(frag);
+	LoadFile(geom);
+
+	Compile();
+}
+
+void Shader::Compile()
+{
+	if(vertex == "" && fragment == "" && geometry == "")
 	{
 		return;
 	}
+
 	for(auto& sh : shaders)
 	{
-		if(vertex == sh->vertex && fragment == sh->fragment && sh->id != 0)
+		if(vertex == sh->vertex && fragment == sh->fragment && geometry == sh->geometry && sh->id != -1)
 		{
 			Log("Shader::LoadFile: Found previous shader that's compatible for '", vertex, "'.");
 			id = sh->id;
 			return;
 		}
 	}
-	path vert = game->fileSystem->GetGamePath(vertex);
-	path frag = game->fileSystem->GetGamePath(fragment);
-	Log("LoadShader: Files opened, of ", file);
-	if (!exists(vert) || !exists(frag))
+
+	uint32 vert = -1;
+	uint32 frag = -1;
+	uint32 geom = -1;
+	id = glCreateProgram();
+
+	if(vertex != "")
 	{
-		Log("Shader::LoadFile: " + file + " could not be loaded");
-		return;
+		vert = Compile(GL_VERTEX_SHADER, game->fileSystem->GetGamePath(vertex).string());
+		glAttachShader(id, vert);
 	}
-	
-	Log("Shader::LoadFile: Compiling shader");
-	uint32 vertId = Compile(GL_VERTEX_SHADER, vert.string());
-	uint32 fragId = Compile(GL_FRAGMENT_SHADER, frag.string());
+	if(fragment != "")
+	{
+		frag = Compile(GL_FRAGMENT_SHADER, game->fileSystem->GetGamePath(fragment).string());
+		glAttachShader(id, frag);
+	}
+	if(geometry != "")
+	{
+		geom = Compile(GL_GEOMETRY_SHADER, game->fileSystem->GetGamePath(geometry).string());
+		glAttachShader(id, geom);
+	}
 
-	// Link the program
-	Log("Shader::LoadFile: Linking shader");
-	uint32_t ProgramID = glCreateProgram();
-	glAttachShader(ProgramID, vertId);
-	glAttachShader(ProgramID, fragId);
-	glLinkProgram(ProgramID);
-	id = ProgramID;
-	Log("Shader::LoadFile: Shader id '", id, "'.");
-
-	// Check the program
+	glLinkProgram(id);
 	CheckErrors();
 
-	glDeleteShader(vertId);
-	glDeleteShader(fragId);
-//	path = file;
+	if(vert) glDeleteShader(vert);
+	if(frag) glDeleteShader(frag);
+	if(geom) glDeleteShader(geom);
 
 	shaders.push_back(this);
 	Unbind();
@@ -201,7 +229,7 @@ void Shader::SetUniform(string name, Texture* val)
 {
 	val->Bind();
 	glUniform1i(GetUniform(name), 0);
-	val->Unbind();
+//	val->Unbind();
 }
 
 }

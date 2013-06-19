@@ -2,7 +2,7 @@
 *
 *	LFANT Source
 *	Copyright (C) 2012-2013 by LazyFox Studios
-*	Created: 2013-06-12 by Taylor Snead
+*	Created: 2013-06-17 by Taylor Snead
 *
 *	Licensed under the Apache License, Version 2.0 (the "License");
 *	you may not use this file except in compliance with the License.
@@ -18,61 +18,77 @@
 *
 ******************************************************************************/
 #pragma once
-#include <lfant/stdafx.h>
 
-// Internal
-#include <lfant/Object.h>
-#include <lfant/Texture.h>
-#include <lfant/Rect.h>
-#include <lfant/Shader.h>
+// internal
+#include <lfant/Mesh.h>
 
-// External
+// external
 
 namespace lfant {
 
-class FrameBuffer : public Object
+class Voxel : public Component
 {
+	DECLARE_COMP(Voxel)
 public:
-	FrameBuffer();
-	~FrameBuffer();
+
+	class Block
+	{
+		friend class Voxel;
+		friend class Chunk;
+	public:
+		Block();
+		~Block();
+
+		bool IsActive();
+		void SetActive(bool value);
+
+	protected:
+		bool active = false;
+
+	private:
+	};
+
+	class Chunk
+	{
+		friend class Voxel;
+	public:
+		Chunk();
+		~Chunk();
+
+		void Update();
+		void Render();
+
+	protected:
+		static const int Size = 16;
+		vector<vector<vector<Block>>> blocks;
+
+	private:
+	};
+
+	Voxel();
+	~Voxel();
 
 	void Init();
-	void OnDestroy();
+	void Update();
 
+	void BeginRender();
 	void Render();
+	void EndRender();
 
-	static void Clear();
-
-	void Bind();
-	static void Unbind();
-
-	static FrameBuffer* GetCurrent();
-
-	uint32_t GetAttachment(uint32_t idx);
-
-	void ResizeViewport();
-	void SetRect(URect r) { rect = r; }
-	void Resize();
-
-	void AddTexture(string name, Texture* tex = nullptr);
-	void GetTextures(Shader* sh);
-
-	URect rect {0,0,0,0};
-	bool hasDepth = false;
-//	ptr<Shader> shader;
+	void Generate();
 
 protected:
-	uint32_t id;
+	ptr<Shader> shader;
+	ptr<Texture> texture;
 
-	deque<string> textureNames;
-	deque<Texture*> textures;
+	uint32_t vertexArray = 0;
 
-	vector<uint32_t> drawBuffers;
-	uint32_t depthBuffer;
-
-	static FrameBuffer* current;
+	vector<Chunk> chunks;
+	vector<vec3> vertexBuffer;
+	uint32_t chunkId = 0;
 
 private:
+
 };
 
 }

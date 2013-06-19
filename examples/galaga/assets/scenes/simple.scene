@@ -19,20 +19,58 @@ scene Simple
 
 		}
 
-		entity Camera
+		component Mesh
 		{
-			component Camera
+			path = meshes/plane.obj
+			material = materials/StarShip.mat
+		}
+
+		entity Backpack
+		{
+			component Inventory
 			{
-				mode = 0
-				fov = 45
-			}
-			component MouseLook
-			{
-				enabled = false
-				lookSpeed = 85
+				equippedItem = 0
 			}
 
+			entity Rifle
+			{
+				file = entities/items/weapons/Rifle.ent
+			}
 		}
+
+	}
+
+	entity Camera
+	{
+		component Transform
+		{
+			rotation = (90,0,0)
+			position = (0,15,0)
+		}
+
+		component Camera
+		{
+			mode = 0
+			fov = 45
+		}
+
+		component FollowEntity
+		{
+			x = true
+			z = true
+			y = false
+
+			entity = Player
+			speed = 1.5
+		}
+
+		/*
+		component MouseLook
+		{
+			enabled = false
+			lookSpeed = 85
+		}
+		*/
 	}
 	/*
 	entity Powa
@@ -46,6 +84,48 @@ scene Simple
 		{
 			path = meshes/suzanne.obj
 			material = materials/Diffuse.mat
+		}
+	}
+
+	entity Lala
+	{
+		component Transform
+		{
+			position = (0,3,0)
+		}
+
+		component Mesh
+		{
+			path = meshes/suzanne.obj
+			material = materials/Diffuse.mat
+		}
+	}*/
+	/*
+	entity Explo
+	{
+		component Transform
+		{
+			position = (0,0,0)
+		}
+
+		component ParticleSystem
+		{
+			type = 2
+			maxParticles = 150000
+			inheritTransform = true
+			lifetime = 4.5 - 8
+			rate = 14000
+			angle = 25
+			gravity = (0,-0.5,0)
+			size = (0.1, 0.2) - (0.1, 0.2)
+			color = ((0,0,0,0.5)-(1,1,1,1)) - ((0,0,0,0.5)-(1,1,1,1))
+			velocity = ((1)-(2)) - ((1)-(5))
+
+			burst
+			{
+				time = 3.2f
+				particles = 6000
+			}
 		}
 	}
 	*/

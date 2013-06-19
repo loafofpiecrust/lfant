@@ -114,7 +114,7 @@ void Renderer::Init()
 	if(!glfwInit())
 	{
 		Log("Renderer::Init: GLFW failed to initialise.");
-		game->Exit();
+		game->Destroy();
 	}
 
 	if(game->standAlone)
@@ -122,7 +122,7 @@ void Renderer::Init()
 		if(!OpenWindow())
 		{
 			// Window opening failed
-			game->Exit();
+			game->Destroy();
 		}
 
 		HideMouse(hideMouse);
@@ -168,14 +168,16 @@ void Renderer::Init()
 
 	Log("Renderer: Initialized");
 
-	{
+/*	{
 		Mesh* mesh = game->scene->Spawn("Lala")->AddComponent<Mesh>();
 		mesh->LoadFile("meshes/suzanne.obj");
 		mesh->material->LoadFile("materials/Diffuse.mat");
-	}
+	}*/
 	
 	
-	fboEntity = game->scene->Spawn("FBOQuad");
+	fboEntity = new Entity;
+	fboEntity->id = 1;
+	fboEntity->Init();
 	fboEntity->transform->SetPosition(vec3(0.1,0.1,1));
 	fboEntity->active = false;
 //	fboEntity->transform->SetScale()
@@ -184,10 +186,11 @@ void Renderer::Init()
 	fboQuad->Enable(false);
 //	fboQuad = new Mesh;
 	fboQuad->usingCamera = false;
+	fboQuad->fboQuad = true;
 //	fboQuad->Init();
 	fboShader = fboQuad->material->shader;
 	fboQuad->material->loaded = true;
-	fboShader->LoadFile("shaders/FrameBuffer");
+	fboShader->LoadFile("shaders/FrameBuffer.vert", "shaders/FrameBuffer.frag");
 	Log("Shader for fbo: ", fboShader->GetId());
 	fboQuad->LoadFile("meshes/quad.obj");
 	Log("Shader for fbo: ", fboShader->GetId());
@@ -200,15 +203,20 @@ void Renderer::Init()
 	Log("Shader for fbo: ", fboShader->GetId());
 //	fboQuad->material->texture->Init();
 //	frameBuffer->AddTexture("texThreshold");
-	frameBuffer->SetRect({0,0,resolution.x, resolution.y});
+	frameBuffer->SetRect({0,0,resolution.x,resolution.y});
 	frameBuffer->hasDepth = true;
 	frameBuffer->Init();
 	Log("Shader for fbo: ", fboShader->GetId());
-
+/*
+	frameBuffer->Clear();
+	glfwSwapBuffers(window);
+	thread::Sleep(1600);
 	frameBuffer->Bind();
 	glViewport(0,0,1920, 1080);
 	frameBuffer->Clear();
-	
+	thread::Sleep(1600);
+	frameBuffer->Unbind();
+	*/
 	// Load all shaders
 	/*
 	   auto shs = game->fileSystem->GetGameFiles("shaders", "vert");
@@ -221,6 +229,17 @@ void Renderer::Init()
 }
 
 static bool fboDrawn = false;
+
+void Renderer::PreUpdate()
+{
+	frameBuffer->Bind();
+	glViewport(0,0,resolution.x,resolution.y);
+//	Log("fbo viewported.");
+	glClearColor(0.0f, 0.4f, 0.0f, 0.0f);
+//	frameBuffer->Clear();
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+//	Log("fbo cleared.");
+}
 
 void Renderer::Update()
 {
@@ -236,6 +255,7 @@ void Renderer::Update()
 
 	// Rendering to the framebuffer
 	
+
 //	frameBuffer->Bind();
 	if(!fboDrawn)
 	{
@@ -246,25 +266,30 @@ void Renderer::Update()
 		fboDrawn = true;
 	}
 
-	glfwSwapBuffers(window);
-	glfwPollEvents();
-
 	frameBuffer->Unbind();
 //	glViewport(0,0,1024, 768);
 	glViewport(0,0,resolution.x,resolution.y);
 //	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+//	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+//	Log("Backbuffer cleared.");
+//	thread::Sleep(1500);
 //	frameBuffer->GetTextures(fboShader);
 
 //	fboQuad->material->shader->Bind();
 	fboQuad->Render();
+//	Log("fboQuad rendered.");
+//	thread::Sleep(1500);
 //	fboQuad->material->shader->Unbind();
 
-	frameBuffer->Bind();
+//	Log("Swapping buffers.");
+	glfwSwapBuffers(window);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+//	Log("Buffers swapped.");
+//	thread::Sleep(1500);
+	glfwPollEvents();
+
+//	frameBuffer->Bind();
 //	glViewport(0,0,1024, 768);
-//	glViewport(0,0,resolution.x,resolution.y);
-//	glClearColor(0.0f, 0.4f, 0.0f, 0.0f);
-	frameBuffer->Clear();
 
 //	fboQuad->Render();
 //	frameBuffer->Unbind();
@@ -274,6 +299,8 @@ void Renderer::OnDestroy()
 {
 //	fboQuad->OnDestroy();
 //	delete fboQuad;
+//	fboEntity->Destroy();
+	delete fboEntity;
 	Log("Renderer::OnDestroy(): Touch");
 	glfwTerminate();
 }

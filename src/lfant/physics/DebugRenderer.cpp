@@ -26,7 +26,7 @@ DebugRenderer::DebugRenderer()
 
 	if(material->shader->GetId() == 0)
 	{
-		material->shader->LoadFile();
+		material->shader->LoadFile("shaders/simple/Diffuse.vert", "shaders/simple/Diffuse.frag");
 	}
 	if(material->shader->GetId() != 0)
 	{

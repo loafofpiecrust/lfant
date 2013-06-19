@@ -110,7 +110,11 @@ void Mesh::BeginRender()
 	}
 
 	FrameBuffer* fbo = FrameBuffer::GetCurrent();
-	if(fbo) fbo->Unbind();
+	if(fbo && !fboQuad)
+	{
+		Log("Unbinding fbo for mesh init.");
+		fbo->Unbind();
+	}
 
 	glGenVertexArrays(1, &vertexArray);
 	glBindVertexArray(vertexArray);
@@ -118,7 +122,7 @@ void Mesh::BeginRender()
 	if(material->shader->GetId() == 0)
 	{
 		Log("Loading default shader.");
-		material->shader->LoadFile();
+		material->shader->LoadFile("shaders/simple/Diffuse.vert", "shaders/simple/Diffuse.frag");
 	}
 
 //	if(material->texture->GetId() == -1)
@@ -155,7 +159,11 @@ void Mesh::BeginRender()
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 
-	if(fbo) fbo->Bind();
+	if(fbo && !fboQuad)
+	{
+		Log("Rebinding fbo after mesh init.");
+		fbo->Bind();
+	}
 }
 
 void Mesh::Render()
@@ -165,7 +173,7 @@ void Mesh::Render()
 		return;
 	}
 
-//	Log("Rendering mesh..");
+//	Log("Rendering mesh '", owner->name, "'.");
 
 	glBindVertexArray(vertexArray);
 

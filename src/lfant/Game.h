@@ -77,6 +77,11 @@ public:
 	virtual void Update();
 
 	/**
+	 *	Destroys the game instance.
+	 */
+	virtual void Destroy();
+
+	/**
 	 *	Schedules the game to be exited at the end of this frame.
 	 */
 	virtual void Exit();
@@ -112,10 +117,6 @@ public:
 	string defaultScene = "";
 
 protected:
-	/**
-	 *	Destroys the game instance. Never call manually.
-	 */
-	virtual void Destroy();
 
 private:
 	bool destroy = false;

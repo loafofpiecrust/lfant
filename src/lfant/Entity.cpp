@@ -52,6 +52,10 @@ Entity::~Entity()
 {
 }
 
+uint32_t GenerateId()
+{
+}
+
 /*******************************************************************************
 *
 *		Generic Entity functions
@@ -68,7 +72,7 @@ void Entity::Init()
 	//	transform = AddComponent<Transform>();
 //	}
 
-	if(lifeTime <= 0.0f)
+	if(lifetime <= 0.0f)
 	{
 		useLifeTime = false;
 	}
@@ -76,20 +80,20 @@ void Entity::Init()
 	if(id == 0)
 	{
 		// Generate new id?
-		id = random::Range<uint64_t>(0, ULLONG_MAX);
+		id = game->scene->GenerateEntityId();
 	}
 }
 
 void Entity::Update()
 {
-	if(lifeTime > 0.0f)
+	if(lifetime > 0.0f)
 	{
 		useLifeTime = true;
 	}
 	if(useLifeTime == true)
 	{
-		lifeTime -= game->time->deltaTime;
-		if(lifeTime <= 0.0f)
+		lifetime -= game->time->deltaTime;
+		if(lifetime <= 0.0f)
 		{
 			Destroy();
 		}
@@ -348,7 +352,7 @@ void Entity::Save(Properties* prop)
 	prop->Set("tags", tags);
 	prop->Set("layer", layer);
 	prop->Set("active", active);
-	prop->Set("lifeTime", lifeTime);
+	prop->Set("lifetime", lifetime);
 
 	for(auto& comp : components)
 	{
@@ -363,12 +367,19 @@ void Entity::Save(Properties* prop)
 
 void Entity::Load(Properties* prop)
 {
+	string file = "";
+	prop->Get("file", file);
+	if(file != "")
+	{
+		LoadFile(file);
+	}
+
 	prop->GetId(name);
 	prop->Get("id", id);
 	prop->Get("tags", tags);
 	prop->Get("layer", layer);
 	prop->Get("active", active);
-	prop->Get("lifeTime", lifeTime);
+	prop->Get("lifetime", lifetime);
 
 	Log("Entity::Load: Loaded basic properties.");
 
@@ -380,11 +391,19 @@ void Entity::Load(Properties* prop)
 		Log("Loading component props, '"+comp->type+" "+comp->id+"'.");
 		if(comp->id != "Transform")
 		{
-			component = AddComponent(comp->id, comp);
+			if(component = GetComponent(comp->id))
+			{
+				component->Load(comp);
+			}
+			else
+			{
+				component = AddComponent(comp->id, comp);
+			}
 			Log("Entity::Load: Added component, owner = ", component->owner);
 			if(comp->id == "Camera")
 			{
 				game->scene->mainCamera = dynamic_cast<Camera*>(component);
+				Log("Added Camera component, now mainCamera = ", game->scene->mainCamera);
 			}
 		}
 		else
@@ -411,13 +430,6 @@ void Entity::Load(Properties* prop)
 	//	ent->Load(child);
 	}
 	
-	string file = "";
-	prop->Get("file", file);
-	if(file != "")
-	{
-		LoadFile(file);
-	}
-
 	Log("Entity::Load: Finished.");
 	Init();
 }

@@ -69,7 +69,7 @@ public:
 	/**
 	 *	Gets an entity by its unique id.
 	 */
-	Entity* GetEntityById(uint32 id);
+	Entity* GetEntityById(uint32 id, bool recursive = true);
 
 	/**
 	 *	Gets the first entity in a given layer.
@@ -127,7 +127,10 @@ protected:
 	 */
 	void RemoveEntity(Entity* ent);
 
+	uint32_t GenerateEntityId();
+
 	deque< ptr<Entity, Object::Delete> > entities;
+	uint32_t currentId = 0;
 
 private:
 

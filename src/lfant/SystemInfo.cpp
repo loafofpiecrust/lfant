@@ -185,7 +185,7 @@ void SystemInfo::Init()
 	   }*/
 }
 
-#elif OSX
+#elif MACOSX
 
 void SystemInfo::Init()
 {

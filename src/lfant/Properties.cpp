@@ -25,6 +25,9 @@
 #include <lfant/FileSystem.h>
 #include <lfant/Range.h>
 #include <lfant/util/String.h>
+#include <lfant/Entity.h>
+#include <lfant/Scene.h>
+#include <lfant/Game.h>
 
 // External
 
@@ -48,6 +51,30 @@ Properties::Properties(istream &stream, string type, string id, Properties *pare
 
 Properties::~Properties()
 {
+}
+
+void Properties::Get(string name, Entity*& ref)
+{
+	int id = 0;
+	string entname = "";
+	Get(name, id);
+	if(id == 0)
+	{
+		Get(name, entname);
+		if(entname != "")
+		{
+			ref = game->scene->GetEntity(entname);
+		}
+	}
+	else
+	{
+		ref = game->scene->GetEntityById(id);
+	}
+}
+
+void Properties::Set(string name, Entity* const& value)
+{
+	Set(name, value->GetId());
 }
 
 void Properties::LoadFile(string path)
@@ -430,7 +457,7 @@ Properties* Properties::AddChild(string type, string id)
 	result->parent = this;
 	result->type = type;
 	result->id = id;
-	children.push_back(ptr<Properties>(result));
+	children.push_back(result);
 	return result;
 }
 

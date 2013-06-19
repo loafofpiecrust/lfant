@@ -148,7 +148,7 @@ void Galaga::Init()
 	Game::Init();
 
 	Log("Loading scene.");
-	scene->LoadFile("scenes/simple.scene");
+	scene->LoadFile("scenes/galaga.scene");
 	scene->SaveFile("scenes/init.scene");
 	Log("Finished loading scene");
 

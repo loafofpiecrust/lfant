@@ -22,6 +22,7 @@
 // External
 
 // Internal
+#include <lfant/Console.h>
 
 
 namespace lfant
@@ -57,7 +58,29 @@ deque<string> Split(deque<string> str, string dropDelim, string keepDelim)
 
 deque<string> SplitParens(string str, string dropDelim, string keepDelim)
 {
-	deque<string> result;
+	deque<string> result = Split(str, dropDelim, keepDelim);
+	for(uint i = 0; i < result.size(); ++i)
+	{
+		Log("SplitParens: result[", i, "] = ", result[i]);
+		if(uint pos = result[i].find("(("))
+		{
+			result[i].erase(pos+1);
+		}
+		if(uint pos = result[i].find("))"))
+		{
+			result[i].erase(pos+1);
+		}
+		if(result[i][0] == '(')
+		{
+			result[i].erase(0);
+		}
+		if(result[i][result[i].size()-1] == ')')
+		{
+			result[i].erase(result[i].end());
+		}
+		Log("SplitParens: result[", i, "] = ", result[i]);
+	}
+	/*
 	bool newstr = false;
 	int parlev = 0;
 	string curr = "";
@@ -108,6 +131,7 @@ deque<string> SplitParens(string str, string dropDelim, string keepDelim)
 			curr = "";
 		}
 	}
+	*/
 }
 
 string Extension(string path)

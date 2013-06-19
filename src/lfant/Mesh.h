@@ -81,6 +81,11 @@ public:
 		data.push_back(t);
 	}
 
+	void pop_back()
+	{
+		data.pop_back();
+	}
+
 	void Create(int target, int mode = 0)
 	{
 		if(mode == 0)
@@ -136,6 +141,7 @@ public:
 
 	ptr<Material> material = new Material;
 	bool usingCamera = true;
+	bool fboQuad = false;
 
 protected:
 

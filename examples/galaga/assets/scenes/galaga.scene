@@ -7,7 +7,7 @@ scene Galaga
 		layer = Player
 		component Transform
 		{
-			position = (0,1,0)
+			position = (0,0,0)
 		}
 
 		component Mesh
@@ -136,6 +136,16 @@ scene Galaga
 		{
 			mode = 0
 			fov = 45
+		}
+
+		component FollowEntity
+		{
+			x = true
+			z = true
+			y = false
+			entity = Player
+			speed = 1.0f
+			damping = 1.25f
 		}
 	}
 }

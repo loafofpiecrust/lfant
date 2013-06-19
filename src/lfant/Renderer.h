@@ -92,6 +92,7 @@ public:
 	void HideMouse(bool hide = true);
 
 	virtual void Init();
+	virtual void PreUpdate();
 	virtual void Update();
 	virtual void OnDestroy();
 

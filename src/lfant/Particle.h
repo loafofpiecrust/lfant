@@ -48,26 +48,26 @@ public:
 
 	// Make these virtual when they need to be inherited and overwritten.
 	void Init();
-	void Update(double delta);
+	void Update();
 	void Destroy();
+
+	void SetPosition(vec3 pos);
+
+	float GetSize();
+	vec4 GetColor();
 
 	//void Launch();
 
 	void Activate(bool reset = false);
 	void Deactivate();
 	void SetVelocity(vec3 vel);
-	void SetSpeed(float speed);
 	void SetSizeRange(float start, float end)
 	{
 		size.min = start;
 		size.max = end;
 	}
-	void SetGravity(vec3 gravity)
-	{
-		this->gravity = gravity;
-	}
 	void StartLife(float life);
-	void InterpParams(double delta);
+	void InterpParams();
 	void SetParamDiffs();
 	void ApplyForce(vec3 force);
 	void ApplyForce(float speed, vec3 dir);
@@ -76,20 +76,21 @@ public:
 	float GetSpeed();
 
 	Range<float> size;
-	float speed;
-	vec3 velocity;
-	Range<vec3> velRange;
-	vec3 velDiff;
-	vec3 gravity;
-	float lifetime;
-	float age;
+	Range<vec3> velocity;
+	Range<vec4> color;
+
 	float sizeDiff;
-	Range<rgba> color;
-	rgba colorDiff;
+	vec3 velocityDiff;
+	vec4 colorDiff;
+
+//	vec3 gravity;
+	float lifetime = 1.0f;
 	bool active = true;
 
-	ParticleSystem* system;
-	Transform* transform;
+	vec3 position = vec3(0);
+//	float size = 1;
+
+//	ParticleSystem* system;
 
 protected:
 
