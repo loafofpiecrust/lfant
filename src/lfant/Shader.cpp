@@ -41,6 +41,11 @@ void Shader::Save(Properties *prop)
 
 void Shader::LoadFile(string file)
 {
+	if(file == "")
+	{
+		return;
+	}
+
 	Log("Shader::LoadFile: Touch.");
 	string ext = Extension(file);
 	if(ext == "vert")
@@ -55,31 +60,37 @@ void Shader::LoadFile(string file)
 	{
 		geometry = file;
 	}
+	else if(ext == "comp")
+	{
+		compute = file;
+	}
 	else
 	{
-		Log("Shader file type unknown, not loading.");
+		Log("Shader file type unknown, not loading. '", file, "'.");
 	}
 }
 
-void Shader::LoadFile(string vert, string frag, string geom)
+void Shader::LoadFile(string vert, string frag, string geom, string comp)
 {
 	LoadFile(vert);
 	LoadFile(frag);
 	LoadFile(geom);
+	LoadFile(comp);
 
 	Compile();
 }
 
 void Shader::Compile()
 {
-	if(vertex == "" && fragment == "" && geometry == "")
+	if(vertex == "" || fragment == "")
 	{
+		Log("Shader link failed: missing vertex or fragment stage.");
 		return;
 	}
 
 	for(auto& sh : shaders)
 	{
-		if(vertex == sh->vertex && fragment == sh->fragment && geometry == sh->geometry && sh->id != -1)
+		if(vertex == sh->vertex && fragment == sh->fragment && geometry == sh->geometry && compute == sh->compute && sh->id != -1)
 		{
 			Log("Shader::LoadFile: Found previous shader that's compatible for '", vertex, "'.");
 			id = sh->id;
@@ -90,6 +101,7 @@ void Shader::Compile()
 	uint32 vert = -1;
 	uint32 frag = -1;
 	uint32 geom = -1;
+	uint32 comp = -1;
 	id = glCreateProgram();
 
 	if(vertex != "")
@@ -107,6 +119,11 @@ void Shader::Compile()
 		geom = Compile(GL_GEOMETRY_SHADER, game->fileSystem->GetGamePath(geometry).string());
 		glAttachShader(id, geom);
 	}
+	if(compute != "")
+	{
+		comp = Compile(GL_COMPUTE_SHADER, game->fileSystem->GetGamePath(compute).string());
+		glAttachShader(id, comp);
+	}
 
 	glLinkProgram(id);
 	CheckErrors();
@@ -114,6 +131,7 @@ void Shader::Compile()
 	if(vert) glDeleteShader(vert);
 	if(frag) glDeleteShader(frag);
 	if(geom) glDeleteShader(geom);
+	if(comp) glDeleteShader(comp);
 
 	shaders.push_back(this);
 	Unbind();

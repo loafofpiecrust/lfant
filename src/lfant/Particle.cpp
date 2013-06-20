@@ -41,7 +41,7 @@ Particle::~Particle()
 
 void Particle::Init()
 {
-	SetParamDiffs();
+//	SetParamDiffs();
 }
 
 void Particle::SetPosition(vec3 pos)
@@ -57,9 +57,9 @@ void Particle::Update()
 //	Log("Updating a particle");
 	InterpParams();
 
-	if(velocity.start != zeroVector)
+//	if(velocity != zeroVector)
 	{
-		SetPosition(position + velocity.start * game->time->deltaTime);
+		SetPosition(position + velocity * game->time->deltaTime);
 	}
 
 	lifetime -= game->time->deltaTime;
@@ -69,41 +69,41 @@ void Particle::Update()
 	}
 }
 
-void Particle::SetParamDiffs()
+void Particle::SetParamDiffs(vec3 vel, vec4 col, float siz)
 {
 	sizeDiff = 0.0f;
 	colorDiff = vec4(0);
 	velocityDiff = vec3(0.0f);
 
-	if(size.end != size.start)
+	if(siz != size)
 	{
-		sizeDiff = (size.end - size.start) / lifetime;
+		sizeDiff = (siz - size) / lifetime;
 	}
-	if(color.end != color.start)
+	if(col != color)
 	{
-		colorDiff = (color.end - color.start) / lifetime;
+		colorDiff = (col - color) / lifetime;
 	}
-	if(velocity.end != velocity.start)
+	if(vel != velocity)
 	{
-		velocityDiff = (velocity.end - velocity.start) / lifetime;
+		velocityDiff = (vel - velocity) / lifetime;
 	}
 }
 
 void Particle::InterpParams()
 {
-	if(colorDiff != vec4(0) && color.start != color.end)
+//	if(colorDiff != vec4(0))
 	{
-		color.start += colorDiff * game->time->deltaTime;
+		color += colorDiff * game->time->deltaTime;
 		// Apply color.
 	}
-	if(sizeDiff != 0.0f && size.start != size.end)
+//	if(sizeDiff != 0.0f)
 	{
-		size.start += sizeDiff * game->time->deltaTime;
+		size += sizeDiff * game->time->deltaTime;
 	}
-	if(velocityDiff != vec3(0.0f) && velocity.start != velocity.end)
+//	if(velocityDiff != vec3(0.0f))
 	{
 		//ApplyForce(-velocity.x);
-		velocity.start += velocityDiff * game->time->deltaTime;
+		velocity += velocityDiff * game->time->deltaTime;
 		//ApplyForce(velocity.x);
 	}
 //	system->UpdatePosition(this);
@@ -111,12 +111,12 @@ void Particle::InterpParams()
 
 float Particle::GetSize()
 {
-	return size.start;
+	return size;
 }
 
 vec4 Particle::GetColor()
 {
-	return color.start;
+	return color;
 }
 
 void Particle::StartLife(float life)
@@ -152,17 +152,17 @@ void Particle::Destroy()
 
 float Particle::GetSpeed()
 {
-	return length(velocity.start);
+	return length(velocity);
 }
 
 void Particle::ApplyForce(vec3 force)
 {
-	velocity.start += force * game->time->deltaTime;
+	velocity += force * game->time->deltaTime;
 }
 
 void Particle::ApplyForce(float speed, vec3 dir)
 {
-	velocity.start += dir * speed;
+	velocity += dir * speed;
 }
 
 }

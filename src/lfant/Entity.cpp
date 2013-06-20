@@ -365,14 +365,8 @@ void Entity::Save(Properties* prop)
 	}
 }
 
-void Entity::Load(Properties* prop)
+void Entity::Load(Properties* prop, bool init)
 {
-	string file = "";
-	prop->Get("file", file);
-	if(file != "")
-	{
-		LoadFile(file);
-	}
 
 	prop->GetId(name);
 	prop->Get("id", id);
@@ -429,9 +423,26 @@ void Entity::Load(Properties* prop)
 		ent = game->scene->SpawnAndLoad(child, child->id, this);
 	//	ent->Load(child);
 	}
+
+	string file = "";
+	prop->Get("file", file);
+	if(file != "")
+	{
+		Log("Loading entity from file path");
+		ptr<Properties> fp {new Properties};
+		fp->LoadFile(file);
+		string type = RemoveScoping(Type(this));
+		to_lower(type);
+		if(Properties* pc = fp->GetChild(type))
+		{
+			Load(pc, true);
+		}
+	}
 	
-	Log("Entity::Load: Finished.");
-	Init();
+	if(init)
+	{
+		Init();
+	}
 }
 
 Component *Entity::AddComponent(string type, Properties *prop)

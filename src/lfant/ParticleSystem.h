@@ -86,6 +86,18 @@ public:
 		Billboard
 	};
 
+	struct ParticleVertex
+	{
+		vec3 position;
+		rgba color;
+		float size;
+
+		ParticleVertex(vec3 pos, vec4 col, float size) :
+			position(pos), color(col), size(size)
+		{
+		}
+	};
+
 	ParticleSystem();
 	virtual ~ParticleSystem();
 
@@ -138,7 +150,8 @@ public:
 	DisplayType displayType;
 	EmitterType emitterType = EmitterType::Cone;
 
-	deque<ptr<Particle>> particles;
+	deque<Particle> particles;
+//	Buffer<Particle> particles;
 	deque<Burst> bursts;
 	deque<Particle*> recycle;
 
@@ -147,19 +160,15 @@ public:
 protected:
 
 	void UpdatePosition(Particle* pt);
+	void OnSetPosition();
 
 	float toEmit = 0.0f;
 
 private:
-//	vector<vec3> points;
-//	vector<Vertex> vertices;
-//	vector<uint32_t> indices;
-//	Buffer<vec3> vertexBuffer;
-	Buffer<vec4> colorBuffer;
-	Buffer<float> sizeBuffer;
-
-//	uint32_t vertexBuffer;
-//	uint32_t indexBuffer;
+//	Buffer<vec4> colorBuffer;
+//	Buffer<float> sizeBuffer;
+	Buffer<ParticleVertex> particleBuffer;
+	bool rewriteBuffer = false;
 };
 
 /** @} */

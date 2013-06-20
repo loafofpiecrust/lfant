@@ -61,23 +61,19 @@ public:
 	void Activate(bool reset = false);
 	void Deactivate();
 	void SetVelocity(vec3 vel);
-	void SetSizeRange(float start, float end)
-	{
-		size.min = start;
-		size.max = end;
-	}
 	void StartLife(float life);
 	void InterpParams();
-	void SetParamDiffs();
+	void SetParamDiffs(vec3 vel, vec4 col, float siz);
 	void ApplyForce(vec3 force);
 	void ApplyForce(float speed, vec3 dir);
 
 	/// Converts the velocity vector into a speed float.
 	float GetSpeed();
 
-	Range<float> size;
-	Range<vec3> velocity;
-	Range<vec4> color;
+	vec3 position = vec3(0);
+	vec4 color;
+	float size;
+	vec3 velocity;
 
 	float sizeDiff;
 	vec3 velocityDiff;
@@ -87,7 +83,6 @@ public:
 	float lifetime = 1.0f;
 	bool active = true;
 
-	vec3 position = vec3(0);
 //	float size = 1;
 
 //	ParticleSystem* system;

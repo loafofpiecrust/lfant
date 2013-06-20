@@ -93,11 +93,12 @@ void Object::Bind()
 
 void Object::LoadFile(string path)
 {
+	Log(Type(this), " loading file '", path, "'.");
 	ptr<Properties> prop {new Properties};
 	prop->LoadFile(path);
-	string type = RemoveScoping(Type(this));
-	to_lower(type);
-	if(Properties* pc = prop->GetChild(type))
+//	string type = RemoveScoping(Type(this));
+//	to_lower(type);
+	if(Properties* pc = prop->GetFirstChild())
 	{
 		Load(pc);
 	}

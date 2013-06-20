@@ -128,6 +128,10 @@ public:
 	/// The OpenGL version to use, 0 is Primary, 1 is Secondary (eg. {4, 3} = OpenGL 4.3).
 	Range<int> version = { 3, 2 };
 
+	float gamma = 2.2f;
+
+	int motionBlur = 5;
+
 protected:
 
 

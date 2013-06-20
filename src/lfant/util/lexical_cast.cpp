@@ -424,7 +424,7 @@ template<>
 Range<int> lexical_cast<Range<int>, string>(const string& src)
 {
 	Range<int> result(0);
-	deque<string> str = lfant::Split(src, " -()");
+	deque<string> str = lfant::Split(src, " .-()");
 	result.min = lexical_cast<int>(str[0]);
 	if(str.size() > 1)
 	{

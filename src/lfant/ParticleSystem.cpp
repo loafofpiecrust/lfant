@@ -49,7 +49,6 @@ ParticleSystem::~ParticleSystem()
 
 void ParticleSystem::Init()
 {
-	material->texture->LoadFile("textures/Default.png");
 	BeginRender();
 }
 
@@ -73,28 +72,31 @@ void ParticleSystem::Update()
 
 	for(uint i = 0; i < particles.size(); ++i)
 	{
-		if(!particles[i])
+		if(!&particles[i])
 		{
 			particles.erase(particles.begin()+i);
 			--i;
 			continue;
 		}
-		if(particles[i]->active)
+		if(particles[i].active)
 		{
-			particles[i]->Update();
+			particles[i].Update();
 
-			if(particles[i]->lifetime <= 0.0f)
+			if(particles[i].lifetime <= 0.0f)
 			{
-				Recycle(particles[i]);
+				Recycle(&particles[i]);
 			}
 
-			vertexBuffer[i] = particles[i]->position;
-			colorBuffer[i] = particles[i]->GetColor();
-			sizeBuffer[i] = particles[i]->GetSize();
+		//	vertexBuffer[i] = particles[i]->position;
+		//	colorBuffer[i] = particles[i]->GetColor();
+		//	sizeBuffer[i] = particles[i]->GetSize();
+			particleBuffer[i].position = particles[i].position;
+			particleBuffer[i].color = particles[i].GetColor()*255;
+			particleBuffer[i].size = particles[i].GetSize();
 
 			if(gravity != vec3(0))
 			{
-				particles[i]->ApplyForce(gravity);
+				particles[i].ApplyForce(gravity);
 			}
 		}
 	}
@@ -130,11 +132,11 @@ void ParticleSystem::UpdatePosition(Particle* pt)
 {
 	for(uint i = 0; i < particles.size(); ++i)
 	{
-		if(particles[i] == pt)
+	//	if(particles[i] == pt)
 		{
-			vertexBuffer[i] = pt->position;
-			colorBuffer[i] = pt->color.start;
-			sizeBuffer[i] = pt->GetSize();
+		//	vertexBuffer[i] = pt->position;
+		//	colorBuffer[i] = pt->color.start;
+		//	sizeBuffer[i] = pt->GetSize();
 		}
 	}
 }
@@ -226,18 +228,21 @@ void ParticleSystem::Emit(Particle* pt)
 				return;
 			}
 		//	Log("Creating new particle");
-			particles.push_back(pt = new Particle);
-			vertexBuffer.push_back(vec3(0));
-			colorBuffer.push_back(vec4(1));
-			sizeBuffer.push_back(1);
+		//	particles.push_back(pt = new Particle);
+			particles.emplace_back();
+			pt = &particles[particles.size()-1];
+		//	vertexBuffer.push_back(vec3(0));
+		//	colorBuffer.push_back(vec4(1));
+		//	sizeBuffer.push_back(1);
+			particleBuffer.push_back({vec3(0), vec4(1), 1.0f});
+			rewriteBuffer = true;
 		}
 	}
 
 //	pt->system = this;
-	pt->SetSizeRange(random::Range(size.start.min, size.start.max), random::Range(size.end.min, size.end.max));
+	pt->size = random::Range(size.start.min, size.start.max);
 //	pt->SetGravity(gravity);
-	pt->color.start = random::Range(color.start.min, color.start.max);
-	pt->color.end = random::Range(color.end.min, color.end.max);
+	pt->color = random::Range(color.start.min, color.start.max);
 	pt->lifetime = random::Range(lifetime.start, lifetime.end);
 	pt->Activate(true);
 	GenerateVelocity(pt);
@@ -321,8 +326,8 @@ void ParticleSystem::GenerateVelocity(Particle* pt)
 //	pt->velRange.start = random::Range(velocity.start.min, velocity.start.max);
 //	pt->velRange.end = random::Range(velocity.end.min, velocity.end.max);
 
-	pt->velocity.start = dir * random::Range(velocity.start.min, velocity.start.max);
-	pt->velocity.end = dir * random::Range(velocity.end.min, velocity.end.max);
+	pt->velocity = dir * random::Range(velocity.start.min, velocity.start.max);
+	pt->SetParamDiffs(dir * random::Range(velocity.end.min, velocity.end.max), random::Range(color.end.min, color.end.max), random::Range(size.end.min, size.end.max));
 }
 
 uint32_t ParticleSystem::GetCount()
@@ -338,12 +343,14 @@ void ParticleSystem::BeginRender()
 		EndRender();
 	}
 
+	material->texture->LoadFile("textures/Particle.png");
+
 	glGenVertexArrays(1, &vertexArray);
 	glBindVertexArray(vertexArray);
 
 //	if(!material->shader->GetId())
 	{
-		material->shader->LoadFile("shaders/particles/Diffuse.vert", "shaders/particles/Diffuse.frag"/*, "shaders/particles/Diffuse.geom"*/);
+		material->shader->LoadFile("shaders/particles/Diffuse.vert", "shaders/particles/Diffuse.frag", "shaders/particles/Diffuse.geom");
 	}
 
 //	if(!material->texture->GetId())
@@ -355,18 +362,20 @@ void ParticleSystem::BeginRender()
 	if(material->shader->GetId())
 	{
 		Log("Adding uniforms..");
-		material->shader->AddUniform("MVP");
+		material->shader->AddUniform("mvp");
+		material->shader->AddUniform("view");
+		material->shader->AddUniform("projection");
 		material->shader->AddUniform("viewportWidth");
 		material->shader->AddUniform("cameraPosition");
 		material->shader->AddUniform("systemPosition");
 		material->shader->AddUniform("textureSampler");
 	}
 
-	CreateBuffer(vertexBuffer, GL_ARRAY_BUFFER, GL_DYNAMIC_DRAW);
-	CreateBuffer(colorBuffer, GL_ARRAY_BUFFER, GL_DYNAMIC_DRAW);
-	CreateBuffer(sizeBuffer, GL_ARRAY_BUFFER, GL_DYNAMIC_DRAW);
-//	Mesh::CreateBuffer(normalBuffer, GL_ARRAY_BUFFER);
-//	Mesh::CreateBuffer(indexBuffer, GL_ELEMENT_ARRAY_BUFFER);
+//	CreateBuffer(vertexBuffer, GL_ARRAY_BUFFER, GL_DYNAMIC_DRAW);
+//	CreateBuffer(colorBuffer, GL_ARRAY_BUFFER, GL_DYNAMIC_DRAW);
+//	CreateBuffer(sizeBuffer, GL_ARRAY_BUFFER, GL_DYNAMIC_DRAW);
+	CreateBuffer(particleBuffer, GL_ARRAY_BUFFER, GL_STREAM_DRAW);
+//	CreateBuffer(particles, GL_ARRAY_BUFFER, GL_STREAM_DRAW);
 
 	loaded = true;
 }
@@ -377,19 +386,22 @@ void ParticleSystem::Render()
 	{
 		return;
 	}
+//	glDisable(GL_DEPTH_TEST);
 
-	glEnable(GL_POINT_SPRITE);
-	glEnable(GL_PROGRAM_POINT_SIZE);
+//	glEnable(GL_POINT_SPRITE);
+//	glEnable(GL_PROGRAM_POINT_SIZE);
 //	glEnable(GL_GEOMETRY_PROGRAM_POINT_SIZE);
 
 	glBindVertexArray(vertexArray);
 
 	glUseProgram(material->shader->GetId());
 
-	mat4 mvp = game->scene->mainCamera->GetProjection() * game->scene->mainCamera->GetView() * owner->transform->GetMatrix();
-	material->shader->SetUniform("MVP", mvp);
+//	mat4 mvp = game->scene->mainCamera->GetProjection() * game->scene->mainCamera->GetView() /* owner->transform->GetMatrix()*/;
+//	material->shader->SetUniform("mvp", mvp);
+	material->shader->SetUniform("projection", game->scene->mainCamera->GetProjection());
+	material->shader->SetUniform("view", game->scene->mainCamera->GetView());
 	material->shader->SetUniform("cameraPosition", game->scene->mainCamera->owner->transform->GetWorldPosition());
-	material->shader->SetUniform("viewportWidth", game->renderer->GetResolution().x);
+//	material->shader->SetUniform("viewportWidth", game->renderer->GetResolution().x);
 
 	if(inheritTransform)
 	{
@@ -401,26 +413,47 @@ void ParticleSystem::Render()
 		material->shader->SetUniform("systemPosition", vec3(0));
 	}
 
-//	material->texture->Bind();
-//	glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
-//	material->shader->SetUniform("textureSampler", material->texture);
+	material->texture->Bind();
+	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	material->shader->SetUniform("textureSampler", material->texture);
+
+	glBindBuffer(GL_ARRAY_BUFFER, particleBuffer);
+	if(rewriteBuffer)
+	{
+	//	Log("BufferData called.");
+		glBufferData(GL_ARRAY_BUFFER, sizeof(ParticleVertex) * particleBuffer.size(), &particleBuffer[0], GL_STREAM_DRAW);
+	//	glBufferData(GL_ARRAY_BUFFER, sizeof(Particle) * particles.size(), &particles[0], GL_STREAM_DRAW);
+		rewriteBuffer = false;
+	}
+	else
+	{
+	//	Log("BufferSubData called.");
+		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(ParticleVertex) * particleBuffer.size(), &particleBuffer[0]);
+	//	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Particle) * particles.size(), &particles[0]);
+	}
 
 	glEnableVertexAttribArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vec3) * vertexBuffer.size(), &vertexBuffer[0], GL_DYNAMIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+//	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+//	glBufferData(GL_ARRAY_BUFFER, sizeof(vec3) * vertexBuffer.size(), &vertexBuffer[0], GL_DYNAMIC_DRAW);
+//	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, false, sizeof(ParticleVertex), (void*)offsetof(ParticleVertex, position));
+//	glVertexAttribPointer(0, 3, GL_FLOAT, false, sizeof(Particle), (void*)offsetof(Particle, position));
 	
 	glEnableVertexAttribArray(1);
-	glBindBuffer(GL_ARRAY_BUFFER, colorBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vec4) * colorBuffer.size(), &colorBuffer[0], GL_DYNAMIC_DRAW);
-	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, (void*)0);
+//	glBindBuffer(GL_ARRAY_BUFFER, colorBuffer);
+//	glBufferData(GL_ARRAY_BUFFER, sizeof(vec4) * colorBuffer.size(), &colorBuffer[0], GL_DYNAMIC_DRAW);
+//	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, (void*)0);
+	glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, true, sizeof(ParticleVertex), (void*)offsetof(ParticleVertex, color));
+//	glVertexAttribPointer(1, 4, GL_FLOAT, false, sizeof(Particle), (void*)offsetof(Particle, color));
 
 	glEnableVertexAttribArray(2);
-	glBindBuffer(GL_ARRAY_BUFFER, sizeBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * sizeBuffer.size(), &sizeBuffer[0], GL_DYNAMIC_DRAW);
-	glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, 0, (void*)0);
+//	glBindBuffer(GL_ARRAY_BUFFER, sizeBuffer);
+//	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * sizeBuffer.size(), &sizeBuffer[0], GL_DYNAMIC_DRAW);
+//	glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, 0, (void*)0);
+	glVertexAttribPointer(2, 1, GL_FLOAT, false, sizeof(ParticleVertex), (void*)offsetof(ParticleVertex, size));
+//	glVertexAttribPointer(2, 1, GL_FLOAT, false, sizeof(Particle), (void*)offsetof(Particle, size));
 	
-	glDrawArrays(GL_POINTS, 0, vertexBuffer.size());
+	glDrawArrays(GL_POINTS, 0, particleBuffer.size());
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -432,8 +465,9 @@ void ParticleSystem::Render()
 
 	glUseProgram(0);
 
-	glDisable(GL_POINT_SPRITE);
-	glDisable(GL_PROGRAM_POINT_SIZE);
+//	glDisable(GL_POINT_SPRITE);
+//	glDisable(GL_PROGRAM_POINT_SIZE);
+//	glEnable(GL_DEPTH_TEST);
 }
 
 void ParticleSystem::EndRender()

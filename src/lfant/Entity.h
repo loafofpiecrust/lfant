@@ -70,7 +70,7 @@ public:
 
 	void Bind();
 	void Save(Properties* prop);
-	void Load(Properties* prop);
+	void Load(Properties* prop, bool init = true);
 
 	/**
 	 *	Adds a new component by instancing the given type.

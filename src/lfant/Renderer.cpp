@@ -83,6 +83,7 @@ void Renderer::Load(Properties* prop)
 	prop->Get("windowResizable", windowResizable);
 	prop->Get("windowPos", windowPos);
 	prop->Get("windowTitle", windowTitle);
+	prop->Get("motionBlur", motionBlur);
 
 	Log("Window title: '"+windowTitle+"'.");
 }
@@ -98,6 +99,7 @@ void Renderer::Save(Properties *prop)
 	prop->Set("fsaa", fsaa);
 	prop->Set("windowResizable", windowResizable);
 	prop->Set("windowTitle", windowTitle);
+	prop->Set("motionBlur", motionBlur);
 }
 
 /*******************************************************************************
@@ -134,11 +136,7 @@ void Renderer::Init()
 
 	// Enable depth test
 	glEnable(GL_DEPTH_TEST);
-
-	// Fragment depth testing
 	glDepthFunc(GL_LEQUAL);
-//	glDepthMask(GL_FALSE);
-//	glDepthRange(0.0f, 1.0f);
 
 	// Backface culling
 	glEnable(GL_CULL_FACE);
@@ -207,6 +205,9 @@ void Renderer::Init()
 	frameBuffer->hasDepth = true;
 	frameBuffer->Init();
 	Log("Shader for fbo: ", fboShader->GetId());
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 /*
 	frameBuffer->Clear();
 	glfwSwapBuffers(window);
@@ -250,6 +251,7 @@ void Renderer::Update()
 //	glEnable(GL_CULL_FACE);
 //	glEnable(GL_DEPTH_TEST);
 //	glDepthFunc(GL_LESS);
+	glEnable(GL_DEPTH_TEST);
 
 //	fboQuad->Render();
 
@@ -281,12 +283,9 @@ void Renderer::Update()
 //	thread::Sleep(1500);
 //	fboQuad->material->shader->Unbind();
 
-//	Log("Swapping buffers.");
 	glfwSwapBuffers(window);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-//	Log("Buffers swapped.");
-//	thread::Sleep(1500);
 	glfwPollEvents();
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 //	frameBuffer->Bind();
 //	glViewport(0,0,1024, 768);

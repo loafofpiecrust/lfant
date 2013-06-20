@@ -158,11 +158,12 @@ void Scene::Save(Properties* prop)
 	{
 		ent->Save(prop->AddChild());
 	}
-	Log("Saving scene took ", game->time->GetTime() - t, " nanoseconds(?)");
+	Log("Saving scene took ", game->time->GetTime() - t, " seconds");
 }
 
 void Scene::Load(Properties *prop)
 {
+	double t = game->time->GetTime();
 	currentId = 0;
 	Log("Scene::Load: Loading scene node");
 	Entity* ent = nullptr;
@@ -172,6 +173,7 @@ void Scene::Load(Properties *prop)
 		Log("Spawned the entity!");
 		ent->Load(i);
 	}
+	Log("Loading scene took ", game->time->GetTime() - t, " seconds");
 }
 
 Entity* Scene::Spawn(string name, Entity* parent)

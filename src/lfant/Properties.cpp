@@ -406,6 +406,11 @@ void Properties::SaveFile(string path)
 	SaveStream(stream);
 }
 
+Properties* Properties::GetFirstChild()
+{
+	return children[0];
+}
+
 Properties* Properties::GetChild(string type)
 {
 	to_lower(type);

@@ -44,7 +44,7 @@ public:
 	/**
 	 *	Supported light types.
 	 */
-	enum LightType
+	enum class Type : byte
 	{
 		Directional = 1,
 		Point = 2,
@@ -59,15 +59,31 @@ public:
 
 protected:
 
-	float radius;
-	float intensity;
-	/// ?
-	float innerAngle;
-	/// ?
-	float outerAngle;
+	struct Directional
+	{
+	};
 
-	rgba color;
-	LightType type;
+	struct Point
+	{
+		float range;
+	};
+
+	struct Spot
+	{
+		float range;
+		float innerAngle;
+		float outerAngle;
+	};
+
+	union
+	{
+		Directional* directional;
+		Point* point;
+		Spot* spot;
+	};
+
+	vec3 color;
+	Type type;
 
 private:
 
