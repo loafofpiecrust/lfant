@@ -56,11 +56,9 @@
 #include <lfant/FrameBuffer.h>
 #include <lfant/Transform.h>
 #include <lfant/Thread.h>
+#include <lfant/Light.h>
 
-#define OFFSET(i) ((byte*)0 + (i))
-
-namespace lfant
-{
+namespace lfant {
 
 Renderer::Renderer()
 {
@@ -108,6 +106,11 @@ void Renderer::Save(Properties *prop)
 *
 *******************************************************************************/
 
+void Renderer::OnError(uint source, uint type, uint id, uint severity, int length, const char* message, void* user)
+{
+	Log("OpenGL Error (", severity, "): ", message);
+}
+
 void Renderer::Init()
 {
 	Subsystem::Init();
@@ -132,11 +135,12 @@ void Renderer::Init()
 
 
 	// Background color
-	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
 	// Enable depth test
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LEQUAL);
+	glDepthMask(GL_TRUE);
 
 	// Backface culling
 	glEnable(GL_CULL_FACE);
@@ -154,9 +158,12 @@ void Renderer::Init()
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+//	glEnable(GL_DEBUG_OUTPUT);
+//	glDebugMessageCallback(OnError, 0);
+
 //	glEnable(GL_TEXTURE_RECTANGLE);
 
-	if(game->standAlone)
+//	if(game->standAlone)
 	{
 		glfwSwapInterval(vsync);
 
@@ -172,52 +179,24 @@ void Renderer::Init()
 		mesh->material->LoadFile("materials/Diffuse.mat");
 	}*/
 	
-	
-	fboEntity = new Entity;
-	fboEntity->id = 1;
-	fboEntity->Init();
-	fboEntity->transform->SetPosition(vec3(0.1,0.1,1));
-	fboEntity->active = false;
-//	fboEntity->transform->SetScale()
-
-	fboQuad = fboEntity->AddComponent<Mesh>();
-	fboQuad->Enable(false);
-//	fboQuad = new Mesh;
-	fboQuad->usingCamera = false;
-	fboQuad->fboQuad = true;
-//	fboQuad->Init();
-	fboShader = fboQuad->material->shader;
-	fboQuad->material->loaded = true;
-	fboShader->LoadFile("shaders/FrameBuffer.vert", "shaders/FrameBuffer.frag");
-	Log("Shader for fbo: ", fboShader->GetId());
-	fboQuad->LoadFile("meshes/quad.obj");
-	Log("Shader for fbo: ", fboShader->GetId());
-//	fboQuad->material->texture->LoadFile("textures/Default.png");
-//	fboQuad->material->texture->size = uvec2(1024,768);
-//	fboQuad->material->shader->AddUniform("matrix");
-	
 	frameBuffer = new FrameBuffer();
-	frameBuffer->AddTexture("textureSampler", fboQuad->material->texture);
-	Log("Shader for fbo: ", fboShader->GetId());
-//	fboQuad->material->texture->Init();
-//	frameBuffer->AddTexture("texThreshold");
+	frameBuffer->AddTexture("lightTex", Texture::Format::RGBA, Texture::Format::RGBA);
+	frameBuffer->AddTexture("diffuseTex", Texture::Format::RGBA, Texture::Format::RGBA);
+	frameBuffer->AddTexture("positionTex", Texture::Format::RGB32F, Texture::Format::RGB);
+	frameBuffer->AddTexture("normalTex", Texture::Format::RGB32F, Texture::Format::RGB);
+//	frameBuffer->AddTexture("specularTex", Texture::Format::RGBA, Texture::Format::RGBA);
+//	frameBuffer->AddDepthTexture("depthTex");
+
 	frameBuffer->SetRect({0,0,resolution.x,resolution.y});
 	frameBuffer->hasDepth = true;
 	frameBuffer->Init();
-	Log("Shader for fbo: ", fboShader->GetId());
+	frameBuffer->Bind();
+	frameBuffer->BeginRender();
+	frameBuffer->Unbind();
+
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-/*
-	frameBuffer->Clear();
-	glfwSwapBuffers(window);
-	thread::Sleep(1600);
-	frameBuffer->Bind();
-	glViewport(0,0,1920, 1080);
-	frameBuffer->Clear();
-	thread::Sleep(1600);
-	frameBuffer->Unbind();
-	*/
 	// Load all shaders
 	/*
 	   auto shs = game->fileSystem->GetGameFiles("shaders", "vert");
@@ -235,71 +214,47 @@ void Renderer::PreUpdate()
 {
 	frameBuffer->Bind();
 	glViewport(0,0,resolution.x,resolution.y);
-//	Log("fbo viewported.");
-	glClearColor(0.0f, 0.4f, 0.0f, 0.0f);
-//	frameBuffer->Clear();
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-//	Log("fbo cleared.");
 }
 
 void Renderer::Update()
 {
-
-//	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-//	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-//	glEnable(GL_CULL_FACE);
-//	glEnable(GL_DEPTH_TEST);
-//	glDepthFunc(GL_LESS);
-	glEnable(GL_DEPTH_TEST);
-
-//	fboQuad->Render();
-
-	// Rendering to the framebuffer
-	
-
-//	frameBuffer->Bind();
-	if(!fboDrawn)
+	if(lights.size() > 0)
 	{
-//		thread::Sleep(1000);
-//		frameBuffer->Render();
-//		Log("fbo drawn once.");
-//		thread::Sleep(1000);
-		fboDrawn = true;
+	//	frameBuffer->Unbind();
+	//	glDepthMask(GL_FALSE);
+	//	glDisable(GL_DEPTH_TEST);
+	//	glBlendEquation(GL_FUNC_ADD);
+		glBlendFunc(GL_ONE, GL_ONE);
+		for(auto& light : lights)
+		{
+			light->Render();
+		}
+	//	frameBuffer->UnbindRead();
+
+	//	glDepthMask(GL_TRUE);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	//	glEnable(GL_DEPTH_TEST);
 	}
 
-	frameBuffer->Unbind();
-//	glViewport(0,0,1024, 768);
-	glViewport(0,0,resolution.x,resolution.y);
-//	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
-//	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-//	Log("Backbuffer cleared.");
-//	thread::Sleep(1500);
-//	frameBuffer->GetTextures(fboShader);
+	glEnable(GL_DEPTH_TEST);
 
-//	fboQuad->material->shader->Bind();
-	fboQuad->Render();
-//	Log("fboQuad rendered.");
-//	thread::Sleep(1500);
-//	fboQuad->material->shader->Unbind();
+	// Rendering to the framebuffer
+
+	frameBuffer->Unbind();
+	glViewport(0,0,resolution.x,resolution.y);
+
+	frameBuffer->Render();
 
 	glfwSwapBuffers(window);
 	glfwPollEvents();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-//	frameBuffer->Bind();
-//	glViewport(0,0,1024, 768);
-
-//	fboQuad->Render();
-//	frameBuffer->Unbind();
 }
 
 void Renderer::OnDestroy()
 {
-//	fboQuad->OnDestroy();
-//	delete fboQuad;
-//	fboEntity->Destroy();
-	delete fboEntity;
+	frameBuffer->EndRender();
 	Log("Renderer::OnDestroy(): Touch");
 	glfwTerminate();
 }
@@ -444,6 +399,22 @@ void Renderer::AddShader(Shader *shader)
 void Renderer::HideMouse(bool hide)
 {
 	glfwSetInputMode(window, GLFW_CURSOR, !hide);
+}
+
+void Renderer::AddLight(Light* light)
+{
+	lights.push_back(light);
+}
+
+void Renderer::RemoveLight(Light* light)
+{
+	for(uint i = 0; i < lights.size(); ++i)
+	{
+		if(lights[i] == light)
+		{
+			lights.erase(lights.begin()+i);
+		}
+	}
 }
 
 }

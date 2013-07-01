@@ -22,8 +22,8 @@
 // External
 
 // Internal
-
-#include <lfant/Component.h>
+#include <lfant/Renderable.h>
+#include <lfant/Shader.h>
 
 namespace lfant
 {
@@ -37,53 +37,25 @@ namespace lfant
 /**
  *
  */
-class Light : public Component
+class Light : public Renderable
 {
 public:
-
-	/**
-	 *	Supported light types.
-	 */
-	enum class Type : byte
-	{
-		Directional = 1,
-		Point = 2,
-		Spot = 3
-	};
-
 	Light();
 	~Light();
 
-	virtual void Init();
-	virtual void Update();
+	void Save(Properties* prop);
+	void Load(Properties* prop);
+
+	void Init();
+	void Update();
+
+	virtual void BeginRender() {};
+	virtual void Render();
+	virtual void EndRender() {};
 
 protected:
-
-	struct Directional
-	{
-	};
-
-	struct Point
-	{
-		float range;
-	};
-
-	struct Spot
-	{
-		float range;
-		float innerAngle;
-		float outerAngle;
-	};
-
-	union
-	{
-		Directional* directional;
-		Point* point;
-		Spot* spot;
-	};
-
-	vec3 color;
-	Type type;
+	vec3 color = vec3(1);
+	ptr<Shader> shader = new Shader;
 
 private:
 

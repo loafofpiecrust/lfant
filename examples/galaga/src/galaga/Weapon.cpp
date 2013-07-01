@@ -48,6 +48,27 @@ void Weapon::Load(Properties* prop)
 {
 	Component::Load(prop);
 
+	deque<string> partNames;
+	prop->Get("parts", partNames);
+	for(auto& pname : partNames)
+	{
+		Properties* pprop = new Properties;
+		pprop->LoadFile(pname);
+
+		Part* part = nullptr;
+		if(pprop->Get<byte>("type") == (byte)Part::Type::Body)
+		{
+			part = new Body;
+		}
+		else
+		{
+			part = new Part;
+		}
+
+		part->Load(pprop);
+		AddPart(part);
+	}
+
 	prop->Get("currentAmmo", currentAmmo);
 	prop->Get("bulletSpeed", bulletSpeed);
 	prop->Get("maxAmmo", maxAmmo);
@@ -59,6 +80,8 @@ void Weapon::Load(Properties* prop)
 	prop->Get("projectilePath", projectilePath);
 	prop->Get("automatic", automatic);
 	prop->Get("direction", direction);
+
+	projectile->LoadFile(projectilePath);
 }
 
 void Weapon::Save(Properties* prop)
@@ -137,8 +160,8 @@ void Weapon::Fire(byte mode)
 			ent->SetLayer(owner->GetLayer());
 			ent->transform->SetPosition(owner->transform->GetWorldPosition());
 			ent->transform->SetRotation(owner->transform->GetWorldRotation());
-			ent->LoadFile(projectilePath);
-			vec3 final = owner->transform->GetDirection() * direction * bulletSpeed / game->time->deltaTime;
+			ent->Load(projectile);
+			vec3 final = owner->transform->GetDirection() * direction * bulletSpeed * 1000.0f;
 			Log("Weapon bullet speed firing, ", bulletSpeed, ", final accel of ", lexical_cast<string>(final));
 			ent->TriggerEvent("Accelerate", final);
 		}
@@ -191,6 +214,111 @@ void Weapon::EndReload()
 bool Weapon::CanFire()
 {
 	return lastFire >= 1/fireRate && (released || automatic);
+}
+
+
+void Weapon::Assemble(const deque<Weapon::Part*>& partList)
+{
+	parts[0]->inventory->AddItem(this);
+
+	for(auto& part : partList)
+	{
+		AddPart(part);
+	}
+
+}
+
+void Weapon::AddPart(Weapon::Part* part)
+{
+	if(part->inventory)
+	{
+		part->inventory->RemoveItem(part);
+	}
+	if(part->owner)
+	{
+		part->owner->SetParent(owner);
+	}
+
+	if(part->type == Part::Type::Body)
+	{
+		Body* body = dynamic_cast<Body*>(part);
+		automatic = body->automatic;
+		shotCost = body->shotCost;
+		projectiles = body->projectiles;
+		this->body = body;
+	}
+	else
+	{
+		parts.push_back(part);
+	}
+
+	if(part->type == Part::Type::Ammo)
+	{
+		projectilePath = part->projectilePath;
+		reloadTime += part->mass*2;
+	}
+	else
+	{
+		reloadTime += part->mass/2;
+	}
+
+	mass += part->mass;
+	maxAmmo += part->ammo;
+	fireRate += part->fireRate;
+	meleeDamage += part->meleeDamage;
+	bulletSpeed += part->bulletSpeed;
+	spread += part->spread;
+	recoil += 1/part->mass * part->bulletSpeed/100;
+}
+
+void Weapon::Disassemble()
+{
+	for(auto& p : parts)
+	{
+		if(inventory)
+		{
+			inventory->AddItem(p);
+		}
+		if(owner)
+		{
+			p->owner->SetParent(owner->parent);
+		}
+	}
+	owner->Destroy();
+}
+
+void Weapon::RemovePart(Weapon::Part* part)
+{
+	if(part->type == Part::Type::Body)
+	{
+		Disassemble();
+		return;
+	}
+
+	if(inventory)
+	{
+		inventory->AddItem(part);
+	}
+	if(owner)
+	{
+		part->owner->SetParent(owner->parent);
+	}
+
+	for(uint i = 0; i < parts.size(); ++i)
+	{
+		if(parts[i] == part)
+		{
+			parts.erase(parts.begin()+i);
+			break;
+		}
+	}
+
+	mass -= part->mass;
+	maxAmmo -= part->ammo;
+	meleeDamage -= part->meleeDamage;
+	bulletSpeed -= part->bulletSpeed;
+	spread -= part->spread;
+	recoil -= 1/part->mass * part->bulletSpeed/100;
 }
 
 }

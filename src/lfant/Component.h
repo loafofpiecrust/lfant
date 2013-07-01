@@ -93,14 +93,6 @@ public:
 protected:
 	Component();
 
-	static map<string, Component* (Entity::*)(Properties*) > componentRegistry __attribute__((init_priority(101)));
-
-	/**
-	 *	Registers a component type by string, only used by the IMPLEMENT_COMP macro.
-	 *	@param name The typename
-	 */
-	static void RegisterType(string name, Component* (Entity::*func)(Properties*));
-
 	// Loop Function Overwrites
 	virtual void Init();
 	virtual void Update();
@@ -151,6 +143,14 @@ protected:
 	}
 
 private:
+
+	static map<string, Component* (Entity::*)(Properties*) > componentRegistry __attribute__((init_priority(101)));
+
+	/**
+	 *	Registers a component type by string, only used by the IMPLEMENT_COMP macro.
+	 *	@param name The typename
+	 */
+	static void RegisterType(string name, Component* (Entity::*func)(Properties*));
 
 	/// Whether this component should Update or not.
 	bool enabled = true;

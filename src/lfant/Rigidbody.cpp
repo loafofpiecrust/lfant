@@ -96,7 +96,7 @@ void Rigidbody::Init()
 
 	ConnectEvent(SENDER(owner, SetPosition), RECEIVER(this, OnSetPos));
 	ConnectEvent(SENDER(owner, SetRotation), RECEIVER(this, OnSetRot));
-	ConnectEvent(SENDER(owner, SetCollider), RECEIVER(this, OnSetCollider));
+	ConnectEvent(SENDER(owner, SetComponentCollider), RECEIVER(this, OnSetCollider));
 	ConnectEvent(SENDER(owner, ApplyForce), RECEIVER(this, ApplyForce));
 	ConnectEvent(SENDER(owner, ApplyCentralForce), RECEIVER(this, ApplyCentralForce));
 	ConnectEvent(SENDER(owner, Accelerate), RECEIVER(this, Accelerate));

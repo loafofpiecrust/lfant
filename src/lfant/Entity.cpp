@@ -151,6 +151,7 @@ void Entity::AddComponent(Component* comp, Properties *prop)
 	}
 	comp->Init();
 	TriggerEvent("AddComponent", comp);
+	Log("Entity::AddComponent: Calling ", "SetComponent"+RemoveScoping(Type(comp)));
 	TriggerEvent("SetComponent"+RemoveScoping(Type(comp)), comp);
 }
 
@@ -248,7 +249,7 @@ void Entity::SetLayer(string layer)
 *
 *******************************************************************************/
 
-void Entity::RemoveComponent(Component* comp)
+void Entity::RemoveComponent(Component* comp, bool destroy)
 {
 	Log("About to remove comp '", comp, "'.");
 	for(uint i = 0; i < components.size(); ++i)
@@ -256,6 +257,11 @@ void Entity::RemoveComponent(Component* comp)
 		if(components[i] == comp)
 		{
 			TriggerEvent("RemoveComponent", comp);
+			TriggerEvent("SetComponent"+RemoveScoping(Type(comp)), comp);
+			if(!destroy)
+			{
+				components[i] = nullptr;
+			}
 			components.erase(components.begin()+i);
 			break;
 		}
@@ -263,7 +269,7 @@ void Entity::RemoveComponent(Component* comp)
 	Log("Removed component");
 }
 
-template<class T>
+template<typename T>
 void Entity::RemoveComponent()
 {
 	for(uint i = 0; i < components.size(); ++i)
@@ -277,6 +283,19 @@ void Entity::RemoveComponent()
 			components.erase(components.begin()+i);
 		}
 	}
+}
+
+void Entity::SetParent(Entity* ent)
+{
+	if(parent)
+	{
+		parent->RemoveChild(ent);
+	}
+	else
+	{
+		game->scene->RemoveEntity(this, false);
+	}
+	ent->AddChild(this);
 }
 
 Entity* Entity::GetChild(string name, bool recursive)

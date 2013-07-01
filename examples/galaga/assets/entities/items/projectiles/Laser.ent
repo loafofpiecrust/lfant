@@ -2,6 +2,7 @@
 entity Bullet
 {
 	lifeTime = 7
+	active = true
 
 	component Transform
 	{

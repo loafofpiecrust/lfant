@@ -139,6 +139,14 @@ public:
 
 	void LoadFile(string path);
 
+	static uint32 CreateBuffer(void* data, uint32 size, int target, int mode = 0);
+
+	template<typename T>
+	static void CreateBuffer(Buffer<T>& data, int target, int mode = 0)
+	{
+		data.id = CreateBuffer(&data[0], sizeof(T)*data.size(), target, mode);
+	}
+
 	ptr<Material> material = new Material;
 	bool usingCamera = true;
 	bool fboQuad = false;
@@ -148,16 +156,6 @@ protected:
 	virtual void BeginRender();
 	virtual void Render();
 	virtual void EndRender();
-
-	// Raw Rendering Functions not to be used outside.
-
-	static uint32 CreateBuffer(void* data, uint32 size, int target, int mode = 0);
-
-	template<typename T>
-	static void CreateBuffer(Buffer<T>& data, int target, int mode = 0)
-	{
-		data.id = CreateBuffer(&data[0], sizeof(T)*data.size(), target, mode);
-	}
 
 	string file = "";
 

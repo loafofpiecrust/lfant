@@ -244,7 +244,7 @@ public:
 	}
 
 	template<typename T>
-	void ConnectEvent(Object* sender, string name, T& var)
+	void ConnectEvent(Object* sender, string name, T* var)
 	{
 		erase_all(name, " ");
 		name = Type(sender) + "::" + name + "(" + Type<T>() + ")";
@@ -256,12 +256,12 @@ public:
 				con = dynamic_cast<EventVar<T>*>(event.get());
 				if(con)
 				{
-					con->var = &var;
+					con->var = var;
 					return;
 				}
 			}
 		}
-		con = new EventVar<T>(name, &var);
+		con = new EventVar<T>(name, var);
 		sender->events.push_front(con);
 
 	}
@@ -297,13 +297,13 @@ public:
 				if(con)
 				{
 					con->sig(arg);
-					continue;
+				//	continue;
 				}
 				EventVar<P1>* conv = dynamic_cast<EventVar<P1>*>(event.get());
 				if(conv)
 				{
 					*conv->var = arg;
-					continue;
+				//	continue;
 				}
 			}
 		}

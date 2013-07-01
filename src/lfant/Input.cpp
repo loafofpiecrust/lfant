@@ -144,10 +144,17 @@ Key_Initializer::Key_Initializer()
 	_key["lsuper"] = GLFW_KEY_LEFT_SUPER;
 	_key["rsuper"] = GLFW_KEY_RIGHT_SUPER;
 	_key["numenter"] = GLFW_KEY_KP_ENTER;
-	_key["mouseleft"] = GLFW_MOUSE_BUTTON_LEFT;
-	_key["mouseright"] = GLFW_MOUSE_BUTTON_RIGHT;
-	_key["mousemiddle"] = GLFW_MOUSE_BUTTON_MIDDLE;
+	_key["mouseleft"] = 400+GLFW_MOUSE_BUTTON_LEFT;
+	_key["mouseright"] = 400+GLFW_MOUSE_BUTTON_RIGHT;
+	_key["mousemiddle"] = 400+GLFW_MOUSE_BUTTON_MIDDLE;
 
+	_key["joy1"] = 500;
+	_key["joy2"] = 501;
+	_key["joy3"] = 502;
+	_key["joy4"] = 503;
+	_key["joy5"] = 504;
+	_key["joy6"] = 505;
+	_key["joy7"] = 506;
 }
 
 Input::Input() :
@@ -345,12 +352,40 @@ void Input::OnMouseMove(GLFWwindow* win, double x, double y)
 void Input::OnMouseButton(GLFWwindow* win, int btn, int action, int mods)
 {
 	game->input->TriggerEvent("MouseButton", (uint16_t)btn, action);
-//	OnKeyPress(btn, mode);
+	OnKeyPress(win, 400+btn, 0, action, mods);
 }
 
 void Input::OnCharPress(GLFWwindow* win, uint32_t key)
 {
 	game->input->TriggerEvent("CharPress", (char)key);
+}
+
+void Input::GetJoystickAxes()
+{
+//	float* values = nullptr;
+	int axisCount = 0;
+	int joyCount = 0;
+	for(uint i = 0; i < 16; ++i)
+	{
+		if(glfwJoystickPresent(i))
+		{
+			++joyCount;
+		}
+	}
+
+	if(joysticks.size() != joyCount)
+	{
+		joysticks.resize(joyCount);
+	}
+	for(uint i = 0; i < joyCount; ++i)
+	{
+		joysticks[i].values = glfwGetJoystickAxes(i, &axisCount);
+		joysticks[i].count = axisCount;
+		for(uint k = 0; k < axisCount; ++k)
+		{
+			Log("Joystick value ", k, " = ", joysticks[i].values[k]);
+		}
+	}
 }
 
 /*******************************************************************************

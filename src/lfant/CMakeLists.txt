@@ -62,6 +62,8 @@ target_link_libraries(${PROJECT_NAME}
 	angelscript
 	rt
 	jpeg
+	OpenCL
+	clcc
 #	gameswf
 #	devil
 #	jsonspirit

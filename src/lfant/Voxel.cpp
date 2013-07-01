@@ -27,6 +27,7 @@
 #include <lfant/Transform.h>
 
 // external
+#include <GL/glew.h>
 
 namespace lfant {
 

@@ -71,13 +71,17 @@ void Scene::OnDestroy()
 //	entities.clear();
 }
 
-void Scene::RemoveEntity(Entity* ent)
+void Scene::RemoveEntity(Entity* ent, bool destroy)
 {
 	for(uint i = 0; i < entities.size(); ++i)
 	{
 		if(entities[i] == ent)
 		{
 			Log("Scene::RemoveEntity: Touch.");
+			if(!destroy)
+			{
+				entities[i] = nullptr;
+			}
 			entities.erase(entities.begin()+i);
 			return;
 		}

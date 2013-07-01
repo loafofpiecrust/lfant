@@ -2,7 +2,7 @@
 *
 *	LFANT Source
 *	Copyright (C) 2012-2013 by LazyFox Studios
-*	Created: 2012-11-01 by Taylor Snead
+*	Created: 2013-06-22 by Taylor Snead
 *
 *	Licensed under the Apache License, Version 2.0 (the "License");
 *	you may not use this file except in compliance with the License.
@@ -18,62 +18,50 @@
 *
 ******************************************************************************/
 #pragma once
-
 #include <lfant/stdafx.h>
+
+// Internal
+#include <lfant/Light.h>
+#include <lfant/Mesh.h>
 
 // External
 
-// Internal
+namespace lfant {
 
-#include <lfant/Component.h>
-
-class btCollisionShape;
-
-namespace lfant
+class PointLight : public Light
 {
-class Rigidbody;
-
-/** @addtogroup Game
- *	 @{
- */
-/** @addtogroup Physics
- *	 @{
- */
-
-class Collider : public Component
-{
-	friend class Rigidbody;
+	DECLARE_COMP(PointLight)
 public:
-	bool trigger;
-	//SurfaceMaterial* material;
-	vec3 center;
-
-protected:
-	Collider()
-	{
-	}
-	virtual ~Collider()
-	{
-	}
+	PointLight();
+	~PointLight();
 
 	void Save(Properties* prop);
 	void Load(Properties* prop);
 
-	virtual void Init();
-	virtual void OnSetScale(vec3 scale);
+	void Init();
+	void PostUpdate();
 
-	virtual btCollisionShape* GetShape() = 0;
+	void BeginRender();
+	void Render();
+	void EndRender();
 
-	virtual vec3 GetSize() { return size; }
-	virtual void SetSize(vec3 size) { this->size = size; }
+	void LoadFile(string path);
 
-	Rigidbody* rigidbody;
-	vec3 size = vec3(1);
+protected:
+	float ambientIntensity = 1.0f;
+	float diffuseIntensity = 1.0f;
+	float attenConst = 1.0f;
+	float attenLinear = 1.0f;
+	float attenExp = 1.0f;
+	float specularPower = 1.0f;
+	float specularIntensity = 1.0f;
+	float radius = 1.0f;
+
+	Buffer<vec3> posBuffer;
+	Buffer<vec2> uvBuffer;
+	Buffer<uint32_t> indexBuffer;
 
 private:
-
 };
 
-/** @} */
-/** @} */
 }

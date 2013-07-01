@@ -41,6 +41,7 @@ class ParticleSystem;
 class Material;
 class FrameBuffer;
 class Entity;
+class Light;
 
 /**	@addtogroup Game
  *	@{
@@ -59,21 +60,29 @@ class Entity;
 class Renderer : public Subsystem
 {
 	friend class Game;
+	friend class Light;
 public:
-
 	Renderer();
-	virtual ~Renderer();
+	~Renderer();
 
 	void Load(Properties *prop);
 	void Save(Properties *prop);
+
+	void Init();
+	void PreUpdate();
+	void Update();
+	void OnDestroy();
 
 	/**
 	 *	Opens a new window, using member settings.
 	 *	@param close Whether or not to close the current window. Leave at true unless you really know what you're doing.
 	 */
 	bool OpenWindow();
+
+	// Static callbacks
 	static void OnCloseWindow(GLFWwindow* win);
 	static void OnSetResolution(GLFWwindow* win, int x, int y);
+	static void OnError(uint source, uint type, uint id, uint severity, int length, const char* message, void* user);
 
 	/// Sets the version property
 	void SetVersion(byte major, byte minor);
@@ -91,13 +100,7 @@ public:
 	 */
 	void HideMouse(bool hide = true);
 
-	virtual void Init();
-	virtual void PreUpdate();
-	virtual void Update();
-	virtual void OnDestroy();
-
 	void AddLight(Light* light);
-	void RenderLight(Light* light);
 	void RemoveLight(Light* light);
 
 	void IndexArray(vector<vec3>& arr, vector<uint32_t>& idx);
@@ -132,20 +135,20 @@ public:
 
 	int motionBlur = 5;
 
-protected:
+	ptr<FrameBuffer> frameBuffer;
+	ptr<FrameBuffer> lightBuffer;
 
+protected:
 
 	/// Whether or not to hide the mouse cursor.
 	bool hideMouse = false;
 	bool windowResizable = false;
 
-	Entity* fboEntity;
 	deque< ptr<Shader> > shaders;
-	Shader* fboShader;
-	Mesh* fboQuad;
-	FrameBuffer* frameBuffer;
 
 	GLFWwindow* window;
+
+	deque<Light*> lights;
 
 public:
 

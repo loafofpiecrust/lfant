@@ -123,28 +123,28 @@ bool CheckType(T1 p1)
 template<typename RT = vec2, typename IT>
 RT vec2_cast(IT v)
 {
-	RT vv(v[0], v[1]);
+	RT vv {v[0], v[1]};
 	return vv;
 }
 
 template<typename RT = vec3, typename IT>
 RT vec3_cast(IT v)
 {
-	RT vv(v[0], v[1], v[2]);
+	RT vv {v[0], v[1], v[2]};
 	return vv;
 }
 
 template<typename RT = vec4, typename IT>
 RT vec4_cast(IT v)
 {
-	RT vv(v[0], v[1], v[2], v[3]);
+	RT vv = {v[0], v[1], v[2], v[3]};
 	return vv;
 }
 
 template<typename RT = quat, typename IT>
 RT quat_cast(IT q)
 {
-	RT qq(q[0], q[1], q[2], q[3]);
+	RT qq {q[0], q[1], q[2], q[3]};
 	return qq;
 }
 

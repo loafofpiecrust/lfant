@@ -192,6 +192,12 @@ class Input : public Subsystem
 		}
 	};
 
+	struct Joystick
+	{
+		const float* values;
+		int count;
+	};
+
 public:
 	Input();
 	~Input();
@@ -224,11 +230,14 @@ public:
 	void SetMousePos(ivec2 pos);
 	void SetMousePos(int32 x, int32 y);
 
+	void GetJoystickAxes();
+
 	bool lockMouse;
 	float mouseSpeed;
 
 protected:
 	deque<Axis> axes;
+	deque<Joystick> joysticks;
 
 	/// The string of input this frame.
 	string inputString;

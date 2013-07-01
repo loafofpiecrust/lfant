@@ -125,7 +125,7 @@ protected:
 	 *	just before destruction.
 	 *	@param name Name of the Entity to remove.
 	 */
-	void RemoveEntity(Entity* ent);
+	void RemoveEntity(Entity* ent, bool destroy = true);
 
 	uint32_t GenerateEntityId();
 

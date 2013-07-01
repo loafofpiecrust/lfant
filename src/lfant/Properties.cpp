@@ -408,7 +408,11 @@ void Properties::SaveFile(string path)
 
 Properties* Properties::GetFirstChild()
 {
-	return children[0];
+	if(children.size() > 0)
+	{
+		return children[0];
+	}
+	return nullptr;
 }
 
 Properties* Properties::GetChild(string type)

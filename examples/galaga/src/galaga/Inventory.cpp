@@ -191,12 +191,19 @@ void Item::Load(Properties* prop)
 
 void Item::Init()
 {
+	Component::Init();
 	Inventory* inv = nullptr;
 	if(owner->parent && (inv = owner->parent->GetComponent<Inventory>()))
 	{
 		Log("Adding item to parent inventory");
 		inv->AddItem(this);
 	}
+}
+
+void Item::OnDestroy()
+{
+	Component::OnDestroy();
+	inventory->RemoveItem(this);
 }
 
 void Item::Equip(bool val)

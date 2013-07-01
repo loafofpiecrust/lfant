@@ -50,6 +50,7 @@ public:
 	void Load(Properties* prop);
 
 	void Init();
+	void OnDestroy();
 
 	void Use(byte mode);
 

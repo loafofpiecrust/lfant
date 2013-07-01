@@ -98,8 +98,10 @@ void Object::LoadFile(string path)
 	prop->LoadFile(path);
 //	string type = RemoveScoping(Type(this));
 //	to_lower(type);
+	Log("Checking for first child");
 	if(Properties* pc = prop->GetFirstChild())
 	{
+		Log("Loading first child");
 		Load(pc);
 	}
 }

@@ -1,44 +1,23 @@
 scene Scene
 {
-	entity Player
+	entity player
 	{
 		active = true
 		id = 1
-		layer = Player
+		layer = Entities
 		lifetime = 0
-		tags = {  }
+		tags = { Player, MainCamera }
 		component Transform
 		{
 			enabled = true
-			position = (2.76372218,0,-0.558429003)
-			rotation = (0,0,0)
+			position = (-0.130794644,0.999997258,-0.193614677)
+			rotation = (359.999207,302.199615,0)
 			scale = (1,1,1)
 		}
-		component Mesh
+		component Player
 		{
+			bulletSpeed = 5
 			enabled = true
-			path = meshes/plane.obj
-			material 
-			{
-				texture 
-				{
-					anisoLevel = 
-					path = /home/taylorsnead/lazyfox/lfant/examples/galaga/bin64/linux/../../assets/textures/StarShip.png
-				}
-				 
-				{
-					fragment = shaders/simple/Diffuse.frag
-					geometry = 
-					vertex = shaders/simple/Diffuse.vert
-				}
-			}
-		}
-		component Movement
-		{
-			enabled = true
-			jumpHeight = 2
-			movementSpeed = 2.5
-			usePhysics = false
 		}
 		component BoxCollider
 		{
@@ -48,20 +27,22 @@ scene Scene
 		component Rigidbody
 		{
 			enabled = true
-			mass = 1
-			maxSpeed = 0
-			trigger = true
-			velocity = (0,0,0)
+			mass = 45
+			maxSpeed = 20
+			trigger = false
+			velocity = (0.196921915,2.1904707e-06,0.127724811)
 		}
-		component Player
+		component Movement
 		{
-			bulletSpeed = 5
 			enabled = true
+			jumpHeight = 5
+			movementSpeed = 15
+			usePhysics = true
 		}
-		entity Bay
+		entity Main
 		{
 			active = true
-			id = 3
+			id = 2
 			layer = Main
 			lifetime = 0
 			tags = {  }
@@ -69,70 +50,36 @@ scene Scene
 			{
 				enabled = true
 				position = (0,0,0)
-				rotation = (0,0,0)
+				rotation = (16.618782,0,0)
 				scale = (1,1,1)
 			}
-			component Inventory
+			component Camera
 			{
+				aspectRatio = 1.77777779
 				enabled = true
-				equippedItem = 0
-				itemLimit = 0
-				mass = 8
-				massLimit = 0
+				fov = 45
+				viewRange = 0.00999999978-1000
 			}
-			entity Laser
+			component MouseLook
 			{
-				active = true
-				id = 2
-				layer = Main
-				lifetime = 0
-				tags = {  }
-				component Transform
-				{
-					enabled = true
-					position = (-0.899999976,0,0.5)
-					rotation = (0,0,0)
-					scale = (1,1,1)
-				}
-				component Item
-				{
-					enabled = true
-					equipped = true
-					equippedPosition = (-0.899999976,0,0.5)
-					initialPosition = (0,0,0)
-					mass = 8
-				}
-				component Weapon
-				{
-					automatic = false
-					bulletSpeed = 3
-					currentAmmo = 14
-					direction = (1,1,1)
-					enabled = true
-					fireRate = 0.200000003
-					maxAmmo = 25
-					meleeDamage = 10
-					projectilePath = entities/items/projectiles/Laser.ent
-					projectiles = 1
-					reloadTime = 2
-					shotCost = 1
-				}
+				enabled = false
+				lookSpeed = 85
 			}
 		}
 	}
-	entity Blamo
+	entity BlasterMinor
 	{
 		active = true
-		id = 4
-		layer = Enemy
+		id = 3
+		layer = Entities
 		lifetime = 0
-		tags = {  }
+		tags = { Entity, Enemy }
 		component Transform
 		{
 			enabled = true
-			position = (0,0,7)
-			rotation = (0,180,0)
-			scale = (1,1,1)
+			position = (0,0,0)
+			rotation = (359.999207,0.00680050673,0)
+			scale = (50,0,50)
 		}
 		component Mesh
 		{
@@ -143,7 +90,7 @@ scene Scene
 				texture 
 				{
 					anisoLevel = 
-					path = /home/taylorsnead/lazyfox/lfant/examples/galaga/bin64/linux/../../assets/textures/StarShip.png
+					path = /home/taylorsnead/lazyfox/lfant/examples/galaga/bin64/linux/../../assets/textures/Default.png
 				}
 				 
 				{
@@ -153,12 +100,62 @@ scene Scene
 				}
 			}
 		}
-		component Movement
+		component BoxCollider
 		{
 			enabled = true
-			jumpHeight = 2
-			movementSpeed = 2.5
-			usePhysics = true
+			size = (1,1,1)
+		}
+		component Rigidbody
+		{
+			enabled = true
+			mass = 0
+			maxSpeed = 0
+			trigger = false
+			velocity = (0,0,0)
+		}
+		component Player
+		{
+			bulletSpeed = 5
+			enabled = true
+		}
+	}
+	entity StarShip
+	{
+		active = true
+		id = 4
+		layer = Entities
+		lifetime = 0
+		tags = { Entity, Player }
+		component Transform
+		{
+			enabled = true
+			position = (2.47953057,1.00001502,1.08937371)
+			rotation = (359.999207,0.00680050673,0)
+			scale = (1,1,1)
+		}
+		component Mesh
+		{
+			enabled = true
+			path = meshes/suzanne.obj
+			material 
+			{
+				texture 
+				{
+					anisoLevel = 
+					path = /home/taylorsnead/lazyfox/lfant/examples/galaga/bin64/linux/../../assets/textures/Default.png
+				}
+				 
+				{
+					fragment = shaders/simple/Diffuse.frag
+					geometry = 
+					vertex = shaders/simple/Diffuse.vert
+				}
+			}
+		}
+		component Player
+		{
+			bulletSpeed = 5
+			enabled = true
 		}
 		component BoxCollider
 		{
@@ -168,13 +165,13 @@ scene Scene
 		component Rigidbody
 		{
 			enabled = true
-			mass = 1
+			mass = 10
 			maxSpeed = 0
-			trigger = true
-			velocity = (0,0,0)
+			trigger = false
+			velocity = (-1.04113963e-06,2.5331974e-07,-0.00024632772)
 		}
 	}
-	entity Cam
+	entity Lighty
 	{
 		active = true
 		id = 5
@@ -184,587 +181,22 @@ scene Scene
 		component Transform
 		{
 			enabled = true
-			position = (2.76372123,15,-0.558428824)
-			rotation = (90,0,0)
+			position = (0,0,0)
+			rotation = (0,0,0)
 			scale = (1,1,1)
 		}
-		component Camera
+		component PointLight
 		{
-			aspectRatio = 1.77777779
+			ambientIntensity = 1
+			attenConst = 1
+			attenExp = 1
+			attenLinear = 1
+			color = (0,1,1)
+			diffuseIntensity = 1
 			enabled = true
-			fov = 45
-			viewRange = 0.00999999978-1000
-		}
-		component FollowEntity
-		{
-			damping = 1.25
-			enabled = true
-			entity = 1
-			speed = 1
-			x = true
-			y = false
-			z = true
-		}
-	}
-	entity Bullet
-	{
-		active = true
-		id = 6
-		layer = Player
-		lifetime = 0
-		tags = {  }
-		component Transform
-		{
-			enabled = true
-			position = (-0.899999976,0,9744.68848)
-			rotation = (0,0,0)
-			scale = (0.219999999,0.699999988,0.699999988)
-		}
-		component Rigidbody
-		{
-			enabled = true
-			mass = 1
-			maxSpeed = 0
-			trigger = true
-			velocity = (0,0,53.90028)
-		}
-		component BoxCollider
-		{
-			enabled = true
-			size = (1,1,1)
-		}
-		component Projectile
-		{
-			enabled = true
-		}
-		component Mesh
-		{
-			enabled = true
-			path = meshes/plane.obj
-			material 
-			{
-				texture 
-				{
-					anisoLevel = 
-					path = /home/taylorsnead/lazyfox/lfant/examples/galaga/bin64/linux/../../assets/textures/Rocket.png
-				}
-				 
-				{
-					fragment = shaders/simple/Diffuse.frag
-					geometry = 
-					vertex = shaders/simple/Diffuse.vert
-				}
-			}
-		}
-	}
-	entity Bullet
-	{
-		active = true
-		id = 7
-		layer = Player
-		lifetime = 0
-		tags = {  }
-		component Transform
-		{
-			enabled = true
-			position = (-0.899999976,0,-0.0584290028)
-			rotation = (0,0,0)
-			scale = (0.219999999,0.699999988,0.699999988)
-		}
-		component Rigidbody
-		{
-			enabled = true
-			mass = 1
-			maxSpeed = 0
-			trigger = true
-			velocity = (0,0,0)
-		}
-		component BoxCollider
-		{
-			enabled = true
-			size = (1,1,1)
-		}
-		component Projectile
-		{
-			enabled = true
-		}
-		component Mesh
-		{
-			enabled = true
-			path = meshes/plane.obj
-			material 
-			{
-				texture 
-				{
-					anisoLevel = 
-					path = /home/taylorsnead/lazyfox/lfant/examples/galaga/bin64/linux/../../assets/textures/Rocket.png
-				}
-				 
-				{
-					fragment = shaders/simple/Diffuse.frag
-					geometry = 
-					vertex = shaders/simple/Diffuse.vert
-				}
-			}
-		}
-	}
-	entity Bullet
-	{
-		active = true
-		id = 8
-		layer = Player
-		lifetime = 0
-		tags = {  }
-		component Transform
-		{
-			enabled = true
-			position = (1.97858894,0,16217.3516)
-			rotation = (0,0,0)
-			scale = (0.219999999,0.699999988,0.699999988)
-		}
-		component Rigidbody
-		{
-			enabled = true
-			mass = 1
-			maxSpeed = 0
-			trigger = true
-			velocity = (0,0,95.3250809)
-		}
-		component BoxCollider
-		{
-			enabled = true
-			size = (1,1,1)
-		}
-		component Projectile
-		{
-			enabled = true
-		}
-		component Mesh
-		{
-			enabled = true
-			path = meshes/plane.obj
-			material 
-			{
-				texture 
-				{
-					anisoLevel = 
-					path = /home/taylorsnead/lazyfox/lfant/examples/galaga/bin64/linux/../../assets/textures/Rocket.png
-				}
-				 
-				{
-					fragment = shaders/simple/Diffuse.frag
-					geometry = 
-					vertex = shaders/simple/Diffuse.vert
-				}
-			}
-		}
-	}
-	entity Bullet
-	{
-		active = true
-		id = 9
-		layer = Player
-		lifetime = 0
-		tags = {  }
-		component Transform
-		{
-			enabled = true
-			position = (1.97858894,0,11275.5449)
-			rotation = (0,0,0)
-			scale = (0.219999999,0.699999988,0.699999988)
-		}
-		component Rigidbody
-		{
-			enabled = true
-			mass = 1
-			maxSpeed = 0
-			trigger = true
-			velocity = (0,0,68.4036636)
-		}
-		component BoxCollider
-		{
-			enabled = true
-			size = (1,1,1)
-		}
-		component Projectile
-		{
-			enabled = true
-		}
-		component Mesh
-		{
-			enabled = true
-			path = meshes/plane.obj
-			material 
-			{
-				texture 
-				{
-					anisoLevel = 
-					path = /home/taylorsnead/lazyfox/lfant/examples/galaga/bin64/linux/../../assets/textures/Rocket.png
-				}
-				 
-				{
-					fragment = shaders/simple/Diffuse.frag
-					geometry = 
-					vertex = shaders/simple/Diffuse.vert
-				}
-			}
-		}
-	}
-	entity Bullet
-	{
-		active = true
-		id = 10
-		layer = Player
-		lifetime = 0
-		tags = {  }
-		component Transform
-		{
-			enabled = true
-			position = (1.97858894,0,8140.09766)
-			rotation = (0,0,0)
-			scale = (0.219999999,0.699999988,0.699999988)
-		}
-		component Rigidbody
-		{
-			enabled = true
-			mass = 1
-			maxSpeed = 0
-			trigger = true
-			velocity = (0,0,51.0968475)
-		}
-		component BoxCollider
-		{
-			enabled = true
-			size = (1,1,1)
-		}
-		component Projectile
-		{
-			enabled = true
-		}
-		component Mesh
-		{
-			enabled = true
-			path = meshes/plane.obj
-			material 
-			{
-				texture 
-				{
-					anisoLevel = 
-					path = /home/taylorsnead/lazyfox/lfant/examples/galaga/bin64/linux/../../assets/textures/Rocket.png
-				}
-				 
-				{
-					fragment = shaders/simple/Diffuse.frag
-					geometry = 
-					vertex = shaders/simple/Diffuse.vert
-				}
-			}
-		}
-	}
-	entity Bullet
-	{
-		active = true
-		id = 11
-		layer = Player
-		lifetime = 0
-		tags = {  }
-		component Transform
-		{
-			enabled = true
-			position = (1.97858894,0,5926.38184)
-			rotation = (0,0,0)
-			scale = (0.219999999,0.699999988,0.699999988)
-		}
-		component Rigidbody
-		{
-			enabled = true
-			mass = 1
-			maxSpeed = 0
-			trigger = true
-			velocity = (0,0,38.4385071)
-		}
-		component BoxCollider
-		{
-			enabled = true
-			size = (1,1,1)
-		}
-		component Projectile
-		{
-			enabled = true
-		}
-		component Mesh
-		{
-			enabled = true
-			path = meshes/plane.obj
-			material 
-			{
-				texture 
-				{
-					anisoLevel = 
-					path = /home/taylorsnead/lazyfox/lfant/examples/galaga/bin64/linux/../../assets/textures/Rocket.png
-				}
-				 
-				{
-					fragment = shaders/simple/Diffuse.frag
-					geometry = 
-					vertex = shaders/simple/Diffuse.vert
-				}
-			}
-		}
-	}
-	entity Bullet
-	{
-		active = true
-		id = 12
-		layer = Player
-		lifetime = 0
-		tags = {  }
-		component Transform
-		{
-			enabled = true
-			position = (0.862187147,0,8245.84277)
-			rotation = (0,0,0)
-			scale = (0.219999999,0.699999988,0.699999988)
-		}
-		component Rigidbody
-		{
-			enabled = true
-			mass = 1
-			maxSpeed = 0
-			trigger = true
-			velocity = (0,0,55.3515587)
-		}
-		component BoxCollider
-		{
-			enabled = true
-			size = (1,1,1)
-		}
-		component Projectile
-		{
-			enabled = true
-		}
-		component Mesh
-		{
-			enabled = true
-			path = meshes/plane.obj
-			material 
-			{
-				texture 
-				{
-					anisoLevel = 
-					path = /home/taylorsnead/lazyfox/lfant/examples/galaga/bin64/linux/../../assets/textures/Rocket.png
-				}
-				 
-				{
-					fragment = shaders/simple/Diffuse.frag
-					geometry = 
-					vertex = shaders/simple/Diffuse.vert
-				}
-			}
-		}
-	}
-	entity Bullet
-	{
-		active = true
-		id = 13
-		layer = Player
-		lifetime = 0
-		tags = {  }
-		component Transform
-		{
-			enabled = true
-			position = (0.302432179,0,-0.0584290028)
-			rotation = (0,0,0)
-			scale = (0.219999999,0.699999988,0.699999988)
-		}
-		component Rigidbody
-		{
-			enabled = true
-			mass = 1
-			maxSpeed = 0
-			trigger = true
-			velocity = (0,0,0)
-		}
-		component BoxCollider
-		{
-			enabled = true
-			size = (1,1,1)
-		}
-		component Projectile
-		{
-			enabled = true
-		}
-		component Mesh
-		{
-			enabled = true
-			path = meshes/plane.obj
-			material 
-			{
-				texture 
-				{
-					anisoLevel = 
-					path = /home/taylorsnead/lazyfox/lfant/examples/galaga/bin64/linux/../../assets/textures/Rocket.png
-				}
-				 
-				{
-					fragment = shaders/simple/Diffuse.frag
-					geometry = 
-					vertex = shaders/simple/Diffuse.vert
-				}
-			}
-		}
-	}
-	entity Bullet
-	{
-		active = true
-		id = 14
-		layer = Player
-		lifetime = 0
-		tags = {  }
-		component Transform
-		{
-			enabled = true
-			position = (0.580781341,0,-0.0584290028)
-			rotation = (0,0,0)
-			scale = (0.219999999,0.699999988,0.699999988)
-		}
-		component Rigidbody
-		{
-			enabled = true
-			mass = 1
-			maxSpeed = 0
-			trigger = true
-			velocity = (0,0,0)
-		}
-		component BoxCollider
-		{
-			enabled = true
-			size = (1,1,1)
-		}
-		component Projectile
-		{
-			enabled = true
-		}
-		component Mesh
-		{
-			enabled = true
-			path = meshes/plane.obj
-			material 
-			{
-				texture 
-				{
-					anisoLevel = 
-					path = /home/taylorsnead/lazyfox/lfant/examples/galaga/bin64/linux/../../assets/textures/Rocket.png
-				}
-				 
-				{
-					fragment = shaders/simple/Diffuse.frag
-					geometry = 
-					vertex = shaders/simple/Diffuse.vert
-				}
-			}
-		}
-	}
-	entity Bullet
-	{
-		active = true
-		id = 15
-		layer = Player
-		lifetime = 0
-		tags = {  }
-		component Transform
-		{
-			enabled = true
-			position = (0.901836157,0,-0.0584290028)
-			rotation = (0,0,0)
-			scale = (0.219999999,0.699999988,0.699999988)
-		}
-		component Rigidbody
-		{
-			enabled = true
-			mass = 1
-			maxSpeed = 0
-			trigger = true
-			velocity = (0,0,0)
-		}
-		component BoxCollider
-		{
-			enabled = true
-			size = (1,1,1)
-		}
-		component Projectile
-		{
-			enabled = true
-		}
-		component Mesh
-		{
-			enabled = true
-			path = meshes/plane.obj
-			material 
-			{
-				texture 
-				{
-					anisoLevel = 
-					path = /home/taylorsnead/lazyfox/lfant/examples/galaga/bin64/linux/../../assets/textures/Rocket.png
-				}
-				 
-				{
-					fragment = shaders/simple/Diffuse.frag
-					geometry = 
-					vertex = shaders/simple/Diffuse.vert
-				}
-			}
-		}
-	}
-	entity Bullet
-	{
-		active = true
-		id = 16
-		layer = Player
-		lifetime = 0
-		tags = {  }
-		component Transform
-		{
-			enabled = true
-			position = (1.86372221,0,6318.12402)
-			rotation = (0,0,0)
-			scale = (0.219999999,0.699999988,0.699999988)
-		}
-		component Rigidbody
-		{
-			enabled = true
-			mass = 1
-			maxSpeed = 0
-			trigger = true
-			velocity = (0,0,49.6013565)
-		}
-		component BoxCollider
-		{
-			enabled = true
-			size = (1,1,1)
-		}
-		component Projectile
-		{
-			enabled = true
-		}
-		component Mesh
-		{
-			enabled = true
-			path = meshes/plane.obj
-			material 
-			{
-				texture 
-				{
-					anisoLevel = 
-					path = /home/taylorsnead/lazyfox/lfant/examples/galaga/bin64/linux/../../assets/textures/Rocket.png
-				}
-				 
-				{
-					fragment = shaders/simple/Diffuse.frag
-					geometry = 
-					vertex = shaders/simple/Diffuse.vert
-				}
-			}
+			radius = 3
+			specularIntensity = 1
+			specularPower = 1
 		}
 	}
 }

@@ -43,6 +43,7 @@ class SystemInfo;
 class UserInterface;
 class Network;
 class ScriptSystem;
+class OpenCL;
 
 /** @addtogroup Game
  *	@{
@@ -107,6 +108,7 @@ public:
 	ptr<Audio> audio;
 	ptr<Network> network;
 	ptr<ScriptSystem> scriptSystem;
+	ptr<OpenCL> openCL;
 	//boost::scoped_ptr<AISystem>			aiSystem;
 	//boost::scoped_ptr<FGSystem>			flowgraph;
 

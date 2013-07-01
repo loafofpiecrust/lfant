@@ -95,7 +95,7 @@ public:
 	 */
 	template<typename C>
 	void RemoveComponent();
-	void RemoveComponent(Component* comp);
+	void RemoveComponent(Component* comp, bool destroy = true);
 
 	/**
 	 *	Clones an identical instance of this Entity.
@@ -140,6 +140,8 @@ public:
 	string GetLayer();
 	void SetLayer(string layer);
 
+	void SetParent(Entity* ent);
+
 	Transform* transform;
 
 	/// Whether to update this Entity or not.
@@ -152,7 +154,7 @@ public:
 
 	float lifetime = 0.0f;
 
-	Entity* parent;
+	Entity* parent = nullptr;
 
 protected:
 
