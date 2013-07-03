@@ -69,11 +69,48 @@ Voxel::Chunk::~Chunk()
 //	blocks.clear();
 }
 
-void Voxel::Chunk::Render()
+void Voxel::Chunk::BeginRender()
 {
+	blockBuffer.data.clear();
+	for(uint x = 0; x < blocks.size(); ++x)
+	{
+		for(uint y = 0; y < blocks[x].size(); ++y)
+		{
+			for(uint z = 0; z < blocks[x][y].size(); ++z)
+			{
+				if(blocks[x][y][z].IsActive())
+				{
+					blockBuffer.push_back(vec3(x,y,z));
+				}
+			}
+		}
+	}
+	
+	if(blockBuffer.id)
+	{
+		glDeleteBuffers(1, blockBuffer.id);
+	}
 
+	glGenBuffers(1, &blockBuffer.id);
+	glBindBuffer(GL_ARRAY_BUFFER, blockBuffer);
+	glBufferData(GL_ARRAY_BUFFER, blockBuffer.size(), &blockBuffer[0], GL_DYNAMIC_DRAW);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
+void Voxel::Chunk::Render()
+{
+	glEnableVertexAttribute(0);
+	glBindBuffer(GL_ARRAY_BUFFER, blockBuffer);
+	glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
+
+	glDrawArrays(GL_POINTS, 0, blockBuffer.size());
+}
+
+void Voxel::Chunk::EndRender()
+{
+	
+}
 
 // Voxel
 IMPLEMENT_COMP(Voxel)
@@ -117,16 +154,24 @@ void Voxel::BeginRender()
 	glGenVertexArrays(1, &vertexArray);
 	glBindVertexArray(vertexArray);
 
-	shader->LoadFile("shaders/simple/Diffuse.vert", "shaders/simple/Diffuse.frag");
+	shader->LoadFile("shaders/simple/Diffuse.vert", "shaders/simple/Diffuse.frag", "shaders/Voxel.geom");
 	texture->LoadFile("textures/Default.png");
 
 	shader->AddUniform("MVP");
 	shader->AddUniform("textureSampler");
 	shader->AddUniform("tiling");
+	shader->AddUniform("chunkPos");
 
-	glGenBuffers(1, &chunkId);
-	glBindBuffer(GL_VERTEX_ARRAY, chunkId);
-	glBufferData(GL_VERTEX_ARRAY, sizeof(vec3) * vertexBuffer.size(), &vertexBuffer[0], GL_STATIC_DRAW);
+	for(uint x = 0; x < chunks.size(); ++x)
+	{
+		for(uint y = 0; y < chunks[x].size(); ++y)
+		{
+			for(uint z = 0; z < chunks[x][y].size(); ++z)
+			{
+				chunks[x][y][z].BeginRender();
+			}
+		}
+	}
 
 	glBindVertexArray(0);
 }
@@ -141,11 +186,17 @@ void Voxel::Render()
 	shader->SetUniform("textureSampler", texture);
 	shader->SetUniform("tiling", texture->tiling);
 
-	glEnableVertexAttribArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, chunkId);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-	glDrawArrays(GL_TRIANGLES, 0, vertexBuffer.size());
+	for(uint x = 0; x < chunks.size(); ++x)
+	{
+		for(uint y = 0; y < chunks[x].size(); ++y)
+		{
+			for(uint z = 0; z < chunks[x][y].size(); ++z)
+			{
+				shader->SetUniform("chunkPos", vec3(x,y,z));
+				chunks[x][y][z].Render();
+			}
+		}
+	}
 
 	shader->Unbind();
 	glBindVertexArray(0);

@@ -263,7 +263,7 @@ void ParticleSystem::Emit(uint32_t count)
 		//	game->openCL->queue.finish();
 
 			game->openCL->queue.enqueue_1d_range_kernel(*emitKernel->Get(), 0, 1);
-		//	game->openCL->queue.finish();
+			game->openCL->queue.finish();
 
 			game->openCL->queue.enqueue_release_gl_buffer(clbuffers[0]);
 			game->openCL->queue.enqueue_release_gl_buffer(clbuffers[1]);
@@ -386,29 +386,20 @@ void ParticleSystem::Render()
 //	glEnable(GL_GEOMETRY_PROGRAM_POINT_SIZE);
 	
 	{
-		glFinish();
-	//	Log("Acquiring gl buffers");
-	//	thread::Sleep(renderSleep);
 		game->openCL->queue.enqueue_acquire_gl_buffer(clbuffers[0]);
 		game->openCL->queue.enqueue_acquire_gl_buffer(clbuffers[1]);
 		game->openCL->queue.enqueue_acquire_gl_buffer(clbuffers[2]);
 	//	game->openCL->queue.enqueue_acquire_gl_objects(3, &clbuffers[0].get());
 	//	game->openCL->queue.finish();
-
-	//	Log("Running kernel");
-	//	thread::Sleep(renderSleep);
+	//
 		updateKernel->Get()->set_arg(8, game->time->deltaTime);
 		game->openCL->queue.enqueue_1d_range_kernel(*updateKernel->Get(), 0, GetCount());
-	//	Log("Finishing queue");
-	//	game->openCL->queue.finish();
+		game->openCL->queue.finish();
 
-	//	Log("Releasing gl buffers");
-	//	thread::Sleep(renderSleep);
 		game->openCL->queue.enqueue_release_gl_buffer(clbuffers[0]);
 		game->openCL->queue.enqueue_release_gl_buffer(clbuffers[1]);
 		game->openCL->queue.enqueue_release_gl_buffer(clbuffers[2]);
 	//	game->openCL->queue.enqueue_release_gl_objects(3, &clbuffers[0].get());
-	//	Log("Finishing queue");
 		game->openCL->queue.finish();
 	}
 
