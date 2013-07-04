@@ -66,7 +66,7 @@ protected:
 	public:
 		RegistryEntry(string type)
 		{
-			Component::componentRegistry[type] = (Component* (Entity::*)(Properties*))&Entity::AddComponent<T>;
+			Component::componentRegistry[type] = reinterpret_cast<Component* (Entity::*)(Properties*)>(&Entity::AddComponent<T>);
 		}
 	};
 
@@ -144,7 +144,7 @@ protected:
 
 private:
 
-	static map<string, Component* (Entity::*)(Properties*) > componentRegistry __attribute__((init_priority(101)));
+	static map<string, Component* (Entity::*)(Properties*) > componentRegistry;
 
 	/**
 	 *	Registers a component type by string, only used by the IMPLEMENT_COMP macro.

@@ -8,6 +8,7 @@
 
 // External
 #include <boost/lexical_cast.hpp>
+#include <string>
 
 namespace lfant
 {
@@ -32,13 +33,6 @@ template<>
 string lexical_cast<string, const char*>(const char* const& src)
 {
 	return string(src);
-}
-
-
-template<>
-string lexical_cast<string, void*>(void* const& src)
-{
-//	return to_string(src);
 }
 
 /*
@@ -138,7 +132,7 @@ bool lexical_cast<bool, string>(const string& src)
 template<>
 string lexical_cast<string, int>(const int& src)
 {
-	return to_string(src);
+	return std::to_string(src);
 }
 
 template<>
@@ -152,25 +146,25 @@ string lexical_cast<string, unsigned char>(const unsigned char& src)
 template<>
 string lexical_cast<string, unsigned short>(const unsigned short& src)
 {
-	return to_string(src);
+	return std::to_string(src);
 }
 
 template<>
 string lexical_cast<string, unsigned int>(const unsigned int& src)
 {
-	return to_string(src);
+	return std::to_string(src);
 }
 
 template<>
 string lexical_cast<string, unsigned long>(const unsigned long& src)
 {
-	return to_string(src);
+	return std::to_string(src);
 }
 
 template<>
 string lexical_cast<string, unsigned long long>(const unsigned long long& src)
 {
-	return to_string(src);
+	return std::to_string(src);
 }
 template<>
 string lexical_cast<string, bool>(const bool& src)

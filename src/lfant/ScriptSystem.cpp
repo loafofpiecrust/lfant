@@ -26,7 +26,7 @@ Script::Script(string module) :
 void Script::LoadFile(string path)
 {
 	Log("Loading script from \'"+game->fileSystem->GetGamePath(path).string()+"\'.");
-	auto r = builder->AddSectionFromFile(game->fileSystem->GetGamePath(path).c_str());
+	auto r = builder->AddSectionFromFile((const char*)game->fileSystem->GetGamePath(path).c_str());
 	if(r < 0)
 	{
 		Log("Script::LoadFile: Errors found in "+path+", could not load.");

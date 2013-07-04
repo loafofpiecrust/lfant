@@ -15,6 +15,10 @@ file(GLOB_RECURSE HEADER_FILES
 	"src/LinearMath/*.h"
 	)
 
+list(REMOVE_ITEM SRC_FILES
+	${PROJECT_SOURCE_DIR}/src/BulletCollision/CollisionDispatch/btInternalEdgeUtility.cpp
+	)
+
 # Output Library Info
 add_library(${PROJECT_NAME} SHARED ${SRC_FILES} ${HEADER_FILES})
 

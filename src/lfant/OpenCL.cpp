@@ -17,7 +17,11 @@
 *	limitations under the License.
 *
 ******************************************************************************/
+#if LINUX
 #include <GL/glx.h>
+#elif WINDOWS
+#include <GL/wgl.h>
+#endif
 #define BOOST_COMPUTE_DEBUG_KERNEL_COMPILATION
 
 #include <lfant/OpenCL.h>
