@@ -51,6 +51,7 @@ void Player::Init()
 	ConnectEvent(SENDER(game->input, Fire), RECEIVER(this, Fire));
 	ConnectEvent(SENDER(game->input, NextItem), RECEIVER(this, NextItem));
 	ConnectEvent(SENDER(game->input, PreviousItem), RECEIVER(this, PreviousItem));
+	ConnectEvent(SENDER(game->input, DropItem), RECEIVER(this, DropItem));
 }
 
 void Player::PreviousItem()
@@ -60,7 +61,12 @@ void Player::PreviousItem()
 
 void Player::NextItem()
 {
-	TriggerEventWithChildren("EquipItem", 1U);
+	TriggerEventWithChildren("EquipItem", 1u);
+}
+
+void Player::DropItem()
+{
+	TriggerEventWithChildren("RemoveItem", -1u);
 }
 
 void Player::Jump(float value)

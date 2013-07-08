@@ -81,7 +81,7 @@ public:
 	{
 		C* comp = new C();
 		AddComponent(comp, prop);
-		TriggerEvent("SetComponent"+RemoveScoping(Type(comp)), comp);
+		TriggerEvent("SetComponent"+RemoveScoping(type::Name(comp)), comp);
 		return comp;
 	}
 
@@ -123,7 +123,7 @@ public:
 		deque<C*> comps;
 		for(auto& comp : components)
 		{
-			if(Type(comp) == Type<C>())
+			if(type::Name(comp) == type::Name<C>())
 			{
 				comps += dynamic_cast<C*>(comp.get());
 			}

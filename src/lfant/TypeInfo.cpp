@@ -25,20 +25,15 @@
 // External
 #include <lfant/util/lexical_cast.h>
 
-namespace lfant
-{
+namespace lfant {
+namespace type {
 
-string ParamType()
-{
-	return "";
-}
-
-string Type()
+string Name()
 {
 	return "";
 }
 
-string DemangleType(string type)
+string Demangle(string type)
 {
 	return string(abi::__cxa_demangle(type.c_str(), 0, 0, (int*)0));
 }
@@ -50,4 +45,4 @@ string RemoveScoping(string type)
 }
 
 }
-
+}

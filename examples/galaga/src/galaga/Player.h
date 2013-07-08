@@ -55,6 +55,7 @@ public:
 	void Fire(float value);
 	void NextItem();
 	void PreviousItem();
+	void DropItem();
 
 	void Load(Properties* prop);
 	void Save(Properties* prop);

@@ -92,8 +92,8 @@ public:
 
 	void AddItem(Item* item);
 	void RemoveItem(Item* item);
-	void RemoveItem(string name);
-	void RemoveItem(uint32_t idx);
+	Item* RemoveItem(string name);
+	Item* RemoveItem(uint32_t idx = -1);
 
 	Item* GetItem(string name);
 	Item* GetItem(uint32_t idx);
