@@ -269,8 +269,8 @@ void FrameBuffer::BeginRender()
 		shader->AddUniform(depthTexName);
 	}
 	
+	shader->AddUniform("cameraPosition");
 	shader->AddUniform("cameraDof");
-	shader->AddUniform("cameraDofWidth");
 
 	posBuffer.push_back(vec2(-1, -1));
 	posBuffer.push_back(vec2(1, -1));
@@ -296,8 +296,8 @@ void FrameBuffer::Render()
 		shader->SetUniform(depthTexName, depthTexture);
 	}
 	
-	shader->SetUniform("cameraDof", game->scene->mainCamera->dof);
-	shader->SetUniform("cameraDofWidth", game->scene->mainCamera->dofWidth);
+	shader->SetUniform("cameraPosition", game->scene->mainCamera->owner->transform->GetWorldPosition());
+	shader->SetUniform("cameraDof", vec2(game->scene->mainCamera->dof, game->scene->mainCamera->dofWidth));
 
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, posBuffer);
