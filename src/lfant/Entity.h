@@ -160,9 +160,7 @@ protected:
 
 	virtual void Init();
 	virtual void Update();
-	virtual void OnDestroy()
-	{
-	}
+	virtual void OnDestroy() {}
 
 	void AddChild(Entity* ent);
 	void RemoveChild(Entity* ent);
@@ -196,7 +194,7 @@ private:
 	deque< ptr<Component, Object::Delete> > components;
 	bool useLifeTime = false;
 
-	/// 64-bit scene-unique identifier.
+	/// Scene-unique identifier.
 	uint32_t id = 0;
 
 	/// The layer of this entity for primarily display filtering

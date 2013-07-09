@@ -99,6 +99,9 @@ public:
 		Orthographic = 1
 	};
 	Mode mode = Mode::Perspective;
+	
+	float dofWidth = 10.0f;
+	float dof = 20.0f;
 
 protected:
 

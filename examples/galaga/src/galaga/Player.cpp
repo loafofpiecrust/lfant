@@ -84,18 +84,6 @@ void Player::Fire(float value)
 	{
 		Log("Player fired");
 		TriggerEventWithChildren("UseItem", (byte)0);
-		/*
-		Log("Player fired");
-		Entity* ent = game->scene->Spawn("bullet"+lexical_cast<string>(random::Range(0,200)));
-	//	ent->lifeTime = 1.0f;
-		ent->transform->SetPosition(owner->transform->GetPosition());
-		ent->transform->SetRotation(owner->transform->GetRotation());
-		Mesh* m = ent->AddComponent<Mesh>();
-		m->material->LoadFile("materials/Diffuse.mat");
-		m->LoadFile("meshes/suzanne.obj");
-		Rigidbody* rb = ent->AddComponent<Rigidbody>();
-		rb->Accelerate(owner->transform->GetDirection() * bulletSpeed / game->time->deltaTime);
-		*/
 	}
 	else
 	{
@@ -108,16 +96,16 @@ void Player::Load(lfant::Properties *prop)
 	Component::Load(prop);
 
 	Log("Loading from player, '"+prop->type+" "+prop->id+"'.");
-	prop->Get("bulletSpeed", bulletSpeed);
+	prop->Get("lookSpeed", lookSpeed);
 
-	Log("The setting of lookSpeed is ", prop->Get<float>("lookSpeed"));
+	Log("The setting of lookSpeed is ", lookSpeed);
 }
 
 void Player::Save(lfant::Properties *prop)
 {
 	Component::Save(prop);
 
-	prop->Set("bulletSpeed", bulletSpeed);
+	prop->Set("lookSpeed", lookSpeed);
 }
 
 void Player::Update()

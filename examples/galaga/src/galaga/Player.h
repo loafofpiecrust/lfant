@@ -63,10 +63,8 @@ public:
 protected:
 
 	float lookSpeed = 0.01f;
-	float bulletSpeed = 5.0f;
 	bool mouseLook = true;
 
-	int meshCount = 0;
 	ivec2 lastMouse;
 
 private:

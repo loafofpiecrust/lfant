@@ -24,6 +24,7 @@
 #include <lfant/Console.h>
 #include <lfant/Thread.h>
 #include <lfant/Renderer.h>
+#include <lfant/Camera.h>
 
 // External
 #include <GL/glew.h>
@@ -267,6 +268,9 @@ void FrameBuffer::BeginRender()
 	{
 		shader->AddUniform(depthTexName);
 	}
+	
+	shader->AddUniform("cameraDof");
+	shader->AddUniform("cameraDofWidth");
 
 	posBuffer.push_back(vec2(-1, -1));
 	posBuffer.push_back(vec2(1, -1));
@@ -291,6 +295,9 @@ void FrameBuffer::Render()
 	{
 		shader->SetUniform(depthTexName, depthTexture);
 	}
+	
+	shader->SetUniform("cameraDof", game->scene->mainCamera->dof);
+	shader->SetUniform("cameraDofWidth", game->scene->mainCamera->dofWidth);
 
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, posBuffer);

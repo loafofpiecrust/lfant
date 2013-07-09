@@ -222,9 +222,9 @@ public:
 	float GetAxis(string name);
 
 	// Buttons: Positive side of the given axis
-	bool GetButton(string name, bool positive = true);
-	bool GetButtonDown(string name, bool positive = true);
-	bool GetButtonUp(string name, bool positive = true);
+	int8_t GetButton(string name);
+	int8_t GetButtonDown(string name);
+	int8_t GetButtonUp(string name);
 
 	ivec2 GetMousePos();
 	void SetMousePos(ivec2 pos);

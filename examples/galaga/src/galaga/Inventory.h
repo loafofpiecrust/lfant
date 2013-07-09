@@ -53,6 +53,9 @@ public:
 	void OnDestroy();
 
 	void Use(byte mode);
+	
+	void SetPrimary(byte mode);
+	void SetSecondary(byte mode);
 
 protected:
 	void Equip(bool val);
@@ -63,6 +66,9 @@ protected:
 	vec3 equippedPosition {0};
 	bool equipped = false;
 	Inventory* inventory = nullptr;
+	
+	byte primary = 0;
+	byte secondary = 0;
 
 private:
 };
