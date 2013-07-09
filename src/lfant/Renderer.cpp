@@ -84,6 +84,7 @@ void Renderer::Load(Properties* prop)
 	prop->Get("motionBlur", motionBlur);
 
 	Log("Window title: '"+windowTitle+"'.");
+	Log("OpenGL Version loaded: ", lexical_cast<string>(version));
 }
 
 void Renderer::Save(Properties *prop)
@@ -105,10 +106,15 @@ void Renderer::Save(Properties *prop)
 *		Game Loop
 *
 *******************************************************************************/
-
+/*
 void Renderer::OnError(uint source, uint type, uint id, uint severity, int length, const char* message, void* user)
 {
 	Log("OpenGL Error (", severity, "): ", message);
+}*/
+
+void Renderer::OnError(int error, const char* msg)
+{
+	Log("GLFW Error(", error, "): '", msg, "'.");
 }
 
 void Renderer::Init()
@@ -169,6 +175,8 @@ void Renderer::Init()
 
 		glfwSetWindowCloseCallback(window, &Renderer::OnCloseWindow);
 		glfwSetWindowSizeCallback(window, &Renderer::OnSetResolution);
+
+		glfwSetErrorCallback(&Renderer::OnError);
 	}
 
 	Log("Renderer: Initialized");
@@ -271,9 +279,9 @@ bool Renderer::OpenWindow()
 //	{
 	Log("Renderer::OpenWindow: About to set window hints.");
 	glfwWindowHint(GLFW_SAMPLES, fsaa);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, version.major);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, version.minor);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+//	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, version.major);
+//	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, version.minor);
+//	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_RESIZABLE, windowResizable);
 
 	Log("Renderer::OpenWindow: Window hints set.");

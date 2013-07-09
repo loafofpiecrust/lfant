@@ -43,12 +43,12 @@ set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -std=gnu++11 -Wno-invalid-offsetof -g -Wno
 
 # RPathing
 set(CMAKE_SKIP_BUILD_RPATH TRUE)
-set(CMAKE_SHARED_LINKER_FLAGS "-Wl,-rpath,$ORIGIN -Wl,-rpath,$ORIGIN/lib -g -Wl,--no-undefined")
+set(CMAKE_SHARED_LINKER_FLAGS "-Wl,-rpath,'$ORIGIN' -Wl,-rpath,'$ORIGIN/lib' -Wl,-rpath-link,. -g -Wl,--no-undefined")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS}")
 #set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--no-undefined")
 if(UNIX)
-	set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-z,origin")
-	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-z,origin")
+	list(APPEND CMAKE_SHARED_LINKER_FLAGS "-Wl,-z,origin")
+	list(APPEND CMAKE_EXE_LINKER_FLAGS "-Wl,-z,origin")
 endif()
 
 set(LIBRARY_OUTPUT_PATH ${ROOT}/bin${ARCH}/${PLATFORM})

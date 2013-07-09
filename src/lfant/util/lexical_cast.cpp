@@ -35,6 +35,14 @@ string lexical_cast<string, const char*>(const char* const& src)
 	return string(src);
 }
 
+template<>
+string lexical_cast<string, void*>(void* const& src)
+{
+	char str[12];
+	sprintf(str, "%p", src);
+	return str;
+}
+
 /*
  *	Primitives from string
  */
@@ -132,39 +140,49 @@ bool lexical_cast<bool, string>(const string& src)
 template<>
 string lexical_cast<string, int>(const int& src)
 {
-	return std::to_string(src);
+	char str[12];
+	sprintf(str, "%i", src);
+	return str;
 }
 
 template<>
 string lexical_cast<string, unsigned char>(const unsigned char& src)
 {
-	string final = "";
-	final.push_back(src);
-	return final;
+	char str[4];
+	sprintf(str, "%u", src);
+	return str;
 }
 
 template<>
 string lexical_cast<string, unsigned short>(const unsigned short& src)
 {
-	return std::to_string(src);
+	char str[6];
+	sprintf(str, "%u", src);
+	return str;
 }
 
 template<>
 string lexical_cast<string, unsigned int>(const unsigned int& src)
 {
-	return std::to_string(src);
+	char str[12];
+	sprintf(str, "%u", src);
+	return str;
 }
 
 template<>
 string lexical_cast<string, unsigned long>(const unsigned long& src)
 {
-	return std::to_string(src);
+	char str[20];
+	sprintf(str, "%lu", src);
+	return str;
 }
 
 template<>
 string lexical_cast<string, unsigned long long>(const unsigned long long& src)
 {
-	return std::to_string(src);
+	char str[40];
+	sprintf(str, "%llu", src);
+	return str;
 }
 template<>
 string lexical_cast<string, bool>(const bool& src)

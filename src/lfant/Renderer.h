@@ -82,7 +82,8 @@ public:
 	// Static callbacks
 	static void OnCloseWindow(GLFWwindow* win);
 	static void OnSetResolution(GLFWwindow* win, int x, int y);
-	static void OnError(uint source, uint type, uint id, uint severity, int length, const char* message, void* user);
+//	static void OnError(uint source, uint type, uint id, uint severity, int length, const char* message, void* user);
+	static void OnError(int error, const char* msg);
 
 	/// Sets the version property
 	void SetVersion(byte major, byte minor);

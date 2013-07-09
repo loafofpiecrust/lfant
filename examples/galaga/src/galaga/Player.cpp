@@ -49,18 +49,24 @@ void Player::Init()
 
 	ConnectEvent(SENDER(game->input, Jump), RECEIVER(this, Jump));
 	ConnectEvent(SENDER(game->input, Fire), RECEIVER(this, Fire));
+	ConnectEvent(SENDER(game->input, Inventory), RECEIVER(this, ToggleInventory));
 	ConnectEvent(SENDER(game->input, NextItem), RECEIVER(this, NextItem));
 	ConnectEvent(SENDER(game->input, PreviousItem), RECEIVER(this, PreviousItem));
 }
 
 void Player::PreviousItem()
 {
-	TriggerEventWithChildren("EquipItem", 0U);
+	TriggerEventWithChildren("EquipItem", 0u);
 }
 
 void Player::NextItem()
 {
-	TriggerEventWithChildren("EquipItem", 1U);
+	TriggerEventWithChildren("EquipItem", 1u);
+}
+
+void Player::ToggleInventory()
+{
+
 }
 
 void Player::Jump(float value)
@@ -74,7 +80,7 @@ void Player::Jump(float value)
 
 void Player::Fire(float value)
 {
-	if(value == 1)
+	if(value == 1.0f)
 	{
 		Log("Player fired");
 		TriggerEventWithChildren("UseItem", (byte)0);
@@ -166,18 +172,6 @@ void Player::Update()
 	if (vrot != 0.0f)
 	{
 		owner->transform->Rotate(vec3(vrot * lookSpeed * game->time->deltaTime, 0, 0));
-	}
-	if (game->input->GetButtonDown("TesterSetVar"))
-	{
-		game->console->Input("set Tester 62.76f");
-	}
-	if (game->input->GetButtonDown("TesterGetVar"))
-	{
-		game->console->Input("get Tester");
-	}
-	if (game->input->GetButtonDown("TesterHelpMe"))
-	{
-		game->console->Input("help Tester");
 	}
 	if (game->input->GetButtonDown("Quit"))
 	{

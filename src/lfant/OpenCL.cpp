@@ -33,13 +33,13 @@
 
 // External
 //#include <CL/cl.h>
-#include <boost/compute.hpp>
+//#include <boost/compute.hpp>
 
 
 namespace lfant {
 
-OpenCL::OpenCL() :
-	platform(compute::system::platforms()[0])
+OpenCL::OpenCL()// :
+//	platform(compute::system::platforms()[0])
 {
 }
 
@@ -47,6 +47,15 @@ OpenCL::~OpenCL()
 {
 }
 
+void OpenCL::Init() {}
+void OpenCL::OnDestroy() {}
+
+OpenCL::Kernel* OpenCL::LoadFile(string path, string entry) { return nullptr; }
+
+OpenCL::Kernel::Kernel(const string& source, string entry) {}
+//boost::compute::command_queue* OpenCL::Kernel::GetQueue() { return nullptr; }
+
+/*
 void OpenCL::Init()
 {
 	gpu = compute::system::default_device();
@@ -60,7 +69,7 @@ void OpenCL::Init()
     	};
 #elif WINDOWS
 	cl_context_properties props[] = {
-		CL_CONTEXT_PLATFORM, (cl_context_properties) platform.m_platform,
+		CL_CONTEXT_PLATFORM, (cl_context_properties) platform.get(),
 		CL_GL_CONTEXT_KHR, (cl_context_properties) wglGetCurrentContext(),
 		CL_WGL_HDC_KHR, (cl_context_properties) wglGetCurrentDC(),
 		NULL
@@ -69,7 +78,7 @@ void OpenCL::Init()
 	cl_context_properties props[] = {
 	    CL_GL_CONTEXT_KHR, (cl_context_properties) glXGetCurrentContext(),
 	    CL_GLX_DISPLAY_KHR, (cl_context_properties) glXGetCurrentDisplay(),
-	    CL_CONTEXT_PLATFORM, (cl_context_properties) platform.m_platform,
+	    CL_CONTEXT_PLATFORM, (cl_context_properties) platform.get(),
 	    NULL
 		};
 #endif
@@ -101,5 +110,6 @@ boost::compute::command_queue* OpenCL::Kernel::GetQueue()
 {
 	return &game->openCL->queue;
 }
+*/
 
 }

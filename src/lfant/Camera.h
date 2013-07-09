@@ -89,6 +89,9 @@ public:
 	void SetViewRange(float near, float far);
 	Range<float> GetViewRange();
 
+	void SetAperture(float value);
+	float GetAperture();
+
 	vec3 lastPos;
 
 	Rect viewport;
@@ -116,6 +119,13 @@ protected:
 
 	/// The viewing range (near and far) of this camera's view, eg. (0.1f, 1000.0f)
 	Range<float> viewRange = { 0.01f, 1000.0f };
+
+	// Real Camera settings
+	float aperture = 1.8f;
+
+	float shutterSpeed = 0.003f;
+
+	uint16_t iso = 300;
 
 private:
 

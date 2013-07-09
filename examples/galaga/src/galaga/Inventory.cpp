@@ -63,7 +63,7 @@ void Inventory::Init()
 {
 	ConnectEvent(SENDER(owner, UseItem), RECEIVER(this, UseItem));
 	ConnectEvent(SENDER(owner, EndUseItem), RECEIVER(this, EndUseItem));
-	ConnectEvent(SENDER(owner, EquipItem), this, (void(Inventory::*)(uint32_t))&Inventory::Equip);
+	ConnectEvent(SENDER(owner, EquipItem), this, reinterpret_cast<void(Inventory::*)(uint32_t)>((Item* (Inventory::*)(uint32_t))&Inventory::Equip));
 }
 
 void Inventory::UseItem(byte mode)
@@ -100,24 +100,39 @@ void Inventory::RemoveItem(Item* item)
 	{
 		if(items[i] == item)
 		{
-			mass -= item->mass;
-			items.erase(items.begin()+i);
+			RemoveItem(i);
 			return;
 		}
 	}
 }
 
-void Inventory::RemoveItem(string name)
+Item* Inventory::RemoveItem(string name)
 {
 	for(uint i = 0; i < items.size(); ++i)
 	{
 		if(items[i]->owner->name == name)
 		{
-			mass -= items[i]->mass;
-			items.erase(items.begin()+i);
-			return;
+			return RemoveItem(i);
 		}
 	}
+	return nullptr;
+}
+
+Item* Inventory::RemoveItem(uint32_t idx)
+{
+	if(items.size() <= idx)
+	{
+		return nullptr;
+	}
+
+	Item* item = items[idx];
+	mass -= item->mass;
+	items.erase(items.begin()+idx);
+	if(equippedItem > idx && idx > 0)
+	{
+		--equippedItem;
+	}
+	return item;
 }
 
 Item* Inventory::GetItem(string name)
@@ -132,28 +147,29 @@ Item* Inventory::GetItem(string name)
 	return nullptr;
 }
 
-void Inventory::Equip(string name)
+Item* Inventory::Equip(string name)
 {
 	for(uint i = 0; i < items.size(); ++i)
 	{
 		if(items[i]->owner->name == name)
 		{
-			Equip(i);
-			return;
+			return Equip(i);
+		//	return;
 		}
 	}
 }
 
-void Inventory::Equip(uint32_t idx)
+Item* Inventory::Equip(uint32_t idx)
 {
 	if(items.size() <= idx || equippedItem == idx)
 	{
-		return;
+		return nullptr;
 	}
 
 	if(items.size() > equippedItem) items[equippedItem]->Equip(false);
 	equippedItem = idx;
 	items[equippedItem]->Equip(true);
+	return items[equippedItem];
 }
 
 

@@ -53,6 +53,9 @@ public:
 
 	void Jump(float value);
 	void Fire(float value);
+
+	void ToggleInventory();
+
 	void NextItem();
 	void PreviousItem();
 

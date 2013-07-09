@@ -5,10 +5,48 @@ set(CMAKE_CXX_COMPILER "clang++")
 endif()
 
 cmake_minimum_required(VERSION 2.8)
+cmake_policy(SET CMP0015 NEW)
 project(galaga)
 
-get_filename_component(ROOT "./" REALPATH)
-set(LFANT ${ROOT}/lfant)
+set(PLATFORM "")
+if(UNIX)
+	if(APPLE)
+		set(PLATFORM "macosx")
+	else()
+		set(PLATFORM "linux")
+	endif()
+else()
+	if(WIN32)
+		set(PLATFORM "windows")
+	endif()
+endif()
+
+if(PLATFORM STREQUAL "linux")
+	if(EXISTS "${PROJECT_SOURCE_DIR}/bin32/linux/lfant/")
+	else()
+		file(STRINGS "${PROJECT_SOURCE_DIR}/bin32/linux/lfantdir.txt" TEMP_STR)
+		message("Project lfant dir: ${TEMP_STR}")
+		execute_process(
+			COMMAND cd ${PROJECT_SOURCE_DIR};ln -s ${TEMP_STR} bin32/linux/lfant
+			)
+	endif()
+endif()
+
+if(PLATFORM STREQUAL "windows")
+	if(EXISTS "${PROJECT_SOURCE_DIR}/bin32/windows/lfant/")
+	else()
+		file(STRINGS "${PROJECT_SOURCE_DIR}/bin32/windows/lfantdir.txt" TEMP_STR)
+		message("cmd /c 'mklink /D \"${PROJECT_SOURCE_DIR}/bin32/windows/lfant\" \"${TEMP_STR}\"'")
+		execute_process(
+			COMMAND cmd /c 'mklink /D \"${PROJECT_SOURCE_DIR}/bin32/windows/lfant\" \"${TEMP_STR}\"'
+	#		RESULT_VARIABLE TEMP_STR
+			)
+	#	message("Output: '${TEMP_STR}'")
+	endif()
+endif()
+
+get_filename_component(ROOT "${PROJECT_SOURCE_DIR}/" REALPATH)
+set(LFANT ${ROOT}/bin32/${PLATFORM}/lfant)
 set(CMAKE_MODULE_PATH ${LFANT}/cmake)
 
 include(Config)
@@ -32,6 +70,9 @@ link_directories(
 
 # Output Library Info
 add_library(${PROJECT_NAME} SHARED ${GAME_SRC})
+target_link_libraries(${PROJECT_NAME}
+	lfant
+	)
 add_executable(launcher ${LAUNCHER_SRC})
 
 # Includes
@@ -50,11 +91,7 @@ target_link_libraries(launcher
 	)
 
 if(PLATFORM STREQUAL "linux")
-target_link_libraries(launcher
-	dl
-	)
+	target_link_libraries(launcher
+		dl
+		)
 endif()
-
-target_link_libraries(${PROJECT_NAME}
-	lfant
-	)

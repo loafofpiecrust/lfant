@@ -35,6 +35,8 @@ namespace lfant {
 namespace galaga {
 
 IMPLEMENT_COMP(Weapon)
+IMPLEMENT_COMP(Weapon::Part)
+IMPLEMENT_COMP(Weapon::Body)
 
 Weapon::Weapon()
 {
@@ -319,6 +321,79 @@ void Weapon::RemovePart(Weapon::Part* part)
 	bulletSpeed -= part->bulletSpeed;
 	spread -= part->spread;
 	recoil -= 1/part->mass * part->bulletSpeed/100;
+}
+
+
+Weapon::Part::Part()
+{
+}
+
+Weapon::Part::~Part()
+{
+}
+
+void Weapon::Part::Load(Properties* prop)
+{
+	Item::Load(prop);
+
+	type = (Weapon::Part::Type)prop->Get<byte>("type");
+	prop->Get("meleeDamage", meleeDamage);
+	prop->Get("bulletSpeed", bulletSpeed);
+	prop->Get("spread", spread);
+	prop->Get("fireRate", fireRate);
+	prop->Get("ammo", ammo);
+	prop->Get("projectilePath", projectilePath);
+	prop->Get("attachmentPoint", attachmentPoint);
+}
+
+void Weapon::Part::Save(Properties* prop)
+{
+	Item::Save(prop);
+
+	prop->Set("type", (byte)type);
+	prop->Set("meleeDamage", meleeDamage);
+	prop->Set("bulletSpeed", bulletSpeed);
+	prop->Set("spread", spread);
+	prop->Set("fireRate", fireRate);
+	prop->Set("ammo", ammo);
+	prop->Set("projectilePath", projectilePath);
+	prop->Set("attachmentPoint", attachmentPoint);
+}
+
+
+Weapon::Body::Body()
+{
+	type = Weapon::Part::Type::Body;
+}
+
+void Weapon::Body::Load(Properties* prop)
+{
+	Part::Load(prop);
+
+	prop->Get("automatic", automatic);
+	prop->Get("projectiles", projectiles);
+	prop->Get("shotCost", shotCost);
+
+	for(auto& patt : prop->GetChildren("attachment"))
+	{
+		attachmentPoints[(Weapon::Part::Type)patt->Get<byte>("type")] = patt->Get<vec3>("position");
+	}
+}
+
+void Weapon::Body::Save(Properties* prop)
+{
+	Part::Save(prop);
+
+	prop->Set("automatic", automatic);
+	prop->Set("projectiles", projectiles);
+	prop->Set("shotCost", shotCost);
+
+	for(auto& att : attachmentPoints)
+	{
+		Properties* patt = prop->AddChild("attachment");
+		patt->Set("type", (byte)att.first);
+		patt->Set("position", att.second);
+	}
 }
 
 }

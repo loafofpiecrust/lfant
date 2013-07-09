@@ -110,7 +110,7 @@ void Camera::UpdateProjection()
 			Log(lexical_cast<string>(fov));
 			Log(lexical_cast<string>(aspectRatio));
 			Log(lexical_cast<string>(viewRange));
-			projection = glm::perspective(fov, aspectRatio, viewRange.min, viewRange.max);
+			projection = glm::perspective(fov/aperture, aspectRatio, viewRange.min, viewRange.max);
 			Log("projection: ", lexical_cast<string>(projection));
 			break;
 		}
@@ -175,6 +175,17 @@ void Camera::SetViewRange(float min, float max)
 Range<float> Camera::GetViewRange()
 {
 	return viewRange;
+}
+
+void Camera::SetAperture(float value)
+{
+	aperture = value;
+	UpdateProjection();
+}
+
+float Camera::GetAperture()
+{
+	return aperture;
 }
 
 }

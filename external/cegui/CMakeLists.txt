@@ -68,7 +68,11 @@ file(GLOB HEADER_FILES
 # Remove unneeded source files
 list(REMOVE_ITEM SRC_FILES FribidiVisualMapping.cpp)
 if(PLATFORM STREQUAL "windows")
-	list(REMOVE_ITEM SRC_FILES "${PROJECT_SOURCE_DIR}/cegui/src/IconvStringTranscoder.cpp")
+	list(REMOVE_ITEM SRC_FILES 
+		${PROJECT_SOURCE_DIR}/cegui/src/IconvStringTranscoder.cpp
+		${PROJECT_SOURCE_DIR}/cegui/src/MinizipResourceProvider.cpp
+		${PROJECT_SOURCE_DIR}/cegui/src/PCRERegexMatcher.cpp
+		)
 else()
 	list(REMOVE_ITEM SRC_FILES
 		${PROJECT_SOURCE_DIR}/cegui/src/Win32StringTranscoder.cpp
@@ -80,6 +84,13 @@ if(PLATFORM STREQUAL "osx")
 else()
 	list(REMOVE_ITEM SRC_FILES
 		${PROJECT_SOURCE_DIR}/cegui/src/RendererModules/OpenGL/ApplePBTextureTarget.cpp
+		)
+endif()
+
+if(PLATFORM STREQUAL "linux")
+else()
+	list(REMOVE_ITEM SRC_FILES
+		${PROJECT_SOURCE_DIR}/cegui/src/RendererModules/OpenGL/GLXPBTextureTarget.cpp
 		)
 endif()
 
@@ -97,12 +108,22 @@ include_directories(
 	)
 
 target_link_libraries(${PROJECT_NAME}
-	pcre
 	glew
-#	xerces-c
 	freetype
-	dl
 	)
+
+if(PLATFORM STREQUAL "linux")
+	target_link_libraries(${PROJECT_NAME}
+		pcre
+		dl
+		)
+endif()
+
+if(PLATFORM STREQUAL "windows")
+	target_link_libraries(${PROJECT_NAME}
+		winmm
+		)
+endif()
 
 add_definitions(
 	-DCEGUI_STATIC

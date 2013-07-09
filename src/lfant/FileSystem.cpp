@@ -63,7 +63,13 @@ string GetProgramDir()
 #elif WINDOWS
 string GetProgramDir()
 {
+	HMODULE hmod = GetModuleHandle(0);
+	char file[100];
+	GetModuleFileName(hmod, file, 100);
 
+	path p(file);
+	p.remove_filename();
+	return p.string();
 }
 #elif MACOSX
 

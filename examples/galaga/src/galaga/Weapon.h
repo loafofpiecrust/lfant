@@ -44,11 +44,12 @@ public:
 
 	class Part : public Item
 	{
+		DECLARE_COMP(Part)
 		friend class Weapon;
 	public:
 		enum class Type : byte
 		{
-			Body = 1,
+			Body = 0,
 			Grip,
 			Stock,
 			Barrel,
@@ -57,8 +58,8 @@ public:
 			Sight
 		};
 
-		Part() {}
-		~Part() {}
+		Part();
+		~Part();
 
 		void Load(Properties* prop);
 		void Save(Properties* prop);
@@ -83,6 +84,7 @@ public:
 
 	class Body : public Part
 	{
+		DECLARE_COMP(Body)
 	public:
 		Body();
 

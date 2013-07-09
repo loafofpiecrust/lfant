@@ -88,7 +88,7 @@ void Voxel::Chunk::BeginRender()
 	
 	if(blockBuffer.id)
 	{
-		glDeleteBuffers(1, blockBuffer.id);
+		glDeleteBuffers(1, &blockBuffer.id);
 	}
 
 	glGenBuffers(1, &blockBuffer.id);
@@ -100,7 +100,7 @@ void Voxel::Chunk::BeginRender()
 
 void Voxel::Chunk::Render()
 {
-	glEnableVertexAttribute(0);
+//	glEnableVertexAttribute(0);
 	glBindBuffer(GL_ARRAY_BUFFER, blockBuffer);
 	glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
 
@@ -121,13 +121,17 @@ Voxel::Voxel() :
 {
 	chunks.emplace_back();
 //	vec3 pos(0);
-	for(uint x = 0; x < chunks[0].blocks.size(); ++x)
+	uint32_t i1 = chunks.size()-1;
+	uint32_t i2 = chunks[i1].size()-1;
+	uint32_t i3 = chunks[i1][i2].size()-1;
+	Chunk& chunk = chunks[i1][i2][i3];
+	for(uint x = 0; x < chunk.blocks.size(); ++x)
 	{
-		for(uint y = 0; y < chunks[0].blocks[x].size(); ++y)
+		for(uint y = 0; y < chunk.blocks[x].size(); ++y)
 		{
-			for(uint z = 0; z < chunks[0].blocks[x][y].size(); ++z)
+			for(uint z = 0; z < chunk.blocks[x][y].size(); ++z)
 			{
-				vertexBuffer.emplace_back(x, y, z);
+			//	vertexBuffer.emplace_back(x, y, z);
 			}
 		}
 	}
