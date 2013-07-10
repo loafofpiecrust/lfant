@@ -81,7 +81,7 @@ public:
 	{
 		C* comp = new C();
 		AddComponent(comp, prop);
-		TriggerEvent("SetComponent"+RemoveScoping(Type(comp)), comp);
+		TriggerEvent("SetComponent"+RemoveScoping(type::Name(comp)), comp);
 		return comp;
 	}
 
@@ -123,7 +123,7 @@ public:
 		deque<C*> comps;
 		for(auto& comp : components)
 		{
-			if(Type(comp) == Type<C>())
+			if(type::Name(comp) == type::Name<C>())
 			{
 				comps += dynamic_cast<C*>(comp.get());
 			}
@@ -160,9 +160,7 @@ protected:
 
 	virtual void Init();
 	virtual void Update();
-	virtual void OnDestroy()
-	{
-	}
+	virtual void OnDestroy() {}
 
 	void AddChild(Entity* ent);
 	void RemoveChild(Entity* ent);
@@ -196,7 +194,7 @@ private:
 	deque< ptr<Component, Object::Delete> > components;
 	bool useLifeTime = false;
 
-	/// 64-bit scene-unique identifier.
+	/// Scene-unique identifier.
 	uint32_t id = 0;
 
 	/// The layer of this entity for primarily display filtering

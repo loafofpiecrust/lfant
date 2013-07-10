@@ -48,6 +48,8 @@ void Camera::Save(Properties* prop)
 	prop->Set("fov", fov);
 	prop->Set("aspectRatio", aspectRatio);
 	prop->Set("viewRange", viewRange);
+	prop->Set("dof", dof);
+	prop->Set("dofWidth", dofWidth);
 //	prop->Set("mode", (short)mode);
 }
 
@@ -58,6 +60,8 @@ void Camera::Load(Properties* prop)
 	prop->Get("fov", fov);
 	prop->Get("aspectRatio", aspectRatio);
 	prop->Get("viewRange", viewRange);
+	prop->Get("dof", dof);
+	prop->Get("dofWidth", dofWidth);
 //	mode = (Mode)prop->Get<short>("mode");
 
 	UpdateProjection();
