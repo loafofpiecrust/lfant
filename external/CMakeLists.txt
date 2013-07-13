@@ -1,4 +1,4 @@
-project(sfexternal)
+project(external)
 
 set(LIBRARY_OUTPUT_PATH "${ROOT}/bin${ARCH}/${PLATFORM}")
 
@@ -8,8 +8,7 @@ add_subdirectory(glew)
 add_subdirectory(boost)
 add_subdirectory(bullet)
 add_subdirectory(assimp)
-#add_subdirectory(squirrel)
-add_subdirectory(angelscript)
+add_subdirectory(squirrel)
 add_subdirectory(cegui)
 add_subdirectory(zlib)
 add_subdirectory(png)

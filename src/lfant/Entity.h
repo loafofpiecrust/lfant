@@ -39,6 +39,9 @@ namespace lfant {
 class Component;
 class Item;
 class Transform;
+class Entity;
+
+bool EntityActive(Entity* ent);
 
 /** @addtogroup Game
  *	@{
@@ -65,29 +68,37 @@ class Entity : public Object
 	friend class Renderer;
 
 public:
+	Entity();
+	Entity(const Entity& ent);
+	virtual ~Entity();
 
-	void Destroy();
+	Entity& operator=(const Entity& other);
 
-	void Bind();
-	void Save(Properties* prop);
-	void Load(Properties* prop, bool init = true);
+	virtual void Destroy();
+
+	virtual void Save(Properties* prop) const;
+	virtual void Load(Properties* prop);
+
+	void Load(Properties* prop, bool init);
+
+	static void Bind() __attribute__((constructor));
 
 	/**
 	 *	Adds a new component by instancing the given type.
 	 *	@tparam C The class of component to add.
 	 */
 	template<typename C>
-	C* AddComponent(Properties* prop = nullptr)
+	C* AddComponent()
 	{
 		C* comp = new C();
-		AddComponent(comp, prop);
-		TriggerEvent("SetComponent"+RemoveScoping(type::Name(comp)), comp);
+		AddComponent(comp);
+		TriggerEvent("SetComponent"+type::Unscope(type::Name(comp)), comp);
 		return comp;
 	}
 
-	Component* AddComponent(string type, Properties* prop = nullptr);
+	Component* AddComponent(string type);
 
-	void AddComponent(Component* comp, Properties* prop = nullptr);
+	void AddComponent(Component* comp);
 
 	/**
 	 *	Removes a component from this Entity
@@ -95,12 +106,14 @@ public:
 	 */
 	template<typename C>
 	void RemoveComponent();
-	void RemoveComponent(Component* comp, bool destroy = true);
+	void RemoveComponent(string type);
+	void RemoveComponent(Component* comp);
 
 	/**
 	 *	Clones an identical instance of this Entity.
 	 */
-	Entity* Clone(string name, Entity* parent = nullptr);
+	Entity* Clone(string name = "", Entity* parent = nullptr) const;
+	void Clone(Entity* ent, string name = "", Entity* parent = nullptr) const;
 
 	template<typename C>
 	C* GetComponent()
@@ -140,6 +153,7 @@ public:
 	string GetLayer();
 	void SetLayer(string layer);
 
+	Entity* GetParent();
 	void SetParent(Entity* ent);
 
 	Transform* transform;
@@ -153,8 +167,6 @@ public:
 	deque<string> tags;
 
 	float lifetime = 0.0f;
-
-	Entity* parent = nullptr;
 
 protected:
 
@@ -172,6 +184,7 @@ protected:
 		TriggerEvent(name, args...);
 		for(auto& c : children)
 		{
+			if(!EntityActive(c)) continue;
 			c->TriggerEventWithChildren(name, args...);
 		}
 	}
@@ -180,18 +193,18 @@ protected:
 	void TriggerEventWithParent(string name, P... args)
 	{
 		TriggerEvent(name, args...);
-		if(parent)
+		if(parent && EntityActive(parent))
 		{
 			parent->TriggerEvent(name, args...);
 		}
 	}
 
 private:
-	Entity();
-	virtual ~Entity();
 
-	deque< ptr<Entity, Object::Delete> > children;
-	deque< ptr<Component, Object::Delete> > components;
+	Component* AddComponent(string type, Properties* prop);
+
+	deque< ptr<Entity> > children;
+	deque< ptr<Component> > components;
 	bool useLifeTime = false;
 
 	/// Scene-unique identifier.
@@ -199,6 +212,8 @@ private:
 
 	/// The layer of this entity for primarily display filtering
 	string layer = "Main";
+
+	Entity* parent = nullptr;
 };
 
 /** @} */

@@ -233,6 +233,7 @@ void Input::Update()
 
 void Input::Load(Properties* prop)
 {
+	Subsystem::Load(prop);
 //	Properties root("settings/input.cfg");
 //	Properties* prop = root.GetChild("input");
 	Log("Loading input props...");
@@ -255,6 +256,11 @@ void Input::Load(Properties* prop)
 		i->Get("snap", axis.snap);
 		i->Get("joyNum", axis.joyNum);
 	}
+}
+
+void Input::Save(Properties* prop) const
+{
+	Subsystem::Save(prop);
 }
 
 /*******************************************************************************
@@ -399,7 +405,7 @@ void Input::AddAxis(string name, string positive, string negative, string altpos
 	axes.push_back(Axis(name, Key[positive], Key[negative], Key[altpos], Key[altneg], sens, dead, snap, joyNum));
 }
 
-float Input::GetAxis(string name)
+float Input::GetAxis(string name) const
 {
 	for(auto& axis : axes)
 	{
@@ -417,57 +423,46 @@ float Input::GetAxis(string name)
 	return 0.0f;
 }
 
-bool Input::GetButton(string name, bool positive)
+int8_t Input::GetButton(string name) const
 {
 	for(auto axis : axes)
 	{
 		if(axis.name == name)
 		{
-			if(positive)
+			if(axis.value > axis.dead && axis.posHeld)
 			{
-				if(axis.value > axis.dead && axis.posHeld)
-				{
-					return true;
-				}
+				return 1;
 			}
-			else
+			if(axis.value < -axis.dead && axis.negHeld)
 			{
-				if(axis.value < -axis.dead && axis.negHeld)
-				{
-					return true;
-				}
+				return -1;
 			}
+			return 0;
 		}
 	}
-	return false;
+	return 0;
 }
 
-bool Input::GetButtonDown(string name, bool positive)
+int8_t Input::GetButtonDown(string name) const
 {
 	for(auto& axis : axes)
 	{
-		if(axis.name == name)
+		if(axis.name == name && axis.down != 0)
 		{
-			if(positive)
+			if(axis.posHeld)
 			{
-				if(axis.posHeld)
-				{
-					return axis.down;
-				}
+				return axis.down;
 			}
-			else
+			else if(axis.negHeld)
 			{
-				if(axis.negHeld)
-				{
-					return axis.down;
-				}
+				return -axis.down;
 			}
 		}
 	}
 	return false;
 }
 
-bool Input::GetButtonUp(string name, bool positive)
+int8_t Input::GetButtonUp(string name) const
 {
 	for(auto axis : axes)
 	{
@@ -485,7 +480,7 @@ bool Input::GetButtonUp(string name, bool positive)
 *
 *******************************************************************************/
 
-ivec2 Input::GetMousePos()
+ivec2 Input::GetMousePos() const
 {
 	dvec2 result;
 	glfwGetCursorPos(game->renderer->GetWindowHandle(), &result.x, &result.y);

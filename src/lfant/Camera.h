@@ -50,14 +50,17 @@ class Camera : public Component
 	friend class Renderer;
 public:
 	Camera();
+	Camera(const Camera& other);
 	virtual ~Camera();
+
+	virtual Component* Clone(Entity* owner) const;
 
 	virtual void Init();
 	virtual void Update();
 	virtual void OnDestroy();
 
-	void Save(Properties* prop);
-	void Load(Properties* prop);
+	virtual void Save(Properties* prop) const;
+	virtual void Load(Properties* prop);
 
 	/**
 	 *	Updates the projection to use the current settings

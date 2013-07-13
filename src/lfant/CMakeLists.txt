@@ -44,8 +44,7 @@ include_directories(
 	${ROOT}/external/glew/include
 	${ROOT}/external/glfw/include
 	${ROOT}/external/cegui/cegui/include
-	${ROOT}/external/angelscript/include
-	${ROOT}/external/angelscript/add_on
+	${ROOT}/external/squirrel/include
 	${ROOT}/external/devil/include
 #	"${ROOT}/external/gameswf"
 	)
@@ -57,16 +56,11 @@ target_link_libraries(${PROJECT_NAME}
 	glfw
 	boost
 	bullet
-#	bass
 	CEGUI
 	png
 	z
-	angelscript
+	squirrel
 	jpeg
-#	OpenCL
-#	gameswf
-#	devil
-#	jsonspirit
 	)
 
 if(PLATFORM STREQUAL "linux")

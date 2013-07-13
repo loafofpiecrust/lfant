@@ -163,6 +163,11 @@ Item* Inventory::GetItem(string name)
 	return nullptr;
 }
 
+Item* Inventory::GetCurrentItem()
+{
+	return items[equippedItem];
+}
+
 Item* Inventory::Equip(string name)
 {
 	for(uint i = 0; i < items.size(); ++i)
@@ -201,71 +206,71 @@ Item::~Item()
 
 void Item::Save(Properties* prop)
 {
- Component::Save(prop);
+	Component::Save(prop);
 
- prop->Set("mass", mass);
- prop->Set("initialPosition", initialPosition);
- prop->Set("equippedPosition", equippedPosition);
- prop->Set("equipped", equipped);
+	prop->Set("mass", mass);
+	prop->Set("initialPosition", initialPosition);
+	prop->Set("equippedPosition", equippedPosition);
+	prop->Set("equipped", equipped);
 }
 
 void Item::Load(Properties* prop)
 {
- Component::Load(prop);
+	Component::Load(prop);
 
- prop->Get("mass", mass);
- Log("Loading, mass: ", mass);
- prop->Get("initialPosition", initialPosition);
- prop->Get("equippedPosition", equippedPosition);
- Log("Loading, equippedPos: ", lexical_cast<string>(equippedPosition));
- prop->Get("equipped", equipped);
+	prop->Get("mass", mass);
+	Log("Loading, mass: ", mass);
+	prop->Get("initialPosition", initialPosition);
+	prop->Get("equippedPosition", equippedPosition);
+	Log("Loading, equippedPos: ", lexical_cast<string>(equippedPosition));
+	prop->Get("equipped", equipped);
 }
 
 void Item::Init()
 {
- Component::Init();
- Inventory* inv = nullptr;
- if(owner->parent && (inv = owner->parent->GetComponent<Inventory>()))
- {
-  Log("Adding item to parent inventory");
-  inv->AddItem(this);
- }
+	Component::Init();
+	Inventory* inv = nullptr;
+	if(owner->parent && (inv = owner->parent->GetComponent<Inventory>()))
+	{
+		Log("Adding item to parent inventory");
+		inv->AddItem(this);
+	}
 }
 
 void Item::OnDestroy()
 {
- Component::OnDestroy();
- inventory->RemoveItem(this);
+	Component::OnDestroy();
+	inventory->RemoveItem(this);
 }
 
 void Item::Equip(bool val)
 {
- Log("Activating this item");
- owner->active = val;
-// Enable(val);
- Log("Setting equipped");
- equipped = val;
- if(val)
- {
-  Log("Setting position, equippedPos: ", lexical_cast<string>(equippedPosition));
-  owner->transform->SetPosition(equippedPosition);
- }
- else
- {
-  owner->transform->SetPosition(initialPosition);
- }
- Log("Done");
+	Log("Activating this item");
+	owner->active = val;
+//	Enable(val);
+	Log("Setting equipped");
+	equipped = val;
+	if(val)
+	{
+		Log("Setting position, equippedPos: ", lexical_cast<string>(equippedPosition));
+		owner->transform->SetPosition(equippedPosition);
+	}
+	else
+	{
+		owner->transform->SetPosition(initialPosition);
+	}
+	Log("Done");
 }
 
 void Item::Use(byte mode)
 {
- Log("ITEM USED!");
- TriggerEvent("Use", mode);
+	Log("ITEM USED!");
+	TriggerEvent("Use", mode);
 }
 
 void Item::EndUse()
 {
- TriggerEvent("EndUse");
+	TriggerEvent("EndUse");
 }
 
 }

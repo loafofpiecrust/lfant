@@ -35,13 +35,13 @@ scene Galaga
 		{
 		}
 
+		component Inventory
+		{
+			equippedItem = 0
+		}
+
 		entity Inventory
 		{
-			component Inventory
-			{
-				equippedItem = 0
-			}
-
 			entity Laser
 			{
 				component Item

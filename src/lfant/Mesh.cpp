@@ -72,7 +72,7 @@ void Mesh::Load(Properties *prop)
 	LoadFile(file);
 }
 
-void Mesh::Save(Properties *prop)
+void Mesh::Save(Properties *prop) const
 {
 	Component::Save(prop);
 
@@ -205,7 +205,7 @@ void Mesh::Render()
 	if(material->texture->GetId() != -1)
 	{
 	//	Log("Setting texture uniforms.");
-		material->shader->SetUniform("textureSampler", material->texture);
+		material->shader->SetUniform("textureSampler", material->texture.get());
 		material->shader->SetUniform("tiling", material->texture->tiling);
 	}
 

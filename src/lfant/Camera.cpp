@@ -37,11 +37,23 @@ Camera::Camera()
 {
 }
 
+Camera::Camera(const Camera& other) :
+	Component(other)
+{
+}
+
 Camera::~Camera()
 {
 }
 
-void Camera::Save(Properties* prop)
+Component* Camera::Clone(Entity* owner) const
+{
+	Camera* inst = new Camera;
+	Component::Clone(inst, owner);
+	return inst;
+}
+
+void Camera::Save(Properties* prop) const
 {
 	Component::Save(prop);
 

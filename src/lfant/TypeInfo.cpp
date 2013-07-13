@@ -38,7 +38,7 @@ string Demangle(string type)
 	return string(abi::__cxa_demangle(type.c_str(), 0, 0, (int*)0));
 }
 
-string RemoveScoping(string type)
+string Unscope(string type)
 {
 	deque<string> toks = Split(type, ":");
 	return toks[toks.size()-1];

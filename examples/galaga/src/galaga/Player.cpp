@@ -24,6 +24,7 @@
 
 // Internal
 #include <galaga/Galaga.h>
+#include <galaga/Inventory.h>
 #include <lfant/Input.h>
 #include <lfant/Console.h>
 #include <lfant/Time.h>
@@ -49,25 +50,27 @@ void Player::Init()
 
 	ConnectEvent(SENDER(game->input, Jump), RECEIVER(this, Jump));
 	ConnectEvent(SENDER(game->input, Fire), RECEIVER(this, Fire));
-	ConnectEvent(SENDER(game->input, Inventory), RECEIVER(this, ToggleInventory));
+	ConnectEvent(SENDER(game->input, ToggleInventory), RECEIVER(this, ToggleInventory));
 	ConnectEvent(SENDER(game->input, NextItem), RECEIVER(this, NextItem));
 	ConnectEvent(SENDER(game->input, PreviousItem), RECEIVER(this, PreviousItem));
 	ConnectEvent(SENDER(game->input, DropItem), RECEIVER(this, DropItem));
+
+	ConnectEvent(SENDER(owner, SetComponentInventory), &inventory);
 }
 
 void Player::PreviousItem()
 {
-	TriggerEventWithChildren("EquipItem", 0u);
+	TriggerEvent("EquipItem", 0u);
 }
 
 void Player::NextItem()
 {
-	TriggerEventWithChildren("EquipItem", 1u);
+	TriggerEvent("EquipItem", 1u);
 }
 
 void Player::DropItem()
 {
-	TriggerEventWithChildren("RemoveItem", -1u);
+	TriggerEvent("RemoveItem", -1u);
 }
 
 void Player::Jump(float value)
@@ -81,14 +84,17 @@ void Player::Jump(float value)
 
 void Player::Fire(float value)
 {
+	if(!inventory)
+		return;
+
 	if(value == 1.0f)
 	{
 		Log("Player fired");
-		TriggerEventWithChildren("UseItem", (byte)0);
+		inventory->GetCurrentItem()->Use(0);
 	}
 	else
 	{
-		TriggerEventWithChildren("EndUseItem");
+		inventory->GetCurrentItem()->EndUse();
 	}
 }
 
@@ -170,7 +176,7 @@ void Player::Update()
 	}
 	if(game->input->GetButtonDown("Reload"))
 	{
-		TriggerEventWithChildren("UseItem", (byte)1);
+		inventory->TriggerEvent("Reload");
 	}
 }
 

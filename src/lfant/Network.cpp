@@ -20,14 +20,13 @@
 
 #include <lfant/Network.h>
 
-// External
-
 // Internal
-
 #include <lfant/Console.h>
 #include <lfant/Thread.h>
 
 #include <lfant/net/Connection.h>
+
+// External
 
 namespace lfant
 {
@@ -56,7 +55,7 @@ void Network::Update()
 	}
 }
 
-void Network::Save(Properties *prop)
+void Network::Save(Properties *prop) const
 {
 	for(auto& con : connections)
 	{
@@ -75,7 +74,7 @@ void Network::Load(Properties *prop)
 	}
 }
 
-net::Connection* Network::GetConnection(string name)
+net::Connection* Network::GetConnection(string name) const
 {
 	for(auto& con : connections)
 	{

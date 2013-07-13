@@ -107,9 +107,10 @@ void Weapon::Init()
 {
 	Component::Init();
 	
-	ConnectEvent(SENDER(owner, Use), RECEIVER(this, Fire));
-	ConnectEvent(SENDER(owner, EndUse), RECEIVER(this, EndFire));
-	ConnectEvent(SENDER(this, Reload), RECEIVER(this, EndReload));
+	ConnectEvent(SENDER(this, Use), RECEIVER(this, Fire));
+	ConnectEvent(SENDER(this, EndUse), RECEIVER(this, EndFire));
+	ConnectEvent(SENDER(this, Reload), RECEIVER(this, Reload));
+	ConnectEvent(SENDER(this, EndReload), RECEIVER(this, EndReload));
 
 	lastFire = 1/fireRate;
 }
@@ -149,7 +150,7 @@ void Weapon::Fire(byte mode)
 		{
 			Log("Cancel reload");
 			reloading = false;
-			CancelTimer("Reload");
+			CancelTimer("EndReload");
 			TriggerEvent("StopAnimation");
 		}
 
@@ -201,7 +202,7 @@ void Weapon::Reload()
 
 	Log("Beginning reload");
 	reloading = true;
-	SetTimer("Reload", reloadTime);
+	SetTimer("EndReload", reloadTime);
 	TriggerEvent("PlayAnimation", "Reload", reloadTime);
 }
 

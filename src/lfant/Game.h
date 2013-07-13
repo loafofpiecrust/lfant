@@ -18,7 +18,6 @@
 *
 ******************************************************************************/
 #pragma once
-
 #include <lfant/stdafx.h>
 
 // External
@@ -28,8 +27,7 @@
 
 #include <lfant/Subsystem.h>
 
-namespace lfant
-{
+namespace lfant {
 
 class Renderer;
 class Input;
@@ -64,8 +62,10 @@ public:
 	Game();
 	virtual ~Game();
 
-	void Load(Properties *prop);
-	void Save(Properties *prop);
+	virtual void Load(Properties *prop);
+	virtual void Save(Properties *prop) const;
+
+	static void Bind() __attribute__((constructor));
 
 	/**
 	 *	This function is called right when the game is launched.

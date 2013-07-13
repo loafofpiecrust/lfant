@@ -8,6 +8,8 @@ cmake_minimum_required(VERSION 2.8)
 cmake_policy(SET CMP0015 NEW)
 project(galaga)
 
+get_filename_component(ROOT "${PROJECT_SOURCE_DIR}/" REALPATH)
+
 set(PLATFORM "")
 if(UNIX)
 	if(APPLE)
@@ -20,36 +22,16 @@ else()
 		set(PLATFORM "windows")
 	endif()
 endif()
-
-if(PLATFORM STREQUAL "linux")
-	if(EXISTS "${PROJECT_SOURCE_DIR}/bin32/linux/lfant/")
-	else()
-		file(STRINGS "${PROJECT_SOURCE_DIR}/bin32/linux/lfantdir.txt" TEMP_STR)
-		message("Project lfant dir: ${TEMP_STR}")
-		execute_process(
-			COMMAND cd ${PROJECT_SOURCE_DIR};ln -s ${TEMP_STR} bin32/linux/lfant
-			)
-	endif()
-endif()
-
-if(PLATFORM STREQUAL "windows")
-	if(EXISTS "${PROJECT_SOURCE_DIR}/bin32/windows/lfant/")
-	else()
-		file(STRINGS "${PROJECT_SOURCE_DIR}/bin32/windows/lfantdir.txt" TEMP_STR)
-		message("cmd /c 'mklink /D \"${PROJECT_SOURCE_DIR}/bin32/windows/lfant\" \"${TEMP_STR}\"'")
-		execute_process(
-			COMMAND cmd /c 'mklink /D \"${PROJECT_SOURCE_DIR}/bin32/windows/lfant\" \"${TEMP_STR}\"'
-	#		RESULT_VARIABLE TEMP_STR
-			)
-	#	message("Output: '${TEMP_STR}'")
-	endif()
-endif()
-
-get_filename_component(ROOT "${PROJECT_SOURCE_DIR}/" REALPATH)
-set(LFANT ${ROOT}/bin32/${PLATFORM}/lfant)
+file(STRINGS "${PROJECT_SOURCE_DIR}/bin32/${PLATFORM}/lfantdir.txt" LFANT)
 set(CMAKE_MODULE_PATH ${LFANT}/cmake)
 
 include(Config)
+
+add_custom_command(
+	TARGET ${PROJECT_NAME} PRE_BUILD
+	COMMAND cp ${LFANT}/${BIN}/*.dll ${ROOT}/${BIN}/lib
+	COMMAND cp ${LFANT}/${BIN}/*.a ${ROOT}/${BIN}/lib
+	)
 
 # Source Dir
 file(GLOB_RECURSE GAME_SRC

@@ -205,7 +205,8 @@ public:
 	virtual void Init();
 	virtual void Update();
 
-	void Load(Properties *prop);
+	virtual void Load(Properties* prop);
+	virtual void Save(Properties* prop) const;
 
 	/** Called when any key is pressed or released.
 	 *	@param key The key that was used.
@@ -219,14 +220,14 @@ public:
 	void AddAxis(string name, string positive = "null", string negative = "null", string altpos = "null", string altneg = "null", float sens = 3.0f, float dead = 0.001f, bool snap = true, byte joyNum = 0);
 
 	// Axes
-	float GetAxis(string name);
+	float GetAxis(string name) const;
 
 	// Buttons: Positive side of the given axis
-	int8_t GetButton(string name);
-	int8_t GetButtonDown(string name);
-	int8_t GetButtonUp(string name);
+	int8_t GetButton(string name) const;
+	int8_t GetButtonDown(string name) const;
+	int8_t GetButtonUp(string name) const;
 
-	ivec2 GetMousePos();
+	ivec2 GetMousePos() const;
 	void SetMousePos(ivec2 pos);
 	void SetMousePos(int32 x, int32 y);
 

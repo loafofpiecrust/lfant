@@ -25,6 +25,8 @@
 #include <lfant/Thread.h>
 #include <lfant/Renderer.h>
 #include <lfant/Camera.h>
+#include <lfant/Scene.h>
+#include <lfant/Transform.h>
 
 // External
 #include <GL/glew.h>
@@ -150,7 +152,7 @@ void FrameBuffer::AddDepthTexture(string name, Texture::Format form1, Texture::F
 	depthTexName = name;
 }
 
-void FrameBuffer::GetTextures(Shader* sh)
+void FrameBuffer::GetTextures(Shader* sh) const
 {
 	if(textures.size() > 0)
 	{
@@ -165,7 +167,7 @@ void FrameBuffer::GetTextures(Shader* sh)
 	}
 }
 
-Texture* FrameBuffer::GetTexture(string name)
+Texture* FrameBuffer::GetTexture(string name) const
 {
 	if(name == depthTexName)
 	{

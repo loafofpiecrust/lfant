@@ -62,7 +62,7 @@ namespace type {
 string Name();
 
 string Demangle(string type);
-string RemoveScoping(string type);
+string Unscope(string type);
 
 template<typename T>
 auto Name()->typename enable_if<!is_ptr<T>::value, string>::type

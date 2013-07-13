@@ -26,6 +26,8 @@
 
 namespace lfant {
 namespace galaga {
+	
+class Inventory;
 
 /** @addtogroup Galaga
  *	@{
@@ -69,6 +71,8 @@ protected:
 	bool mouseLook = true;
 
 	ivec2 lastMouse;
+
+	Inventory* inventory;
 
 private:
 
