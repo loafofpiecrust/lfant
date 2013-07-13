@@ -35,6 +35,8 @@ namespace lfant {
 namespace galaga {
 
 IMPLEMENT_COMP(Weapon)
+IMPLEMENT_COMP(Weapon::Part)
+IMPLEMENT_COMP(Weapon::Body)
 
 Weapon::Weapon()
 {
@@ -48,6 +50,27 @@ void Weapon::Load(Properties* prop)
 {
 	Component::Load(prop);
 
+	deque<string> partNames;
+	prop->Get("parts", partNames);
+	for(auto& pname : partNames)
+	{
+		Properties* pprop = new Properties;
+		pprop->LoadFile(pname);
+
+		Part* part = nullptr;
+		if(pprop->Get<byte>("type") == (byte)Part::Type::Body)
+		{
+			part = new Body;
+		}
+		else
+		{
+			part = new Part;
+		}
+
+		part->Load(pprop);
+		AddPart(part);
+	}
+
 	prop->Get("currentAmmo", currentAmmo);
 	prop->Get("bulletSpeed", bulletSpeed);
 	prop->Get("maxAmmo", maxAmmo);
@@ -59,6 +82,8 @@ void Weapon::Load(Properties* prop)
 	prop->Get("projectilePath", projectilePath);
 	prop->Get("automatic", automatic);
 	prop->Get("direction", direction);
+
+	projectile->LoadFile(projectilePath);
 }
 
 void Weapon::Save(Properties* prop)
@@ -82,9 +107,10 @@ void Weapon::Init()
 {
 	Component::Init();
 	
-	ConnectEvent(SENDER(owner, Use), RECEIVER(this, Fire));
-	ConnectEvent(SENDER(owner, EndUse), RECEIVER(this, EndFire));
-	ConnectEvent(SENDER(this, Reload), RECEIVER(this, EndReload));
+	ConnectEvent(SENDER(this, Use), RECEIVER(this, Fire));
+	ConnectEvent(SENDER(this, EndUse), RECEIVER(this, EndFire));
+	ConnectEvent(SENDER(this, Reload), RECEIVER(this, Reload));
+	ConnectEvent(SENDER(this, EndReload), RECEIVER(this, EndReload));
 
 	lastFire = 1/fireRate;
 }
@@ -124,7 +150,7 @@ void Weapon::Fire(byte mode)
 		{
 			Log("Cancel reload");
 			reloading = false;
-			CancelTimer("Reload");
+			CancelTimer("EndReload");
 			TriggerEvent("StopAnimation");
 		}
 
@@ -137,8 +163,8 @@ void Weapon::Fire(byte mode)
 			ent->SetLayer(owner->GetLayer());
 			ent->transform->SetPosition(owner->transform->GetWorldPosition());
 			ent->transform->SetRotation(owner->transform->GetWorldRotation());
-			ent->LoadFile(projectilePath);
-			vec3 final = owner->transform->GetDirection() * direction * bulletSpeed / game->time->deltaTime;
+			ent->Load(projectile);
+			vec3 final = owner->transform->GetDirection() * direction * bulletSpeed * 1000.0f;
 			Log("Weapon bullet speed firing, ", bulletSpeed, ", final accel of ", lexical_cast<string>(final));
 			ent->TriggerEvent("Accelerate", final);
 		}
@@ -176,7 +202,7 @@ void Weapon::Reload()
 
 	Log("Beginning reload");
 	reloading = true;
-	SetTimer("Reload", reloadTime);
+	SetTimer("EndReload", reloadTime);
 	TriggerEvent("PlayAnimation", "Reload", reloadTime);
 }
 
@@ -191,6 +217,184 @@ void Weapon::EndReload()
 bool Weapon::CanFire()
 {
 	return lastFire >= 1/fireRate && (released || automatic);
+}
+
+
+void Weapon::Assemble(const deque<Weapon::Part*>& partList)
+{
+	parts[0]->inventory->AddItem(this);
+
+	for(auto& part : partList)
+	{
+		AddPart(part);
+	}
+
+}
+
+void Weapon::AddPart(Weapon::Part* part)
+{
+	if(part->inventory)
+	{
+		part->inventory->RemoveItem(part);
+	}
+	if(part->owner)
+	{
+		part->owner->SetParent(owner);
+	}
+
+	if(part->type == Part::Type::Body)
+	{
+		Body* body = dynamic_cast<Body*>(part);
+		automatic = body->automatic;
+		shotCost = body->shotCost;
+		projectiles = body->projectiles;
+		this->body = body;
+	}
+	else
+	{
+		parts.push_back(part);
+	}
+
+	if(part->type == Part::Type::Ammo)
+	{
+		projectilePath = part->projectilePath;
+		reloadTime += part->mass*2;
+	}
+	else
+	{
+		reloadTime += part->mass/2;
+	}
+
+	mass += part->mass;
+	maxAmmo += part->ammo;
+	fireRate += part->fireRate;
+	meleeDamage += part->meleeDamage;
+	bulletSpeed += part->bulletSpeed;
+	spread += part->spread;
+	recoil += 1/part->mass * part->bulletSpeed/100;
+}
+
+void Weapon::Disassemble()
+{
+	for(auto& p : parts)
+	{
+		if(inventory)
+		{
+			inventory->AddItem(p);
+		}
+		if(owner)
+		{
+			p->owner->SetParent(owner->parent);
+		}
+	}
+	owner->Destroy();
+}
+
+void Weapon::RemovePart(Weapon::Part* part)
+{
+	if(part->type == Part::Type::Body)
+	{
+		Disassemble();
+		return;
+	}
+
+	if(inventory)
+	{
+		inventory->AddItem(part);
+	}
+	if(owner)
+	{
+		part->owner->SetParent(owner->parent);
+	}
+
+	for(uint i = 0; i < parts.size(); ++i)
+	{
+		if(parts[i] == part)
+		{
+			parts.erase(parts.begin()+i);
+			break;
+		}
+	}
+
+	mass -= part->mass;
+	maxAmmo -= part->ammo;
+	meleeDamage -= part->meleeDamage;
+	bulletSpeed -= part->bulletSpeed;
+	spread -= part->spread;
+	recoil -= 1/part->mass * part->bulletSpeed/100;
+}
+
+
+Weapon::Part::Part()
+{
+}
+
+Weapon::Part::~Part()
+{
+}
+
+void Weapon::Part::Load(Properties* prop)
+{
+	Item::Load(prop);
+
+	type = (Weapon::Part::Type)prop->Get<byte>("type");
+	prop->Get("meleeDamage", meleeDamage);
+	prop->Get("bulletSpeed", bulletSpeed);
+	prop->Get("spread", spread);
+	prop->Get("fireRate", fireRate);
+	prop->Get("ammo", ammo);
+	prop->Get("projectilePath", projectilePath);
+	prop->Get("attachmentPoint", attachmentPoint);
+}
+
+void Weapon::Part::Save(Properties* prop)
+{
+	Item::Save(prop);
+
+	prop->Set("type", (byte)type);
+	prop->Set("meleeDamage", meleeDamage);
+	prop->Set("bulletSpeed", bulletSpeed);
+	prop->Set("spread", spread);
+	prop->Set("fireRate", fireRate);
+	prop->Set("ammo", ammo);
+	prop->Set("projectilePath", projectilePath);
+	prop->Set("attachmentPoint", attachmentPoint);
+}
+
+
+Weapon::Body::Body()
+{
+	type = Weapon::Part::Type::Body;
+}
+
+void Weapon::Body::Load(Properties* prop)
+{
+	Part::Load(prop);
+
+	prop->Get("automatic", automatic);
+	prop->Get("projectiles", projectiles);
+	prop->Get("shotCost", shotCost);
+
+	for(auto& patt : prop->GetChildren("attachment"))
+	{
+		attachmentPoints[(Weapon::Part::Type)patt->Get<byte>("type")] = patt->Get<vec3>("position");
+	}
+}
+
+void Weapon::Body::Save(Properties* prop)
+{
+	Part::Save(prop);
+
+	prop->Set("automatic", automatic);
+	prop->Set("projectiles", projectiles);
+	prop->Set("shotCost", shotCost);
+
+	for(auto& att : attachmentPoints)
+	{
+		Properties* patt = prop->AddChild("attachment");
+		patt->Set("type", (byte)att.first);
+		patt->Set("position", att.second);
+	}
 }
 
 }

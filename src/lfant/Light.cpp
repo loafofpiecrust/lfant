@@ -23,6 +23,8 @@
 // External
 
 // Internal
+#include <lfant/Game.h>
+#include <lfant/Renderer.h>
 
 namespace lfant
 {
@@ -37,14 +39,34 @@ Light::~Light()
 
 }
 
+void Light::Load(Properties* prop)
+{
+	Component::Load(prop);
+
+	prop->Get("color", color);
+}
+
+void Light::Save(Properties* prop)
+{
+	Component::Save(prop);
+
+	prop->Set("color", color);
+}
+
 void Light::Init()
 {
-
+	game->renderer->AddLight(this);
+	Renderable::Init();
 }
 
 void Light::Update()
 {
 
+}
+
+void Light::Render()
+{
+	
 }
 
 }

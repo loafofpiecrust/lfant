@@ -7,7 +7,7 @@ glm@g-truc.net
 ================================================================================
 The MIT License
 --------------------------------------------------------------------------------
-Copyright (c) 2005 - 2012 G-Truc Creation (www.g-truc.net)
+Copyright (c) 2005 - 2013 G-Truc Creation (www.g-truc.net)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -35,6 +35,48 @@ GLM is a header only library, there is nothing to build, just include it.
 
 More informations in GLM manual:
 http://glm.g-truc.net/glm.pdf
+
+================================================================================
+GLM 0.9.4.4: 2013-05-29
+--------------------------------------------------------------------------------
+- Fixed slerp when costheta is close to 1 #65
+- Fixed mat4x2 value_type constructor #70
+- Fixed glm.natvis for Visual C++ 12 #82
+- Added assert in inversesqrt to detect division by zero #61
+- Fixed missing swizzle operators #86
+- Fixed CUDA warnings #86
+- Fixed GLM natvis for VC11 #82
+- Fixed GLM_GTX_multiple with negative values #79
+- Fixed glm::perspective when zNear is zero #71
+
+================================================================================
+GLM 0.9.4.3: 2013-03-20
+--------------------------------------------------------------------------------
+- Detected qualifier for Clang
+- Fixed C++11 mode for GCC, couldn't be enabled without MS extensions
+- Fixed squad, intermediate and exp quaternion functions
+- Fixed GTX_polar_coordinates euclidean function, takes a vec2 instead of a vec3
+- Clarify the license applying on the manual
+- Added a docx copy of the manual
+- Fixed GLM_GTX_matrix_interpolation
+- Fixed isnan and isinf on Android with Clang
+- Autodetected C++ version using __cplusplus value
+- Fixed mix for bool and bvec* third parameter
+
+================================================================================
+GLM 0.9.4.2: 2013-02-14
+--------------------------------------------------------------------------------
+- Fixed compAdd from GTX_component_wise
+- Fixed SIMD support for Intel compiler on Windows
+- Fixed isnan and isinf for CUDA compiler
+- Fixed GLM_FORCE_RADIANS on glm::perspective
+- Fixed GCC warnings
+- Fixed packDouble2x32 on XCode
+- Fixed mix for vec4 SSE implementation
+- Fixed 0x2013 dash character in comments that cause issue in Windows 
+  Japanese mode
+- Fixed documentation warnings
+- Fixed CUDA warnings
 
 ================================================================================
 GLM 0.9.4.1: 2012-12-22

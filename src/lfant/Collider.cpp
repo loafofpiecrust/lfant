@@ -46,15 +46,10 @@ void Collider::Load(Properties* prop)
 
 void Collider::Init()
 {
-	TriggerEvent("SetCollider", this);
+	TriggerEvent("SetComponentCollider", this);
 	ConnectEvent(SENDER(owner, SetScale), RECEIVER(this, OnSetScale));
-	ConnectEvent(SENDER(owner, SetRigidbody), RECEIVER(this, OnSetRigidbody));
-	OnSetScale(vec3());
-}
-
-void Collider::OnSetRigidbody(Rigidbody* rb)
-{
-	rigidbody = rb;
+	ConnectEvent(SENDER(owner, SetComponentRigidbody), rigidbody);
+	OnSetScale(vec3(1));
 }
 
 void Collider::OnSetScale(vec3 scale)

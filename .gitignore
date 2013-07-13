@@ -15,3 +15,5 @@ build
 analysis
 wiki
 docs
+*/bin32
+*/bin64

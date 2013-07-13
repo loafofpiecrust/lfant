@@ -5,13 +5,33 @@ set(CMAKE_CXX_COMPILER "clang++")
 endif()
 
 cmake_minimum_required(VERSION 2.8)
+cmake_policy(SET CMP0015 NEW)
 project(galaga)
 
-get_filename_component(ROOT "./" REALPATH)
-set(LFANT ${ROOT}/lfant)
+get_filename_component(ROOT "${PROJECT_SOURCE_DIR}/" REALPATH)
+
+set(PLATFORM "")
+if(UNIX)
+	if(APPLE)
+		set(PLATFORM "macosx")
+	else()
+		set(PLATFORM "linux")
+	endif()
+else()
+	if(WIN32)
+		set(PLATFORM "windows")
+	endif()
+endif()
+file(STRINGS "${PROJECT_SOURCE_DIR}/bin32/${PLATFORM}/lfantdir.txt" LFANT)
 set(CMAKE_MODULE_PATH ${LFANT}/cmake)
 
 include(Config)
+
+add_custom_command(
+	TARGET ${PROJECT_NAME} PRE_BUILD
+	COMMAND cp ${LFANT}/${BIN}/*.dll ${ROOT}/${BIN}/lib
+	COMMAND cp ${LFANT}/${BIN}/*.a ${ROOT}/${BIN}/lib
+	)
 
 # Source Dir
 file(GLOB_RECURSE GAME_SRC
@@ -32,6 +52,9 @@ link_directories(
 
 # Output Library Info
 add_library(${PROJECT_NAME} SHARED ${GAME_SRC})
+target_link_libraries(${PROJECT_NAME}
+	lfant
+	)
 add_executable(launcher ${LAUNCHER_SRC})
 
 # Includes
@@ -50,11 +73,7 @@ target_link_libraries(launcher
 	)
 
 if(PLATFORM STREQUAL "linux")
-target_link_libraries(launcher
-	dl
-	)
+	target_link_libraries(launcher
+		dl
+		)
 endif()
-
-target_link_libraries(${PROJECT_NAME}
-	lfant
-	)

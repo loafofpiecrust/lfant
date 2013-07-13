@@ -59,47 +59,47 @@ public:
 	/**
 	 *	Gets the first entity with a certain name.
 	 */
-	Entity* GetEntity(string name, bool recursive = true);
+	Entity* GetEntity(string name, bool recursive = true) const;
 
 	/**
 	 *	Gets the first entity with a certain tag.
 	 */
-	Entity* GetEntityByTag(string tag);
+	Entity* GetEntityByTag(string tag) const;
 
 	/**
 	 *	Gets an entity by its unique id.
 	 */
-	Entity* GetEntityById(uint32 id, bool recursive = true);
+	Entity* GetEntityById(uint32 id, bool recursive = true) const;
 
 	/**
 	 *	Gets the first entity in a given layer.
 	 *	@todo
 	 *		Not sure whether layer should be uint16 or string.
 	 */
-	Entity* GetEntityByLayer(string layer);
+	Entity* GetEntityByLayer(string layer) const;
 
 	/**
 	 *	Returns pointers to all entities with a certain tag.
 	 *	@param tag Tag to search for.
 	 *	@return All entities with tag.
 	 */
-	deque<Entity*> GetEntities(string tag);
+	deque<Entity*> GetEntities(string tag) const;
 
-	deque<Entity*> GetLayer(string layer);
+	deque<Entity*> GetLayer(string layer) const;
 
 	/**
 	 *	Saves the scene to a file.
 	 *
 	 *	@param file File to save to, without extension.
 	 */
-	void Save(Properties *prop);
+	virtual void Save(Properties *prop) const;
 
 	/**
 	 *	Loads the scene from a file.
 	 *
 	 *	@param file File to load from, without extension.
 	 */
-	void Load(Properties* prop);
+	virtual void Load(Properties* prop);
 
 	/**
 	 *	Spawns an entity in this Scene. Use this for any creation
@@ -125,11 +125,13 @@ protected:
 	 *	just before destruction.
 	 *	@param name Name of the Entity to remove.
 	 */
-	void RemoveEntity(Entity* ent);
+	void RemoveEntity(Entity* ent, bool destroy = true);
+
+	void AddEntity(Entity* ent);
 
 	uint32_t GenerateEntityId();
 
-	deque< ptr<Entity, Object::Delete> > entities;
+	deque< ptr<Entity> > entities;
 	uint32_t currentId = 0;
 
 private:

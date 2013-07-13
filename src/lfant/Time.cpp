@@ -21,9 +21,9 @@
 
 // External
 #include <boost/chrono.hpp>
+#include <GLFW/glfw3.h>
 
 // Internal
-
 #include <lfant/Console.h>
 
 namespace lfant
@@ -41,14 +41,16 @@ Time::~Time()
 
 double Time::GetTime()
 {
-	return boost::chrono::duration<double>(hclock::now() - startTime).count();
+//	return boost::chrono::duration<double>(hclock::now() - startTime).count();
+	return glfwGetTime();
 }
 
 void Time::ResetTime()
 {
 	// Figure something out?
 	Log("Time::ResetTime: Started");
-	startTime = hclock::now();
+//	startTime = hclock::now();
+	glfwSetTime(0.0);
 	Log("Time::ResetTime: Finished");
 }
 

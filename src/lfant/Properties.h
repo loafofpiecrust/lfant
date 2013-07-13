@@ -57,6 +57,7 @@ public:
 	void LoadStream(istream& stream);
 	void SaveStream(ostream& stream);
 
+	Properties* GetFirstChild();
 	Properties* GetChild(string type);
 	Properties* GetChildById(string id);
 	deque<Properties*> GetChildren(string type = "");

@@ -24,7 +24,7 @@
 #include <lfant/Object.h>
 
 // External
-#include <GL/glew.h>
+//#include <GL/glew.h>
 
 namespace lfant
 {
@@ -48,34 +48,45 @@ public:
 
 	enum class WrapMode : uint16
 	{
-	//	Clamp = 0x812F,
-	//	Repeat = 0x2901
-		Clamp = GL_CLAMP_TO_EDGE,
-		Repeat = GL_REPEAT
+		Clamp = 0x812F,
+		Repeat = 0x2901
+	//	Clamp = GL_CLAMP_TO_EDGE,
+	//	Repeat = GL_REPEAT
 	};
 
 	enum class Format : uint16
 	{
-		/*
-		Rgb = 0x1907,
-		Rgba = 0x1908,
-		CompressedRgb = 0x84ED,
-		CompressedRgba = 0x84EE,
-		Rgb32f = 0x8815,
-		Rgba32f = 0x8814
-		*/
-		Rgb = GL_RGB,
-		Rgba = GL_RGBA,
-		Rgb32f = GL_RGB32F,
-		Rgba32f = GL_RGBA32F
+		RGB = 0x1907,
+		RGBA = 0x1908,
+		RGBA16F = 0x881A,
+		RGB32F = 0x8815,
+		RGBA32F = 0x8814,
+
+		CompressedRGB = 0x84ED,
+		CompressedRGBA = 0x84EE,
+
+		Depth = 0x1902,
+		Depth24 = 0x81A6,
+		Depth32F = 0x8CAC
+		
+	//	Rgb = GL_RGB,
+	//	Rgba = GL_RGBA,
+	//	Rgb32f = GL_RGB32F,
+	//	Rgba32f = GL_RGBA32F
 	};
 
 	enum class ScaleFilter : uint16
 	{
-	//	Nearest = 0x2600,
-	//	Linear = 0x2601
-		Nearest = GL_NEAREST,
-		Linear = GL_LINEAR
+		Nearest = 0x2600,
+		Linear = 0x2601
+	//	Nearest = GL_NEAREST,
+	//	Linear = GL_LINEAR
+	};
+
+	enum class DataType : uint16
+	{
+		Byte = 0x1401,
+		Float = 0x1406
 	};
 
 	Texture();
@@ -106,18 +117,19 @@ public:
 	uint32 GetIndex();
 	void SetIndex(uint32 idx);
 
-	void SetFormat(Format input = Format::Rgba, Format output = Format::Rgba);
+	void SetFormat(Format input = Format::RGBA, Format output = Format::RGBA);
 
 	string path = "";
 	WrapMode wrapMode = WrapMode::Repeat;
 	FilterMode filterMode = FilterMode::Bilinear;
 	uint8 anisoLevel = 1;
 //	Format format = Format::Compressed;
-	Format internalFormat = Format::Rgba;
-	Format format = Format::Rgba;
+	Format internalFormat = Format::RGBA;
+	Format format = Format::RGBA;
+	DataType dataType = DataType::Byte;
 	uvec2 size = uvec2(0);
 	vec2 tiling = vec2(1);
-	uint32 index = -1;
+	uint32 index = 0;
 	byte msaa = 0;
 	uint32 mode;
 	ScaleFilter scaleFilter = ScaleFilter::Nearest;

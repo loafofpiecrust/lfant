@@ -144,10 +144,17 @@ Key_Initializer::Key_Initializer()
 	_key["lsuper"] = GLFW_KEY_LEFT_SUPER;
 	_key["rsuper"] = GLFW_KEY_RIGHT_SUPER;
 	_key["numenter"] = GLFW_KEY_KP_ENTER;
-	_key["mouseleft"] = GLFW_MOUSE_BUTTON_LEFT;
-	_key["mouseright"] = GLFW_MOUSE_BUTTON_RIGHT;
-	_key["mousemiddle"] = GLFW_MOUSE_BUTTON_MIDDLE;
+	_key["mouseleft"] = 400+GLFW_MOUSE_BUTTON_LEFT;
+	_key["mouseright"] = 400+GLFW_MOUSE_BUTTON_RIGHT;
+	_key["mousemiddle"] = 400+GLFW_MOUSE_BUTTON_MIDDLE;
 
+	_key["joy1"] = 500;
+	_key["joy2"] = 501;
+	_key["joy3"] = 502;
+	_key["joy4"] = 503;
+	_key["joy5"] = 504;
+	_key["joy6"] = 505;
+	_key["joy7"] = 506;
 }
 
 Input::Input() :
@@ -226,6 +233,7 @@ void Input::Update()
 
 void Input::Load(Properties* prop)
 {
+	Subsystem::Load(prop);
 //	Properties root("settings/input.cfg");
 //	Properties* prop = root.GetChild("input");
 	Log("Loading input props...");
@@ -248,6 +256,11 @@ void Input::Load(Properties* prop)
 		i->Get("snap", axis.snap);
 		i->Get("joyNum", axis.joyNum);
 	}
+}
+
+void Input::Save(Properties* prop) const
+{
+	Subsystem::Save(prop);
 }
 
 /*******************************************************************************
@@ -345,12 +358,40 @@ void Input::OnMouseMove(GLFWwindow* win, double x, double y)
 void Input::OnMouseButton(GLFWwindow* win, int btn, int action, int mods)
 {
 	game->input->TriggerEvent("MouseButton", (uint16_t)btn, action);
-//	OnKeyPress(btn, mode);
+	OnKeyPress(win, 400+btn, 0, action, mods);
 }
 
 void Input::OnCharPress(GLFWwindow* win, uint32_t key)
 {
 	game->input->TriggerEvent("CharPress", (char)key);
+}
+
+void Input::GetJoystickAxes()
+{
+//	float* values = nullptr;
+	int axisCount = 0;
+	int joyCount = 0;
+	for(uint i = 0; i < 16; ++i)
+	{
+		if(glfwJoystickPresent(i))
+		{
+			++joyCount;
+		}
+	}
+
+	if(joysticks.size() != joyCount)
+	{
+		joysticks.resize(joyCount);
+	}
+	for(uint i = 0; i < joyCount; ++i)
+	{
+		joysticks[i].values = glfwGetJoystickAxes(i, &axisCount);
+		joysticks[i].count = axisCount;
+		for(uint k = 0; k < axisCount; ++k)
+		{
+			Log("Joystick value ", k, " = ", joysticks[i].values[k]);
+		}
+	}
 }
 
 /*******************************************************************************
@@ -364,7 +405,7 @@ void Input::AddAxis(string name, string positive, string negative, string altpos
 	axes.push_back(Axis(name, Key[positive], Key[negative], Key[altpos], Key[altneg], sens, dead, snap, joyNum));
 }
 
-float Input::GetAxis(string name)
+float Input::GetAxis(string name) const
 {
 	for(auto& axis : axes)
 	{
@@ -382,57 +423,46 @@ float Input::GetAxis(string name)
 	return 0.0f;
 }
 
-bool Input::GetButton(string name, bool positive)
+int8_t Input::GetButton(string name) const
 {
 	for(auto axis : axes)
 	{
 		if(axis.name == name)
 		{
-			if(positive)
+			if(axis.value > axis.dead && axis.posHeld)
 			{
-				if(axis.value > axis.dead && axis.posHeld)
-				{
-					return true;
-				}
+				return 1;
 			}
-			else
+			if(axis.value < -axis.dead && axis.negHeld)
 			{
-				if(axis.value < -axis.dead && axis.negHeld)
-				{
-					return true;
-				}
+				return -1;
 			}
+			return 0;
 		}
 	}
-	return false;
+	return 0;
 }
 
-bool Input::GetButtonDown(string name, bool positive)
+int8_t Input::GetButtonDown(string name) const
 {
 	for(auto& axis : axes)
 	{
-		if(axis.name == name)
+		if(axis.name == name && axis.down != 0)
 		{
-			if(positive)
+			if(axis.posHeld)
 			{
-				if(axis.posHeld)
-				{
-					return axis.down;
-				}
+				return axis.down;
 			}
-			else
+			else if(axis.negHeld)
 			{
-				if(axis.negHeld)
-				{
-					return axis.down;
-				}
+				return -axis.down;
 			}
 		}
 	}
 	return false;
 }
 
-bool Input::GetButtonUp(string name, bool positive)
+int8_t Input::GetButtonUp(string name) const
 {
 	for(auto axis : axes)
 	{
@@ -450,7 +480,7 @@ bool Input::GetButtonUp(string name, bool positive)
 *
 *******************************************************************************/
 
-ivec2 Input::GetMousePos()
+ivec2 Input::GetMousePos() const
 {
 	dvec2 result;
 	glfwGetCursorPos(game->renderer->GetWindowHandle(), &result.x, &result.y);

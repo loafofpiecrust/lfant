@@ -30,8 +30,7 @@
 #include <lfant/Range.h>
 #include <lfant/util/String.h>
 
-namespace lfant
-{
+namespace lfant {
 
 /** @addtogroup Game
  *	 @{
@@ -58,39 +57,41 @@ struct remove_ref < T&& >
 	typedef T type;
 };
 
-string Type();
+namespace type {
 
-string DemangleType(string type);
-string RemoveScoping(string type);
+string Name();
+
+string Demangle(string type);
+string Unscope(string type);
 
 template<typename T>
-auto Type()->typename enable_if<!is_ptr<T>::value, string>::type
+auto Name()->typename enable_if<!is_ptr<T>::value, string>::type
 {
-	return DemangleType(typeid(T).name());
+	return type::Demangle(typeid(T).name());
 }
 
 template<typename T>
-auto Type()->typename enable_if<is_ptr<T>::value, string>::type
+auto Name()->typename enable_if<is_ptr<T>::value, string>::type
 {
-	return DemangleType(typeid(T::value_type).name());
+	return type::Demangle(typeid(T::value_type).name());
 }
 
 template<typename T>
-auto Type(T p1)->typename enable_if<!is_ptr<T>::value && !is_pointer<T>::value, string>::type
+auto Name(T p1)->typename enable_if<!is_ptr<T>::value && !is_pointer<T>::value, string>::type
 {
-	return DemangleType(typeid(p1).name());
+	return type::Demangle(typeid(p1).name());
 }
 
 template<typename T>
-auto Type(T& p1)->typename enable_if<is_ptr<T>::value, string>::type
+auto Name(T& p1)->typename enable_if<is_ptr<T>::value, string>::type
 {
-	return DemangleType(typeid(*(p1.get())).name());
+	return type::Demangle(typeid(*(p1.get())).name());
 }
 
 template<typename T>
-auto Type(T p1) -> typename enable_if<is_pointer<T>::value, string>::type
+auto Name(T p1) -> typename enable_if<is_pointer<T>::value, string>::type
 {
-	return DemangleType(typeid(*p1).name());
+	return type::Demangle(typeid(*p1).name());
 }
 
 /*
@@ -102,49 +103,51 @@ auto Type(T p1) -> typename enable_if<is_pointer<T>::value, string>::type
  */
 
 template<typename P1, typename P2, typename ... P>
-string Type()
+string Name()
 {
-	return Type<P1>() + "," + Type<P2, P ...>();
+	return type::Name<P1>() + "," + type::Name<P2, P ...>();
 }
 
 template<typename T2, typename T1>
-bool CheckType(T1 p1, T2 p2)
+bool Compare(T1 p1, T2 p2)
 {
-	return Type(p1) == Type(p2);
+	return type::Name(p1) == type::Name(p2);
 }
 
 template<typename T2, typename T1>
-bool CheckType(T1 p1)
+bool Compare(T1 p1)
 {
-	return Type(p1) == Type<T2>();
+	return type::Name(p1) == type::Name<T2>();
+}
+
 }
 
 // Type-Casting
 template<typename RT = vec2, typename IT>
 RT vec2_cast(IT v)
 {
-	RT vv(v[0], v[1]);
+	RT vv {v[0], v[1]};
 	return vv;
 }
 
 template<typename RT = vec3, typename IT>
 RT vec3_cast(IT v)
 {
-	RT vv(v[0], v[1], v[2]);
+	RT vv {v[0], v[1], v[2]};
 	return vv;
 }
 
 template<typename RT = vec4, typename IT>
 RT vec4_cast(IT v)
 {
-	RT vv(v[0], v[1], v[2], v[3]);
+	RT vv = {v[0], v[1], v[2], v[3]};
 	return vv;
 }
 
 template<typename RT = quat, typename IT>
 RT quat_cast(IT q)
 {
-	RT qq(q[0], q[1], q[2], q[3]);
+	RT qq {q[0], q[1], q[2], q[3]};
 	return qq;
 }
 

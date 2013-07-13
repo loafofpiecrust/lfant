@@ -8,7 +8,7 @@
 *	you may not use this file except in compliance with the License.
 *	You may obtain a copy of the License at
 *
-*	http://www.apache.org/licenses/LICENSE-2.0
+*		http://www.apache.org/licenses/LICENSE-2.0
 *
 *	Unless required by applicable law or agreed to in writing, software
 *	distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,7 +18,6 @@
 *
 ******************************************************************************/
 #pragma once
-
 #include <lfant/stdafx.h>
 
 // External
@@ -51,14 +50,17 @@ class Camera : public Component
 	friend class Renderer;
 public:
 	Camera();
+	Camera(const Camera& other);
 	virtual ~Camera();
+
+	virtual Component* Clone(Entity* owner) const;
 
 	virtual void Init();
 	virtual void Update();
 	virtual void OnDestroy();
 
-	void Save(Properties* prop);
-	void Load(Properties* prop);
+	virtual void Save(Properties* prop) const;
+	virtual void Load(Properties* prop);
 
 	/**
 	 *	Updates the projection to use the current settings
@@ -89,6 +91,9 @@ public:
 	void SetViewRange(float near, float far);
 	Range<float> GetViewRange();
 
+	void SetAperture(float value);
+	float GetAperture();
+
 	vec3 lastPos;
 
 	Rect viewport;
@@ -99,6 +104,9 @@ public:
 		Orthographic = 1
 	};
 	Mode mode = Mode::Perspective;
+	
+	float dofWidth = 10.0f;
+	float dof = 20.0f;
 
 protected:
 
@@ -116,6 +124,13 @@ protected:
 
 	/// The viewing range (near and far) of this camera's view, eg. (0.1f, 1000.0f)
 	Range<float> viewRange = { 0.01f, 1000.0f };
+
+	// Real Camera settings
+	float aperture = 1.8f;
+
+	float shutterSpeed = 0.003f;
+
+	uint16_t iso = 300;
 
 private:
 

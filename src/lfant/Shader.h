@@ -61,7 +61,7 @@ public:
 	void Save(Properties* prop);
 //	void LoadFile(string file = "");
 	void LoadFile(string file);
-	void LoadFile(string vert, string frag, string geom = "");
+	void LoadFile(string vert, string frag, string geom = "", string comp = "");
 	void Compile();
 
 	void Bind();
@@ -86,9 +86,10 @@ protected:
 	static uint32 Compile(uint32 type, const string& path);
 	void CheckErrors();
 
-	string vertex = "";
-	string fragment = "";
+	string vertex = "shaders/simple/Diffuse.vert";
+	string fragment = "shaders/simple/Diffuse.frag";
 	string geometry = "";
+	string compute = "";
 	uint32 id = -1;
 	map<string, uint32> uniforms;
 

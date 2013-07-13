@@ -1,0 +1,49 @@
+Copyright Jeremy Pack 2008
+rostovpack - at - gmail.com
+boost-extension.blogspot.com
+
+Latest Release - Downloadable
+I've packaged together the latest stable release:
+
+extension_reflection.tar.gz
+
+It contains the tests, examples, documentation and headers.
+It also contains the other Boost libraries that these depend on.
+Most of the other libraries are used by the examples,
+but not required for using the headers.
+
+To use the library in your project, just add the root of the
+extracted directory to your include path
+(ie, /home/me/downloads/extension-reflection).
+
+If you want to make sure that the tests pass on your system,
+you will need bjam - see
+http://www.boost.org/doc/libs/1_35_0/more/getting_started/index.html,
+which includes BJAM setup (you don't need to install the rest of Boost
+to use Extension and Reflection - only the subset included here).
+Then run the test_redist.sh or test_redist.bat script. If bjam is not
+in your path, you'll need to set the variable BOOST_BJAM_PATH. You
+can also set BOOST_BJAM_OPTIONS if needed.
+
+I haven't built a Windows .bat file yet, but to replicate the functionality
+of the above, set the variables BOOST_ROOT and BOOST_SANDBOX_ROOT to this
+directory. Then, run bjam in each of the following directories:
+
+libs/extension/examples
+libs/extension/test
+libs/reflection/examples
+libs/reflection/test
+
+For the documentation, I've only updated the Extension reference
+section. The docs are at libs/extension/doc/html/index.html in the
+redistributable. I'll post the latest docs up on the site once
+I've fixed some of the tutorials.
+
+Feel free to let me know if you have trouble getting the
+redistributable to work on a given system - it is a work
+in progress.
+
+Also, it can take a little bit of setup to use Extension without
+Bjam. If you've worked it out for your compiler/OS, feel free
+to send me your instructions and I'll try to post them with
+the documentation.

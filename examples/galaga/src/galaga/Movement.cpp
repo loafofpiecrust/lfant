@@ -68,7 +68,7 @@ void Movement::Init()
 	ConnectEvent(SENDER(owner, Jump), RECEIVER(this, Jump));
 
 	rigidbody = owner->GetComponent<Rigidbody>();
-	ConnectEvent(SENDER(owner, SetComponentRigidbody), rigidbody);
+	ConnectEvent(SENDER(owner, SetComponentRigidbody), (Component**)&rigidbody);
 }
 
 void Movement::Update()
@@ -80,8 +80,8 @@ void Movement::Move(vec3 velocity)
 {
 	if(rigidbody && usePhysics)
 	{
-	//	rigidbody->Accelerate(velocity * movementSpeed);
-		TriggerEvent("Accelerate", velocity * movementSpeed);
+		rigidbody->Accelerate(velocity * movementSpeed);
+	//	TriggerEvent("Accelerate", velocity * movementSpeed);
 	}
 	else
 	{
@@ -91,10 +91,10 @@ void Movement::Move(vec3 velocity)
 
 void Movement::Jump()
 {
-//	Log("Jumpheight: ", jumpHeight / game->time->deltaTime);
-	if(usePhysics)
+	if(rigidbody && usePhysics)
 	{
-		TriggerEvent("Accelerate", vec3(0, jumpHeight / game->time->deltaTime, 0));
+	//	Log("Jumpheight: ", jumpHeight / game->time->deltaTime);
+		rigidbody->Accelerate(vec3(0, jumpHeight / game->time->deltaTime, 0));
 	}
 	else
 	{

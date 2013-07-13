@@ -20,18 +20,19 @@
 #pragma once
 
 // External
+#include <boost/compute/container/vector.hpp>
 
 // Internal
-
 #include <lfant/Component.h>
 #include <lfant/Range.h>
 #include <lfant/Material.h>
 #include <lfant/Vertex.h>
 #include <lfant/Mesh.h>
+#include <lfant/OpenCL.h>
 
 namespace lfant
 {
-class Particle;
+//class Particle;
 
 /** @addtogroup Game
  *	 @{
@@ -39,6 +40,18 @@ class Particle;
 /** @addtogroup Particles
  *	 @{
  */
+
+struct Particle
+{
+	vec4 pos;
+	vec4 color;
+	vec4 vel;
+	vec4 velChange;
+	vec4 colorChange;
+	float sizeChange;
+	float life;
+	float size;
+} __attribute__ ((aligned (16)));
 
 /**	This class handles a ParticleSystem Component
  *		Gives functionality for emitting particles from this transform. The
@@ -52,7 +65,7 @@ class Particle;
  *		Having the ParticleSystem Component send a call to render itself.
  *		Integrate with Bullet Physics for collision detection, bounciness, friction, and maybe buoyancy.
  */
-class ParticleSystem : public Mesh
+class ParticleSystem : public Renderable
 {
 	DECLARE_COMP(ParticleSystem)
 	friend class Renderer;
@@ -86,6 +99,18 @@ public:
 		Billboard
 	};
 
+	struct ParticleVertex
+	{
+		vec3 position;
+		rgba color;
+		float size;
+
+		ParticleVertex(vec3 pos, vec4 col, float size) :
+			position(pos), color(col), size(size)
+		{
+		}
+	};
+
 	ParticleSystem();
 	virtual ~ParticleSystem();
 
@@ -105,12 +130,10 @@ public:
 	 *	Emits a specific amount of particles
 	 *	@param amount The amount of particles to emit.
 	 */
-	void Emit(uint32_t amount);
-	void Emit(Particle* pt = nullptr);
+	void Emit(uint32_t amount = 1);
 	void Recycle(Particle* pt);
 	void Clear();
 	uint32_t GetCount();
-	void GenerateVelocity(Particle* pt);
 
 	// Particle properties
 	Range<float> lifetime = {1.0f, 5.0f};
@@ -129,7 +152,7 @@ public:
 	float rate = 1.5f;
 	uint32_t maxParticles = 1500;
 	vec3 dimensions = vec3(1.0f);
-	vec3 gravity = vec3(0.0f, 0.0f, 0.0f);
+	vec4 gravity = vec4(0.0f, 0.0f, 0.0f, 1.0f);
 	bool pausable = true;
 	bool paused = false;
 	bool looping = true;
@@ -138,28 +161,37 @@ public:
 	DisplayType displayType;
 	EmitterType emitterType = EmitterType::Cone;
 
-	deque<ptr<Particle>> particles;
+//	deque<Particle> particles;
+	uint32_t particleCount = 0;
+//	Buffer<Particle> particles;
 	deque<Burst> bursts;
 	deque<Particle*> recycle;
 
-//	Material material;
+	ptr<Material> material;
 
 protected:
 
 	void UpdatePosition(Particle* pt);
+	void OnSetPosition();
 
 	float toEmit = 0.0f;
 
 private:
-//	vector<vec3> points;
-//	vector<Vertex> vertices;
-//	vector<uint32_t> indices;
-//	Buffer<vec3> vertexBuffer;
-	Buffer<vec4> colorBuffer;
-	Buffer<float> sizeBuffer;
+//	Buffer<vec4> colorBuffer;
+//	Buffer<float> sizeBuffer;
+//	Buffer<ParticleVertex> particleBuffer;
+	uint32_t colorBuffer;
+	uint32_t posBuffer;
+	uint32_t sizeBuffer;
+	uint32_t vertexArray;
 
-//	uint32_t vertexBuffer;
-//	uint32_t indexBuffer;
+	vector<uint32_t> buffers;
+	vector<boost::compute::buffer> clbuffers;
+
+	ptr<OpenCL::Kernel> updateKernel;
+	ptr<OpenCL::Kernel> emitKernel;
+
+	bool rewriteBuffer = false;
 };
 
 /** @} */

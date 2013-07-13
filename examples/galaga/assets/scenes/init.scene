@@ -1,44 +1,23 @@
 scene Scene
 {
-	entity Player
+	entity player
 	{
 		active = true
 		id = 1
-		layer = Player
+		layer = Entities
 		lifetime = 0
-		tags = {  }
+		tags = { Player, MainCamera }
 		component Transform
 		{
 			enabled = true
-			position = (0,0,0)
+			position = (0,2,0)
 			rotation = (0,0,0)
 			scale = (1,1,1)
 		}
-		component Mesh
+		component Player
 		{
+			bulletSpeed = 5
 			enabled = true
-			path = meshes/plane.obj
-			material 
-			{
-				texture 
-				{
-					anisoLevel = 
-					path = /home/taylorsnead/lazyfox/lfant/examples/galaga/bin64/linux/../../assets/textures/StarShip.png
-				}
-				 
-				{
-					fragment = shaders/simple/Diffuse.frag
-					geometry = 
-					vertex = shaders/simple/Diffuse.vert
-				}
-			}
-		}
-		component Movement
-		{
-			enabled = true
-			jumpHeight = 2
-			movementSpeed = 2.5
-			usePhysics = false
 		}
 		component BoxCollider
 		{
@@ -48,20 +27,22 @@ scene Scene
 		component Rigidbody
 		{
 			enabled = true
-			mass = 1
-			maxSpeed = 0
-			trigger = true
+			mass = 45
+			maxSpeed = 20
+			trigger = false
 			velocity = (0,0,0)
 		}
-		component Player
+		component Movement
 		{
-			bulletSpeed = 5
 			enabled = true
+			jumpHeight = 5
+			movementSpeed = 15
+			usePhysics = true
 		}
-		entity Bay
+		entity Main
 		{
 			active = true
-			id = 3
+			id = 2
 			layer = Main
 			lifetime = 0
 			tags = {  }
@@ -72,67 +53,33 @@ scene Scene
 				rotation = (0,0,0)
 				scale = (1,1,1)
 			}
-			component Inventory
+			component Camera
 			{
+				aspectRatio = 1.77777779
 				enabled = true
-				equippedItem = 0
-				itemLimit = 0
-				mass = 8
-				massLimit = 0
+				fov = 45
+				viewRange = 0.00999999978-1000
 			}
-			entity Laser
+			component MouseLook
 			{
-				active = true
-				id = 2
-				layer = Main
-				lifetime = 0
-				tags = {  }
-				component Transform
-				{
-					enabled = true
-					position = (-0.899999976,0,0.5)
-					rotation = (0,0,0)
-					scale = (1,1,1)
-				}
-				component Item
-				{
-					enabled = true
-					equipped = true
-					equippedPosition = (-0.899999976,0,0.5)
-					initialPosition = (0,0,0)
-					mass = 8
-				}
-				component Weapon
-				{
-					automatic = false
-					bulletSpeed = 3
-					currentAmmo = 25
-					direction = (1,1,1)
-					enabled = true
-					fireRate = 0.200000003
-					maxAmmo = 25
-					meleeDamage = 10
-					projectilePath = entities/items/projectiles/Laser.ent
-					projectiles = 1
-					reloadTime = 2
-					shotCost = 1
-				}
+				enabled = false
+				lookSpeed = 85
 			}
 		}
 	}
-	entity Blamo
+	entity BlasterMinor
 	{
 		active = true
-		id = 4
-		layer = Enemy
+		id = 3
+		layer = Entities
 		lifetime = 0
-		tags = {  }
+		tags = { Entity, Enemy }
 		component Transform
 		{
 			enabled = true
-			position = (0,0,7)
-			rotation = (0,180,0)
-			scale = (1,1,1)
+			position = (0,0,0)
+			rotation = (0,0,0)
+			scale = (50,0,50)
 		}
 		component Mesh
 		{
@@ -143,7 +90,7 @@ scene Scene
 				texture 
 				{
 					anisoLevel = 
-					path = /home/taylorsnead/lazyfox/lfant/examples/galaga/bin64/linux/../../assets/textures/StarShip.png
+					path = /home/taylorsnead/lazyfox/lfant/examples/galaga/bin64/linux/../../assets/textures/Default.png
 				}
 				 
 				{
@@ -153,12 +100,62 @@ scene Scene
 				}
 			}
 		}
-		component Movement
+		component BoxCollider
 		{
 			enabled = true
-			jumpHeight = 2
-			movementSpeed = 2.5
-			usePhysics = true
+			size = (1,1,1)
+		}
+		component Rigidbody
+		{
+			enabled = true
+			mass = 0
+			maxSpeed = 0
+			trigger = false
+			velocity = (0,0,0)
+		}
+		component Player
+		{
+			bulletSpeed = 5
+			enabled = true
+		}
+	}
+	entity StarShip
+	{
+		active = true
+		id = 4
+		layer = Entities
+		lifetime = 0
+		tags = { Entity, Player }
+		component Transform
+		{
+			enabled = true
+			position = (1,3,1)
+			rotation = (0,0,0)
+			scale = (1,1,1)
+		}
+		component Mesh
+		{
+			enabled = true
+			path = meshes/suzanne.obj
+			material 
+			{
+				texture 
+				{
+					anisoLevel = 
+					path = /home/taylorsnead/lazyfox/lfant/examples/galaga/bin64/linux/../../assets/textures/Default.png
+				}
+				 
+				{
+					fragment = shaders/simple/Diffuse.frag
+					geometry = 
+					vertex = shaders/simple/Diffuse.vert
+				}
+			}
+		}
+		component Player
+		{
+			bulletSpeed = 5
+			enabled = true
 		}
 		component BoxCollider
 		{
@@ -168,13 +165,13 @@ scene Scene
 		component Rigidbody
 		{
 			enabled = true
-			mass = 1
+			mass = 10
 			maxSpeed = 0
-			trigger = true
+			trigger = false
 			velocity = (0,0,0)
 		}
 	}
-	entity Cam
+	entity Lighty
 	{
 		active = true
 		id = 5
@@ -184,26 +181,22 @@ scene Scene
 		component Transform
 		{
 			enabled = true
-			position = (0,15,3)
-			rotation = (90,0,0)
+			position = (0,0,0)
+			rotation = (0,0,0)
 			scale = (1,1,1)
 		}
-		component Camera
+		component PointLight
 		{
-			aspectRatio = 1.77777779
+			ambientIntensity = 1
+			attenConst = 1
+			attenExp = 1
+			attenLinear = 1
+			color = (0,1,1)
+			diffuseIntensity = 1
 			enabled = true
-			fov = 45
-			viewRange = 0.00999999978-1000
-		}
-		component FollowEntity
-		{
-			damping = 1.25
-			enabled = true
-			entity = 1
-			speed = 1
-			x = true
-			y = false
-			z = true
+			radius = 3
+			specularIntensity = 1
+			specularPower = 1
 		}
 	}
 }

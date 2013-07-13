@@ -60,7 +60,6 @@ protected:
 	void Load(Properties* prop);
 
 	virtual void Init();
-	virtual void OnSetRigidbody(Rigidbody* rb);
 	virtual void OnSetScale(vec3 scale);
 
 	virtual btCollisionShape* GetShape() = 0;

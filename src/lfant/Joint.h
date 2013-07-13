@@ -58,8 +58,6 @@ protected:
 	Joint();
 
 	virtual void Init();
-	virtual void OnAddComponent(Component* comp);
-	virtual void OnRemoveComponent(Component* comp);
 
 private:
 

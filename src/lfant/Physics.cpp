@@ -102,7 +102,7 @@ void Physics::Init()
 
 void Physics::Update()
 {
-	if(world)
+//	if(world)
 	{
 		world->stepSimulation(game->time->deltaTime);
 

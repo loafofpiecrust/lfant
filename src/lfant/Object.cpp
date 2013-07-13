@@ -24,6 +24,7 @@
 #include <lfant/Game.h>
 #include <lfant/Time.h>
 #include <lfant/Console.h>
+#include <lfant/ScriptSystem.h>
 
 // External
 
@@ -76,29 +77,17 @@ void Object::OnDestroy()
 {
 }
 
-void Object::Bind()
-{
-	//SClass<Object> cls;
-	/*cls.Func("connect", &Object::connect);
-	   cls.Func("trigger", &Object::trigger);
-
-	   cls.Func("Init", &Object::Init);
-	   cls.Func("Update", &Object::Update);
-	   cls.Func("Destroy", &Object::Destroy);
-
-	   cls.Func("OnDestroy", &Object::OnDestroy);*/
-	//cls.FUNC( Object, Init );
-	//cls.FUNC( Object, Update );
-}
-
 void Object::LoadFile(string path)
 {
-	ptr<Properties> prop {new Properties};
-	prop->LoadFile(path);
-	string type = RemoveScoping(Type(this));
-	to_lower(type);
-	if(Properties* pc = prop->GetChild(type))
+	Log(type::Name(this), " loading file '", path, "'.");
+	Properties prop;
+	prop.LoadFile(path);
+//	string type = type::Unscope(type::Name(this));
+//	to_lower(type);
+	Log("Checking for first child");
+	if(Properties* pc = prop.GetFirstChild())
 	{
+		Log("Loading first child");
 		Load(pc);
 	}
 }
@@ -107,18 +96,36 @@ void Object::Load(Properties *prop)
 {
 }
 
-void Object::SaveFile(string path)
+void Object::SaveFile(string path) const
 {
-	ptr<Properties> prop {new Properties};
-	Save(prop);
-	prop->SaveFile(path);
+	Properties prop;
+	Save(&prop);
+	prop.SaveFile(path);
 }
 
-void Object::Save(Properties *prop)
+void Object::Save(Properties *prop) const
 {
-	string type = RemoveScoping(Type(this));
+	string type = type::Unscope(type::Name(this));
 	to_lower(type);
 	prop->type = type;
+}
+
+void Object::Bind()
+{
+	Script::BaseClass<Object> inst;
+
+	inst.Func("Init", &Object::Init);
+	inst.Func("Update", &Object::Update);
+	inst.Func("Destroy", &Object::Destroy);
+	inst.Func("OnDestroy", &Object::OnDestroy);
+	inst.Func("ConnectEvent", &Object::ConnectScriptEvent);
+	inst.Func("SetTimer", &Object::SetTimer);
+	inst.Func("CancelTimer", &Object::CancelTimer);
+	inst.Func("GetTimer", &Object::GetTimer);
+	inst.Func("Load", &Object::Load);
+	inst.Func("Save", &Object::Save);
+	inst.Func("LoadFile", &Object::LoadFile);
+	inst.Func("SaveFile", &Object::SaveFile);
 }
 
 }
