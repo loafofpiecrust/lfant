@@ -1,11 +1,9 @@
 project(glew)
 
-set(INCLUDE_DIR "include")
-set(SOURCE_DIR "src")
-
 # Source Dir
-file(GLOB_RECURSE SRC_FILES "${SOURCE_DIR}/*.c")
-file(GLOB_RECURSE HEADER_FILES "${INCLUDE_DIR}/*.h")
+file(GLOB_RECURSE SRC_FILES
+	"src/glew.c"
+	)
 
 # Library Search Paths
 link_directories(
@@ -15,18 +13,27 @@ link_directories(
 	)
 
 # Output Library Info
-add_library(${PROJECT_NAME} SHARED ${SRC_FILES} ${HEADER_FILES})
+add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
 
 # Includes
-include_directories("${INCLUDE_DIR}")
+include_directories("include")
 
 add_definitions(
 	-DGLEW_BUILD_DLL
 	)
 
+if(PLATFORM STREQUAL "linux")
 target_link_libraries(${PROJECT_NAME}
 	GL
 	GLU
 	pthread
 	X11
 	)
+endif()
+
+if(PLATFORM STREQUAL "windows")
+target_link_libraries(${PROJECT_NAME}
+	opengl32
+	glu32
+	)
+endif()

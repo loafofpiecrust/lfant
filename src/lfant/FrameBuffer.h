@@ -25,6 +25,7 @@
 #include <lfant/Texture.h>
 #include <lfant/Rect.h>
 #include <lfant/Shader.h>
+#include <lfant/Mesh.h>
 
 // External
 
@@ -36,15 +37,18 @@ public:
 	FrameBuffer();
 	~FrameBuffer();
 
-	void Init();
-	void OnDestroy();
+	virtual void Init();
+	virtual void OnDestroy();
 
-	void Render();
+	void DrawBuffers();
 
 	static void Clear();
 
 	void Bind();
 	static void Unbind();
+
+	void BindRead();
+	static void UnbindRead();
 
 	static FrameBuffer* GetCurrent();
 
@@ -54,21 +58,37 @@ public:
 	void SetRect(URect r) { rect = r; }
 	void Resize();
 
-	void AddTexture(string name, Texture* tex = nullptr);
-	void GetTextures(Shader* sh);
+	void AddTexture(string name, Texture::Format form1 = Texture::Format::RGB32F, Texture::Format form2 = Texture::Format::RGB);
+	void AddDepthTexture(string name, Texture::Format form1 = Texture::Format::RGB32F, Texture::Format form2 = Texture::Format::RGB);
+	void GetTextures(Shader* sh) const;
+	Texture* GetTexture(string name) const;
+
+	void SetCurrentTexture(string name);
+
+	virtual void BeginRender();
+	virtual void Render();
+	virtual void EndRender();
 
 	URect rect {0,0,0,0};
 	bool hasDepth = false;
+	uint32_t startIndex = 0;
 //	ptr<Shader> shader;
 
 protected:
-	uint32_t id;
+	uint32_t id = 0;
 
 	deque<string> textureNames;
 	deque<Texture*> textures;
+	Texture* currentTex = nullptr;
+	Texture* depthTexture = nullptr;
+	string depthTexName = "";
+
+	Buffer<vec2> posBuffer;
+//	Mesh::Buffer<vec2> uvBuffer = 0;
+	ptr<Shader> shader;
 
 	vector<uint32_t> drawBuffers;
-	uint32_t depthBuffer;
+	uint32_t depthBuffer = 0;
 
 	static FrameBuffer* current;
 

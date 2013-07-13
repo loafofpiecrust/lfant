@@ -36,6 +36,7 @@
 #include <lfant/Camera.h>
 #include <lfant/FileSystem.h>
 #include <lfant/FrameBuffer.h>
+#include <lfant/Thread.h>
 
 namespace lfant
 {
@@ -71,7 +72,7 @@ void Mesh::Load(Properties *prop)
 	LoadFile(file);
 }
 
-void Mesh::Save(Properties *prop)
+void Mesh::Save(Properties *prop) const
 {
 	Component::Save(prop);
 
@@ -119,7 +120,7 @@ void Mesh::BeginRender()
 	glGenVertexArrays(1, &vertexArray);
 	glBindVertexArray(vertexArray);
 
-	if(material->shader->GetId() == 0)
+	if(material->shader->GetId() == -1)
 	{
 		Log("Loading default shader.");
 		material->shader->LoadFile("shaders/simple/Diffuse.vert", "shaders/simple/Diffuse.frag");
@@ -131,10 +132,12 @@ void Mesh::BeginRender()
 //		material->texture->LoadFile();
 	}
 
-	if(material->shader->GetId() != 0)
+	if(material->shader->GetId() != -1)
 	{
 		Log("Adding uniforms..");
-		material->shader->AddUniform("MVP");
+		material->shader->AddUniform("M");
+		material->shader->AddUniform("V");
+		material->shader->AddUniform("P");
 		material->shader->AddUniform("textureSampler");
 		material->shader->AddUniform("tiling");
 	//	material->shader->AddUniform("modelMatrix");
@@ -184,8 +187,9 @@ void Mesh::Render()
 //	mat4 mvp = mat4(1);
 	if(owner && usingCamera)
 	{
-		mat4 mvp = game->scene->mainCamera->GetProjection() * game->scene->mainCamera->GetView() * owner->transform->GetMatrix();
-		material->shader->SetUniform("MVP", mvp);
+		material->shader->SetUniform("P", game->scene->mainCamera->GetProjection());
+		material->shader->SetUniform("V", game->scene->mainCamera->GetView());
+		material->shader->SetUniform("M", owner->transform->GetMatrix());
 	}
 
 //	if(material->shader->GetUniform("modelMatrix"))
@@ -201,7 +205,7 @@ void Mesh::Render()
 	if(material->texture->GetId() != -1)
 	{
 	//	Log("Setting texture uniforms.");
-		material->shader->SetUniform("textureSampler", material->texture);
+		material->shader->SetUniform("textureSampler", material->texture.get());
 		material->shader->SetUniform("tiling", material->texture->tiling);
 	}
 
@@ -227,7 +231,7 @@ void Mesh::Render()
 	glDisableVertexAttribArray(1);
 	glDisableVertexAttribArray(0);
 
-	glBindTexture(material->texture->GetMode(), 0);
+	material->texture->Unbind();
 
 	glBindVertexArray(0);
 

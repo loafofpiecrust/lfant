@@ -45,8 +45,8 @@ public:
 	Material();
 	Material(string texture, string shader);
 
-	void Load(Properties *prop);
-	void Save(Properties *prop);
+	virtual void Load(Properties *prop);
+	virtual void Save(Properties *prop) const;
 
 	// Path and name for the texture file.
 	ptr<Texture> texture;

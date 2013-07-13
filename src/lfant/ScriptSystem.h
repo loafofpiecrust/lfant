@@ -24,9 +24,10 @@
 #include <lfant/Subsystem.h>
 
 // External
-
-class asIScriptEngine;
-class CScriptBuilder;
+#include <sqrat/sqratClass.h>
+#include <sqrat/sqratVM.h>
+#include <sqrat/sqratTable.h>
+#include <sqrat/sqratScript.h>
 
 namespace lfant
 {
@@ -35,38 +36,81 @@ class Script
 {
 public:
 
-	class Class
+	template<typename C, typename CC>
+	class ClassBase
 	{
-public:
-		Class() {
+	public:
+		ClassBase() {}
+
+		template<typename T>
+		void Func(string name, T (C::* func))
+		{
+			inst.Func(name.c_str(), func);
 		}
 
 		template<typename T>
-		void Create(string type, bool ref)
+		void StaticFunc(string name, T (C::*func))
 		{
-			Create(type, ref, sizeof(T));
+			inst.StaticFunc(name.c_str(), func);
 		}
 
-		template<typename T, typename R>
-		void Method(string decl, R (T::* func));
+		template<typename T>
+		void Var(string name, T (C::* var))
+		{
+			inst.Var(name.c_str(), var);
+		}
 
-		void Variable();
-		void Operator();
+		template<typename T>
+		void Prop(string name, T (C::* get)())
+		{
+			inst.Prop(name.c_str(), get);
+		}
 
+		template<typename T>
+		void Prop(string name, T (C::* get)() const)
+		{
+			inst.Prop(name.c_str(), get);
+		}
 
-private:
-		void Create(string type, bool ref, int size);
+		template<typename T>
+		void Prop(string name, T (C::*get)(), void (C::*set)(T))
+		{
+			inst.Prop(name.c_str(), get, set);
+		}
 
+		template<typename T>
+		void StaticVar(string name, T (C::* var))
+		{
+			inst.StaticVar(name.c_str(), var);
+		}
+
+		void Bind()
+		{
+			Sqrat::RootTable().Bind(type.c_str(), inst);
+		}
+
+	private:
 		string type;
+		CC inst;
 	};
 
-	Script(string module);
+	template<typename C>
+	class BaseClass : public ClassBase<C, Sqrat::Class<C>>
+	{
+	};
+
+	template<typename C, typename P>
+	class Class : public ClassBase<C, Sqrat::DerivedClass<C, P>>
+	{
+	};
+
+	Script();
 
 	void LoadFile(string path);
-	void Compile();
+	void Run();
 
 private:
-	CScriptBuilder* builder;
+	Sqrat::Script inst;
 };
 
 /**
@@ -93,8 +137,7 @@ public:
 protected:
 
 private:
-
-	asIScriptEngine* scriptEngine;
+	Sqrat::SqratVM vm;
 
 };
 

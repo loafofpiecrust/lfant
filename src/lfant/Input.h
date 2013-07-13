@@ -192,6 +192,12 @@ class Input : public Subsystem
 		}
 	};
 
+	struct Joystick
+	{
+		const float* values;
+		int count;
+	};
+
 public:
 	Input();
 	~Input();
@@ -199,7 +205,8 @@ public:
 	virtual void Init();
 	virtual void Update();
 
-	void Load(Properties *prop);
+	virtual void Load(Properties* prop);
+	virtual void Save(Properties* prop) const;
 
 	/** Called when any key is pressed or released.
 	 *	@param key The key that was used.
@@ -213,22 +220,25 @@ public:
 	void AddAxis(string name, string positive = "null", string negative = "null", string altpos = "null", string altneg = "null", float sens = 3.0f, float dead = 0.001f, bool snap = true, byte joyNum = 0);
 
 	// Axes
-	float GetAxis(string name);
+	float GetAxis(string name) const;
 
 	// Buttons: Positive side of the given axis
-	bool GetButton(string name, bool positive = true);
-	bool GetButtonDown(string name, bool positive = true);
-	bool GetButtonUp(string name, bool positive = true);
+	int8_t GetButton(string name) const;
+	int8_t GetButtonDown(string name) const;
+	int8_t GetButtonUp(string name) const;
 
-	ivec2 GetMousePos();
+	ivec2 GetMousePos() const;
 	void SetMousePos(ivec2 pos);
 	void SetMousePos(int32 x, int32 y);
+
+	void GetJoystickAxes();
 
 	bool lockMouse;
 	float mouseSpeed;
 
 protected:
 	deque<Axis> axes;
+	deque<Joystick> joysticks;
 
 	/// The string of input this frame.
 	string inputString;

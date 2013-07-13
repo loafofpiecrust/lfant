@@ -36,6 +36,7 @@ public:
 	void Save(Properties *prop);
 	void Load(Properties *prop);
 
+	void Init();
 	void Update();
 
 	vec3 GetPosition();
@@ -71,6 +72,9 @@ public:
 	vec3 GetUp();
 
 protected:
+
+	void OnSetWorldPos();
+
 	vec3 position = vec3(0);
 	vec3 rotation = vec3(0);
 	vec3 scale = vec3(1);
@@ -82,6 +86,7 @@ protected:
 	vec3 direction;
 
 	Transform* parent = nullptr;
+	bool updateMatrix = false;
 
 
 private:

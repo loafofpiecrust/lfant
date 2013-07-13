@@ -40,6 +40,7 @@
 #include <lfant/UserInterface.h>
 #include <lfant/Network.h>
 #include <lfant/ScriptSystem.h>
+#include <lfant/OpenCL.h>
 
 #include "Game.h"
 #include "Scene.h"
@@ -61,7 +62,8 @@ Game::Game() :
 	input {new Input},
 	audio {new Audio},
 	network {new Network},
-	scriptSystem {new ScriptSystem}
+	scriptSystem {new ScriptSystem},
+	openCL {new OpenCL}
 {
 }
 
@@ -77,9 +79,9 @@ Game::~Game()
 
 void Game::Init()
 {
+	console->Init();
 	LoadFile("settings/game.cfg");
 
-	console->Init();
 	Log("Initing filesystem");
 	fileSystem->Init();
 //	settings->Init();
@@ -90,6 +92,7 @@ void Game::Init()
 	Log("Initing physics");
 	physics->Init();
 	renderer->Init();
+	openCL->Init();
 	input->Init();
 //	audio->Init();
 //	network->Init();
@@ -125,16 +128,26 @@ void Game::Update()
 
 void Game::Load(Properties* prop)
 {
+	Subsystem::Load(prop);
+
 	prop->Get("orgName", orgName);
 	prop->Get("gameName", gameName);
 	prop->Get("defaultScene", defaultScene);
+	Log("Game loading, default scene is '", defaultScene, "'.");
 }
 
-void Game::Save(Properties* prop)
+void Game::Save(Properties* prop) const
 {
+	Subsystem::Save(prop);
+
 	prop->Set("orgName", orgName);
 	prop->Set("gameName", gameName);
 	prop->Set("defaultScene", defaultScene);
+}
+
+void Game::Bind()
+{
+//	Script::Class<Game, Object> inst;
 }
 
 /*******************************************************************************

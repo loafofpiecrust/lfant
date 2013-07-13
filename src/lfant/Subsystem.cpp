@@ -28,8 +28,7 @@
 // External
 
 
-namespace lfant
-{
+namespace lfant {
 
 Subsystem::Subsystem()
 {
@@ -44,10 +43,10 @@ Subsystem::~Subsystem()
 void Subsystem::Init()
 {
 	Object::Init();
-	if(Type(this) != Type<Scene>())
+	if(type::Name(this) != type::Name<Scene>())
 	{
 		printf("About to load file for subsystem\n");
-		string type = RemoveScoping(Type(this));
+		string type = type::Unscope(type::Name(this));
 		to_lower(type);
 		LoadFile("settings/"+type+".cfg");
 	}

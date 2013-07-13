@@ -8,6 +8,7 @@
 
 // External
 #include <boost/lexical_cast.hpp>
+#include <string>
 
 namespace lfant
 {
@@ -34,11 +35,12 @@ string lexical_cast<string, const char*>(const char* const& src)
 	return string(src);
 }
 
-
 template<>
 string lexical_cast<string, void*>(void* const& src)
 {
-//	return to_string(src);
+	char str[12];
+	sprintf(str, "%p", src);
+	return str;
 }
 
 /*
@@ -138,39 +140,49 @@ bool lexical_cast<bool, string>(const string& src)
 template<>
 string lexical_cast<string, int>(const int& src)
 {
-	return to_string(src);
+	char str[12];
+	sprintf(str, "%i", src);
+	return str;
 }
 
 template<>
 string lexical_cast<string, unsigned char>(const unsigned char& src)
 {
-	string final = "";
-	final.push_back(src);
-	return final;
+	char str[4];
+	sprintf(str, "%u", src);
+	return str;
 }
 
 template<>
 string lexical_cast<string, unsigned short>(const unsigned short& src)
 {
-	return to_string(src);
+	char str[6];
+	sprintf(str, "%u", src);
+	return str;
 }
 
 template<>
 string lexical_cast<string, unsigned int>(const unsigned int& src)
 {
-	return to_string(src);
+	char str[12];
+	sprintf(str, "%u", src);
+	return str;
 }
 
 template<>
 string lexical_cast<string, unsigned long>(const unsigned long& src)
 {
-	return to_string(src);
+	char str[20];
+	sprintf(str, "%lu", src);
+	return str;
 }
 
 template<>
 string lexical_cast<string, unsigned long long>(const unsigned long long& src)
 {
-	return to_string(src);
+	char str[40];
+	sprintf(str, "%llu", src);
+	return str;
 }
 template<>
 string lexical_cast<string, bool>(const bool& src)
@@ -424,7 +436,7 @@ template<>
 Range<int> lexical_cast<Range<int>, string>(const string& src)
 {
 	Range<int> result(0);
-	deque<string> str = lfant::Split(src, " -()");
+	deque<string> str = lfant::Split(src, " .-()");
 	result.min = lexical_cast<int>(str[0]);
 	if(str.size() > 1)
 	{

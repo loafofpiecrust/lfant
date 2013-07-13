@@ -29,6 +29,7 @@
 #include <lfant/util/String.h>
 #include <lfant/FileSystem.h>
 #include <lfant/Console.h>
+#include <lfant/Thread.h>
 
 namespace lfant
 {
@@ -103,21 +104,18 @@ void Texture::InitData(byte* data)
 		glGenTextures(1, &id);
 		Log("Generating tex id, ", id);
 	}
-	if(index == -1)
-	{
-		SetIndex(0);
-	}
 	Bind();
 
 	Log("Texture mode is ", mode, ". GL_TEXTURE_2D = ", GL_TEXTURE_2D);
 	Log("internalFormat = ", (uint)internalFormat, ". GL_RGBA = ", GL_RGBA, ", GL_RGB32F = ", GL_RGB32F);
 	Log("format = ", (uint)format, ". GL_RGBA = ", GL_RGBA, ", GL_RGB32F = ", GL_RGB32F);
+	Log("dataType = ", (uint)dataType, ". GL_FLOAT = ", GL_FLOAT, ", GL_UNSIGNED_BYTE = ", GL_UNSIGNED_BYTE);
 	
-	glTexImage2D(mode, 0, (uint)internalFormat, size.x, size.y, 0, (uint)format, GL_UNSIGNED_BYTE, data);
+	glTexImage2D(mode, 0, (uint)internalFormat, size.x, size.y, 0, (uint)format, (uint)dataType, data);
 
 	Log("scaleFilter = ", (uint)scaleFilter, ", GL_LINEAR = ", GL_LINEAR, ", GL_NEAREST = ", GL_NEAREST);
 	glTexParameteri(mode, GL_TEXTURE_MAG_FILTER, (uint)scaleFilter);
-	glTexParameteri(mode, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(mode, GL_TEXTURE_MIN_FILTER, (uint)scaleFilter);
 
 	Log("wrapMode = ", (uint)wrapMode, ", GL_CLAMP_TO_EDGE = ", GL_CLAMP_TO_EDGE, ", GL_REPEAT = ", GL_REPEAT);
 	if(wrapMode != WrapMode::Repeat)
@@ -154,6 +152,7 @@ void Texture::Bind()
 
 void Texture::Unbind()
 {
+	glActiveTexture(GL_TEXTURE0 + index);
 	glBindTexture(mode, 0);
 }
 

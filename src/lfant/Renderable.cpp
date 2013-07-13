@@ -62,6 +62,10 @@ void Renderable::OnDestroy()
 
 void Renderable::BeginRender()
 {
+	if(loaded)
+	{
+		EndRender();
+	}
 	loaded = true;
 }
 

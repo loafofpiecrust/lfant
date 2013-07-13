@@ -63,7 +63,13 @@ string GetProgramDir()
 #elif WINDOWS
 string GetProgramDir()
 {
+	HMODULE hmod = GetModuleHandle(0);
+	char file[100];
+	GetModuleFileName(hmod, file, 100);
 
+	path p(file);
+	p.remove_filename();
+	return p.string();
 }
 #elif MACOSX
 
@@ -84,7 +90,7 @@ void FileSystem::Init()
 	Subsystem::Init();
 }
 
-path FileSystem::GetGamePath(string name)
+path FileSystem::GetGamePath(string name) const
 {
 	path result(gameFolder + "/assets/" + name);
 	if(!exists(result))
@@ -95,7 +101,7 @@ path FileSystem::GetGamePath(string name)
 	return result;
 }
 
-path FileSystem::GetUserPath(string name)
+path FileSystem::GetUserPath(string name) const
 {
 	path result(userFolder + "/" + name);
 	if(!exists(result))
@@ -105,7 +111,7 @@ path FileSystem::GetUserPath(string name)
 	return result;
 }
 
-deque<path> FileSystem::GetGameFiles(string dir)
+deque<path> FileSystem::GetGameFiles(string dir) const
 {
 	deque<path> result;
 	if(exists(dir) && is_directory(dir))

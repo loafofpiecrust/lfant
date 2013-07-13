@@ -96,7 +96,7 @@ void Rigidbody::Init()
 
 	ConnectEvent(SENDER(owner, SetPosition), RECEIVER(this, OnSetPos));
 	ConnectEvent(SENDER(owner, SetRotation), RECEIVER(this, OnSetRot));
-	ConnectEvent(SENDER(owner, SetCollider), RECEIVER(this, OnSetCollider));
+	ConnectEvent(SENDER(owner, SetComponentCollider), RECEIVER(this, OnSetCollider));
 	ConnectEvent(SENDER(owner, ApplyForce), RECEIVER(this, ApplyForce));
 	ConnectEvent(SENDER(owner, ApplyCentralForce), RECEIVER(this, ApplyCentralForce));
 	ConnectEvent(SENDER(owner, Accelerate), RECEIVER(this, Accelerate));
@@ -104,7 +104,7 @@ void Rigidbody::Init()
 
 	body->getWorldTransform().setOrigin(vec3_cast<btVector3>(owner->transform->GetPosition()));
 	body->forceActivationState(DISABLE_DEACTIVATION);
-	body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
+//	body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
 	Log("Rigidbody is trigger? ", IsTrigger());
 	SetTrigger(IsTrigger());
 }
@@ -232,7 +232,7 @@ void Rigidbody::OnSetCollider(Collider *collider)
 	}
 	else
 	{
-		Log("Collider set for entity, setting for rigidbody, type: '", Type(collider), "'.");
+		Log("Collider set for entity, setting for rigidbody, type: '", type::Name(collider), "'.");
 		body->setCollisionShape(collider->GetShape());
 		this->collider = collider;
 	}

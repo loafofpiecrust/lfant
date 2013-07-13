@@ -57,10 +57,27 @@ void Console::Init()
 	//	RegisterCommand(&Console::CmdLoadFile, "loadfile");
 }
 
+void Console::Update()
+{
+}
+
+void Console::OnDestroy()
+{
+	logFile.close();
+}
+
 void Console::Load(Properties *prop)
 {
-	prop = prop->GetChild("console");
+	Subsystem::Load(prop);
+
 	prop->Get("logFile", logName);
+}
+
+void Console::Save(Properties* prop) const
+{
+	Subsystem::Save(prop);
+
+	prop->Set("logFile", logName);
 }
 
 void Console::CmdGetVar(deque<string> args)
@@ -95,11 +112,6 @@ void Console::CmdHelp(deque<string> args)
 	}
 	*/
 	Log("help: none found.");
-}
-
-void Console::OnDestroy()
-{
-	logFile.close();
 }
 
 void Console::Input(string line)

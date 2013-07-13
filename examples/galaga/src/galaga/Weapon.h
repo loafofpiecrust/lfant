@@ -22,7 +22,7 @@
 // External
 
 // Internal
-#include <lfant/Component.h>
+#include <galaga/Inventory.h>
 
 namespace lfant {
 namespace galaga {
@@ -37,10 +37,67 @@ namespace galaga {
 /**
  *
  */
-class Weapon : public lfant::Component
+class Weapon : public Item
 {
 	DECLARE_COMP(Weapon)
 public:
+
+	class Part : public Item
+	{
+		DECLARE_COMP(Part)
+		friend class Weapon;
+	public:
+		enum class Type : byte
+		{
+			Body = 0,
+			Grip,
+			Stock,
+			Barrel,
+			Muzzle,
+			Ammo,
+			Sight
+		};
+
+		Part();
+		~Part();
+
+		void Load(Properties* prop);
+		void Save(Properties* prop);
+
+	protected:
+		Type type = Type::Body;
+	//	Weapon::Type weaponType = Weapon::Type::Pistol;
+
+		float meleeDamage = 1.0f;
+		float bulletSpeed = 0.0f;
+		float spread = 0.0f;
+		float fireRate = 0.0f;
+
+		// Ammo
+		uint32_t ammo = 0;
+		string projectilePath = "entities/items/projectiles/Bullet.ent";
+
+		vec3 attachmentPoint = vec3(0);
+
+	private:
+	};
+
+	class Body : public Part
+	{
+		DECLARE_COMP(Body)
+	public:
+		Body();
+
+		void Load(Properties* prop);
+		void Save(Properties* prop);
+
+		bool automatic = false;
+		uint32_t projectiles = 1;
+		uint32_t shotCost = 1;
+
+		map<Part::Type, vec3> attachmentPoints;
+	};
+
 	Weapon();
 	virtual ~Weapon();
 
@@ -57,18 +114,29 @@ public:
 	bool CanFire();
 	bool CanReload();
 
+	void Assemble(const deque<Part*>& partList);
+	void Disassemble();
+	void AddPart(Part* part);
+	void RemovePart(Part* part);
+
 protected:
 	void EndFire();
 
-	uint32_t currentAmmo = 25;
-	uint32_t maxAmmo = 25;
+	uint32_t currentAmmo = 0;
+	uint32_t maxAmmo = 0;
 	uint32_t ammoPool = 100;
 	uint32_t shotCost = 1;
 	uint32_t projectiles = 1;
-	float fireRate = 10.0f;
-	float reloadTime = 1.0f;
-	float meleeDamage = 10.0f;
-	float bulletSpeed = 110.0f;
+	float fireRate = 0.0f;
+	float reloadTime = 0.0f;
+	float meleeDamage = 0.0f;
+	float bulletSpeed = 0.0f;
+
+	float spread = 0.0f;
+	float currentSpread = 0.0f;
+
+	float recoil = 0.0f;
+	float currentRecoil = 0.0f;
 
 	float lastFire = 0.0f;
 
@@ -79,6 +147,10 @@ protected:
 	vec3 direction = vec3(1);
 
 	string projectilePath = "entities/items/projectiles/Bullet.ent";
+	ptr<Properties> projectile = new Properties;
+
+	Body* body;
+	deque<Part*> parts;
 
 
 private:

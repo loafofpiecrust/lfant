@@ -1,20 +1,20 @@
 /******************************************************************************
  *
- *	LFANT Source
- *	Copyright (C) 2012-2013 by LazyFox Studios
- *	Created: 2013-06-04 by Taylor Snead
+ * LFANT Source
+ * Copyright (C) 2012-2013 by LazyFox Studios
+ * Created: 2013-06-04 by Taylor Snead
  *
- *	Licensed under the Apache License, Version 2.0 (the "License");
- *	you may not use this file except in compliance with the License.
- *	You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *	http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- *	Unless required by applicable law or agreed to in writing, software
- *	distributed under the License is distributed on an "AS IS" BASIS,
- *	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *	See the License for the specific language governing permissions and
- *	limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  ******************************************************************************/
 
@@ -63,7 +63,7 @@ void Inventory::Init()
 {
 	ConnectEvent(SENDER(owner, UseItem), RECEIVER(this, UseItem));
 	ConnectEvent(SENDER(owner, EndUseItem), RECEIVER(this, EndUseItem));
-	ConnectEvent(SENDER(owner, EquipItem), this, (void(Inventory::*)(uint32_t))&Inventory::Equip);
+	ConnectEvent(SENDER(owner, EquipItem), this, reinterpret_cast<void(Inventory::*)(uint32_t)>((Item* (Inventory::*)(uint32_t))&Inventory::Equip));
 }
 
 void Inventory::UseItem(byte mode)
@@ -100,24 +100,55 @@ void Inventory::RemoveItem(Item* item)
 	{
 		if(items[i] == item)
 		{
-			mass -= item->mass;
-			items.erase(items.begin()+i);
+			RemoveItem(i);
 			return;
 		}
 	}
 }
 
-void Inventory::RemoveItem(string name)
+Item* Inventory::RemoveItem(string name)
 {
 	for(uint i = 0; i < items.size(); ++i)
 	{
 		if(items[i]->owner->name == name)
 		{
-			mass -= items[i]->mass;
-			items.erase(items.begin()+i);
-			return;
+			return RemoveItem(i);
 		}
 	}
+	return nullptr;
+}
+
+Item* Inventory::RemoveItem(uint32_t idx)
+{
+	if(items.size() <= idx)
+	{
+		return nullptr;
+	}
+
+	Item* item = items[idx];
+	mass -= item->mass;
+	items.erase(items.begin()+idx);
+	if(equippedItem > idx && idx > 0)
+	{
+		--equippedItem;
+	}
+	return item;
+}
+
+Item* Inventory::RemoveItem(uint32_t idx)
+{
+	if(idx == -1)
+	{
+		idx = equippedItem;
+	}
+	
+	if(idx > items.size()) return nullptr;
+	
+	Item* item = items[idx];
+	mass -= item->mass;
+	items.erase(items.begin()+idx);
+	item->owner->transform->SetWorldPosition(owner->transform->GetWorldPosition());
+	return item;
 }
 
 Item* Inventory::GetItem(string name)
@@ -132,28 +163,34 @@ Item* Inventory::GetItem(string name)
 	return nullptr;
 }
 
-void Inventory::Equip(string name)
+Item* Inventory::GetCurrentItem()
+{
+	return items[equippedItem];
+}
+
+Item* Inventory::Equip(string name)
 {
 	for(uint i = 0; i < items.size(); ++i)
 	{
 		if(items[i]->owner->name == name)
 		{
-			Equip(i);
-			return;
+			return Equip(i);
+		//	return;
 		}
 	}
 }
 
-void Inventory::Equip(uint32_t idx)
+Item* Inventory::Equip(uint32_t idx)
 {
 	if(items.size() <= idx || equippedItem == idx)
 	{
-		return;
+		return nullptr;
 	}
 
 	if(items.size() > equippedItem) items[equippedItem]->Equip(false);
 	equippedItem = idx;
 	items[equippedItem]->Equip(true);
+	return items[equippedItem];
 }
 
 
@@ -191,12 +228,19 @@ void Item::Load(Properties* prop)
 
 void Item::Init()
 {
+	Component::Init();
 	Inventory* inv = nullptr;
 	if(owner->parent && (inv = owner->parent->GetComponent<Inventory>()))
 	{
 		Log("Adding item to parent inventory");
 		inv->AddItem(this);
 	}
+}
+
+void Item::OnDestroy()
+{
+	Component::OnDestroy();
+	inventory->RemoveItem(this);
 }
 
 void Item::Equip(bool val)

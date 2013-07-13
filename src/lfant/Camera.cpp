@@ -37,17 +37,31 @@ Camera::Camera()
 {
 }
 
+Camera::Camera(const Camera& other) :
+	Component(other)
+{
+}
+
 Camera::~Camera()
 {
 }
 
-void Camera::Save(Properties* prop)
+Component* Camera::Clone(Entity* owner) const
+{
+	Camera* inst = new Camera;
+	Component::Clone(inst, owner);
+	return inst;
+}
+
+void Camera::Save(Properties* prop) const
 {
 	Component::Save(prop);
 
 	prop->Set("fov", fov);
 	prop->Set("aspectRatio", aspectRatio);
 	prop->Set("viewRange", viewRange);
+	prop->Set("dof", dof);
+	prop->Set("dofWidth", dofWidth);
 //	prop->Set("mode", (short)mode);
 }
 
@@ -58,6 +72,8 @@ void Camera::Load(Properties* prop)
 	prop->Get("fov", fov);
 	prop->Get("aspectRatio", aspectRatio);
 	prop->Get("viewRange", viewRange);
+	prop->Get("dof", dof);
+	prop->Get("dofWidth", dofWidth);
 //	mode = (Mode)prop->Get<short>("mode");
 
 	UpdateProjection();
@@ -110,7 +126,7 @@ void Camera::UpdateProjection()
 			Log(lexical_cast<string>(fov));
 			Log(lexical_cast<string>(aspectRatio));
 			Log(lexical_cast<string>(viewRange));
-			projection = glm::perspective(fov, aspectRatio, viewRange.min, viewRange.max);
+			projection = glm::perspective(fov/aperture, aspectRatio, viewRange.min, viewRange.max);
 			Log("projection: ", lexical_cast<string>(projection));
 			break;
 		}
@@ -175,6 +191,17 @@ void Camera::SetViewRange(float min, float max)
 Range<float> Camera::GetViewRange()
 {
 	return viewRange;
+}
+
+void Camera::SetAperture(float value)
+{
+	aperture = value;
+	UpdateProjection();
+}
+
+float Camera::GetAperture()
+{
+	return aperture;
 }
 
 }

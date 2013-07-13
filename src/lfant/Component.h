@@ -44,6 +44,11 @@ namespace lfant {
 #define IMPLEMENT_COMP(type) \
 	Component::RegistryEntry<type> type::_registryEntry {#type};
 
+template<typename C>
+Component* CreateComponent()
+{
+	return new C();
+}
 
 /**	The base class for all Entity Components.
  *		Component is the basis for all things to be attached to
@@ -66,15 +71,24 @@ protected:
 	public:
 		RegistryEntry(string type)
 		{
-			Component::componentRegistry[type] = (Component* (Entity::*)(Properties*))&Entity::AddComponent<T>;
+			Component::componentRegistry[type] = &lfant::CreateComponent<T>;
 		}
 	};
 
 public:
+	Component();
+	Component(const Component& other);
 	virtual ~Component();
 
+//	virtual Component& operator=(const Component& other);
+
+	virtual Component* Clone(Entity* owner) const;
+	void Clone(Component* comp, Entity* owner) const;
+
 	virtual void Load(Properties* prop);
-	virtual void Save(Properties* prop);
+	virtual void Save(Properties* prop) const;
+
+	static void Bind() __attribute__((constructor));
 
 	/**
 	 *	Returns whether this component is enabled.
@@ -86,21 +100,10 @@ public:
 	 */
 	void Enable(bool enable = true);
 
-
 	/// The owner of this Component.
 	Entity* owner = nullptr;
 
 protected:
-	Component();
-
-	static map<string, Component* (Entity::*)(Properties*) > componentRegistry __attribute__((init_priority(101)));
-
-	/**
-	 *	Registers a component type by string, only used by the IMPLEMENT_COMP macro.
-	 *	@param name The typename
-	 */
-	static void RegisterType(string name, Component* (Entity::*func)(Properties*));
-
 	// Loop Function Overwrites
 	virtual void Init();
 	virtual void Update();
@@ -151,6 +154,14 @@ protected:
 	}
 
 private:
+
+	static map<string, Component* (*)()> componentRegistry;
+
+	/**
+	 *	Registers a component type by string, only used by the IMPLEMENT_COMP macro.
+	 *	@param name The typename
+	 */
+	static void RegisterType(string name, Component* (*func)());
 
 	/// Whether this component should Update or not.
 	bool enabled = true;

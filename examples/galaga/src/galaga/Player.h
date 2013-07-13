@@ -26,6 +26,8 @@
 
 namespace lfant {
 namespace galaga {
+	
+class Inventory;
 
 /** @addtogroup Galaga
  *	@{
@@ -53,8 +55,12 @@ public:
 
 	void Jump(float value);
 	void Fire(float value);
+
+	void ToggleInventory();
+
 	void NextItem();
 	void PreviousItem();
+	void DropItem();
 
 	void Load(Properties* prop);
 	void Save(Properties* prop);
@@ -62,11 +68,11 @@ public:
 protected:
 
 	float lookSpeed = 0.01f;
-	float bulletSpeed = 5.0f;
 	bool mouseLook = true;
 
-	int meshCount = 0;
 	ivec2 lastMouse;
+
+	Inventory* inventory;
 
 private:
 

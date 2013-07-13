@@ -41,6 +41,18 @@ Transform::~Transform()
 
 }
 
+void Transform::Init()
+{
+	Component::Init();
+
+//	if(owner->parent)
+	{
+//		ConnectEvent(SENDER(owner->parent->transform, SetPosition), RECEIVER(this, OnSetWorldPos));
+//		ConnectEvent(SENDER(owner->parent->transform, SetRotation), RECEIVER(this, OnSetWorldPos));
+//		ConnectEvent(SENDER(owner->parent->transform, SetScale), RECEIVER(this, OnSetWorldPos));
+	}
+}
+
 void Transform::Save(Properties *prop)
 {
 	Component::Save(prop);
@@ -60,6 +72,13 @@ void Transform::Load(Properties *prop)
 	prop->Get("scale", scale);
 
 	Log("Loaded position: "+lexical_cast<string>(position));
+}
+
+void Transform::OnSetWorldPos()
+{
+	TriggerEvent("SetPosition");
+
+	updateMatrix = true;
 }
 
 vec3 Transform::GetPosition()
@@ -216,7 +235,11 @@ void Transform::SetWorldScale(vec3 scl)
 void Transform::Update()
 {
 //	Log("Transform updating");
-	SetMatrix();
+//	if(updateMatrix)
+	{
+		SetMatrix();
+	//	updateMatrix = false;
+	}
 //	SetDirection();
 }
 
@@ -233,7 +256,7 @@ void Transform::SetMatrix()
 //	pos.x = -pos.x;
 //	vec3 rot = radians(GetRotation());
 	quat rot = GetRotationQuat();
-	matrix = mat4(1);
+//	matrix = mat4(1);
 
 	if(owner->parent)
 	{
@@ -241,7 +264,7 @@ void Transform::SetMatrix()
 	}
 	else
 	{
-	//	scl.x = -scl.x;
+		matrix = mat4();
 	}
 
 //	matrix = glm::translate(mat4(), pos) * mat4_cast(rot) * glm::scale(mat4(), scl);

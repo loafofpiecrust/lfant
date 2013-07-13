@@ -1,7 +1,9 @@
 #version 330 core
 
 // uniforms
-uniform mat4 MVP;
+uniform mat4 M;
+uniform mat4 V;
+uniform mat4 P;
 
 // inputs
 layout(location = 0) in vec3 position;
@@ -13,12 +15,18 @@ layout(location = 2) in vec3 normal;
 
 // outputs
 //out vec2 UV;
+out vec3 vertPos;
+out vec3 vertNormal;
 
 void main()
 {
+	vec4 pos = V * M * vec4(position, 1);
 	// Sets the final position of the vertex.
-	gl_Position = MVP * vec4(position, 1);
+	vertPos = pos.xyz;
+	gl_Position = P * pos;
 
 	// Sets fragment UV to vertex UV
 	gl_TexCoord[0].xy = vertexUV;
+
+	vertNormal = normalize(vec4(M * vec4(normal, 0)).xyz);
 }

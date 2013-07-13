@@ -47,12 +47,12 @@ public:
 	FileSystem();
 	~FileSystem();
 
-	void Init();
+	virtual void Init();
 
-	path GetUserPath(string name);
-	path GetGamePath(string name);
+	path GetUserPath(string name) const;
+	path GetGamePath(string name) const;
 
-	deque<path> GetGameFiles(string dir);
+	deque<path> GetGameFiles(string dir) const;
 
 protected:
 

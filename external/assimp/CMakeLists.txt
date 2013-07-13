@@ -53,6 +53,11 @@ add_definitions(
 	)
 
 target_link_libraries(${PROJECT_NAME}
-	rt
 	z
 	)
+
+if(PLATFORM STREQUAL "linux")
+target_link_libraries(${PROJECT_NAME}
+	rt
+	)
+endif()

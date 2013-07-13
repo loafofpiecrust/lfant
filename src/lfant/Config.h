@@ -50,3 +50,5 @@
 #if __GXX_EXPERIMENTAL_CXX0X__
 #	define GLM_FORCE_CXX11
 #endif
+
+#undef CreateWindow
