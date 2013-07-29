@@ -44,6 +44,12 @@ namespace lfant {
 #define IMPLEMENT_COMP(type) \
 	Component::RegistryEntry<type> type::_registryEntry {#type};
 
+template<typename C>
+Component* CreateComponent()
+{
+	return new C;
+}
+
 
 /**	The base class for all Entity Components.
  *		Component is the basis for all things to be attached to
@@ -66,7 +72,7 @@ protected:
 	public:
 		RegistryEntry(string type)
 		{
-			Component::componentRegistry[type] = (Component* (Entity::*)(Properties*))&Entity::AddComponent<T>;
+			Component::componentRegistry[type] = &lfant::CreateComponent<T>;
 		}
 	};
 
@@ -144,13 +150,13 @@ protected:
 
 private:
 
-	static map<string, Component* (Entity::*)(Properties*) > componentRegistry __attribute__((init_priority(101)));
+	static map<string, Component* (*)()> componentRegistry;
 
 	/**
 	 *	Registers a component type by string, only used by the IMPLEMENT_COMP macro.
 	 *	@param name The typename
 	 */
-	static void RegisterType(string name, Component* (Entity::*func)(Properties*));
+	static void RegisterType(string name, Component* (Entity::*func)());
 
 	/// Whether this component should Update or not.
 	bool enabled = true;

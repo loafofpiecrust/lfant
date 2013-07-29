@@ -1,9 +1,14 @@
 message("Config file called")
-get_filename_component(ROOT "./" REALPATH)
+#get_filename_component(ROOT "./" REALPATH)
 
 set(ARCH "x64")
 set(ARCH "x64" CACHE STRING "Architecture to build for. (x86/x64)")
 
+set(ANDROID_NDK_PATH "" CACHE STRING "Root path of your android ndk")
+set(ANDROID_TOOLCHAIN "" CACHE STRING "Toolchain name to use for android building")
+
+# Desktop setup
+if(ANDROID_NDK_PATH STREQUAL "")
 if(ARCH STREQUAL "x64")
 	set(ARCH "64")
 	set(ARCH_OPTION "x86-64")
@@ -29,14 +34,40 @@ else()
 	endif()
 endif()
 
+# Android setup
+else()
+	set(ANDROID ON)
+	set(PLATFORM "android")
+
+	if(UNIX)
+		if(APPLE)
+		else()
+			set( ANDROID_NDK_HOST_SYSTEM_NAME "linux-x86" )
+		endif()
+	else()
+		if(WIN32)
+		endif()
+	endif()
+
+#	set(ANDROID_NDK ${ANDROID_NDK})
+	set(ANDROID_NDK_TOOLCHAIN_ROOT ${ANDROID_NDK_PATH}/toolchains/${ANDROID_TOOLCHAIN})
+#	set(ANDROID_NDK_TOOLCHAIN_BIN "${ANDROID_NDK_TOOLCHAIN_ROOT}/prebuilt/linux-x86/arm-linux-androideabi/bin")
+	set(CMAKE_TOOLCHAIN_FILE ${LFANT}/cmake/android.toolchain.cmake)
+	set(ANDROID_NATIVE_API_LEVEL "android-9")
+endif()
+
 if(PLATFORM STREQUAL "")
 	message(FATAL_ERROR "This platform is not supported.")
 endif()
 
+message("Platform: ${PLATFORM}")
+
 set(CMAKE_BUILD_TYPE Release)
-set(CMAKE_C_FLAGS "-m${ARCH} -O3 -Wall -D__STRICT_ANSI__")
-if(WIN32)
-else()
+set(CMAKE_C_FLAGS "-O3 -Wall -D__STRICT_ANSI__")
+if(NOT ANDROID)
+	list(APPEND CMAKE_C_FLAGS "-m${ARCH}")
+endif()
+if(NOT WIN32)
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
 endif()
 set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -std=gnu++11 -Wno-invalid-offsetof -g -Wno-overloaded-virtual")
@@ -51,5 +82,10 @@ if(UNIX)
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-z,origin")
 endif()
 
-set(LIBRARY_OUTPUT_PATH ${ROOT}/bin${ARCH}/${PLATFORM})
+if(ANDROID)
+	set(LIBRARY_OUTPUT_PATH ${ROOT}/android/bin)
+else()
+	set(LIBRARY_OUTPUT_PATH ${ROOT}/bin${ARCH}/${PLATFORM})
+endif()
+
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${LIBRARY_OUTPUT_PATH})

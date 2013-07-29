@@ -321,5 +321,29 @@ void Weapon::RemovePart(Weapon::Part* part)
 	recoil -= 1/part->mass * part->bulletSpeed/100;
 }
 
+void Weapon::Part::Save(Properties* prop)
+{
+	Item::Save(prop);
+}
+
+void Weapon::Part::Load(Properties* prop)
+{
+	Item::Load(prop);
+}
+
+Weapon::Body::Body()
+{
+}
+
+void Weapon::Body::Save(Properties* prop)
+{
+	Part::Save(prop);
+}
+
+void Weapon::Body::Load(Properties* prop)
+{
+	Part::Load(prop);
+}
+
 }
 }

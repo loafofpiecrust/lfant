@@ -9,14 +9,14 @@
 #define HAVE_VERSION(major,minor) (VERSION_MINOR >= minor && VERSION_MAJOR == major) || (VERSION_MAJOR > major)
 
 // Detect platform if not specified
-#if !WINDOWS && !LINUX && !OSX
-#	ifdef _WIN32
-#		define WINDOWS 1
-#	elif __linux
-#		define LINUX 1
-#	elif _APPLE_
-#		define MACOSX 1
-#	endif
+#ifdef ANDROID
+#	define ANDROID 1
+#elif _WIN32
+#	define WINDOWS 1
+#elif __linux
+#	define LINUX 1
+#elif _APPLE_
+#	define MACOSX 1
 #endif
 
 // Platform Preprocessor
@@ -33,6 +33,15 @@
 #	define ROOTXP extern "C++"
 #	define GLFWCALL
 #	include <unistd.h>
+#endif
+
+#if ANDROID
+#	define ROOTXP extern "C++"
+#	include <unistd.h>
+#	define LFANT_GLES 1
+#	define GLEW_ES_ONLY 1
+#else
+#	define LFANT_GL 1
 #endif
 
 // General Preprocessor

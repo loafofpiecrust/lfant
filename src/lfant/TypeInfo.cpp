@@ -25,13 +25,9 @@
 // External
 #include <lfant/util/lexical_cast.h>
 
-namespace lfant
-{
+namespace lfant {
 
-string ParamType()
-{
-	return "";
-}
+namespace type {
 
 string Type()
 {
@@ -47,6 +43,7 @@ string RemoveScoping(string type)
 {
 	deque<string> toks = Split(type, ":");
 	return toks[toks.size()-1];
+}
 }
 
 }

@@ -108,7 +108,10 @@ public:
 	ptr<Audio> audio;
 	ptr<Network> network;
 	ptr<ScriptSystem> scriptSystem;
+
+#if !ANDROID
 	ptr<OpenCL> openCL;
+#endif
 	//boost::scoped_ptr<AISystem>			aiSystem;
 	//boost::scoped_ptr<FGSystem>			flowgraph;
 

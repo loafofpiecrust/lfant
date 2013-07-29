@@ -1,5 +1,5 @@
 
-if(UNIX)
+if(UNIX AND NOT ANDROID)
 set(CMAKE_C_COMPILER "clang")
 set(CMAKE_CXX_COMPILER "clang++")
 endif()
@@ -40,6 +40,7 @@ include_directories(
 	"${LFANT}/src"
 	"${LFANT}/external/glm"
 	"${LFANT}/external/boost"
+	"${LFANT}/external/glew/include"
 	"${LFANT}/external/glfw/include"
 	"${LFANT}/external/raknet/Source"
 	"${LFANT}/external/cegui/cegui/include"

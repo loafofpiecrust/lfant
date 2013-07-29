@@ -141,20 +141,6 @@ void Entity::RemoveChild(Entity* ent)
 	}
 }
 
-void Entity::AddComponent(Component* comp, Properties *prop)
-{
-	components.push_back(comp);
-	comp->owner = this;
-	if(prop)
-	{
-		comp->Load(prop);
-	}
-	comp->Init();
-	TriggerEvent("AddComponent", comp);
-	Log("Entity::AddComponent: Calling ", "SetComponent"+RemoveScoping(Type(comp)));
-	TriggerEvent("SetComponent"+RemoveScoping(Type(comp)), comp);
-}
-
 void Entity::UnsafeDestroy()
 {
 	Object::Destroy();
@@ -214,10 +200,10 @@ Entity* Entity::Clone(string name, Entity* parent)
 
 Component* Entity::GetComponent(string type)
 {
-	string unscoped = RemoveScoping(type);
+	string unscoped = type::Unscope(type);
 	for(auto& comp : components)
 	{
-		if(Type(comp) == type || Type(comp) == unscoped || RemoveScoping(Type(comp)).find(unscoped) != -1)
+		if(type::Name(comp) == type || type::Name(comp) == unscoped || type::Unscope(type::Name(comp)).find(unscoped) != -1)
 		{
 			return comp;
 		}
@@ -257,7 +243,7 @@ void Entity::RemoveComponent(Component* comp, bool destroy)
 		if(components[i] == comp)
 		{
 			TriggerEvent("RemoveComponent", comp);
-			TriggerEvent("SetComponent"+RemoveScoping(Type(comp)), comp);
+			TriggerEvent("SetComponent"+type::Unscope(type::Name(comp)), comp);
 			if(!destroy)
 			{
 				components[i] = nullptr;
@@ -275,10 +261,10 @@ void Entity::RemoveComponent()
 	for(uint i = 0; i < components.size(); ++i)
 	{
 		Component* comp = components[i];
-		if(Type<T>() == Type(comp))
+		if(Type<T>() == type::Name(comp))
 		{
 			TriggerEvent("RemoveComponent", comp);
-			TriggerEvent("SetComponent"+RemoveScoping(Type(comp)), comp);
+			TriggerEvent("SetComponent"+type::Unscope(type::Name(comp)), comp);
 			comp->Destroy();
 			components.erase(components.begin()+i);
 		}
@@ -450,7 +436,7 @@ void Entity::Load(Properties* prop, bool init)
 		Log("Loading entity from file path");
 		ptr<Properties> fp {new Properties};
 		fp->LoadFile(file);
-		string type = RemoveScoping(Type(this));
+		string type = type::Unscope(type::Name(this));
 		to_lower(type);
 		if(Properties* pc = fp->GetChild(type))
 		{
@@ -462,6 +448,20 @@ void Entity::Load(Properties* prop, bool init)
 	{
 		Init();
 	}
+}
+
+void Entity::AddComponent(Component* comp)
+{
+	components.push_back(comp);
+	comp->owner = this;
+	if(prop)
+	{
+		comp->Load(prop);
+	}
+	comp->Init();
+	TriggerEvent("AddComponent", comp);
+	Log("Entity::AddComponent: Calling ", "SetComponent"+type::Unscope(type::Name(comp)));
+	TriggerEvent("SetComponent"+type::Unscope(type::Name(comp)), comp);
 }
 
 Component *Entity::AddComponent(string type, Properties *prop)
@@ -477,9 +477,14 @@ Component *Entity::AddComponent(string type, Properties *prop)
 	else
 	{
 		Log("Found function for this type.");
-		result = (this->*val)(prop);
-		Log("Added component owner ptr: '", result->owner, "'.");
+		result = (*val)();
+		components.push_back(result);
 		result->owner = this;
+		if(prop)
+		{
+			result->Load(prop);
+		}
+		result->Init();
 	}
 
 	if(type == "Camera" && result)

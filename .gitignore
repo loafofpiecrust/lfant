@@ -1,6 +1,11 @@
 # git ignore file
 
+# Executables
+#-------------
+*.exe
+
 # Libraries
+#-----------
 *.so
 *.a
 *.dll
@@ -8,10 +13,25 @@
 *.dylib
 
 # Objects
+#----------
 *.o
 
+# IDE Files
+#-----------
+#*.workspace
+#*.project
+
 # Folders
+#----------
 build
-analysis
-wiki
 docs
+wiki
+src/tests
+
+# Binary folders
+#----------------
+bin32
+bin64
+*/bin32
+*/bin64
+*/obj

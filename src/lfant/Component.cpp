@@ -29,7 +29,7 @@
 
 namespace lfant {
 
-map< string, Component* (Entity::*)(Properties*)> Component::componentRegistry __attribute__((init_priority(101)));
+map< string, Component* (*)()> Component::componentRegistry __attribute__((init_priority(101)));
 
 Component::Component()
 {

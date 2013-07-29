@@ -41,34 +41,40 @@ configure_file( "${PROJECT_SOURCE_DIR}/cegui/include/CEGUI/Config.h.in" "${PROJE
 
 # Library Search Paths
 link_directories(
-	"${LIBRARY_OUTPUT_PATH}"
-	"/usr/lib/x86_64-linux-gnu/mesa"
+	${LIBRARY_OUTPUT_PATH}
+	/usr/lib/x86_64-linux-gnu/mesa
 	)
 
 # Source Info
 file(GLOB SRC_FILES
-	"cegui/src/*.cpp"
-	"cegui/src/falagard/*.cpp"
-	"cegui/src/widgets/*.cpp"
-	"cegui/src/WindowRendererSets/Core/*.cpp"
-	"cegui/src/XMLParserModules/TinyXML/*.cpp"
-	"cegui/src/ImageCodecModules/STB/*.cpp"
-	"cegui/src/RendererModules/OpenGL/*.cpp"
-	"cegui/include/CEGUI/tinyxml/*.cpp"
-	"cegui/src/CommonDialogs/*.cpp"
-	"cegui/src/CommonDialogs/ColourPicker/*.cpp"
+	cegui/src/*.cpp
+	cegui/src/falagard/*.cpp
+	cegui/src/widgets/*.cpp
+	cegui/src/WindowRendererSets/Core/*.cpp
+	cegui/src/XMLParserModules/TinyXML/*.cpp
+	cegui/src/ImageCodecModules/STB/*.cpp
+	cegui/src/RendererModules/OpenGL/*.cpp
+	cegui/include/CEGUI/tinyxml/*.cpp
+	cegui/src/CommonDialogs/*.cpp
+	cegui/src/CommonDialogs/ColourPicker/*.cpp
 	)
 
 file(GLOB HEADER_FILES
-	"cegui/src/*.h"
-	"cegui/src/RendererModules/OpenGL3/*.h"
-	"cegui/include/CEGUI/tinyxml/*.h"
+	cegui/src/*.h
+	cegui/src/RendererModules/OpenGL3/*.h
+	cegui/include/CEGUI/tinyxml/*.h
 	)
 
 # Remove unneeded source files
-list(REMOVE_ITEM SRC_FILES FribidiVisualMapping.cpp)
+list(REMOVE_ITEM SRC_FILES
+	${PROJECT_SOURCE_DIR}/cegui/src/FribidiVisualMapping.cpp
+	${PROJECT_SOURCE_DIR}/cegui/src/MinizipResourceProvider.cpp
+	)
 if(PLATFORM STREQUAL "windows")
-	list(REMOVE_ITEM SRC_FILES "${PROJECT_SOURCE_DIR}/cegui/src/IconvStringTranscoder.cpp")
+	list(REMOVE_ITEM SRC_FILES
+		${PROJECT_SOURCE_DIR}/cegui/src/IconvStringTranscoder.cpp
+		${PROJECT_SOURCE_DIR}/cegui/src/PCRERegexMatcher.cpp
+		)
 else()
 	list(REMOVE_ITEM SRC_FILES
 		${PROJECT_SOURCE_DIR}/cegui/src/Win32StringTranscoder.cpp
@@ -76,10 +82,17 @@ else()
 		)
 endif()
 
-if(PLATFORM STREQUAL "osx")
+if(PLATFORM STREQUAL "macosx")
 else()
 	list(REMOVE_ITEM SRC_FILES
 		${PROJECT_SOURCE_DIR}/cegui/src/RendererModules/OpenGL/ApplePBTextureTarget.cpp
+		)
+endif()
+
+if(PLATFORM STREQUAL "linux")
+else()
+	list(REMOVE_ITEM SRC_FILES
+		${PROJECT_SOURCE_DIR}/cegui/src/RendererModules/OpenGL/GLXPBTextureTarget.cpp
 		)
 endif()
 
@@ -95,15 +108,26 @@ include_directories(
 	"cegui/include/CEGUI/freetype"
 	"cegui/include/CEGUI/tinyxml"
 	)
-
-target_link_libraries(${PROJECT_NAME}
-	pcre
-	glew
-#	xerces-c
-	freetype
-	dl
-	)
-
+	
 add_definitions(
 	-DCEGUI_STATIC
 	)
+
+target_link_libraries(${PROJECT_NAME}
+	glew
+#	xerces-c
+	freetype
+	m
+	)
+
+if(PLATFORM STREQUAL "linux")
+	target_link_libraries(${PROJECT_NAME}
+		pcre
+		dl
+	)
+endif()
+if(PLATFORM STREQUAL "windows")
+	target_link_libraries(${PROJECT_NAME}
+		winmm
+	)
+endif()

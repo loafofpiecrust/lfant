@@ -44,7 +44,7 @@ FileSystem::~FileSystem()
 {
 }
 
-#if LINUX
+#if LINUX || ANDROID
 string GetProgramDir()
 {
 	char tmp[128];
@@ -76,6 +76,8 @@ void FileSystem::Init()
 #if WINDOWS
 	const string home = getenv("USERPROFILE");
 #elif UNIX
+	const string home = getenv("HOME");
+#elif ANDROID
 	const string home = getenv("HOME");
 #endif
 	userFolder = home + "/Documents/My Games/" + game->orgName + "/" + game->gameName;

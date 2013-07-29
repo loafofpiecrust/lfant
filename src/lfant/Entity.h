@@ -81,13 +81,13 @@ public:
 	{
 		C* comp = new C();
 		AddComponent(comp, prop);
-		TriggerEvent("SetComponent"+RemoveScoping(Type(comp)), comp);
+		TriggerEvent("SetComponent"+type::Unscope(type::Name(comp)), comp);
 		return comp;
 	}
 
 	Component* AddComponent(string type, Properties* prop = nullptr);
 
-	void AddComponent(Component* comp, Properties* prop = nullptr);
+	void AddComponent(Component* comp);
 
 	/**
 	 *	Removes a component from this Entity
@@ -123,7 +123,7 @@ public:
 		deque<C*> comps;
 		for(auto& comp : components)
 		{
-			if(Type(comp) == Type<C>())
+			if(type::Name(comp) == Type<C>())
 			{
 				comps += dynamic_cast<C*>(comp.get());
 			}

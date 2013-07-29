@@ -39,7 +39,6 @@ include_directories(
 	${ROOT}/external/glm
 	${ROOT}/external/boost
 	${ROOT}/external/bullet/src
-	${ROOT}/external/glew/include
 	${ROOT}/external/glfw/include
 	${ROOT}/external/cegui/cegui/include
 	${ROOT}/external/angelscript/include
@@ -52,7 +51,6 @@ include_directories(
 target_link_libraries(${PROJECT_NAME}
 	glew
 	assimp
-	glfw
 	boost
 	bullet
 #	bass
@@ -68,3 +66,19 @@ target_link_libraries(${PROJECT_NAME}
 #	devil
 #	jsonspirit
 	)
+
+if(NOT ANDROID)
+include_directories(
+	${ROOT}/external/glew/include
+	)
+
+target_link_libraries(${PROJECT_NAME}
+	glfw
+	)
+
+else()
+
+include_directories(
+	${ROOT}/external/glew/es/include
+	)
+endif()
