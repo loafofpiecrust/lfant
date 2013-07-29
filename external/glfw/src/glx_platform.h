@@ -44,6 +44,10 @@
  #include <dlfcn.h>
 #endif
 
+#ifdef __linux
+    #include <pthread.h>
+#endif
+
 // We support four different ways for getting addresses for GL/GLX
 // extension functions: glXGetProcAddress, glXGetProcAddressARB,
 // glXGetProcAddressEXT, and dlsym
