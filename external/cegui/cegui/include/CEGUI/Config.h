@@ -171,9 +171,9 @@ setting CMake options and regenerating, rather than editing directly.
 // Define the default place where cegui will look for loadable modules
 // this can be changed at runtime via the CEGUI_MODULE_DIR environment var.
 #if defined(_WIN32) || defined(__WIN32__)
-#   define CEGUI_MODULE_DIR "/home/taylorsnead/lazyfox/lfant/android/build/bin/"
+#   define CEGUI_MODULE_DIR "/home/taylorsnead/lazyfox/lfant/bin64/linux/build/bin/"
 #else
-#   define CEGUI_MODULE_DIR "/home/taylorsnead/lazyfox/android/ndk9/toolchains/arm-linux-androideabi-4.8/prebuilt/linux-x86/user//"
+#   define CEGUI_MODULE_DIR "/usr/local//"
 #endif
 
 #endif	// end of guard _CEGUIConfig_h_

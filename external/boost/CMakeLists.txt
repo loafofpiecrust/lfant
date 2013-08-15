@@ -25,20 +25,20 @@ if(PLATFORM STREQUAL "windows")
 	set(SRC_FILES ${SRC_FILES} ${SRC_FILES_PLAT})
 endif()
 
-if(EXISTS "${PROJECT_SOURCE_DIR}/boost/")
+if(EXISTS "${PROJECT_SOURCE_DIR}/boost/.svn/")
 	execute_process(
-		COMMAND svn update boost
+		COMMAND svn update ${PROJECT_SOURCE_DIR}/boost
 		)
 	execute_process(
-		COMMAND svn update libs
+		COMMAND svn update ${PROJECT_SOURCE_DIR}/libs
 		)
 #	message("We have boost dir")
 else()
 	execute_process(
-		COMMAND svn co http://svn.boost.org/svn/boost/trunk/boost boost
+		COMMAND svn co http://svn.boost.org/svn/boost/trunk/boost ${PROJECT_SOURCE_DIR}/boost
 		)
 	execute_process(
-		COMMAND svn co http://svn.boost.org/svn/boost/trunk/libs libs
+		COMMAND svn co http://svn.boost.org/svn/boost/trunk/libs ${PROJECT_SOURCE_DIR}/libs
 		)
 #	message("No boost dir")
 endif()

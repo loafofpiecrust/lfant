@@ -89,7 +89,7 @@ void Scene::RemoveEntity(Entity* ent, bool destroy)
 	Log("Scene::RemoveEntity: Finished.");
 }
 
-Entity* Scene::GetEntity(string name, bool recursive)
+Entity* Scene::GetEntity(string name, bool recursive) const
 {
 	for(auto& ent : entities)
 	{
@@ -108,7 +108,7 @@ Entity* Scene::GetEntity(string name, bool recursive)
 	return nullptr;
 }
 
-Entity* Scene::GetEntityById(uint32_t id, bool recursive)
+Entity* Scene::GetEntityById(uint32_t id, bool recursive) const
 {
 	for(auto& ent : entities)
 	{
@@ -152,7 +152,7 @@ uint32_t Scene::GenerateEntityId()
 	return ++currentId;
 }
 
-void Scene::Save(Properties* prop)
+void Scene::Save(Properties* prop) const
 {
 	double t = game->time->GetTime();
 	prop->type = "scene";
@@ -180,6 +180,22 @@ void Scene::Load(Properties *prop)
 	Log("Loading scene took ", game->time->GetTime() - t, " seconds");
 }
 
+void Scene::AddEntity(Entity* ent)
+{
+	ent->active = true;
+	ent->Init();
+
+	if(!ent->parent)
+	{
+		entities.push_back(ent);
+		Log("Scene::Spawn: pushed in.");
+	}
+	else
+	{
+		ent->parent->AddChild(ent);
+	}
+}
+
 Entity* Scene::Spawn(string name, Entity* parent)
 {
 	Entity* ent = new Entity;
@@ -188,22 +204,7 @@ Entity* Scene::Spawn(string name, Entity* parent)
 	Log("Scene::Spawn: Set parent.");
 	ent->name = name;
 	Log("Scene::Spawn: Set name.");
-	ent->active = true;
-	Log("Scene::Spawn: Set active.");
-	Log("Scene::Spawn: About to Init, ", ent->name);
-
-	ent->Init();
-	Log("Scene::Spawn: Initialised, ", ent);
-	if(!parent)
-	{
-		entities.push_back(ent);
-		Log("Scene::Spawn: pushed in.");
-	}
-	else
-	{
-		parent->AddChild(ent);
-	}
-	return ent;
+	AddEntity(ent);
 }
 
 Entity* Scene::SpawnAndLoad(Properties* prop, string name, Entity* parent)
@@ -227,7 +228,7 @@ Entity* Scene::SpawnAndLoad(Properties* prop, string name, Entity* parent)
 	return ent;
 }
 
-deque<Entity*> Scene::GetEntities(string tag)
+deque<Entity*> Scene::GetEntities(string tag) const
 {
 	deque<Entity*> result;
 	for(auto& ent : entities)

@@ -114,6 +114,7 @@ void Shader::Compile()
 		frag = Compile(GL_FRAGMENT_SHADER, game->fileSystem->GetGamePath(fragment).string());
 		glAttachShader(id, frag);
 	}
+#if !LFANT_GLES
 	if(geometry != "")
 	{
 		geom = Compile(GL_GEOMETRY_SHADER, game->fileSystem->GetGamePath(geometry).string());
@@ -124,14 +125,17 @@ void Shader::Compile()
 		comp = Compile(GL_COMPUTE_SHADER, game->fileSystem->GetGamePath(compute).string());
 		glAttachShader(id, comp);
 	}
+#endif
 
 	glLinkProgram(id);
 	CheckErrors();
 
 	if(vert) glDeleteShader(vert);
 	if(frag) glDeleteShader(frag);
+#if !LFANT_GLES
 	if(geom != -1) glDeleteShader(geom);
 	if(comp != -1) glDeleteShader(comp);
+#endif
 
 	shaders.push_back(this);
 	Unbind();

@@ -4,11 +4,11 @@ message("Config file called")
 set(ARCH "x64")
 set(ARCH "x64" CACHE STRING "Architecture to build for. (x86/x64)")
 
-set(ANDROID_NDK_PATH "" CACHE STRING "Root path of your android ndk")
+#set(ANDROID_NDK_PATH "" CACHE STRING "Root path of your android ndk")
 set(ANDROID_TOOLCHAIN "" CACHE STRING "Toolchain name to use for android building")
 
 # Desktop setup
-if(ANDROID_NDK_PATH STREQUAL "")
+if(ANDROID_TOOLCHAIN STREQUAL "")
 if(ARCH STREQUAL "x64")
 	set(ARCH "64")
 	set(ARCH_OPTION "x86-64")
@@ -50,7 +50,7 @@ else()
 	endif()
 
 #	set(ANDROID_NDK ${ANDROID_NDK})
-	set(ANDROID_NDK_TOOLCHAIN_ROOT ${ANDROID_NDK_PATH}/toolchains/${ANDROID_TOOLCHAIN})
+#	set(ANDROID_NDK_TOOLCHAIN_ROOT ${ANDROID_NDK_PATH}/toolchains/${ANDROID_TOOLCHAIN})
 #	set(ANDROID_NDK_TOOLCHAIN_BIN "${ANDROID_NDK_TOOLCHAIN_ROOT}/prebuilt/linux-x86/arm-linux-androideabi/bin")
 	set(CMAKE_TOOLCHAIN_FILE ${LFANT}/cmake/android.toolchain.cmake)
 	set(ANDROID_NATIVE_API_LEVEL "android-9")
@@ -65,7 +65,7 @@ message("Platform: ${PLATFORM}")
 set(CMAKE_BUILD_TYPE Release)
 set(CMAKE_C_FLAGS "-O3 -Wall -D__STRICT_ANSI__")
 if(NOT ANDROID)
-	list(APPEND CMAKE_C_FLAGS "-m${ARCH}")
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m${ARCH}")
 endif()
 if(NOT WIN32)
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
@@ -74,18 +74,28 @@ set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -std=gnu++11 -Wno-invalid-offsetof -g -Wno
 
 # RPathing
 set(CMAKE_SKIP_BUILD_RPATH TRUE)
-set(CMAKE_SHARED_LINKER_FLAGS "-Wl,-rpath,$ORIGIN -Wl,-rpath,$ORIGIN/lib -g -Wl,--no-undefined")
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS}")
+set(CMAKE_SHARED_LINKER_FLAGS "-Wl,-rpath,'$ORIGIN' -Wl,-rpath,'$ORIGIN/lib' -Wl,-rpath-link,. -Wl,--no-undefined")
 #set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--no-undefined")
 if(UNIX)
-	set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-z,origin")
-	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-z,origin")
+	set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-z,origin -g")
 endif()
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS}")
 
 if(ANDROID)
-	set(LIBRARY_OUTPUT_PATH ${ROOT}/android/bin)
+	set(BIN "android/bin")
 else()
-	set(LIBRARY_OUTPUT_PATH ${ROOT}/bin${ARCH}/${PLATFORM})
+	set(BIN "bin${ARCH}/${PLATFORM}")
 endif()
 
+set(LIBRARY_OUTPUT_PATH ${ROOT}/${BIN})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${LIBRARY_OUTPUT_PATH})
+
+message("output: ${LIBRARY_OUTPUT_PATH}")
+
+if(NOT ROOT STREQUAL LFANT AND NOT EXISTS "${LIBRARY_OUTPUT_PATH}/lib")
+	if(PLATFORM STREQUAL "linux")
+		execute_process(
+			COMMAND ln -s "${LFANT}/${BIN}" "${LIBRARY_OUTPUT_PATH}/lib"
+			)
+	endif()
+endif()

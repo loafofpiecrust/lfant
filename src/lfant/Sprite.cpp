@@ -82,8 +82,6 @@ void Sprite::Render()
 
 	printf("Rendering sprite...\n");
 
-	glBindVertexArray(vertexArray);
-
 //	glUseProgram(material->shader->GetId());
 	material->shader->Use();
 	*/
@@ -119,8 +117,6 @@ void Sprite::Render()
 	glDisableVertexAttribArray(0);
 
 	material->texture->Unbind();
-
-	glBindVertexArray(0);
 	*/
 	Mesh::Render();
 }
@@ -246,7 +242,6 @@ void Sprite::EndRender()
 	uvBuffer.Destroy();
 	indexBuffer.Destroy();
 	material->texture->Destroy();
-	glDeleteVertexArrays(1, &vertexArray);
 
 	Renderable::EndRender();
 }

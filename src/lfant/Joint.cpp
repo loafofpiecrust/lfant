@@ -52,22 +52,8 @@ void Joint::Init()
 	{
 		rigidbody = rb;
 	}
-}
 
-void Joint::OnAddComponent(Component* comp)
-{
-	if(Type(comp) == "Rigidbody")
-	{
-		rigidbody = dynamic_cast<Rigidbody*>(comp);
-	}
-}
-
-void Joint::OnRemoveComponent(Component* comp)
-{
-	if(Type(comp) == "Rigidbody")
-	{
-		rigidbody = nullptr;
-	}
+	ConnectEvent(SENDER(owner, SetComponentRigidbody), &rigidbody);
 }
 
 }

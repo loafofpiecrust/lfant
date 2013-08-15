@@ -3,7 +3,6 @@ scene Galaga
 {
 	entity Player
 	{
-	//	file = entities/StarShip.ent
 		layer = Player
 		component Transform
 		{
@@ -36,24 +35,25 @@ scene Galaga
 		{
 		}
 
-		entity Bay
+		component Inventory
 		{
-			component Inventory
-			{
-				equippedItem = 0
-			}
+			equippedItem = 0
+		}
 
+		entity Inventory
+		{
 			entity Laser
 			{
 				component Item
 				{
-					mass = 8
-					equippedPosition = (-0.9,0,0.5)
-					initialPosition = (0,0,0)
 				}
 
 				component Weapon
 				{
+					mass = 8
+					equippedPosition = (-0.9, 0, 0.5)
+					initialPosition = (0,0,0)
+					
 					bulletSpeed = 3
 					reloadTime = 2
 					fireRate = 0.2
@@ -94,8 +94,8 @@ scene Galaga
 		{
 			trigger = true
 		}
-		/*
-		entity Bay
+		
+	/*	entity Bay
 		{
 			component Inventory
 			{
@@ -120,8 +120,7 @@ scene Galaga
 					projectilePath = entities/items/projectiles/Laser.ent
 				}
 			}
-		}
-		*/
+		}*/
 	}
 
 	entity Cam

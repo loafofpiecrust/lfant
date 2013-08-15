@@ -135,17 +135,26 @@ void Game::Update()
 
 void Game::Load(Properties* prop)
 {
+	Subsystem::Load(prop);
+
 	prop->Get("orgName", orgName);
 	prop->Get("gameName", gameName);
 	prop->Get("defaultScene", defaultScene);
 	Log("Game loading, default scene is '", defaultScene, "'.");
 }
 
-void Game::Save(Properties* prop)
+void Game::Save(Properties* prop) const
 {
+	Subsystem::Save(prop);
+
 	prop->Set("orgName", orgName);
 	prop->Set("gameName", gameName);
 	prop->Set("defaultScene", defaultScene);
+}
+
+void Game::Bind()
+{
+//	Script::Class<Game, Object> inst;
 }
 
 /*******************************************************************************

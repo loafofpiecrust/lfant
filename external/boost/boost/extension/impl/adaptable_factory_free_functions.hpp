@@ -13,10 +13,10 @@
 template <class Interface, class Derived, class Info, class TypeInfo
           BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, class Param)>
 inline Interface* create_func(
-    boost::reflections::basic_parameter_map<Info, TypeInfo>& map,
+    boost::extensions::basic_parameter_map<Info, TypeInfo>& map,
     const std::vector<Info>& names) {
 #if N
-  reflections::generic_parameter<TypeInfo>* gen;
+  extensions::generic_parameter<TypeInfo>* gen;
 #define BOOST_EXTENSION_GET_FROM_LIST(z, n, data) \
   gen = map.template get_first<BOOST_PP_CAT(Param, n)>(names[n]); \
   if (!gen) return 0; \
@@ -31,10 +31,10 @@ inline Interface* create_func(
 template <class Interface, class Derived, class Info, class TypeInfo
           BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, class Param)>
 inline boost::function<Interface* ()> get_functor_func(
-    boost::reflections::basic_parameter_map<Info, TypeInfo>& map,
+    boost::extensions::basic_parameter_map<Info, TypeInfo>& map,
     const std::vector<Info>& names) {
 #if N
-  reflections::generic_parameter<TypeInfo>* gen;
+  extensions::generic_parameter<TypeInfo>* gen;
 #define BOOST_EXTENSION_GET_FROM_LIST(z, n, data) \
   gen = map.template get_first<BOOST_PP_CAT(Param, n)>(names[n]); \
   if (!gen) return boost::function<Interface* ()>(); \
@@ -54,7 +54,7 @@ inline boost::function<Interface* ()> get_functor_func(
 template <class Info, class TypeInfo BOOST_PP_COMMA_IF(N)
           BOOST_PP_ENUM_PARAMS(N, class Param)>
 inline std::vector<std::pair<TypeInfo, Info> > check_func(
-    const boost::reflections::basic_parameter_map<Info, TypeInfo>& map,
+    const boost::extensions::basic_parameter_map<Info, TypeInfo>& map,
     const std::vector<Info>& names) {
   std::vector<std::pair<TypeInfo, Info> > needed_parameters;
 #define BOOST_EXTENSION_CHECK_IN_LIST(z, n, data) \

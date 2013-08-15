@@ -53,10 +53,10 @@ public:
 	void OnDestroy();
 
 	void Use(byte mode);
+	void EndUse();
 
 protected:
 	void Equip(bool val);
-	void EndUse();
 
 	float mass = 1.0f;
 	vec3 initialPosition {0};
@@ -92,19 +92,27 @@ public:
 
 	void AddItem(Item* item);
 	void RemoveItem(Item* item);
-	void RemoveItem(string name);
-	void RemoveItem(uint32_t idx);
+	Item* RemoveItem(string name);
+	Item* RemoveItem(uint32_t idx = -1);
 
 	Item* GetItem(string name);
 	Item* GetItem(uint32_t idx);
 
-	void Equip(string name);
-	void Equip(uint32_t idx);
+	Item* GetCurrentItem();
+
+	Item* Equip(string name);
+	Item* Equip(uint32_t idx);
 	void UseItem(byte mode);
+	void EndUseItem();
+
+	template<typename... P>
+	void TriggerEvent(string name, P... args)
+	{
+		Component::TriggerEvent(name, args...);
+		GetCurrentItem()->TriggerEvent(name, args...);
+	}
 
 protected:
-
-	void EndUseItem();
 
 	deque<Item*> items;
 

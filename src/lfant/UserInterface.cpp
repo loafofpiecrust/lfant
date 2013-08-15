@@ -268,7 +268,7 @@ void UserInterface::CreateWindow(Properties* prop, CEGUI::Window* parent)
 {
 	CEGUI::Window* win = windowManager->createWindow(prop->Get<string>("type"), prop->id);
 
-	string type = RemoveScoping(Type(win));
+	string type = type::Unscope(type::Name(win));
 	if(type == "PushButton")
 	{
 		win->subscribeEvent(CEGUI::PushButton::EventClicked, &UserInterface::OnClickButton, this);

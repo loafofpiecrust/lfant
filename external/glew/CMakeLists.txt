@@ -2,13 +2,13 @@ project(glew)
 
 # Source Dir
 if(NOT ANDROID)
-file(GLOB_RECURSE SRC_FILES
-	src/glew.c
-	)
+	file(GLOB SRC_FILES
+		src/glew.c
+		)
 else()
-file(GLOB_RECURSE SRC_FILES
-	src/es/glew.c
-	)
+	file(GLOB SRC_FILES
+		es/src/glew.c
+		)
 endif()
 
 # Library Search Paths
@@ -38,22 +38,29 @@ add_definitions(
 	)
 
 if(PLATFORM STREQUAL "linux")
-	target_link_libraries(${PROJECT_NAME}
-		GL
-		GLU
-		pthread
-		X11
-		stdc++
-		)
+target_link_libraries(${PROJECT_NAME}
+	GL
+	GLU
+	pthread
+	X11
+	)
 endif()
 
 if(PLATFORM STREQUAL "windows")
-	target_link_libraries(${PROJECT_NAME}
-		glu32
-		pthread
-		gdi32
-		user32
-		kernel32
-		opengl32
-		)
+target_link_libraries(${PROJECT_NAME}
+	opengl32
+	glu32
+	)
+endif()
+
+if(ANDROID)
+add_definitions(
+	-DGLEW_ES_ONLY
+	-D__WINSCW__
+	)
+target_link_libraries(${PROJECT_NAME}
+	EGL
+#	GL
+	GLESv2
+	)
 endif()

@@ -288,6 +288,13 @@ void SystemInfo::Init()
 	*/
 
 }
+#elif ANDROID
+
+void SystemInfo::Init()
+{
+	
+}
+
 #endif
 
 }

@@ -72,8 +72,9 @@ list(REMOVE_ITEM SRC_FILES
 	)
 if(PLATFORM STREQUAL "windows")
 	list(REMOVE_ITEM SRC_FILES
-		${PROJECT_SOURCE_DIR}/cegui/src/IconvStringTranscoder.cpp
+		${PROJECT_SOURCE_DIR}/cegui/src/MinizipResourceProvider.cpp
 		${PROJECT_SOURCE_DIR}/cegui/src/PCRERegexMatcher.cpp
+		${PROJECT_SOURCE_DIR}/cegui/src/IconvStringTranscoder.cpp
 		)
 else()
 	list(REMOVE_ITEM SRC_FILES
@@ -115,7 +116,6 @@ add_definitions(
 
 target_link_libraries(${PROJECT_NAME}
 	glew
-#	xerces-c
 	freetype
 	m
 	)
@@ -126,8 +126,9 @@ if(PLATFORM STREQUAL "linux")
 		dl
 	)
 endif()
+
 if(PLATFORM STREQUAL "windows")
 	target_link_libraries(${PROJECT_NAME}
 		winmm
-	)
+		)
 endif()

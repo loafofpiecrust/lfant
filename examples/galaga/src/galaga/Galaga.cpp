@@ -53,14 +53,13 @@ namespace galaga {
 
 extern "C" void Launch()
 {
-	printf("Launching\n");
-	game = new Galaga();
-	game->standAlone = true;
-	printf("Initing\n");
+	game = new Galaga;
 	game->Init();
-	Log("Game initialised");
-	game->Update();
-	Log("Game ending");
+	while(!game->IsExited())
+	{
+		game->Update();
+	}
+	game->Destroy();
 	delete game;
 }
 
@@ -185,11 +184,7 @@ void Galaga::Init()
 
 void Galaga::Update()
 {
-	while(!IsExited())
-	{
-		Game::Update();
-	}
-	Destroy();
+	Game::Update();
 }
 
 void Galaga::Destroy()

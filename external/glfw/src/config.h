@@ -38,32 +38,9 @@
 #ifdef __linux
 // Define this to 1 if building GLFW for X11
 #define _GLFW_X11 1
+
 // Define this to 1 if building GLFW for GLX
 #define _GLFW_GLX 1
-#endif
-
-#ifdef WIN32
-// Define this to 1 if building GLFW for Win32
-#define _GLFW_WIN32 1
-// Define this to 1 if building GLFW for WGL
-#define _GLFW_WGL 1
-#endif
-
-#ifdef __APPLE__
-// Define this to 1 if building GLFW for Cocoa
-#define _GLFW_COCOA 1
-// Define this to 1 if building GLFW for NSGL
-#define _GLFW_NSGL 1
-#endif
-
-// Define this to 1 if building GLFW for EGL
-//#cmakedefine _GLFW_EGL
-
-// Define this to 1 if building as a shared library / dynamic library / DLL
-#define _GLFW_BUILD_DLL 1
-
-// Define this to 1 to disable dynamic loading of winmm
-#define _GLFW_NO_DLOAD_WINMM 1
 
 // Define this to 1 if glXGetProcAddress is available
 #define _GLFW_HAS_GLXGETPROCADDRESS 1
@@ -73,11 +50,37 @@
 #define _GLFW_HAS_GLXGETPROCADDRESSEXT 1
 // Define this to 1 if dlopen is available
 #define _GLFW_HAS_DLOPEN 1
+#endif
+
+#ifdef WIN32
+// Define this to 1 if building GLFW for Win32
+#define _GLFW_WIN32 1
+
+// Define this to 1 if building GLFW for WGL
+#define _GLFW_WGL 1
+#endif
+
+#ifdef __APPLE__
+// Define this to 1 if building GLFW for Cocoa
+#define _GLFW_COCOA 1
+
+// Define this to 1 if building GLFW for NSGL
+#define _GLFW_NSGL 1
+#endif
+
+// Define this to 1 if building GLFW for EGL
+//#define _GLFW_EGL 1
+
+// Define this to 1 if building as a shared library / dynamic library / DLL
+#define _GLFW_BUILD_DLL 1
+
+// Define this to 1 to disable dynamic loading of winmm
+#define _GLFW_NO_DLOAD_WINMM 1
 
 // Define this to 1 if glfwInit should change the current directory
-//#cmakedefine _GLFW_USE_CHDIR
+#define _GLFW_USE_CHDIR 1
 // Define this to 1 if glfwCreateWindow should populate the menu bar
-#define _GLFW_USE_MENUBAR
+#define _GLFW_USE_MENUBAR 1
 
 // Define this to 1 if using OpenGL as the client library
 #define _GLFW_USE_OPENGL 1
@@ -87,5 +90,5 @@
 //#cmakedefine _GLFW_USE_GLESV2
 
 // The GLFW version as used by glfwGetVersionString
-#define _GLFW_VERSION_FULL "@GLFW_VERSION_FULL@"
+#define _GLFW_VERSION_FULL "3.0.1"
 

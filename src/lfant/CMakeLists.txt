@@ -4,9 +4,6 @@ project(lfant)
 set(VERSION_MAJOR 0)
 set(VERSION_MINOR 1)
 
-set(INCLUDE_DIR "${ROOT}/src")
-set(SOURCE_DIR ".")
-
 # Library Search Paths
 link_directories(
 	${LIBRARY_OUTPUT_PATH}
@@ -15,18 +12,47 @@ link_directories(
 	)
 
 # Source Info
-file(GLOB_RECURSE SRC_FILES ${SOURCE_DIR}/*.cpp)
-file(GLOB_RECURSE HEADER_FILES ${INCLUDE_DIR}/lfant/*.h)
+file(GLOB SRC_FILES 
+	*.cpp
+	)
+
+file(GLOB_RECURSE SRC_FILES_REC
+	net/*.cpp
+	util/*.cpp
+	physics/*.cpp
+	platform/${PLATFORM}/*.cpp
+	)
+list(APPEND SRC_FILES "${SRC_FILES_REC}")
+
+if(PLATFORM STREQUAL "android")
+	list(REMOVE_ITEM SRC_FILES
+		${PROJECT_SOURCE_DIR}/OpenCL.cpp
+		)
+	file(GLOB_RECURSE SRC_FILES_PLAT
+		platform/mobile/*.cpp
+	#	platform/mobile/*.c
+		)
+	list(APPEND SRC_FILES "${SRC_FILES_PLAT}")
+else()
+	file(GLOB_RECURSE SRC_FILES_PLAT
+		platform/desktop/*.cpp
+		)
+	list(APPEND SRC_FILES "${SRC_FILES_PLAT}")
+endif()
+
+list(REMOVE_ITEM SRC_FILES
+	${PROJECT_SOURCE_DIR}/ParticleSystem.cpp
+	)
 
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ggdb")
 #set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -g")
 
 # Output Library Info
-add_library(${PROJECT_NAME} SHARED ${SRC_FILES} ${HEADER_FILES})
-#add_executable(${PROJECT_NAME} ${SRC_FILES} ${HEADER_FILES})
+add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
+#add_executable(${PROJECT_NAME} ${SRC_FILES})
 
 # Dependencies
-add_dependencies(${PROJECT_NAME} ${ROOT}/external)
+#add_dependencies(${PROJECT_NAME} ${ROOT}/external)
 
 # Includes Info
 include_directories(
@@ -41,30 +67,20 @@ include_directories(
 	${ROOT}/external/bullet/src
 	${ROOT}/external/glfw/include
 	${ROOT}/external/cegui/cegui/include
-	${ROOT}/external/angelscript/include
-	${ROOT}/external/angelscript/add_on
+	${ROOT}/external/squirrel/include
 	${ROOT}/external/devil/include
 #	"${ROOT}/external/gameswf"
 	)
 
 # Linker Options
 target_link_libraries(${PROJECT_NAME}
-	glew
 	assimp
 	boost
 	bullet
-#	bass
-	CEGUI
 	png
 	z
-	angelscript
-	rt
+	squirrel
 	jpeg
-	OpenCL
-	clcc
-#	gameswf
-#	devil
-#	jsonspirit
 	)
 
 if(NOT ANDROID)
@@ -74,6 +90,10 @@ include_directories(
 
 target_link_libraries(${PROJECT_NAME}
 	glfw
+	OpenCL
+	clcc
+	CEGUI
+	glew
 	)
 
 else()
@@ -81,4 +101,17 @@ else()
 include_directories(
 	${ROOT}/external/glew/es/include
 	)
+
+target_link_libraries(${PROJECT_NAME}
+	android
+	log
+	EGL
+	GLESv2
+	)
+endif()
+
+if(PLATFORM STREQUAL "linux")
+	target_link_libraries(${PROJECT_NAME}
+		rt
+		)
 endif()

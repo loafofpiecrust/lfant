@@ -11,22 +11,22 @@ file(GLOB SRC_FILES
 	src/monitor.c
 	src/time.c
 	src/window.c
-)
+	)
 
 if(PLATFORM STREQUAL "linux")
 	file(GLOB SRC_FILES_PLAT
 		src/glx_*.c
 		src/x11_*.c
-	)
-	set(SRC_FILES ${SRC_FILES} ${SRC_FILES_PLAT})
+		)
+	list(APPEND SRC_FILES ${SRC_FILES_PLAT})
 endif()
 
 if(PLATFORM STREQUAL "windows")
 	file(GLOB SRC_FILES_PLAT
 		src/wgl_*.c
 		src/win32_*.c
-	)
-	set(SRC_FILES ${SRC_FILES} ${SRC_FILES_PLAT})
+		)
+	list(APPEND SRC_FILES ${SRC_FILES_PLAT})
 endif()
 
 if(PLATFORM STREQUAL "macosx")

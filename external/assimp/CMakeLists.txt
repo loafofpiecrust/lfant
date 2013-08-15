@@ -56,8 +56,8 @@ target_link_libraries(${PROJECT_NAME}
 	z
 	)
 
-if(NOT ANDROID)
-	target_link_libraries(${PROJECT_NAME}
-		rt
-		)
+if(PLATFORM STREQUAL "linux")
+target_link_libraries(${PROJECT_NAME}
+	rt
+	)
 endif()

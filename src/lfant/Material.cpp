@@ -61,7 +61,7 @@ void Material::Load(Properties* prop)
 	loaded = true;
 }
 
-void Material::Save(Properties *prop)
+void Material::Save(Properties *prop) const
 {
 	Object::Save(prop);
 	texture->Save(prop->AddChild());

@@ -47,7 +47,7 @@ namespace lfant {
 template<typename C>
 Component* CreateComponent()
 {
-	return new C;
+	return new C();
 }
 
 
@@ -77,10 +77,19 @@ protected:
 	};
 
 public:
+	Component();
+	Component(const Component& other);
 	virtual ~Component();
 
+//	virtual Component& operator=(const Component& other);
+
+	virtual Component* Clone(Entity* owner) const;
+	void Clone(Component* comp, Entity* owner) const;
+
 	virtual void Load(Properties* prop);
-	virtual void Save(Properties* prop);
+	virtual void Save(Properties* prop) const;
+
+	static void Bind() __attribute__((constructor));
 
 	/**
 	 *	Returns whether this component is enabled.
@@ -97,7 +106,6 @@ public:
 	Entity* owner = nullptr;
 
 protected:
-	Component();
 
 	// Loop Function Overwrites
 	virtual void Init();
@@ -156,7 +164,7 @@ private:
 	 *	Registers a component type by string, only used by the IMPLEMENT_COMP macro.
 	 *	@param name The typename
 	 */
-	static void RegisterType(string name, Component* (Entity::*func)());
+	static void RegisterType(string name, Component* (*func)());
 
 	/// Whether this component should Update or not.
 	bool enabled = true;

@@ -36,6 +36,17 @@ public:
 		friend class Voxel;
 		friend class Chunk;
 	public:
+		
+		enum class Type : byte
+		{
+			Default = 0,
+
+			Grass,
+			Dirt,
+
+			Count
+		};
+
 		Block();
 		~Block();
 
@@ -44,6 +55,7 @@ public:
 
 	protected:
 		bool active = false;
+		Type type = Type::Default;
 
 	private:
 	};
@@ -56,11 +68,15 @@ public:
 		~Chunk();
 
 		void Update();
+
+		void BeginRender();
 		void Render();
+		void EndRender();
 
 	protected:
 		static const int Size = 16;
 		vector<vector<vector<Block>>> blocks;
+		Buffer<vec3> blockBuffer;
 
 	private:
 	};
@@ -81,11 +97,7 @@ protected:
 	ptr<Shader> shader;
 	ptr<Texture> texture;
 
-	uint32_t vertexArray = 0;
-
-	vector<Chunk> chunks;
-	vector<vec3> vertexBuffer;
-	uint32_t chunkId = 0;
+	vector<vector<vector<Chunk>>> chunks;
 
 private:
 

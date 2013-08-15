@@ -107,13 +107,11 @@ public:
 	virtual ~Console();
 
 	virtual void Init();
-	virtual void Update()
-	{
-	}
-
-	void Load(Properties* prop);
-
+	virtual void Update();
 	virtual void OnDestroy();
+
+	virtual void Load(Properties* prop);
+	virtual void Save(Properties* prop) const;
 
 	void Input(string line);
 

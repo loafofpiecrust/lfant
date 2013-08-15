@@ -44,6 +44,7 @@ public:
 
 	class Part : public Item
 	{
+		DECLARE_COMP(Part)
 		friend class Weapon;
 	public:
 		enum class Type : byte
@@ -57,8 +58,8 @@ public:
 			Sight
 		};
 
-		Part() {}
-		virtual ~Part() {}
+		Part();
+		~Part();
 
 		virtual void Load(Properties* prop);
 		virtual void Save(Properties* prop);
@@ -83,6 +84,7 @@ public:
 
 	class Body : public Part
 	{
+		DECLARE_COMP(Body)
 	public:
 		Body();
 		virtual ~Body() {}

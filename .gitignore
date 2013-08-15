@@ -1,11 +1,8 @@
 # git ignore file
 
-# Executables
-#-------------
-*.exe
+*.sublime-workspace
 
 # Libraries
-#-----------
 *.so
 *.a
 *.dll
@@ -13,25 +10,12 @@
 *.dylib
 
 # Objects
-#----------
 *.o
 
-# IDE Files
-#-----------
-#*.workspace
-#*.project
-
 # Folders
-#----------
 build
-docs
+analysis
 wiki
-src/tests
-
-# Binary folders
-#----------------
-bin32
-bin64
-*/bin32
-*/bin64
-*/obj
+docs
+bin*
+*/bin*

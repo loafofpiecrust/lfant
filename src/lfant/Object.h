@@ -34,6 +34,8 @@
 #include <typeinfo>
 #include <forward_list>
 #include <iostream>
+#include <sqrat/sqratObject.h>
+#include <sqrat/sqratFunction.h>
 
 #define SENDER(obj, sig) obj, #sig
 #define RECEIVER(obj, slot) obj, &remove_ref<decltype(*obj)>::type::slot
@@ -117,6 +119,18 @@ class Object
 		}
 	};
 
+	class EventScript : public Event
+	{
+	public:
+		Sqrat::Function func;
+		Sqrat::Object obj;
+
+		EventScript(string name, Sqrat::Function func, Sqrat::Object obj) :
+			Event(name), func(func), obj(obj)
+		{
+		}
+	};
+
 	class Timer
 	{
 	public:
@@ -130,6 +144,8 @@ class Object
 	};
 
 public:
+	Object();
+	virtual ~Object();
 
 	/**
 	 *	Loads the object's data from a Properties structure.
@@ -147,25 +163,27 @@ public:
 	 *	Saves Object data to a Properties structure.
 	 *	@param prop Namespace to save to.
 	 */
-	virtual void Save(Properties* prop);
+	virtual void Save(Properties* prop) const;
 
 	/**
 	 *	Creates a file and calls Save(), outputting to the file.
 	 *	@param path File to save to.
 	 */
-	virtual void SaveFile(string path);
+	virtual void SaveFile(string path) const;
+
+	static void Bind() __attribute__((constructor));
 
 	template<typename R>
-	void ConnectEvent(Object* sender, string name, R* receiver, void (R::* func)())
+	void ConnectEvent(Object* sender, string name, R* receiver, void (R::*func)())
 	{
 		erase_all(name, " ");
-		name = Type(sender) + "::" + name + "()";
+		name = type::Name(sender) + "::" + name + "()";
 		Event0* con = nullptr;
 		for(auto& event : sender->events)
 		{
 			if(event->name == name)
 			{
-				con = dynamic_cast<Event0*>(event.get());
+				con = dynamic_cast<Event0*>(event);
 				if(con)
 				{
 					con->sig.connect(boost::bind(func, receiver));
@@ -174,20 +192,20 @@ public:
 			}
 		}
 		con = new Event0(name, boost::bind(func, receiver));
-		sender->events.push_front(ptr<Event>(con));
+		sender->events.push_back(con);
 	}
 
 	template<typename R, typename P1>
 	void ConnectEvent(Object* sender, string name, R* receiver, void (R::* func)(P1))
 	{
 		erase_all(name, " ");
-		name = Type(sender) + "::" + name + "(" + Type<P1>() + ")";
+		name = type::Name(sender) + "::" + name + "(" + type::Name<P1>() + ")";
 		EventP<P1>* con = nullptr;
 		for(auto& event : sender->events)
 		{
 			if(event->name == name)
 			{
-				con = dynamic_cast<EventP<P1>*>(event.get());
+				con = dynamic_cast<EventP<P1>*>(event);
 				if(con)
 				{
 					con->sig.connect(boost::bind(func, receiver, _1));
@@ -196,20 +214,20 @@ public:
 			}
 		}
 		con = new EventP<P1>(name, boost::bind(func, receiver, _1));
-		sender->events.push_front(ptr<Event>(con));
+		sender->events.push_back(con);
 	}
 
 	template<typename R, typename P1, typename P2>
 	void ConnectEvent(Object* sender, string name, R* receiver, void (R::* func)(P1, P2))
 	{
 		erase_all(name, " ");
-		name = Type(sender) + "::" + name + "(" + Type<P1, P2>() + ")";
+		name = type::Name(sender) + "::" + name + "(" + type::Name<P1, P2>() + ")";
 		EventP<P1, P2>* con = nullptr;
 		for(auto& event : sender->events)
 		{
 			if(event->name == name)
 			{
-				con = dynamic_cast<EventP<P1, P2>*>(event.get());
+				con = dynamic_cast<EventP<P1, P2>*>(event);
 				if(con)
 				{
 					con->sig.connect(boost::bind(func, receiver, _1, _2));
@@ -218,20 +236,20 @@ public:
 			}
 		}
 		con = new EventP<P1, P2>(name, boost::bind(func, receiver, _1, _2));
-		sender->events.push_front(con);
+		sender->events.push_back(con);
 	}
 
 	template<typename R, typename P1, typename P2, typename P3>
 	void ConnectEvent(Object* sender, string name, R* receiver, void (R::* func)(P1, P2, P3))
 	{
 		erase_all(name, " ");
-		name = Type(sender) + "::" + name + "(" + Type<P1, P2, P3>() + ")";
+		name = type::Name(sender) + "::" + name + "(" + type::Name<P1, P2, P3>() + ")";
 		EventP<P1, P2, P3>* con = nullptr;
 		for(auto& event : sender->events)
 		{
 			if(event->name == name)
 			{
-				con = dynamic_cast<EventP<P1, P2, P3>*>(event.get());
+				con = dynamic_cast<EventP<P1, P2, P3>*>(event);
 				if(con)
 				{
 					con->sig.connect(boost::bind(func, receiver, _1, _2, _3));
@@ -240,20 +258,20 @@ public:
 			}
 		}
 		con = new EventP<P1, P2, P3>(name, boost::bind(func, receiver, _1, _2, _3));
-		sender->events.push_front(con);
+		sender->events.push_back(con);
 	}
 
 	template<typename T>
 	void ConnectEvent(Object* sender, string name, T* var)
 	{
 		erase_all(name, " ");
-		name = Type(sender) + "::" + name + "(" + Type<T>() + ")";
+		name = type::Name(sender) + "::" + name + "(" + type::Name<T>() + ")";
 		EventVar<T>* con = nullptr;
 		for(auto& event : sender->events)
 		{
 			if(event->name == name)
 			{
-				con = dynamic_cast<EventVar<T>*>(event.get());
+				con = dynamic_cast<EventVar<T>*>(event);
 				if(con)
 				{
 					con->var = var;
@@ -262,20 +280,19 @@ public:
 			}
 		}
 		con = new EventVar<T>(name, var);
-		sender->events.push_front(con);
+		sender->events.push_back(con);
 
 	}
-
 
 	virtual void TriggerEvent(string name)
 	{
 		erase_all(name, " ");
-		string type = Type(this) + "::" + name + "()";
+		string type = type::Name(this) + "::" + name + "()";
 		for(auto& event : events)
 		{
 			if(event->name == type)
 			{
-				Event0* con = dynamic_cast<Event0*>(event.get());
+				Event0* con = dynamic_cast<Event0*>(event);
 				if(con)
 				{
 					con->sig();
@@ -288,18 +305,18 @@ public:
 	void TriggerEvent(string name, P1 arg)
 	{
 		erase_all(name, " ");
-		string type = Type(this) + "::" + name + "(" + Type<P1>() + ")";
+		string type = type::Name(this) + "::" + name + "(" + type::Name<P1>() + ")";
 		for(auto& event : events)
 		{
 			if(event->name == type)
 			{
-				EventP<P1>* con = dynamic_cast<EventP<P1>*>(event.get());
+				EventP<P1>* con = dynamic_cast<EventP<P1>*>(event);
 				if(con)
 				{
 					con->sig(arg);
 				//	continue;
 				}
-				EventVar<P1>* conv = dynamic_cast<EventVar<P1>*>(event.get());
+				EventVar<P1>* conv = dynamic_cast<EventVar<P1>*>(event);
 				if(conv)
 				{
 					*conv->var = arg;
@@ -314,12 +331,12 @@ public:
 	void TriggerEvent(string name, P1 arg, P2 arg2)
 	{
 		erase_all(name, " ");
-		string type = Type(this) + "::" + name + "(" + Type<P1, P2>() + ")";
+		string type = type::Name(this) + "::" + name + "(" + type::Name<P1, P2>() + ")";
 		for(auto& event : events)
 		{
 			if(event->name == type)
 			{
-				auto con = dynamic_cast<EventP<P1, P2>*>(event.get());
+				auto con = dynamic_cast<EventP<P1, P2>*>(event);
 				if(con)
 				{
 					con->sig(arg, arg2);
@@ -333,12 +350,12 @@ public:
 	void TriggerEvent(string name, P1 arg, P2 arg2, P3 arg3)
 	{
 		erase_all(name, " ");
-		string type = Type(this) + "::" + name + "(" + Type<P1, P2, P3>() + ")";
+		string type = type::Name(this) + "::" + name + "(" + type::Name<P1, P2, P3>() + ")";
 		for(auto& event : events)
 		{
 			if(event->name == type)
 			{
-				auto con = dynamic_cast<EventP<P1, P2, P3>*>(event.get());
+				auto con = dynamic_cast<EventP<P1, P2, P3>*>(event);
 				if(con)
 				{
 					con->sig(arg, arg2, arg3);
@@ -351,7 +368,7 @@ public:
 	bool EventConnected(string name)
 	{
 		erase_all(name, " ");
-		name = Type(this) + "::" + name;
+		name = type::Name(this) + "::" + name;
 		for(auto& event : events)
 		{
 			if(event->name == name)
@@ -365,7 +382,7 @@ public:
 	void SetTimer(string name, float time)
 	{
 		erase_all(name, " ");
-	//	name = Type(this) + "::" + name + "()";
+	//	name = type::Name(this) + "::" + name + "()";
 		for(auto& t : timers)
 		{
 			if(t->name == name)
@@ -380,7 +397,7 @@ public:
 	void CancelTimer(string name)
 	{
 		erase_all(name, " ");
-	//	name = Type(this) + "::" + name + "()";
+	//	name = type::Name(this) + "::" + name + "()";
 		for(uint i = 0; i < timers.size(); ++i)
 		{
 			if(timers[i]->name == name)
@@ -394,7 +411,7 @@ public:
 	float* GetTimer(string name)
 	{
 		erase_all(name, " ");
-	//	name = Type(this) + "::" + name + "()";
+	//	name = type::Name(this) + "::" + name + "()";
 		for(auto& t : timers)
 		{
 			if(t->name == name)
@@ -422,9 +439,6 @@ public:
 	virtual void Destroy();
 
 protected:
-	Object();
-	virtual ~Object();
-
 	struct Delete
 	{
 		void operator()(Object* obj)
@@ -439,15 +453,33 @@ protected:
 	 */
 	virtual void OnDestroy();
 
-	/**
-	 *	Called when the object should be bound to script.
-	 */
-	virtual void Bind();
-
 private:
 
-	deque< ptr<Event> > events;
-	deque< ptr<Timer> > timers;
+	deque< Event* > events;
+	deque< Timer* > timers;
+
+	// For scripts
+	void ConnectScriptEvent(Object* sender, string name, Sqrat::Object receiver, Sqrat::Function func)
+	{
+		erase_all(name, " ");
+		name = type::Name(sender) + "::" + name + "()";
+		EventScript* con = nullptr;
+		for(auto& event : sender->events)
+		{
+			if(event->name == name)
+			{
+				con = dynamic_cast<EventScript*>(event);
+				if(con)
+				{
+					con->func = func;
+					con->obj = receiver;
+					return;
+				}
+			}
+		}
+		con = new EventScript(name, func, receiver);
+		sender->events.push_back(con);
+	}
 };
 
 /// @}

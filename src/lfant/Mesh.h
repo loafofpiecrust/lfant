@@ -18,7 +18,6 @@
 *
 ******************************************************************************/
 #pragma once
-
 #include <lfant/stdafx.h>
 
 // Internal
@@ -125,8 +124,8 @@ public:
 	Mesh();
 	~Mesh();
 
-	void Load(Properties *prop);
-	void Save(Properties *prop);
+	virtual void Load(Properties *prop);
+	virtual void Save(Properties *prop) const;
 
 	void SetShape(string preset);
 
@@ -137,7 +136,7 @@ public:
 	void SetInput(string path);
 	void SetTexture(string name);
 
-	void LoadFile(string path);
+	virtual void LoadFile(string path);
 
 	static uint32 CreateBuffer(void* data, uint32 size, int target, int mode = 0);
 

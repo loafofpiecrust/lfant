@@ -39,8 +39,8 @@ public:
 protected:
 	float maxHealth = 100.0f;
 	float health = 0.0f;
-
-
+	
+	
 
 private:
 };

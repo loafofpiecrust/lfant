@@ -18,16 +18,16 @@
 *
 ******************************************************************************/
 #pragma once
-
 #include <lfant/stdafx.h>
-
-// External
-#include <boost/asio.hpp>
-#include <forward_list>
 
 // Internal
 #include <lfant/ptr.h>
 #include <lfant/Subsystem.h>
+
+// External
+#include <boost/asio.hpp>
+#include <forward_list>
+#include <type_traits>
 
 namespace lfant
 {
@@ -59,18 +59,18 @@ public:
 	virtual void Init();
 	virtual void Update();
 
-	void Save(Properties *prop);
-	void Load(Properties *prop);
+	virtual void Save(Properties *prop) const;
+	virtual void Load(Properties *prop);
 
 	template<typename C>
-	C* AddConnection(string name = "")
+	auto AddConnection(string name = "") -> typename enable_if<boost::is_base_of<net::Connection, C>::value, C*>::type
 	{
 		C* con = new C;
 		connections.push_back(con);
 		return con;
 	}
 
-	net::Connection* GetConnection(string name);
+	net::Connection* GetConnection(string name) const;
 
 protected:
 //	byte GetPacketId(RakNet::Packet* p);

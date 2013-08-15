@@ -232,7 +232,7 @@ void Rigidbody::OnSetCollider(Collider *collider)
 	}
 	else
 	{
-		Log("Collider set for entity, setting for rigidbody, type: '", Type(collider), "'.");
+		Log("Collider set for entity, setting for rigidbody, type: '", type::Name(collider), "'.");
 		body->setCollisionShape(collider->GetShape());
 		this->collider = collider;
 	}

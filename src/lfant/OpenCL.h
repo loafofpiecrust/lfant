@@ -43,12 +43,12 @@ public:
 	public:
 		Kernel(const string& source, string entry);
 
-		boost::compute::kernel* Get() {return kernel;}
-		boost::compute::command_queue* GetQueue();
+	//	boost::compute::kernel* Get() {return kernel;}
+	//	boost::compute::command_queue* GetQueue();
 
 	private:
-		boost::compute::program program;
-		ptr<boost::compute::kernel> kernel;
+	//	boost::compute::program program;
+	//	ptr<boost::compute::kernel> kernel;
 	};
 	friend class Kernel;
 
@@ -61,10 +61,10 @@ public:
 	void OnDestroy();
 
 //protected:
-	boost::compute::platform platform;
-	boost::compute::device gpu;
-	boost::compute::context context;
-	boost::compute::command_queue queue;
+//	boost::compute::platform platform;
+//	boost::compute::device gpu;
+//	boost::compute::context context;
+//	boost::compute::command_queue queue;
 
 private:
 };

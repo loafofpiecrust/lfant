@@ -53,6 +53,7 @@ public:
 #ifndef BOOST_EXTENSION_DOXYGEN_INVOKED
   class type_map_convertible {
   public:
+    friend class basic_type_map<TypeInfo>;
     ~type_map_convertible() {
       for (typename std::map<TypeInfo, generic_type_holder*>::iterator
            it =instances_.begin(); it != instances_.end(); ++it) {
@@ -92,6 +93,14 @@ public:
     std::map<TypeInfo, generic_type_holder*> instances_;
   };
 
+  size_t size() {
+    return convertible_.instances_.size();
+  }
+
+  bool empty() {
+    return convertible_.instances_.empty();
+  }
+
   type_map_convertible& get() {
     return convertible_;
   }
@@ -122,6 +131,18 @@ private:
   * type of basic_factory_map.
   */
 typedef basic_type_map<default_type_info> type_map;
+
+/** A macro to use as a generic
+  * function declaration for
+  * functions in shared libraries
+  * taking a reference to type_map
+  * and returning void.
+  */
+#define BOOST_EXTENSION_TYPE_MAP_FUNCTION \
+extern "C" \
+void BOOST_EXTENSION_EXPORT_DECL \
+boost_extension_exported_type_map_function \
+  (boost::extensions::type_map& types)
 
 } // namespace extensions
 } // namespace boost

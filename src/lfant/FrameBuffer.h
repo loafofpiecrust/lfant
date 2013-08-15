@@ -37,8 +37,8 @@ public:
 	FrameBuffer();
 	~FrameBuffer();
 
-	void Init();
-	void OnDestroy();
+	virtual void Init();
+	virtual void OnDestroy();
 
 	void DrawBuffers();
 
@@ -60,14 +60,14 @@ public:
 
 	void AddTexture(string name, Texture::Format form1 = Texture::Format::RGB32F, Texture::Format form2 = Texture::Format::RGB);
 	void AddDepthTexture(string name, Texture::Format form1 = Texture::Format::RGB32F, Texture::Format form2 = Texture::Format::RGB);
-	void GetTextures(Shader* sh);
-	Texture* GetTexture(string name);
+	void GetTextures(Shader* sh) const;
+	Texture* GetTexture(string name) const;
 
 	void SetCurrentTexture(string name);
 
-	void BeginRender();
-	void Render();
-	void EndRender();
+	virtual void BeginRender();
+	virtual void Render();
+	virtual void EndRender();
 
 	URect rect {0,0,0,0};
 	bool hasDepth = false;

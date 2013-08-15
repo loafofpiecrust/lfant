@@ -18,7 +18,6 @@
 *
 ******************************************************************************/
 
-
 #include <lfant/Entity.h>
 
 // Internal
@@ -40,16 +39,57 @@
 // External
 #include <stdarg.h>
 
-namespace lfant
+namespace lfant {
+
+bool EntityActive(Entity* ent)
 {
+	return ent->active;
+}
 
 Entity::Entity()
 {
 	transform = AddComponent<Transform>();
 }
 
+Entity::Entity(const Entity& ent)
+{
+	ent.Clone(this);
+}
+
 Entity::~Entity()
 {
+}
+
+Entity& Entity::operator=(const Entity& other)
+{
+	other.Clone(this);
+	return *this;
+}
+
+Entity* Entity::Clone(string name, Entity* parent) const
+{
+	Entity* ent = new Entity;
+	Clone(ent, name, parent);
+	return ent;
+}
+
+void Entity::Clone(Entity* ent, string name, Entity* parent) const
+{
+	if(name == "") name = this->name;
+	if(!parent) parent = this->parent;
+
+	ent->name = name;
+	ent->parent = parent;
+	game->scene->AddEntity(ent);
+
+	for(auto& c : components)
+	{
+		c->Clone(ent);
+	}
+	for(auto& c : children)
+	{
+		c->Clone(c->name, ent);
+	}
 }
 
 uint32_t GenerateId()
@@ -125,7 +165,7 @@ void Entity::Update()
 
 void Entity::AddChild(Entity* ent)
 {
-	children.push_front(ent);
+	children.push_back(ent);
 }
 
 void Entity::RemoveChild(Entity* ent)
@@ -139,6 +179,16 @@ void Entity::RemoveChild(Entity* ent)
 			return;
 		}
 	}
+}
+
+void Entity::AddComponent(Component* comp)
+{
+	components.push_back(comp);
+	comp->owner = this;
+	comp->Init();
+	TriggerEvent("AddComponent", comp);
+	Log("Entity::AddComponent: Calling ", "SetComponent"+type::Unscope(type::Name(comp)));
+	TriggerEvent("SetComponent"+type::Unscope(type::Name(comp)), comp);
 }
 
 void Entity::UnsafeDestroy()
@@ -189,15 +239,6 @@ void Entity::Destroy()
 	}
 }
 
-Entity* Entity::Clone(string name, Entity* parent)
-{
-	Entity* ent = game->scene->Spawn(name, parent);
-	//ent->components = components;
-	/// @todo clone children here
-	//ent->Init();
-	return ent;
-}
-
 Component* Entity::GetComponent(string type)
 {
 	string unscoped = type::Unscope(type);
@@ -235,7 +276,7 @@ void Entity::SetLayer(string layer)
 *
 *******************************************************************************/
 
-void Entity::RemoveComponent(Component* comp, bool destroy)
+void Entity::RemoveComponent(Component* comp)
 {
 	Log("About to remove comp '", comp, "'.");
 	for(uint i = 0; i < components.size(); ++i)
@@ -244,10 +285,6 @@ void Entity::RemoveComponent(Component* comp, bool destroy)
 		{
 			TriggerEvent("RemoveComponent", comp);
 			TriggerEvent("SetComponent"+type::Unscope(type::Name(comp)), comp);
-			if(!destroy)
-			{
-				components[i] = nullptr;
-			}
 			components.erase(components.begin()+i);
 			break;
 		}
@@ -261,7 +298,7 @@ void Entity::RemoveComponent()
 	for(uint i = 0; i < components.size(); ++i)
 	{
 		Component* comp = components[i];
-		if(Type<T>() == type::Name(comp))
+		if(type::Name<T>() == type::Name(comp))
 		{
 			TriggerEvent("RemoveComponent", comp);
 			TriggerEvent("SetComponent"+type::Unscope(type::Name(comp)), comp);
@@ -269,6 +306,27 @@ void Entity::RemoveComponent()
 			components.erase(components.begin()+i);
 		}
 	}
+}
+
+void Entity::RemoveComponent(string type)
+{
+	for(uint i = 0; i < components.size(); ++i)
+	{
+		Component* comp = components[i];
+		string t = type::Name(comp);
+		if(t == type || type::Unscope(t) == type)
+		{
+			TriggerEvent("RemoveComponent", comp);
+			TriggerEvent("SetComponent"+type::Unscope(t), comp);
+			comp->Destroy();
+			components.erase(components.begin()+i);
+		}
+	}
+}
+
+Entity* Entity::GetParent()
+{
+	return parent;
 }
 
 void Entity::SetParent(Entity* ent)
@@ -332,14 +390,27 @@ bool Entity::HasTag(string tag)
 
 
 void Entity::Bind()
-{
-	/*
-	   Script::Class obj;
-	   obj.Create<Entity>("Entity", true);
+{/*
+	Script::Class<Entity, Object> inst;
+	inst.Var("name", &Entity::name);
+//	inst.Var("id", &Entity::id);
+//	inst.Var("layer", &Entity::layer);
+	inst.Var("active", &Entity::active);
+	inst.Var("lifetime", &Entity::lifetime);
 
-	   obj.Method("void Destroy()", &Entity::Destroy);
-	 */
-}
+	inst.Func("Init", &Entity::Init);
+	inst.Func("Update", &Entity::Update);
+	inst.Func("Destroy", &Entity::Destroy);
+	inst.Func("AddComponent", (Component* (Entity::*)(string))&Entity::AddComponent);
+	inst.Func("GetComponent", (Component* (Entity::*)(string))&Entity::GetComponent);
+	inst.Func("RemoveComponent", (void (Entity::*)(string))&Entity::RemoveComponent);
+	inst.Func("Clone", &Entity::Clone);
+	inst.Func("GetChild", &Entity::GetChild);
+
+	inst.Prop<string>("layer", &Entity::GetLayer, &Entity::SetLayer);
+	inst.Prop<uint32_t>("id", &Entity::GetId);
+	inst.Prop<Entity*>("parent", &Entity::GetParent, &Entity::SetParent);
+*/}
 
 
 /*******************************************************************************
@@ -348,7 +419,7 @@ void Entity::Bind()
 *
 *******************************************************************************/
 
-void Entity::Save(Properties* prop)
+void Entity::Save(Properties* prop) const
 {
 	prop->type = "entity";
 	prop->id = name;
@@ -370,7 +441,7 @@ void Entity::Save(Properties* prop)
 	}
 }
 
-void Entity::Load(Properties* prop, bool init)
+void Entity::Load(Properties* prop)
 {
 
 	prop->GetId(name);
@@ -443,28 +514,23 @@ void Entity::Load(Properties* prop, bool init)
 			Load(pc, true);
 		}
 	}
-	
+}
+
+void Entity::Load(Properties* prop, bool init)
+{
+	Load(prop);
 	if(init)
 	{
 		Init();
 	}
 }
 
-void Entity::AddComponent(Component* comp)
+Component *Entity::AddComponent(string type)
 {
-	components.push_back(comp);
-	comp->owner = this;
-	if(prop)
-	{
-		comp->Load(prop);
-	}
-	comp->Init();
-	TriggerEvent("AddComponent", comp);
-	Log("Entity::AddComponent: Calling ", "SetComponent"+type::Unscope(type::Name(comp)));
-	TriggerEvent("SetComponent"+type::Unscope(type::Name(comp)), comp);
+	return AddComponent(type, nullptr);
 }
 
-Component *Entity::AddComponent(string type, Properties *prop)
+Component* Entity::AddComponent(string type, Properties* prop)
 {
 	printf("Adding comp via string of type\n");
 	auto val = Component::componentRegistry[type];
@@ -472,22 +538,18 @@ Component *Entity::AddComponent(string type, Properties *prop)
 	if(val == nullptr)
 	{
 		Log("No function for this component type.");
-		result = nullptr;
+		return nullptr;
 	}
 	else
 	{
-		Log("Found function for this type.");
+		Log("Adding component");
 		result = (*val)();
-		components.push_back(result);
 		result->owner = this;
-		if(prop)
-		{
-			result->Load(prop);
-		}
-		result->Init();
+		if(prop) result->Load(prop);
+		AddComponent(result);
 	}
 
-	if(type == "Camera" && result)
+	if(type == "Camera")
 	{
 		game->scene->mainCamera = dynamic_cast<Camera*>(result);
 	}

@@ -72,7 +72,7 @@ void Mesh::Load(Properties *prop)
 	LoadFile(file);
 }
 
-void Mesh::Save(Properties *prop)
+void Mesh::Save(Properties *prop) const
 {
 	Component::Save(prop);
 
@@ -117,9 +117,6 @@ void Mesh::BeginRender()
 		fbo->Unbind();
 	}
 
-	glGenVertexArrays(1, &vertexArray);
-	glBindVertexArray(vertexArray);
-
 	if(material->shader->GetId() == -1)
 	{
 		Log("Loading default shader.");
@@ -160,7 +157,6 @@ void Mesh::BeginRender()
 	
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
 
 	if(fbo && !fboQuad)
 	{
@@ -177,8 +173,6 @@ void Mesh::Render()
 	}
 
 //	Log("Rendering mesh '", owner->name, "'.");
-
-	glBindVertexArray(vertexArray);
 
 //	glUseProgram(material->shader->GetId());
 //	Log("Binding shader for ", owner->name);
@@ -205,7 +199,7 @@ void Mesh::Render()
 	if(material->texture->GetId() != -1)
 	{
 	//	Log("Setting texture uniforms.");
-		material->shader->SetUniform("textureSampler", material->texture);
+		material->shader->SetUniform("textureSampler", material->texture.get());
 		material->shader->SetUniform("tiling", material->texture->tiling);
 	}
 
@@ -233,8 +227,6 @@ void Mesh::Render()
 
 	material->texture->Unbind();
 
-	glBindVertexArray(0);
-
 //	material->shader->Unbind();
 	glUseProgram(0);
 }
@@ -246,7 +238,6 @@ void Mesh::EndRender()
 	normalBuffer.Destroy();
 	indexBuffer.Destroy();
 	material->texture->Destroy();
-	glDeleteVertexArrays(1, &vertexArray);
 	loaded = false;
 }
 

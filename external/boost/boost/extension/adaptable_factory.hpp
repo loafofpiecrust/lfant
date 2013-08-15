@@ -21,7 +21,7 @@
 #include <boost/extension/common.hpp>
 #include <boost/extension/impl/create.hpp>
 #include <boost/function.hpp>
-#include <boost/reflection/parameter_map.hpp>
+#include <boost/extension/parameter_map.hpp>
 
 namespace boost {
 namespace extensions {
@@ -66,7 +66,7 @@ public:
     * \pre is_valid() == true.
     * \post None.
     */
-  Interface* create(boost::reflections::parameter_map& map) const {
+  Interface* create(boost::extensions::parameter_map& map) const {
     return (*func_)(map, parameter_names_);
   }
 
@@ -81,7 +81,7 @@ public:
     * \post None.
     */
   function<Interface* ()> get_function(
-      boost::reflections::parameter_map& map) const {
+      boost::extensions::parameter_map& map) const {
     return (*functor_func_)(map, parameter_names_);
   }
 
@@ -93,7 +93,7 @@ public:
     * \post None.
     */
   std::vector<std::pair<TypeInfo, Info> > get_missing_params(
-      const boost::reflections::parameter_map& map) const {
+      const boost::extensions::parameter_map& map) const {
     return (*check_func_)(map, parameter_names_);
   }
 
@@ -139,13 +139,13 @@ public:
 # include BOOST_PP_ITERATE()
 private:
   function<Interface* ()> (*functor_func_)(
-    boost::reflections::basic_parameter_map<Info>& map,
+    boost::extensions::basic_parameter_map<Info>& map,
     const std::vector<Info>& names);
   Interface* (*func_)(
-    boost::reflections::basic_parameter_map<Info>& map,
+    boost::extensions::basic_parameter_map<Info>& map,
     const std::vector<Info>& names);
   std::vector<std::pair<TypeInfo, Info> >  (*check_func_)(
-    const boost::reflections::basic_parameter_map<Info>& map,
+    const boost::extensions::basic_parameter_map<Info>& map,
     const std::vector<Info>& names);
   std::vector<Info> parameter_names_;
 #endif  // BOOST_EXTENSION_DOXYGEN_INVOKED

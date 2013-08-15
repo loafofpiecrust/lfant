@@ -24,6 +24,7 @@
 
 // Internal
 #include <galaga/Galaga.h>
+#include <galaga/Inventory.h>
 #include <lfant/Input.h>
 #include <lfant/Console.h>
 #include <lfant/Time.h>
@@ -49,18 +50,27 @@ void Player::Init()
 
 	ConnectEvent(SENDER(game->input, Jump), RECEIVER(this, Jump));
 	ConnectEvent(SENDER(game->input, Fire), RECEIVER(this, Fire));
+	ConnectEvent(SENDER(game->input, ToggleInventory), RECEIVER(this, ToggleInventory));
 	ConnectEvent(SENDER(game->input, NextItem), RECEIVER(this, NextItem));
 	ConnectEvent(SENDER(game->input, PreviousItem), RECEIVER(this, PreviousItem));
+	ConnectEvent(SENDER(game->input, DropItem), RECEIVER(this, DropItem));
+
+	ConnectEvent(SENDER(owner, SetComponentInventory), &inventory);
 }
 
 void Player::PreviousItem()
 {
-	TriggerEventWithChildren("EquipItem", 0U);
+	TriggerEvent("EquipItem", 0u);
 }
 
 void Player::NextItem()
 {
-	TriggerEventWithChildren("EquipItem", 1U);
+	TriggerEvent("EquipItem", 1u);
+}
+
+void Player::DropItem()
+{
+	TriggerEvent("RemoveItem", -1u);
 }
 
 void Player::Jump(float value)
@@ -72,28 +82,24 @@ void Player::Jump(float value)
 	}
 }
 
+void Player::ToggleInventory()
+{
+	
+}
+
 void Player::Fire(float value)
 {
-	if(value == 1)
+	if(!inventory)
+		return;
+
+	if(value == 1.0f)
 	{
 		Log("Player fired");
-		TriggerEventWithChildren("UseItem", (byte)0);
-		/*
-		Log("Player fired");
-		Entity* ent = game->scene->Spawn("bullet"+lexical_cast<string>(random::Range(0,200)));
-	//	ent->lifeTime = 1.0f;
-		ent->transform->SetPosition(owner->transform->GetPosition());
-		ent->transform->SetRotation(owner->transform->GetRotation());
-		Mesh* m = ent->AddComponent<Mesh>();
-		m->material->LoadFile("materials/Diffuse.mat");
-		m->LoadFile("meshes/suzanne.obj");
-		Rigidbody* rb = ent->AddComponent<Rigidbody>();
-		rb->Accelerate(owner->transform->GetDirection() * bulletSpeed / game->time->deltaTime);
-		*/
+		inventory->GetCurrentItem()->Use(0);
 	}
 	else
 	{
-		TriggerEventWithChildren("EndUseItem");
+		inventory->GetCurrentItem()->EndUse();
 	}
 }
 
@@ -102,16 +108,16 @@ void Player::Load(lfant::Properties *prop)
 	Component::Load(prop);
 
 	Log("Loading from player, '"+prop->type+" "+prop->id+"'.");
-	prop->Get("bulletSpeed", bulletSpeed);
+	prop->Get("lookSpeed", lookSpeed);
 
-	Log("The setting of lookSpeed is ", prop->Get<float>("lookSpeed"));
+	Log("The setting of lookSpeed is ", lookSpeed);
 }
 
 void Player::Save(lfant::Properties *prop)
 {
 	Component::Save(prop);
 
-	prop->Set("bulletSpeed", bulletSpeed);
+	prop->Set("lookSpeed", lookSpeed);
 }
 
 void Player::Update()
@@ -167,18 +173,6 @@ void Player::Update()
 	{
 		owner->transform->Rotate(vec3(vrot * lookSpeed * game->time->deltaTime, 0, 0));
 	}
-	if (game->input->GetButtonDown("TesterSetVar"))
-	{
-		game->console->Input("set Tester 62.76f");
-	}
-	if (game->input->GetButtonDown("TesterGetVar"))
-	{
-		game->console->Input("get Tester");
-	}
-	if (game->input->GetButtonDown("TesterHelpMe"))
-	{
-		game->console->Input("help Tester");
-	}
 	if (game->input->GetButtonDown("Quit"))
 	{
 		Log("Calling exit function");
@@ -187,7 +181,7 @@ void Player::Update()
 	}
 	if(game->input->GetButtonDown("Reload"))
 	{
-		TriggerEventWithChildren("UseItem", (byte)1);
+		inventory->TriggerEvent("Reload");
 	}
 }
 

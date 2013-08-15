@@ -68,12 +68,12 @@ void MouseLook::Init()
 
 void MouseLook::Look(vec3 rot)
 {
-	if(owner->parent)
+	if(owner->GetParent())
 	{
-		owner->parent->transform->Rotate(vec3(0,rot.y,0) * lookSpeed * game->time->deltaTime);
+		owner->GetParent()->transform->Rotate(vec3(0,rot.y,0) * lookSpeed * game->time->deltaTime);
 		owner->transform->Rotate(vec3(rot.x,0,rot.z) * lookSpeed * game->time->deltaTime);
 
-	//	Log("Parent rot: ", lexical_cast<string>(owner->parent->transform->GetWorldRotation()));
+	//	Log("Parent rot: ", lexical_cast<string>(owner->GetParent()->transform->GetWorldRotation()));
 	//	Log("Camera rot: ", lexical_cast<string>(owner->transform->GetWorldRotation()));
 	}
 	else
@@ -89,7 +89,9 @@ void MouseLook::OnSetMousePos(ivec2 pos)
 	ivec2 screenCenter = game->renderer->GetResolution()/2;
 	Look(vec3(mousePos.y, -mousePos.x, 0));
 //	if(pos.x )
+#if !ANDROID
 	game->input->SetMousePos(screenCenter);
+#endif
 //	lastMouse = pos;
 	lastMouse = screenCenter;
 }

@@ -1010,36 +1010,34 @@ void _glfwPlatformGetWindowSize(_GLFWwindow* window, int* width, int* height)
 
 void _glfwPlatformSetWindowSize(_GLFWwindow* window, int width, int height)
 {
+    if (!window->resizable)
+    {
+        // Update window size restrictions to match new window size
+
+        XSizeHints* hints = XAllocSizeHints();
+
+        hints->flags |= (PMinSize | PMaxSize);
+        hints->min_width  = hints->max_width  = width;
+        hints->min_height = hints->max_height = height;
+
+        XSetWMNormalHints(_glfw.x11.display, window->x11.handle, hints);
+        XFree(hints);
+    }
+
     if (window->monitor)
     {
-        _glfwSetVideoMode(window->monitor, &window->videoMode);
-
         if (window->x11.overrideRedirect)
         {
             GLFWvidmode mode;
             _glfwPlatformGetVideoMode(window->monitor, &mode);
             XResizeWindow(_glfw.x11.display, window->x11.handle,
-                          mode.width, mode.height);
+                          window->videoMode.width, window->videoMode.height);
         }
+
+        _glfwSetVideoMode(window->monitor, &window->videoMode);
     }
     else
-    {
-        if (!window->resizable)
-        {
-            // Update window size restrictions to match new window size
-
-            XSizeHints* hints = XAllocSizeHints();
-
-            hints->flags |= (PMinSize | PMaxSize);
-            hints->min_width  = hints->max_width  = width;
-            hints->min_height = hints->max_height = height;
-
-            XSetWMNormalHints(_glfw.x11.display, window->x11.handle, hints);
-            XFree(hints);
-        }
-
         XResizeWindow(_glfw.x11.display, window->x11.handle, width, height);
-    }
 
     XFlush(_glfw.x11.display);
 }

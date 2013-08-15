@@ -16,7 +16,7 @@
 #include <cstring>
 
 #if (defined(_WIN32) || defined(__WIN32__) || defined(WIN32)) \
-    && !defined(BOOST_DISABLE_WIN32)
+    && !defined(BOOST_DISABLE_WIN32) && !defined(__GNUC__)
 
 #ifndef _WIN32_WINNT
 #define _WIN32_WINNT 0x0501
@@ -29,57 +29,45 @@
 #endif
 
 #include <Windows.h>
-namespace boost
-{
-	namespace extensions
-	{
-		namespace impl
-		{
-			typedef HMODULE library_handle;
-			typedef FARPROC generic_function_ptr;
-			inline library_handle load_shared_library ( const char* library_name )
-			{
-				return LoadLibraryA ( library_name );
-			}
-			inline generic_function_ptr get_function ( library_handle handle,
-					const char* function_name )
-			{
-				return GetProcAddress ( handle, function_name );
-			}
-			inline bool close_shared_library ( library_handle handle )
-			{
-				return FreeLibrary ( handle ) != 0;
-			}
-		}  // namespace impl
-	}  // namespace extensions
+namespace boost {
+namespace extensions {
+namespace impl {
+  typedef HMODULE library_handle;
+  typedef FARPROC generic_function_ptr;
+  inline library_handle load_shared_library(const char* library_name) {
+    return LoadLibraryA(library_name);
+  }
+  inline generic_function_ptr get_function(library_handle handle,
+                                           const char* function_name) {
+    return GetProcAddress(handle, function_name);
+  }
+  inline bool close_shared_library(library_handle handle) {
+    return FreeLibrary(handle) != 0;
+  }
+}  // namespace impl
+}  // namespace extensions
 }  // namespace boost
 
 #   pragma comment(lib, "kernel32.lib")
 #else
 #include <dlfcn.h>
-namespace boost
-{
-	namespace extensions
-	{
-		namespace impl
-		{
-			typedef void * library_handle;
-			typedef void * generic_function_ptr;
-			inline library_handle load_shared_library ( const char* library_name )
-			{
-				return dlopen ( library_name, RTLD_LAZY );
-			}
-			inline generic_function_ptr get_function ( library_handle handle,
-					const char* function_name )
-			{
-				return dlsym ( handle, function_name );
-			}
-			inline bool close_shared_library ( library_handle handle )
-			{
-				return dlclose ( handle ) == 0;
-			}
-		}  // namespace impl
-	}  // namespace extensions
+namespace boost {
+namespace extensions {
+namespace impl {
+  typedef void * library_handle;
+  typedef void * generic_function_ptr;
+  inline library_handle load_shared_library(const char* library_name) {
+    return dlopen(library_name, RTLD_LAZY);
+  }
+  inline generic_function_ptr get_function(library_handle handle,
+                                           const char* function_name) {
+    return dlsym(handle, function_name);
+  }
+  inline bool close_shared_library(library_handle handle) {
+    return dlclose(handle)==0;
+  }
+}  // namespace impl
+}  // namespace extensions
 }  // namespace boost
 
 #endif
