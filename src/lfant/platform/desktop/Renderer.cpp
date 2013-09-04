@@ -21,6 +21,7 @@
 #include <lfant/Renderer.h>
 
 // Internal
+#include <lfant/Game.h>
 
 // External
 #include <GLFW/glfw3.h>

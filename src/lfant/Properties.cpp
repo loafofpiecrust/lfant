@@ -362,10 +362,9 @@ void Properties::SaveStream(ostream &stream)
 
 	stream << GetIndent() << "{\n";
 
-	map<string,string>::iterator iter;
-	for(iter = values.begin(); iter != values.end(); ++iter)
+	for(auto& i : values)
 	{
-		stream << GetIndent()+"\t" << iter->first << " = " << iter->second << "\n";
+		stream << GetIndent()+"\t" << i.first << " = " << i.second << "\n";
 	}
 
 	for(auto& child : children)
@@ -379,21 +378,24 @@ void Properties::SaveStream(ostream &stream)
 void Properties::AddValue(string name, string value)
 {
 	name = TrimSpace(name);
+	string valname = Get<string>(name);
 //	value = Expand(value);
-	Log("Adding to '"+values[name]+"', named '"+name+"'.");
-	if(values[name] == "")
+	if(valname == "")
 	{
-		Get(name, values[name]);
+		Get(name, valname);
 	}
-	values[name].append(value);
+	Set(name, valname+value);
+//	values[name].append(value);
 	Log(name, " += ", value);
 }
 
 void Properties::SubtractValue(string name, string value)
 {
 	name = TrimSpace(name);
+	string val = Get<string>(name);
 //	value = Expand(value);
-	values[name] = Replace(values[name], value, "");
+//	values[name] = Replace(values[name], value, "");
+	Set(name, Replace(val, value, ""));
 	Log(name, " -= ", value);
 }
 
@@ -455,7 +457,7 @@ deque<Properties*> Properties::GetChildren(string type)
 	return props;
 }
 
-map<string, string>& Properties::GetValues()
+qumap<string, string>& Properties::GetValues()
 {
 	return values;
 }

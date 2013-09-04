@@ -151,8 +151,8 @@ void Player::Update()
 	}
 	if (game->input->GetButtonDown("ShowRot"))
 	{
-	//	Log("Player rotation: ", lexical_cast<string>(owner->transform->GetRotation()));
-	//	Log("Camera rotation: ", lexical_cast<string>(game->scene->mainCamera->owner->transform->GetRotation()));
+		Log("Player rotation: ", lexical_cast<string>(owner->transform->GetRotation()));
+		Log("Camera rotation: ", lexical_cast<string>(game->scene->mainCamera->owner->transform->GetRotation()));
 	//	Log("Camera direction: ", lexical_cast<string>(game->scene->mainCamera->owner->transform->GetDirection()));
 	//	Log("Camera right: ", lexical_cast<string>(game->scene->mainCamera->owner->transform->GetRight()));
 	//	Log("Camera up: ", lexical_cast<string>(game->scene->mainCamera->owner->transform->GetUp()));

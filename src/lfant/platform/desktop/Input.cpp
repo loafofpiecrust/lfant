@@ -2,8 +2,12 @@
 #include <lfant/Input.h>
 
 // Internal
+#include <lfant/Game.h>
+#include <lfant/Renderer.h>
+#include <lfant/Console.h>
 
 // External
+#include <GLFW/glfw3.h>
 
 namespace lfant {
 
@@ -197,7 +201,7 @@ void Input::OnMouseButton(GLFWwindow* win, int btn, int action, int mods)
 	}
 	else if(action == GLFW_RELEASE)
 	{
-		game->input->TriggerEvent("MouseUp", (uint16_t)btn)
+		game->input->TriggerEvent("MouseUp", (uint16_t)btn);
 	}
 	OnKeyPress(win, 400+btn, 0, action, mods);
 }

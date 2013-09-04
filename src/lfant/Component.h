@@ -21,11 +21,13 @@
 
 #include <lfant/stdafx.h>
 
-// External
-
 // Internal
+#include <lfant/util/qumap.h>
 #include <lfant/Object.h>
 #include <lfant/Entity.h>
+#include <lfant/TypeRegistry.h>
+
+// External
 
 namespace lfant {
 
@@ -36,19 +38,8 @@ namespace lfant {
  *	 @{
  */
 
-//#define REGISTER_COMP(comp) static bool BOOST_PP_CAT( comp, __regged ) = componentRegistry.insert( BOOST_PP_STRINGIZE(comp), &Entity::AddComponent<comp>());
-#define DECLARE_COMP(type) \
-	friend class lfant::Entity;\
-	static RegistryEntry<type> _registryEntry;
-
-#define IMPLEMENT_COMP(type) \
-	Component::RegistryEntry<type> type::_registryEntry {#type};
-
-template<typename C>
-Component* CreateComponent()
-{
-	return new C();
-}
+#define DECLARE_COMP(type) DECLARE_TYPE(Component, type)
+#define IMPLEMENT_COMP(type) IMPLEMENT_TYPE(Component, type)
 
 
 /**	The base class for all Entity Components.
@@ -64,18 +55,7 @@ Component* CreateComponent()
 class Component : public Object
 {
 	friend class Entity;
-protected:
-
-	template<typename T>
-	class RegistryEntry
-	{
-	public:
-		RegistryEntry(string type)
-		{
-			Component::componentRegistry[type] = &lfant::CreateComponent<T>;
-		}
-	};
-
+	DECLARE_REGISTRY(Component)
 public:
 	Component();
 	Component(const Component& other);
@@ -158,13 +138,7 @@ protected:
 
 private:
 
-	static map<string, Component* (*)()> componentRegistry;
-
-	/**
-	 *	Registers a component type by string, only used by the IMPLEMENT_COMP macro.
-	 *	@param name The typename
-	 */
-	static void RegisterType(string name, Component* (*func)());
+//	static TypeRegistry<Component> registry;
 
 	/// Whether this component should Update or not.
 	bool enabled = true;

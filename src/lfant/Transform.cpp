@@ -57,6 +57,8 @@ void Transform::Save(Properties *prop)
 {
 	Component::Save(prop);
 
+	Log("Saving transform attr");
+
 	prop->Set("position", position);
 	prop->Set("rotation", rotation);
 	prop->Set("scale", scale);
@@ -88,6 +90,7 @@ vec3 Transform::GetPosition()
 
 void Transform::SetPosition(vec3 pos)
 {
+//	pos.y = -pos.y;
 	position = pos;
 	TriggerEvent("SetPosition", position);
 }
@@ -96,6 +99,7 @@ quat Transform::GetRotationQuat()
 {
 	vec3 rot = radians(rotation);
 	rot.y = -rot.y;
+//	rot.x = -rot.x;
 	return quat(rot);
 //	return quat(radians(rotation));
 }
@@ -348,7 +352,7 @@ void Transform::Translate(vec3 pos)
 
 void Transform::Rotate(vec3 rot)
 {
-	SetRotation(rotation + rot);
+	SetRotation(GetRotation() + rot);
 
 	//rotationQuat = quat(rotation);
 	//_rotationQuat = rotate( _rotationQuat, rot.x, xdir );
@@ -359,7 +363,7 @@ void Transform::Rotate(vec3 rot)
 
 void Transform::Scale(vec3 scl)
 {
-	SetScale(scale * scl);
+	SetScale(GetScale() * scl);
 //	TriggerEvent("SetScale", scale);
 }
 
@@ -380,7 +384,7 @@ vec3 Transform::GetRight()
 
 vec3 Transform::GetUp()
 {
-	return matrix[1].xyz;
+	return -vec3(matrix[1].xyz);
 //	return cross(GetDirection(), GetRight());
 //	return up;
 }

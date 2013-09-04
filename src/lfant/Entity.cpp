@@ -533,7 +533,7 @@ Component *Entity::AddComponent(string type)
 Component* Entity::AddComponent(string type, Properties* prop)
 {
 	printf("Adding comp via string of type\n");
-	auto val = Component::componentRegistry[type];
+	auto val = Component::registry.Get(type);
 	Component* result = nullptr;
 	if(val == nullptr)
 	{
@@ -545,8 +545,16 @@ Component* Entity::AddComponent(string type, Properties* prop)
 		Log("Adding component");
 		result = (*val)();
 		result->owner = this;
-		if(prop) result->Load(prop);
-		AddComponent(result);
+		if(result->initBeforeLoad)
+		{
+			AddComponent(result);
+			if(prop) result->Load(prop);
+		}
+		else
+		{
+			if(prop) result->Load(prop);
+			AddComponent(result);
+		}
 	}
 
 	if(type == "Camera")

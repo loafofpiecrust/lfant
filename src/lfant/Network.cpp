@@ -86,5 +86,10 @@ net::Connection* Network::GetConnection(string name) const
 	return nullptr;
 }
 
+net::Connection* Network::AddConnection(string type)
+{
+	return net::Connection::registry.New(type);
+}
+
 }
 

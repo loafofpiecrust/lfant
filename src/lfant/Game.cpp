@@ -107,6 +107,7 @@ void Game::Init()
 //	userInterface->Init();
 	scene->Init();
 
+	Log("About to load '"+defaultScene+"' as default.");
 	if(defaultScene != "") scene->LoadFile(defaultScene);
 
 	Log("Window callback set.");
@@ -140,7 +141,8 @@ void Game::Load(Properties* prop)
 	prop->Get("orgName", orgName);
 	prop->Get("gameName", gameName);
 	prop->Get("defaultScene", defaultScene);
-	Log("Game loading, default scene is '", defaultScene, "'.");
+	Log("Game name: "+gameName);
+	Log("Game loading, default scene is '"+defaultScene+"'.");
 }
 
 void Game::Save(Properties* prop) const

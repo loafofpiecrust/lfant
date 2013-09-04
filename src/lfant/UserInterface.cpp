@@ -310,9 +310,17 @@ void UserInterface::Load(Properties *prop)
 	deque<string> schemes;
 	string pfont = "";
 	string pcursor = "";
+	string file = "";
 	prop->Get("schemes", schemes);
 	prop->Get("font", pfont);
 	prop->Get("cursor", pcursor);
+	prop->Get("file", file);
+
+	Log("UserInterface, file to load: '"+file+"'.");
+	if(file != "")
+	{
+		LoadFile(file);
+	}
 
 	for(auto& i : schemes)
 	{
@@ -333,8 +341,7 @@ void UserInterface::Load(Properties *prop)
 
 	context->setDefaultTooltipType(prop->Get<string>("tooltip"));
 
-	deque<Properties*> pwins = prop->GetChildren("window");
-	for(Properties* pw : pwins)
+	for(Properties* pw : prop->GetChildren("window"))
 	{
 		CreateWindow(pw);
 	}

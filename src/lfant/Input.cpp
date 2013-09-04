@@ -38,7 +38,7 @@ namespace lfant
 
 Key_Initializer Key;
 
-uint16 Key_Initializer::operator [](string in)
+uint16 Key_Initializer::operator[](string in)
 {
 	if(in.size() == 1)
 	{
@@ -69,10 +69,18 @@ void Input::Update()
 	{
 		if(axis.down || axis.up)
 		{
-			TriggerEvent(axis.name);
+		//	TriggerEvent(axis.name);
 			TriggerEvent(axis.name, axis.value);
-			TriggerEvent(axis.name, axis.name, axis.value);
 			TriggerEvent("All", axis.name, axis.value);
+
+			if(axis.down)
+			{
+				TriggerEvent(axis.name+"_Down");
+			}
+			else if(axis.up)
+			{
+				TriggerEvent(axis.name+"_Up");
+			}
 		}
 		if(axis.down)
 		{

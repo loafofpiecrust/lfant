@@ -22,6 +22,7 @@
 
 // Internal
 #include <lfant/Subsystem.h>
+#include <lfant/util/qumap.h>
 
 // External
 #include <bitset>
@@ -45,7 +46,7 @@ public:
 	Key_Initializer();
 	uint16_t operator[](string in);
 private:
-	map<string, uint16_t> _key;
+	qumap<string, uint16_t> _key;
 };
 
 extern Key_Initializer Key;

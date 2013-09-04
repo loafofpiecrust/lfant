@@ -36,14 +36,6 @@ using namespace boost::filesystem;
 namespace lfant
 {
 
-FileSystem::FileSystem()
-{
-}
-
-FileSystem::~FileSystem()
-{
-}
-
 #if LINUX || ANDROID
 string GetProgramDir()
 {
@@ -64,8 +56,8 @@ string GetProgramDir()
 string GetProgramDir()
 {
 	HMODULE hmod = GetModuleHandle(0);
-	char file[100];
-	GetModuleFileName(hmod, file, 100);
+	char file[128];
+	GetModuleFileName(hmod, file, 128);
 
 	path p(file);
 	p.remove_filename();
@@ -74,6 +66,15 @@ string GetProgramDir()
 #elif MACOSX
 
 #endif
+
+FileSystem::FileSystem() :
+	gameFolder(GetProgramDir()+"/../../..")
+{
+}
+
+FileSystem::~FileSystem()
+{
+}
 
 void FileSystem::Init()
 {
@@ -87,7 +88,6 @@ void FileSystem::Init()
 	const string home = getenv("HOME");
 #endif
 	userFolder = home + "/Documents/My Games/" + game->orgName + "/" + game->gameName;
-	gameFolder = GetProgramDir()+"/../..";
 
 	Subsystem::Init();
 }

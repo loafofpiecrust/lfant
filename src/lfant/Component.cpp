@@ -30,7 +30,9 @@
 
 namespace lfant {
 
-map< string, Component* (*)()> Component::componentRegistry __attribute__((init_priority(101)));
+IMPLEMENT_REGISTRY(Component)
+//TypeRegistry<Component> Component::registry __attribute__((init_priority(101)));
+//qumap<string, Component* (*)()> Component::componentRegistry __attribute__((init_priority(101)));
 
 Component::Component()
 {
@@ -133,22 +135,6 @@ void Component::Enable(bool enable)
 	}
 }
 
-void Component::RegisterType(string name, Component* (*func)())
-{
-//	Log("Registering component type '"+name+"', func: '", func, "'.");
-	printf("Component::RegisterType: Touch.\n");
-	if(func)
-	{
-		componentRegistry[name] = nullptr;
-		cout << "Registering type with function ptr " << func << " to this current value: " << componentRegistry[name] << "\n";
-		componentRegistry[name] = func;
-	}
-	else
-	{
-		printf("Component::RegisterType: Function is null.\n");
-	}
-}
-
 
 bool Component::IsEnabled()
 {
@@ -157,6 +143,7 @@ bool Component::IsEnabled()
 
 void Component::Bind()
 {
+/*
 	Script::Class<Component, Object> inst;
 
 	inst.Var("owner", &Component::owner);
@@ -164,6 +151,7 @@ void Component::Bind()
 	inst.Func("Init", &Component::Init);
 	inst.Func("IsEnabled", &Component::IsEnabled);
 	inst.Func("Enable", &Component::Enable);
+*/
 }
 
 }

@@ -91,7 +91,6 @@ include_directories(
 target_link_libraries(${PROJECT_NAME}
 	glfw
 	OpenCL
-	clcc
 	CEGUI
 	glew
 	)

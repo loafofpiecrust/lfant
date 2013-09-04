@@ -128,6 +128,9 @@ public:
 	 */
 	float GetSpeed();
 
+	float GetFriction() const;
+	void SetFriction(float f);
+
 	void SetMaxSpeed(float speed) { maxSpeed = speed; }
 	float GetMaxSpeed() { return maxSpeed; }
 
@@ -167,6 +170,9 @@ protected:
 	btMotionState* motionState;
 	Collider* collider = nullptr;
 	vec3 inertia = vec3(0);
+
+	bvec3 lockPosition = bvec3(false);
+	bvec3 lockRotation = bvec3(false);
 };
 
 /** @} */

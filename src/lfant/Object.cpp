@@ -75,11 +75,22 @@ void Object::Destroy()
 
 void Object::OnDestroy()
 {
+	for(auto& s : senders)
+	{
+		for(uint i = 0; i < s->events.size(); ++i)
+		{
+			if(s->events[i]->obj == this)
+			{
+				delete s->events[i];
+				s->events.erase(s->events.begin()+i);
+			}
+		}
+	}
 }
 
 void Object::LoadFile(string path)
 {
-	Log(type::Name(this), " loading file '", path, "'.");
+//	Log(type::Name(this), " loading file '", path, "'.");
 	Properties prop;
 	prop.LoadFile(path);
 //	string type = type::Unscope(type::Name(this));
@@ -112,6 +123,7 @@ void Object::Save(Properties *prop) const
 
 void Object::Bind()
 {
+	/*
 	Script::BaseClass<Object> inst;
 
 	inst.Func("Init", &Object::Init);
@@ -126,6 +138,7 @@ void Object::Bind()
 	inst.Func("Save", &Object::Save);
 	inst.Func("LoadFile", &Object::LoadFile);
 	inst.Func("SaveFile", &Object::SaveFile);
+	*/
 }
 
 }

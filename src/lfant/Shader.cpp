@@ -100,8 +100,6 @@ void Shader::Compile()
 
 	uint32 vert = -1;
 	uint32 frag = -1;
-	uint32 geom = -1;
-	uint32 comp = -1;
 	id = glCreateProgram();
 
 	if(vertex != "")
@@ -115,6 +113,8 @@ void Shader::Compile()
 		glAttachShader(id, frag);
 	}
 #if !LFANT_GLES
+	uint32 geom = -1;
+	uint32 comp = -1;
 	if(geometry != "")
 	{
 		geom = Compile(GL_GEOMETRY_SHADER, game->fileSystem->GetGamePath(geometry).string());

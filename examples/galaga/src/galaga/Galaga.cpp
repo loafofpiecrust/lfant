@@ -146,14 +146,10 @@ void Galaga::Init()
 {
 	Game::Init();
 
-	Log("Loading scene.");
-//	scene->LoadFile("scenes/main.scene");
 	scene->SaveFile("scenes/init.scene");
-	Log("Finished loading scene");
 
 //	userInterface->LoadFile("gui/MainMenu.gui");
 //	userInterface->LoadMovie("HUD", "gui/hud.swf");
-//	server = network->AddConnection<net::Server>();
 	/*
 	Log("Setting up client...");
 	client = new net::Client;
@@ -178,8 +174,6 @@ void Galaga::Init()
 	//	client->SendData("12345678");
 
 	//	client->GetDataAsync(8);
-
-
 }
 
 void Galaga::Update()

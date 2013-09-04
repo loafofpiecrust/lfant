@@ -10,6 +10,8 @@ namespace lfant {
 namespace net {
 namespace udp {
 
+IMPLEMENT_TYPE(net::Connection, net::udp::Server)
+
 Server::Server()// :
 //	acceptor(*io)
 {

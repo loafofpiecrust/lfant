@@ -30,6 +30,8 @@
 namespace lfant
 {
 
+IMPLEMENT_TYPE(net::Connection, ChatServer)
+
 ChatServer::ChatServer()
 {
 	name = game->systemInfo->computerName;

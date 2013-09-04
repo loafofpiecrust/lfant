@@ -94,15 +94,8 @@ void Camera::Init()
 
 void Camera::Update()
 {
-//	Log("Updating cam view");
-	vec3 pos = owner->transform->GetWorldPosition();
-//	pos.x = -pos.x;
-	view = glm::lookAt(
-				pos,
-				pos + owner->transform->GetDirection(),
-				owner->transform->GetUp()
-				);
-	//	UpdateProjection();
+	UpdateView();
+//	UpdateProjection();
 }
 
 void Camera::OnDestroy()
@@ -150,10 +143,10 @@ mat4 Camera::GetView()
 
 void Camera::UpdateView()
 {
-//	Log("Camera direction: ", lexical_cast<string>(owner->transform->GetDirection()), ", up: ", lexical_cast<string>(owner->transform->GetUp()));
+	vec3 pos = owner->transform->GetWorldPosition();
 	view = glm::lookAt(
-				owner->transform->GetWorldPosition(),
-				owner->transform->GetWorldPosition() + owner->transform->GetDirection(),
+				pos,
+				pos + owner->transform->GetDirection(),
 				owner->transform->GetUp()
 				);
 }

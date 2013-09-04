@@ -1,0 +1,115 @@
+scene Pong
+{
+	system Physics
+	{
+		gravity = (0,0,0)
+	}
+
+	entity Observer
+	{
+		layer = Other
+
+		component Transform
+		{
+			position = (0,0,-6)
+		}
+
+		component Camera
+		{
+			mode = 0
+			fov = 90
+		}
+	}
+
+	entity Player1
+	{
+		layer = Players
+
+		component Transform
+		{
+			position = (0.5f,0,0)
+			scale = (0.1, 0.1, 0.1)
+			rotation = (-90,0,0)
+		}
+
+		component Mesh
+		{
+			path = meshes/plane.obj
+			material = materials/Diffuse.mat
+		}
+
+		component BoxCollider
+		{
+		}
+
+		component Rigidbody
+		{
+			lockPosition = (1,0,1)
+		}
+
+		// Add Handle component
+
+		// Add PongPlayer component
+		component pong::Player
+		{
+		}
+	}
+
+	entity Player2
+	{
+		layer = Players
+
+		component Transform
+		{
+			position = (-5,0,0)
+		}
+
+		component BoxCollider
+		{
+		}
+
+		component Rigidbody
+		{
+		}
+
+		// Add Handle component
+
+		// Add PongAI component
+	}
+
+	entity Ball
+	{
+		layer = Pucks
+
+		component Transform
+		{
+			position = (0,0,0)
+			rotation = (-90,0,0)
+			scale = 0.1f
+		}
+
+		component Mesh
+		{
+			path = meshes/plane.obj
+			material = materials/Diffuse.mat
+		}
+
+		// Add Ball/Puck comp
+
+		component BoxCollider
+		{
+			// Set size?
+		}
+
+		component Rigidbody
+		{
+			friction = 1.5f
+			restitution = 1.4f
+			lockPosition = (0,0,1)
+		}
+
+		component pong::Ball
+		{
+		}
+	}
+}
