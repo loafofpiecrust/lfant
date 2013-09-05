@@ -1,5 +1,7 @@
 # git ignore file
 
+*.sublime-workspace
+
 # Libraries
 *.so
 *.a
@@ -15,5 +17,5 @@ build
 analysis
 wiki
 docs
-*/bin32
-*/bin64
+bin*
+*/bin*

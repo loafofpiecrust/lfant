@@ -214,6 +214,13 @@ string lexical_cast<string, vec3>(const vec3& src)
 }
 
 template<>
+string lexical_cast<string, bvec3>(const bvec3& src)
+{
+	return "("+lexical_cast<string>(src.x)+","+lexical_cast<string>(src.y)+","+
+			lexical_cast<string>(src.z)+")";
+}
+
+template<>
 string lexical_cast<string, vec4>(const vec4& src)
 {
 	return "("+lexical_cast<string>(src.x)+","+lexical_cast<string>(src.y)+","+
@@ -354,6 +361,23 @@ ivec3 lexical_cast<ivec3, string>(const string& val)
 		if(str.size() > 2)
 		{
 			result.z = lexical_cast<int>(str[2]);
+		}
+	}
+	return result;
+}
+
+template<>
+bvec3 lexical_cast<bvec3, string>(const string& val)
+{
+	bvec3 result(0);
+	deque<string> str = lfant::Split(val, " x:,()");
+	result.x = lexical_cast<bool>(str[0]);
+	if(str.size() > 1)
+	{
+		result.y = lexical_cast<bool>(str[1]);
+		if(str.size() > 2)
+		{
+			result.z = lexical_cast<bool>(str[2]);
 		}
 	}
 	return result;

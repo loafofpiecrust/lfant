@@ -33,7 +33,7 @@ void main()
 		color = diffuse;
 		return;
 	}
-
+/*
 	vec2 blur = vec2(1.0/300.0, 1.0/200.0);
 	int samp = 3;
 	const float sampDiv = pow(samp-1, 4);
@@ -45,7 +45,8 @@ void main()
 			blurred += texture2D(diffuseTex, vec2(UV.x + x * blur.x, UV.y + y * blur.y)) / sampDiv;
 		}
 	}
-
 	// @todo Make lighting seperate to have a final addition step.
 	color = blurred;
+*/
+	color = diffuse;
 }

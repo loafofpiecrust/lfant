@@ -1,0 +1,97 @@
+scene FPS
+{
+	system Physics
+	{
+		gravity = (0,-9.81,0)
+	}
+
+	entity Floor
+	{
+		component Transform
+		{
+			scale = (1, 0.1, 1)
+		}
+
+		component Mesh
+		{
+			path = meshes/plane.obj
+			material = materials/Diffuse.mat
+		}
+
+		component BoxCollider
+		{
+		}
+
+		component Rigidbody
+		{
+			mass = 0
+			restitution = 0.7f
+		}
+	}
+
+	entity Player
+	{
+		component Transform
+		{
+			position = (0,2,0)
+		}
+
+		component Player
+		{
+		}
+
+		component Movement
+		{
+			movementSpeed = 15
+			jumpHeight = 5
+			usePhysics = true
+		}
+
+		component BoxCollider
+		{
+			size = (1,1,1)
+		}
+
+		component Rigidbody
+		{
+			mass = 45
+			maxSpeed = 20
+		}
+
+		entity Cam
+		{
+			component Camera
+			{
+				mode = 0
+				fov = 90
+			}
+			component MouseLook
+			{
+				enabled = false
+				lookSpeed = 85
+			}
+		}
+	}
+
+	entity HeadThing
+	{
+		component Transform
+		{
+			position = (2,2,2)
+		}
+
+		component Mesh
+		{
+			path = meshes/suzanne.obj
+			material = materials/Diffuse.mat
+		}
+
+		component BoxCollider
+		{
+		}
+
+		component Rigidbody
+		{
+		}
+	}
+}

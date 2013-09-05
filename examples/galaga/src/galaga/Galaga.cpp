@@ -53,14 +53,13 @@ namespace galaga {
 
 extern "C" void Launch()
 {
-	printf("Launching\n");
-	game = new Galaga();
-	game->standAlone = true;
-	printf("Initing\n");
+	game = new Galaga;
 	game->Init();
-	Log("Game initialised");
-	game->Update();
-	Log("Game ending");
+	while(!game->IsExited())
+	{
+		game->Update();
+	}
+	game->Destroy();
 	delete game;
 }
 
@@ -147,14 +146,10 @@ void Galaga::Init()
 {
 	Game::Init();
 
-	Log("Loading scene.");
-//	scene->LoadFile("scenes/main.scene");
 	scene->SaveFile("scenes/init.scene");
-	Log("Finished loading scene");
 
 //	userInterface->LoadFile("gui/MainMenu.gui");
 //	userInterface->LoadMovie("HUD", "gui/hud.swf");
-//	server = network->AddConnection<net::Server>();
 	/*
 	Log("Setting up client...");
 	client = new net::Client;
@@ -179,17 +174,11 @@ void Galaga::Init()
 	//	client->SendData("12345678");
 
 	//	client->GetDataAsync(8);
-
-
 }
 
 void Galaga::Update()
 {
-	while(!IsExited())
-	{
-		Game::Update();
-	}
-	Destroy();
+	Game::Update();
 }
 
 void Galaga::Destroy()

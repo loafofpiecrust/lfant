@@ -11,6 +11,8 @@ namespace lfant {
 namespace net {
 namespace udp {
 
+IMPLEMENT_TYPE(net::Connection, net::udp::Client)
+
 Client::Client():
 	resolver(*io)
 {

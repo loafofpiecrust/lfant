@@ -29,7 +29,14 @@
 #include <lfant/Transform.h>
 
 // External
+#if !ANDROID
 #include <GL/glew.h>
+#else
+//#include <EGL/egl.h>
+#include <GLES2/gl2.h>
+#include <GLES2/gl2ext.h>
+#include <GLES2/gl2platform.h>
+#endif
 
 namespace lfant {
 
@@ -209,20 +216,30 @@ void FrameBuffer::Unbind()
 
 void FrameBuffer::BindRead()
 {
+#if !LFANT_GLES
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, id);
+#else
+	glBindFramebuffer(GL_FRAMEBUFFER, id);
+#endif
 	FrameBuffer::current = this;
 }
 
 void FrameBuffer::UnbindRead()
 {
+#if !LFANT_GLES
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+#else
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+#endif
 	FrameBuffer::current = nullptr;
 }
 
 void FrameBuffer::DrawBuffers()
 {
 //	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, id);
+#if !LFANT_GLES
 	glDrawBuffers(drawBuffers.size(), &drawBuffers[0]);
+#endif
 	if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 	{
 		Log("Framebuffer failed to draw.");
@@ -232,19 +249,7 @@ void FrameBuffer::DrawBuffers()
 
 uint32_t FrameBuffer::GetAttachment(uint32_t idx)
 {
-	switch(idx)
-	{
-		case 1: return GL_COLOR_ATTACHMENT1;
-		case 2: return GL_COLOR_ATTACHMENT2;
-		case 3: return GL_COLOR_ATTACHMENT3;
-		case 4: return GL_COLOR_ATTACHMENT4;
-		case 5: return GL_COLOR_ATTACHMENT5;
-		case 6: return GL_COLOR_ATTACHMENT6;
-		case 7: return GL_COLOR_ATTACHMENT7;
-		case 8: return GL_COLOR_ATTACHMENT8;
-		case 9: return GL_COLOR_ATTACHMENT9;
-		default: return GL_COLOR_ATTACHMENT0;
-	}
+	return GL_COLOR_ATTACHMENT0 + idx;
 }
 
 void FrameBuffer::ResizeViewport()

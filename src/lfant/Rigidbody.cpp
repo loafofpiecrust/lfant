@@ -18,7 +18,6 @@
 *
 ******************************************************************************/
 
-
 // External
 #include <btBulletDynamicsCommon.h>
 #include <BulletDynamics/Dynamics/btRigidBody.h>
@@ -32,13 +31,13 @@
 #include <lfant/Console.h>
 #include <lfant/Rigidbody.h>
 
-namespace lfant
-{
+namespace lfant {
 
 IMPLEMENT_COMP(Rigidbody)
 
 Rigidbody::Rigidbody()
 {
+	initBeforeLoad = true;
 }
 
 Rigidbody::~Rigidbody()
@@ -53,22 +52,46 @@ void Rigidbody::Save(Properties* prop)
 	prop->Set("velocity", GetVelocity());
 	prop->Set("maxSpeed", maxSpeed);
 	prop->Set("trigger", IsTrigger());
+	prop->Set("friction", body->getFriction());
+	prop->Set("restitution", body->getRestitution());
+
+	prop->Set("lockPosition", lockPosition);
+	prop->Set("lockRotation", lockRotation);
 }
 
 void Rigidbody::Load(Properties* prop)
 {
 	Component::Load(prop);
 
+	float friction = 1.0f, restitution = 0.0f, mass = 1.0f;
+	vec3 vel(0);
+
 	prop->Get("mass", mass);
+	prop->Get("velocity", vel);
 	prop->Get("maxSpeed", maxSpeed);
 	prop->Get("trigger", isTrigger);
+	prop->Get("friction", friction);
+	prop->Get("restitution", restitution);
+
+	prop->Get("lockPosition", lockPosition);
+	prop->Get("lockRotation", lockRotation);
+
+	Log("Rb loaded, restitution: ", restitution);
+
+	body->setFriction(friction);
+	body->setRestitution(restitution);
+	SetMass(mass);
+	body->setLinearVelocity(vec3_cast<btVector3>(vel));
+
+	Log("Locked position: ", lexical_cast<string>(lockPosition));
 
 //	SetVelocity(prop->Get<vec3>("velocity"));
 }
 
 /*******************************************************************************
+*
 *		General functions
-*		\area General
+*
 *******************************************************************************/
 
 void Rigidbody::Init()
@@ -124,7 +147,7 @@ void Rigidbody::Update()
 	{
 		owner->transform->SetRotation(rot);
 	}
-	
+
 	/*
 	quat rot = quat_cast<quat>(body->getWorldTransform().getRotation());
 	if(rot != owner->transform->GetRotationQuat())
@@ -168,8 +191,9 @@ void Rigidbody::OnSetRot( vec3 rot )
 }
 
 /*******************************************************************************
+*
 *		Gravity functions
-*		\area Gravity
+*
 *******************************************************************************/
 
 float Rigidbody::GetMass()
@@ -193,8 +217,9 @@ void Rigidbody::SetMass(float mass)
 }
 
 /*******************************************************************************
+*
 *		Constraints functions
-*		\area Constraints
+*
 *******************************************************************************/
 
 btTypedConstraint* Rigidbody::GetConstraint(uint16 idx)

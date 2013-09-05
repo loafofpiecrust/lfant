@@ -27,7 +27,9 @@
 #include <GL/glew.h>
 //#include <GL/gl.h>
 //#include <SFML/Graphics.hpp>
+#if !ANDROID
 #include <GLFW/glfw3.h>
+#endif
 
 #include <glm/gtc/type_ptr.hpp>
 
@@ -122,11 +124,14 @@ void Renderer::Init()
 	Subsystem::Init();
 
 	Log("Renderer::Init: About to start GLFW");
+
+#if !ANDROID
 	if(!glfwInit())
 	{
 		Log("Renderer::Init: GLFW failed to initialise.");
 		game->Destroy();
 	}
+#endif
 
 	if(game->standAlone)
 	{
@@ -139,6 +144,17 @@ void Renderer::Init()
 		HideMouse(hideMouse);
 	}
 
+#if !ANDROID
+	glfwSwapInterval(vsync);
+
+	glfwSetWindowCloseCallback(window, &Renderer::OnCloseWindow);
+	glfwSetWindowSizeCallback(window, &Renderer::OnSetResolution);
+
+	glfwSetErrorCallback(&Renderer::OnError);
+	
+	glShadeModel(GL_SMOOTH);
+	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+#endif
 
 	// Background color
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -155,8 +171,6 @@ void Renderer::Init()
 
 	// Texture and shading
 	glEnable(GL_TEXTURE_2D);
-	glShadeModel(GL_SMOOTH);
-	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
 	// Point sprites
 //	glEnable(GL_POINT_SPRITE);
@@ -169,23 +183,7 @@ void Renderer::Init()
 
 //	glEnable(GL_TEXTURE_RECTANGLE);
 
-//	if(game->standAlone)
-	{
-		glfwSwapInterval(vsync);
-
-		glfwSetWindowCloseCallback(window, &Renderer::OnCloseWindow);
-		glfwSetWindowSizeCallback(window, &Renderer::OnSetResolution);
-
-		glfwSetErrorCallback(&Renderer::OnError);
-	}
-
 	Log("Renderer: Initialized");
-
-/*	{
-		Mesh* mesh = game->scene->Spawn("Lala")->AddComponent<Mesh>();
-		mesh->LoadFile("meshes/suzanne.obj");
-		mesh->material->LoadFile("materials/Diffuse.mat");
-	}*/
 	
 	frameBuffer = new FrameBuffer();
 	frameBuffer->AddTexture("lightTex", Texture::Format::RGBA, Texture::Format::RGBA);
@@ -255,8 +253,10 @@ void Renderer::Update()
 
 	frameBuffer->Render();
 
+#if !ANDROID
 	glfwSwapBuffers(window);
 	glfwPollEvents();
+#endif
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
@@ -264,7 +264,9 @@ void Renderer::OnDestroy()
 {
 	frameBuffer->EndRender();
 	Log("Renderer::OnDestroy(): Touch");
+#if !ANDROID
 	glfwTerminate();
+#endif
 }
 
 /*******************************************************************************
@@ -275,6 +277,7 @@ void Renderer::OnDestroy()
 
 bool Renderer::OpenWindow()
 {
+#if !ANDROID
 //	if(game->standAlone)
 //	{
 	Log("Renderer::OpenWindow: About to set window hints.");
@@ -300,7 +303,6 @@ bool Renderer::OpenWindow()
 	SetWindowPos(windowPos);
 	Log("Renderer::OpenWindow: Window successfully opened.");
 //	}
-
 	glewExperimental = true;     // Needed for core profile
 	if (glewInit() != GLEW_OK)
 	{
@@ -308,6 +310,7 @@ bool Renderer::OpenWindow()
 		return false;
 	}
 	Log("Renderer::OpenWindow: GLEW Initialised.");
+#endif
 
 	return true;
 }
@@ -346,27 +349,6 @@ ivec2 Renderer::GetResolution()
 	return resolution;
 }
 
-void Renderer::SetWindowTitle(string title)
-{
-	windowTitle = title;
-	glfwSetWindowTitle(window, title.c_str());
-}
-
-void Renderer::SetResolution(ivec2 res)
-{
-	resolution = res;
-	glfwSetWindowSize(window, res.x, res.y);
-}
-
-void Renderer::SetVersion(byte major, byte minor)
-{
-	version = {major, minor};
-	if(!OpenWindow())
-	{
-		game->Exit();
-	}
-}
-
 void Renderer::SetRendering(bool render)
 {
 	if(!render && render)
@@ -374,12 +356,6 @@ void Renderer::SetRendering(bool render)
 		Update();
 	}
 	this->render = render;
-}
-
-void Renderer::SetWindowPos(ivec2 pos)
-{
-	windowPos = pos;
-	glfwSetWindowPos(window, pos.x, pos.y);
 }
 
 Shader *Renderer::GetShader(string name)
@@ -402,11 +378,6 @@ void Renderer::AddShader(Shader *shader)
 //		return;
 	}
 //	shaders.push_back(ptr<Shader>(shader));
-}
-
-void Renderer::HideMouse(bool hide)
-{
-	glfwSetInputMode(window, GLFW_CURSOR, !hide);
 }
 
 void Renderer::AddLight(Light* light)

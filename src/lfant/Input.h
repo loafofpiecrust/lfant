@@ -22,6 +22,7 @@
 
 // Internal
 #include <lfant/Subsystem.h>
+#include <lfant/util/qumap.h>
 
 // External
 #include <bitset>
@@ -45,7 +46,7 @@ public:
 	Key_Initializer();
 	uint16_t operator[](string in);
 private:
-	map<string, uint16_t> _key;
+	qumap<string, uint16_t> _key;
 };
 
 extern Key_Initializer Key;
@@ -198,6 +199,11 @@ class Input : public Subsystem
 		int count;
 	};
 
+	struct Touch
+	{
+		vec2 pos;
+	};
+
 public:
 	Input();
 	~Input();
@@ -213,8 +219,6 @@ public:
 	 *	@param mode The way the key was used. 0 = Release; 1 = Press;
 	 */
 	static void OnKeyPress(GLFWwindow* win, int key, int scancode, int action, int mods);
-	static void OnMouseMove(GLFWwindow* win, double x, double y);
-	static void OnMouseButton(GLFWwindow* win, int btn, int action, int mods);
 	static void OnCharPress(GLFWwindow* win, uint32_t key);
 
 	void AddAxis(string name, string positive = "null", string negative = "null", string altpos = "null", string altneg = "null", float sens = 3.0f, float dead = 0.001f, bool snap = true, byte joyNum = 0);
@@ -227,9 +231,19 @@ public:
 	int8_t GetButtonDown(string name) const;
 	int8_t GetButtonUp(string name) const;
 
+#if !ANDROID
+	static void OnMouseMove(GLFWwindow* win, double x, double y);
+	static void OnMouseButton(GLFWwindow* win, int btn, int action, int mods);
 	ivec2 GetMousePos() const;
 	void SetMousePos(ivec2 pos);
 	void SetMousePos(int32 x, int32 y);
+#else
+	static void OnMouseMove(GLFWwindow* win, double x, double y);
+	static void OnMouseButton(GLFWwindow* win, int btn, int action, int mods);
+	deque<Touch>& GetTouches();
+	Touch& GetTouch(uint32_t idx);
+	void OnTouch(uint32_t idx, int action, Touch data);
+#endif
 
 	void GetJoystickAxes();
 
@@ -239,6 +253,9 @@ public:
 protected:
 	deque<Axis> axes;
 	deque<Joystick> joysticks;
+#if ANDROID
+	deque<Touch> touches;
+#endif
 
 	/// The string of input this frame.
 	string inputString;

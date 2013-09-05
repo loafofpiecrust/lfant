@@ -49,7 +49,7 @@ public:
 	public:
 		enum class Type : byte
 		{
-			Body = 0,
+			Body = 1,
 			Grip,
 			Stock,
 			Barrel,
@@ -61,8 +61,8 @@ public:
 		Part();
 		~Part();
 
-		void Load(Properties* prop);
-		void Save(Properties* prop);
+		virtual void Load(Properties* prop);
+		virtual void Save(Properties* prop);
 
 	protected:
 		Type type = Type::Body;
@@ -87,9 +87,10 @@ public:
 		DECLARE_COMP(Body)
 	public:
 		Body();
+		virtual ~Body() {}
 
-		void Load(Properties* prop);
-		void Save(Properties* prop);
+		virtual void Load(Properties* prop);
+		virtual void Save(Properties* prop);
 
 		bool automatic = false;
 		uint32_t projectiles = 1;
@@ -101,8 +102,8 @@ public:
 	Weapon();
 	virtual ~Weapon();
 
-	void Load(Properties* prop);
-	void Save(Properties* prop);
+	virtual void Load(Properties* prop);
+	virtual void Save(Properties* prop);
 
 	virtual void Init();
 	virtual void Update();

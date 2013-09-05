@@ -40,7 +40,10 @@
 #include <lfant/UserInterface.h>
 #include <lfant/Network.h>
 #include <lfant/ScriptSystem.h>
+
+#if !ANDROID
 #include <lfant/OpenCL.h>
+#endif
 
 #include "Game.h"
 #include "Scene.h"
@@ -62,8 +65,10 @@ Game::Game() :
 	input {new Input},
 	audio {new Audio},
 	network {new Network},
-	scriptSystem {new ScriptSystem},
-	openCL {new OpenCL}
+	scriptSystem {new ScriptSystem}
+#if !ANDROID
+	,openCL {new OpenCL}
+#endif
 {
 }
 
@@ -92,7 +97,9 @@ void Game::Init()
 	Log("Initing physics");
 	physics->Init();
 	renderer->Init();
+#if !ANDROID
 	openCL->Init();
+#endif
 	input->Init();
 //	audio->Init();
 //	network->Init();
@@ -100,6 +107,7 @@ void Game::Init()
 //	userInterface->Init();
 	scene->Init();
 
+	Log("About to load '"+defaultScene+"' as default.");
 	if(defaultScene != "") scene->LoadFile(defaultScene);
 
 	Log("Window callback set.");
@@ -133,7 +141,8 @@ void Game::Load(Properties* prop)
 	prop->Get("orgName", orgName);
 	prop->Get("gameName", gameName);
 	prop->Get("defaultScene", defaultScene);
-	Log("Game loading, default scene is '", defaultScene, "'.");
+	Log("Game name: "+gameName);
+	Log("Game loading, default scene is '"+defaultScene+"'.");
 }
 
 void Game::Save(Properties* prop) const

@@ -9,6 +9,8 @@
 namespace lfant {
 namespace net {
 
+IMPLEMENT_REGISTRY(net::Connection)
+
 Connection::Connection()
 {
 }

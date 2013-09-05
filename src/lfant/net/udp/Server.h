@@ -3,6 +3,7 @@
 #include <lfant/stdafx.h>
 
 // Internal
+#include <lfant/TypeRegistry.h>
 #include <lfant/net/udp/Connection.h>
 
 // External
@@ -13,6 +14,7 @@ namespace udp {
 
 class Server : public Connection
 {
+	DECLARE_TYPE(net::Connection, net::udp::Server)
 public:
 	Server();
 	virtual ~Server();

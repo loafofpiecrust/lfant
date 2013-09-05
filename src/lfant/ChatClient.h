@@ -24,6 +24,7 @@
 // External
 
 // Internal
+#include <lfant/TypeRegistry.h>
 #include <lfant/net/tcp/Client.h>
 
 namespace lfant
@@ -36,6 +37,8 @@ struct Peer;
  */
 class ChatClient : public net::tcp::Client
 {
+	DECLARE_TYPE(net::Connection, ChatClient)
+	
 public:
 	ChatClient();
 	ChatClient(asio::io_service& new_io);

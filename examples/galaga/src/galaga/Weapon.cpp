@@ -150,7 +150,7 @@ void Weapon::Fire(byte mode)
 		{
 			Log("Cancel reload");
 			reloading = false;
-			CancelTimer("EndReload");
+			CancelTimer("Reload");
 			TriggerEvent("StopAnimation");
 		}
 
@@ -202,7 +202,7 @@ void Weapon::Reload()
 
 	Log("Beginning reload");
 	reloading = true;
-	SetTimer("EndReload", reloadTime);
+	SetTimer("Reload", reloadTime);
 	TriggerEvent("PlayAnimation", "Reload", reloadTime);
 }
 
@@ -284,7 +284,7 @@ void Weapon::Disassemble()
 		}
 		if(owner)
 		{
-			p->owner->SetParent(owner->parent);
+			p->owner->SetParent(owner->GetParent());
 		}
 	}
 	owner->Destroy();
@@ -304,7 +304,7 @@ void Weapon::RemovePart(Weapon::Part* part)
 	}
 	if(owner)
 	{
-		part->owner->SetParent(owner->parent);
+		part->owner->SetParent(owner->GetParent());
 	}
 
 	for(uint i = 0; i < parts.size(); ++i)

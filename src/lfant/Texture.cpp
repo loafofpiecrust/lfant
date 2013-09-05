@@ -22,7 +22,7 @@
 // External
 #include <GL/glew.h>
 #include <lfant/lodepng.h>
-#include <lfant/CImg.h>
+//#include <lfant/CImg.h>
 
 // Internal
 #include <lfant/TextureLoader.h>
@@ -105,19 +105,12 @@ void Texture::InitData(byte* data)
 		Log("Generating tex id, ", id);
 	}
 	Bind();
-
-	Log("Texture mode is ", mode, ". GL_TEXTURE_2D = ", GL_TEXTURE_2D);
-	Log("internalFormat = ", (uint)internalFormat, ". GL_RGBA = ", GL_RGBA, ", GL_RGB32F = ", GL_RGB32F);
-	Log("format = ", (uint)format, ". GL_RGBA = ", GL_RGBA, ", GL_RGB32F = ", GL_RGB32F);
-	Log("dataType = ", (uint)dataType, ". GL_FLOAT = ", GL_FLOAT, ", GL_UNSIGNED_BYTE = ", GL_UNSIGNED_BYTE);
 	
 	glTexImage2D(mode, 0, (uint)internalFormat, size.x, size.y, 0, (uint)format, (uint)dataType, data);
 
-	Log("scaleFilter = ", (uint)scaleFilter, ", GL_LINEAR = ", GL_LINEAR, ", GL_NEAREST = ", GL_NEAREST);
 	glTexParameteri(mode, GL_TEXTURE_MAG_FILTER, (uint)scaleFilter);
 	glTexParameteri(mode, GL_TEXTURE_MIN_FILTER, (uint)scaleFilter);
 
-	Log("wrapMode = ", (uint)wrapMode, ", GL_CLAMP_TO_EDGE = ", GL_CLAMP_TO_EDGE, ", GL_REPEAT = ", GL_REPEAT);
 	if(wrapMode != WrapMode::Repeat)
 	{
 		glTexParameteri(mode, GL_TEXTURE_WRAP_S, (uint)wrapMode);
@@ -313,10 +306,10 @@ void Texture::LoadDDS(int mode)
 		format = GL_COMPRESSED_RGBA_S3TC_DXT1_EXT;
 		break;
 	case FOURCC_DXT3:
-		format = GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
+		format = GL_COMPRESSED_RGBA_S3TC_DXT1_EXT + 1;
 		break;
 	case FOURCC_DXT5:
-		format = GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
+		format = GL_COMPRESSED_RGBA_S3TC_DXT1_EXT + 2;
 		break;
 	default:
 		free(buffer);

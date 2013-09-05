@@ -25,6 +25,7 @@
 #include <boost/chrono.hpp>
 
 // Internal
+#include <lfant/util/qumap.h>
 #include <lfant/Subsystem.h>
 
 using namespace boost::chrono;
@@ -78,7 +79,7 @@ public:
 	double lastFrame;
 
 private:
-	map<string, float> timers;
+	qumap<string, float> timers;
 	hclock::time_point startTime;
 };
 

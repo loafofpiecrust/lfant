@@ -24,7 +24,7 @@
 // External
 
 // Internal
-
+#include <lfant/TypeRegistry.h>
 #include <lfant/net/tcp/Server.h>
 
 namespace lfant
@@ -43,6 +43,7 @@ struct Peer
  */
 class ChatServer : public net::tcp::Server
 {
+	DECLARE_TYPE(net::Connection, ChatServer)
 public:
 	ChatServer();
 	virtual ~ChatServer();

@@ -23,6 +23,7 @@
 
 // Internal
 #include <lfant/Object.h>
+#include <lfant/util/qumap.h>
 
 // External
 #include <forward_list>
@@ -91,7 +92,7 @@ protected:
 	string geometry = "";
 	string compute = "";
 	uint32 id = -1;
-	map<string, uint32> uniforms;
+	qumap<string, uint32> uniforms;
 
 	static deque<Shader*> shaders;
 	static Shader* current;

@@ -5,6 +5,7 @@
 // Internal
 #include <lfant/Rect.h>
 #include <lfant/ptr.h>
+#include <lfant/util/qumap.h>
 
 // External
 #include <wx/frame.h>
@@ -76,7 +77,7 @@ public:
 	wxObject* GetLastObject(int back = 1);
 
 protected:
-	map<string, int> ids;
+	qumap<string, int> ids;
 	int currId = 0;
 	ptr<wxAuiManager> manager;
 	deque<ptr<wxAuiNotebook>> notebooks;

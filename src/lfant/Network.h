@@ -23,6 +23,7 @@
 // Internal
 #include <lfant/ptr.h>
 #include <lfant/Subsystem.h>
+#include <lfant/Component.h>
 
 // External
 #include <boost/asio.hpp>
@@ -51,7 +52,6 @@ class Connection;
 class Network : public Subsystem
 {
 	friend class Game;
-
 public:
 	Network();
 	virtual ~Network();
@@ -63,12 +63,14 @@ public:
 	virtual void Load(Properties *prop);
 
 	template<typename C>
-	auto AddConnection(string name = "") -> typename enable_if<boost::is_base_of<net::Connection, C>::value, C*>::type
+	auto AddConnection() -> typename enable_if<boost::is_base_of<net::Connection, C>::value, C*>::type
 	{
 		C* con = new C;
 		connections.push_back(con);
 		return con;
 	}
+
+	net::Connection* AddConnection(string type);
 
 	net::Connection* GetConnection(string name) const;
 
@@ -77,6 +79,8 @@ protected:
 
 public:
 	deque< ptr<net::Connection> > connections;
+
+private:
 
 };
 

@@ -7,6 +7,7 @@
 #include <array>
 
 // Internal
+#include <lfant/TypeRegistry.h>
 #include <lfant/net/udp/Connection.h>
 
 namespace lfant {
@@ -18,6 +19,7 @@ namespace udp {
  */
 class Client : public Connection
 {
+	DECLARE_TYPE(net::Connection, net::udp::Client)
 public:
 	Client();
 	Client(asio::io_service& io);

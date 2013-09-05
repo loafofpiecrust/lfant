@@ -25,6 +25,8 @@
 #include <lfant/Camera.h>
 #include <lfant/Properties.h>
 #include <lfant/Time.h>
+#include <lfant/Physics.h>
+#include <lfant/Network.h>
 
 // External
 
@@ -171,8 +173,20 @@ void Scene::Load(Properties *prop)
 	currentId = 0;
 	Log("Scene::Load: Loading scene node");
 	Entity* ent = nullptr;
+	for(auto& i : prop->GetChildren("system"))
+	{
+		if(i->id == "Physics")
+		{
+			game->physics->Load(i);
+		}
+		else if(i->id == "Network")
+		{
+			game->network->Load(i);
+		}
+	}
 	for(auto& i : prop->GetChildren("entity"))
 	{
+		Log("About to spawn");
 		ent = Spawn(i->id);
 		Log("Spawned the entity!");
 		ent->Load(i);
@@ -188,12 +202,13 @@ void Scene::AddEntity(Entity* ent)
 	if(!ent->parent)
 	{
 		entities.push_back(ent);
-		Log("Scene::Spawn: pushed in.");
+		Log("Scene::AddEntity: pushed in.");
 	}
 	else
 	{
 		ent->parent->AddChild(ent);
 	}
+	Log("Scene::AddEntity: Finished.");
 }
 
 Entity* Scene::Spawn(string name, Entity* parent)
@@ -205,6 +220,8 @@ Entity* Scene::Spawn(string name, Entity* parent)
 	ent->name = name;
 	Log("Scene::Spawn: Set name.");
 	AddEntity(ent);
+	Log("Scene::Spawn: Finished.");
+	return ent;
 }
 
 Entity* Scene::SpawnAndLoad(Properties* prop, string name, Entity* parent)
@@ -219,7 +236,7 @@ Entity* Scene::SpawnAndLoad(Properties* prop, string name, Entity* parent)
 	if(!parent)
 	{
 		entities.push_back(ent);
-		Log("Scene::Spawn: pushed in.");
+		Log("Scene::SpawnAndLoad: pushed in.");
 	}
 	else
 	{
