@@ -97,8 +97,6 @@ protected:
 	ptr<Shader> shader;
 	ptr<Texture> texture;
 
-	uint32_t vertexArray = 0;
-
 	vector<vector<vector<Chunk>>> chunks;
 
 private:

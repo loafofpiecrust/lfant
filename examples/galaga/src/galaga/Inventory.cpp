@@ -120,23 +120,6 @@ Item* Inventory::RemoveItem(string name)
 
 Item* Inventory::RemoveItem(uint32_t idx)
 {
-	if(items.size() <= idx)
-	{
-		return nullptr;
-	}
-
-	Item* item = items[idx];
-	mass -= item->mass;
-	items.erase(items.begin()+idx);
-	if(equippedItem > idx && idx > 0)
-	{
-		--equippedItem;
-	}
-	return item;
-}
-
-Item* Inventory::RemoveItem(uint32_t idx)
-{
 	if(idx == -1)
 	{
 		idx = equippedItem;
@@ -147,6 +130,10 @@ Item* Inventory::RemoveItem(uint32_t idx)
 	Item* item = items[idx];
 	mass -= item->mass;
 	items.erase(items.begin()+idx);
+	if(equippedItem > idx && idx > 0)
+	{
+		--equippedItem;
+	}
 	item->owner->transform->SetWorldPosition(owner->transform->GetWorldPosition());
 	return item;
 }
@@ -230,7 +217,7 @@ void Item::Init()
 {
 	Component::Init();
 	Inventory* inv = nullptr;
-	if(owner->parent && (inv = owner->parent->GetComponent<Inventory>()))
+	if(owner->GetParent() && (inv = owner->GetParent()->GetComponent<Inventory>()))
 	{
 		Log("Adding item to parent inventory");
 		inv->AddItem(this);

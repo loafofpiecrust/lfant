@@ -626,7 +626,7 @@ PFNGLDELETEFENCESAPPLEPROC __glewDeleteFencesAPPLE = NULL;
 PFNGLFINISHFENCEAPPLEPROC __glewFinishFenceAPPLE = NULL;
 PFNGLFINISHOBJECTAPPLEPROC __glewFinishObjectAPPLE = NULL;
 PFNGLGENFENCESAPPLEPROC __glewGenFencesAPPLE = NULL;
-PFNGLISFENCEAPPLEPROC __glewIsFenceAPPLE = NULL;
+PFNGLIROOTNCEAPPLEPROC __glewIsFenceAPPLE = NULL;
 PFNGLSETFENCEAPPLEPROC __glewSetFenceAPPLE = NULL;
 PFNGLTESTFENCEAPPLEPROC __glewTestFenceAPPLE = NULL;
 PFNGLTESTOBJECTAPPLEPROC __glewTestObjectAPPLE = NULL;
@@ -2086,7 +2086,7 @@ PFNGLDELETEFENCESNVPROC __glewDeleteFencesNV = NULL;
 PFNGLFINISHFENCENVPROC __glewFinishFenceNV = NULL;
 PFNGLGENFENCESNVPROC __glewGenFencesNV = NULL;
 PFNGLGETFENCEIVNVPROC __glewGetFenceivNV = NULL;
-PFNGLISFENCENVPROC __glewIsFenceNV = NULL;
+PFNGLIROOTNCENVPROC __glewIsFenceNV = NULL;
 PFNGLSETFENCENVPROC __glewSetFenceNV = NULL;
 PFNGLTESTFENCENVPROC __glewTestFenceNV = NULL;
 
@@ -3813,7 +3813,7 @@ static GLboolean _glewInit_GL_APPLE_fence (GLEW_CONTEXT_ARG_DEF_INIT)
   r = ((glFinishFenceAPPLE = (PFNGLFINISHFENCEAPPLEPROC)glewGetProcAddress((const GLubyte*)"glFinishFenceAPPLE")) == NULL) || r;
   r = ((glFinishObjectAPPLE = (PFNGLFINISHOBJECTAPPLEPROC)glewGetProcAddress((const GLubyte*)"glFinishObjectAPPLE")) == NULL) || r;
   r = ((glGenFencesAPPLE = (PFNGLGENFENCESAPPLEPROC)glewGetProcAddress((const GLubyte*)"glGenFencesAPPLE")) == NULL) || r;
-  r = ((glIsFenceAPPLE = (PFNGLISFENCEAPPLEPROC)glewGetProcAddress((const GLubyte*)"glIsFenceAPPLE")) == NULL) || r;
+  r = ((glIsFenceAPPLE = (PFNGLIROOTNCEAPPLEPROC)glewGetProcAddress((const GLubyte*)"glIsFenceAPPLE")) == NULL) || r;
   r = ((glSetFenceAPPLE = (PFNGLSETFENCEAPPLEPROC)glewGetProcAddress((const GLubyte*)"glSetFenceAPPLE")) == NULL) || r;
   r = ((glTestFenceAPPLE = (PFNGLTESTFENCEAPPLEPROC)glewGetProcAddress((const GLubyte*)"glTestFenceAPPLE")) == NULL) || r;
   r = ((glTestObjectAPPLE = (PFNGLTESTOBJECTAPPLEPROC)glewGetProcAddress((const GLubyte*)"glTestObjectAPPLE")) == NULL) || r;
@@ -7606,7 +7606,7 @@ static GLboolean _glewInit_GL_NV_fence (GLEW_CONTEXT_ARG_DEF_INIT)
   r = ((glFinishFenceNV = (PFNGLFINISHFENCENVPROC)glewGetProcAddress((const GLubyte*)"glFinishFenceNV")) == NULL) || r;
   r = ((glGenFencesNV = (PFNGLGENFENCESNVPROC)glewGetProcAddress((const GLubyte*)"glGenFencesNV")) == NULL) || r;
   r = ((glGetFenceivNV = (PFNGLGETFENCEIVNVPROC)glewGetProcAddress((const GLubyte*)"glGetFenceivNV")) == NULL) || r;
-  r = ((glIsFenceNV = (PFNGLISFENCENVPROC)glewGetProcAddress((const GLubyte*)"glIsFenceNV")) == NULL) || r;
+  r = ((glIsFenceNV = (PFNGLIROOTNCENVPROC)glewGetProcAddress((const GLubyte*)"glIsFenceNV")) == NULL) || r;
   r = ((glSetFenceNV = (PFNGLSETFENCENVPROC)glewGetProcAddress((const GLubyte*)"glSetFenceNV")) == NULL) || r;
   r = ((glTestFenceNV = (PFNGLTESTFENCENVPROC)glewGetProcAddress((const GLubyte*)"glTestFenceNV")) == NULL) || r;
 

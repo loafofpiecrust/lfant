@@ -12,9 +12,33 @@ link_directories(
 	)
 
 # Source Info
-file(GLOB_RECURSE SRC_FILES 
+file(GLOB SRC_FILES 
 	*.cpp
 	)
+
+file(GLOB_RECURSE SRC_FILES_REC
+	net/*.cpp
+	util/*.cpp
+	physics/*.cpp
+	platform/${PLATFORM}/*.cpp
+	)
+list(APPEND SRC_FILES "${SRC_FILES_REC}")
+
+if(PLATFORM STREQUAL "android")
+	list(REMOVE_ITEM SRC_FILES
+		${PROJECT_SOURCE_DIR}/OpenCL.cpp
+		)
+	file(GLOB_RECURSE SRC_FILES_PLAT
+		platform/mobile/*.cpp
+	#	platform/mobile/*.c
+		)
+	list(APPEND SRC_FILES "${SRC_FILES_PLAT}")
+else()
+	file(GLOB_RECURSE SRC_FILES_PLAT
+		platform/desktop/*.cpp
+		)
+	list(APPEND SRC_FILES "${SRC_FILES_PLAT}")
+endif()
 
 list(REMOVE_ITEM SRC_FILES
 	${PROJECT_SOURCE_DIR}/ParticleSystem.cpp
@@ -28,7 +52,7 @@ add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
 #add_executable(${PROJECT_NAME} ${SRC_FILES})
 
 # Dependencies
-add_dependencies(${PROJECT_NAME} ${ROOT}/external)
+#add_dependencies(${PROJECT_NAME} ${ROOT}/external)
 
 # Includes Info
 include_directories(
@@ -41,7 +65,6 @@ include_directories(
 	${ROOT}/external/glm
 	${ROOT}/external/boost
 	${ROOT}/external/bullet/src
-	${ROOT}/external/glew/include
 	${ROOT}/external/glfw/include
 	${ROOT}/external/cegui/cegui/include
 	${ROOT}/external/squirrel/include
@@ -51,28 +74,43 @@ include_directories(
 
 # Linker Options
 target_link_libraries(${PROJECT_NAME}
-	glew
 	assimp
-	glfw
 	boost
 	bullet
-	CEGUI
 	png
 	z
 	squirrel
 	jpeg
 	)
 
+if(NOT ANDROID)
+include_directories(
+	${ROOT}/external/glew/include
+	)
+
+target_link_libraries(${PROJECT_NAME}
+	glfw
+	OpenCL
+	CEGUI
+	glew
+	)
+
+else()
+
+include_directories(
+	${ROOT}/external/glew/es/include
+	)
+
+target_link_libraries(${PROJECT_NAME}
+	android
+	log
+	EGL
+	GLESv2
+	)
+endif()
+
 if(PLATFORM STREQUAL "linux")
 	target_link_libraries(${PROJECT_NAME}
 		rt
-		)
-endif()
-
-if(PLATFORM STREQUAL "windows")
-	target_link_libraries(${PROJECT_NAME}
-		winmm
-		ws2_32
-		wsock32
 		)
 endif()

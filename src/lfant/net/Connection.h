@@ -3,6 +3,7 @@
 #include <lfant/stdafx.h>
 
 // Internal
+#include <lfant/TypeRegistry.h>
 #include <lfant/Object.h>
 
 // External
@@ -16,6 +17,8 @@ namespace net {
 
 class Connection : public Object
 {
+	DECLARE_REGISTRY(net::Connection)
+	
 public:
 	virtual ~Connection();
 
@@ -41,8 +44,6 @@ protected:
 	shared_ptr<asio::io_service> io {new asio::io_service};
 
 	char lastData[256];
-
-private:
 };
 
 }

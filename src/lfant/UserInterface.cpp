@@ -34,6 +34,7 @@
 #include <lfant/Renderer.h>
 
 // External
+#if !LFANT_GLES
 #include <GLFW/glfw3.h>
 
 #include <CEGUI/CEGUI.h>
@@ -43,6 +44,7 @@
 #include <CEGUI/ImageManager.h>
 #include <CEGUI/XMLParserModules/TinyXML/XMLParser.h>
 
+#endif
 /*
 #include <gameswf/gameswf.h>
 #include <base/tu_file.h>
@@ -63,7 +65,7 @@ UserInterface::~UserInterface()
 {
 }
 
-
+#if !LFANT_GLES
 // gameswf
 /*
 static tu_file*	file_opener(const char* url)
@@ -266,7 +268,7 @@ void UserInterface::CreateWindow(Properties* prop, CEGUI::Window* parent)
 {
 	CEGUI::Window* win = windowManager->createWindow(prop->Get<string>("type"), prop->id);
 
-	string type = RemoveScoping(Type(win));
+	string type = type::Unscope(type::Name(win));
 	if(type == "PushButton")
 	{
 		win->subscribeEvent(CEGUI::PushButton::EventClicked, &UserInterface::OnClickButton, this);
@@ -308,9 +310,17 @@ void UserInterface::Load(Properties *prop)
 	deque<string> schemes;
 	string pfont = "";
 	string pcursor = "";
+	string file = "";
 	prop->Get("schemes", schemes);
 	prop->Get("font", pfont);
 	prop->Get("cursor", pcursor);
+	prop->Get("file", file);
+
+	Log("UserInterface, file to load: '"+file+"'.");
+	if(file != "")
+	{
+		LoadFile(file);
+	}
 
 	for(auto& i : schemes)
 	{
@@ -331,8 +341,7 @@ void UserInterface::Load(Properties *prop)
 
 	context->setDefaultTooltipType(prop->Get<string>("tooltip"));
 
-	deque<Properties*> pwins = prop->GetChildren("window");
-	for(Properties* pw : pwins)
+	for(Properties* pw : prop->GetChildren("window"))
 	{
 		CreateWindow(pw);
 	}
@@ -540,6 +549,59 @@ bool UserInterface::OnCloseWindow(const CEGUI::EventArgs &evt)
 
 	args->window->destroy();
 }
+
+#else
+
+void UserInterface::CreateWindow(Properties* prop, CEGUI::Window* parent)
+{
+}
+
+void UserInterface::Load(Properties *prop)
+{
+}
+
+void UserInterface::Save(Properties* prop)
+{
+	Subsystem::Save(prop);
+}
+
+void UserInterface::Init()
+{
+}
+
+void UserInterface::Update()
+{
+}
+
+void UserInterface::OnDestroy()
+{
+}
+
+void UserInterface::RemoveWindow(string fileName)
+{
+}
+
+void UserInterface::OnKey(uint16 key, int mode)
+{
+}
+
+void UserInterface::OnChar(char key)
+{
+}
+
+void UserInterface::OnMouseButton(uint16 btn, int mode)
+{
+}
+
+void UserInterface::OnMouseMove(int x, int y)
+{
+}
+
+void UserInterface::OnWindowResize(uint width, uint height)
+{
+}
+
+#endif
 
 
 }

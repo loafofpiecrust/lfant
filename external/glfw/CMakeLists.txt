@@ -2,8 +2,8 @@ project(glfw)
 
 # Source Dir
 file(GLOB SRC_FILES
-	src/context.c
 	src/clipboard.c
+	src/context.c
 	src/gamma.c
 	src/init.c
 	src/input.c
@@ -29,25 +29,29 @@ if(PLATFORM STREQUAL "windows")
 	list(APPEND SRC_FILES ${SRC_FILES_PLAT})
 endif()
 
-file(GLOB_RECURSE HEADER_FILES
-	"include/*.h"
+if(PLATFORM STREQUAL "macosx")
+	file(GLOB SRC_FILES_PLAT
+		src/cocoa_*.c
+		src/nsgl_*.c
 	)
+	set(SRC_FILES ${SRC_FILES} ${SRC_FILES_PLAT})
+endif()
 
 # Library Search Paths
 link_directories(
-	"${LIBRARY_OUTPUT_PATH}"
+	${LIBRARY_OUTPUT_PATH}
 	# System
-	"/usr/lib/x86_64-linux-gnu/mesa"
+#	/usr/lib/x86_64-linux-gnu/mesa
 	)
 
 # Output Library Info
-add_library(${PROJECT_NAME} SHARED ${SRC_FILES} ${HEADER_FILES})
+add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
 #add_executable(${PROJECT_NAME} SRC_FILES)
 
 # Includes
 include_directories(
-	"include"
-	"src"
+	include
+	src
 	)
 
 add_definitions(
@@ -58,21 +62,27 @@ add_definitions(
 
 #set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -lXext -lX11")
 
-if(PLATFORM STREQUAL "linux")
 target_link_libraries(${PROJECT_NAME}
-	:libGL.so
-	GLU
-	pthread
-	X11
-	rt
-	Xext
+	m
+	)
+
+if(PLATFORM STREQUAL "linux")
+	target_link_libraries(${PROJECT_NAME}
+		GL
+		GLU
+		pthread
+		X11
+		Xext
+		Xrandr
+		Xi
+		Xxf86vm
+		rt
 	)
 endif()
-
 if(PLATFORM STREQUAL "windows")
-target_link_libraries(${PROJECT_NAME}
-	opengl32
-	glu32
-	winmm
+	target_link_libraries(${PROJECT_NAME}
+		opengl32
+		glu32
+		winmm
 	)
 endif()

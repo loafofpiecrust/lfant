@@ -16,7 +16,7 @@
 #include <cstring>
 
 #if (defined(_WIN32) || defined(__WIN32__) || defined(WIN32)) \
-    && !defined(BOOST_DISABLE_WIN32)
+    && !defined(BOOST_DISABLE_WIN32) && !defined(__GNUC__)
 
 #ifndef _WIN32_WINNT
 #define _WIN32_WINNT 0x0501

@@ -39,6 +39,38 @@ folders, like lfant/examples/galaga/bin64/linux.
 
 This may switch to premake, once it is more usable for this project.
 
+Android
+=========
+Install the android sdk and ndk, and download the platform tools for whichever android
+platform you want, here I use API level 10, or Gingerbread.
+```bash
+mkdir ~/lfant/android/build
+cd ~/lfant/android/build
+
+export ANDROID_NDK=$HOME/android/ndk
+cmake -DANDROID_TOOLCHAIN=x86-4.8 ../..
+make
+
+sudo apt-get install ant
+mkdir ~projects/proj/android/build
+cd ~/projects/proj/android/build
+cmake -DANDROID_TOOLCHAIN=x86-4.8 ../..
+make
+
+cd ../
+$HOME/android/sdk/tools/android update project -t "android-10" -p . -s
+$HOME/android/ndk/ndk-build
+```
+
+To build the apk:
+```bash
+ant debug
+```
+or
+```bash
+ant debug install
+```
+
 Creating a project (WIP)
 ============================
 To create a new project based on lfant, the script 'new-project.sh'(WIP) in lfant root can be run. When the editor is available, it will allow the creation and management of projects.

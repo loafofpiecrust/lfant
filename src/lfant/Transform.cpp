@@ -45,17 +45,19 @@ void Transform::Init()
 {
 	Component::Init();
 
-//	if(owner->parent)
+//	if(owner->GetParent())
 	{
-//		ConnectEvent(SENDER(owner->parent->transform, SetPosition), RECEIVER(this, OnSetWorldPos));
-//		ConnectEvent(SENDER(owner->parent->transform, SetRotation), RECEIVER(this, OnSetWorldPos));
-//		ConnectEvent(SENDER(owner->parent->transform, SetScale), RECEIVER(this, OnSetWorldPos));
+//		ConnectEvent(SENDER(owner->GetParent()->transform, SetPosition), RECEIVER(this, OnSetWorldPos));
+//		ConnectEvent(SENDER(owner->GetParent()->transform, SetRotation), RECEIVER(this, OnSetWorldPos));
+//		ConnectEvent(SENDER(owner->GetParent()->transform, SetScale), RECEIVER(this, OnSetWorldPos));
 	}
 }
 
 void Transform::Save(Properties *prop)
 {
 	Component::Save(prop);
+
+	Log("Saving transform attr");
 
 	prop->Set("position", position);
 	prop->Set("rotation", rotation);
@@ -88,6 +90,7 @@ vec3 Transform::GetPosition()
 
 void Transform::SetPosition(vec3 pos)
 {
+//	pos.y = -pos.y;
 	position = pos;
 	TriggerEvent("SetPosition", position);
 }
@@ -96,6 +99,7 @@ quat Transform::GetRotationQuat()
 {
 	vec3 rot = radians(rotation);
 	rot.y = -rot.y;
+//	rot.x = -rot.x;
 	return quat(rot);
 //	return quat(radians(rotation));
 }
@@ -143,9 +147,9 @@ vec3 Transform::GetWorldPosition()
 {
 	return matrix[3].xyz;
 	/*
-	if(owner->parent)
+	if(owner->GetParent())
 	{
-		return owner->parent->transform->GetWorldPosition() + GetPosition();
+		return owner->GetParent()->transform->GetWorldPosition() + GetPosition();
 	}
 	else
 	{
@@ -156,9 +160,9 @@ vec3 Transform::GetWorldPosition()
 
 void Transform::SetWorldPosition(vec3 pos)
 {
-	if(owner->parent)
+	if(owner->GetParent())
 	{
-		SetPosition(pos - owner->parent->transform->GetWorldPosition());
+		SetPosition(pos - owner->GetParent()->transform->GetWorldPosition());
 	}
 	else
 	{
@@ -168,9 +172,9 @@ void Transform::SetWorldPosition(vec3 pos)
 
 quat Transform::GetWorldRotationQuat()
 {
-	if(owner->parent)
+	if(owner->GetParent())
 	{
-		return owner->parent->transform->GetWorldRotationQuat() * GetRotationQuat();
+		return owner->GetParent()->transform->GetWorldRotationQuat() * GetRotationQuat();
 	//	return GetRotationQuat() * owner->parent->transform->GetWorldRotationQuat();
 	}
 	else
@@ -181,14 +185,21 @@ quat Transform::GetWorldRotationQuat()
 
 void Transform::SetWorldRotationQuat(quat rot)
 {
-	SetRotation(degrees(eulerAngles(rot)) - parent->GetWorldRotation());
+	if(owner->GetParent())
+	{
+		SetRotation(degrees(eulerAngles(rot)) - owner->GetParent()->transform->GetWorldRotation());
+	}
+	else
+	{
+		SetRotationQuat(rot);
+	}
 }
 
 vec3 Transform::GetWorldRotation()
 {
-	if(owner->parent)
+	if(owner->GetParent())
 	{
-		return owner->parent->transform->GetWorldRotation() + GetRotation();
+		return owner->GetParent()->transform->GetWorldRotation() + GetRotation();
 	}
 	else
 	{
@@ -198,9 +209,9 @@ vec3 Transform::GetWorldRotation()
 
 void Transform::SetWorldRotation(vec3 rot)
 {
-	if(owner->parent)
+	if(owner->GetParent())
 	{
-		SetRotation(rot - owner->parent->transform->GetWorldRotation());
+		SetRotation(rot - owner->GetParent()->transform->GetWorldRotation());
 	}
 	else
 	{
@@ -210,9 +221,9 @@ void Transform::SetWorldRotation(vec3 rot)
 
 vec3 Transform::GetWorldScale()
 {
-	if(owner->parent)
+	if(owner->GetParent())
 	{
-		return owner->parent->transform->GetWorldScale() * GetScale();
+		return owner->GetParent()->transform->GetWorldScale() * GetScale();
 	}
 	else
 	{
@@ -222,9 +233,9 @@ vec3 Transform::GetWorldScale()
 
 void Transform::SetWorldScale(vec3 scl)
 {
-	if(owner->parent)
+	if(owner->GetParent())
 	{
-		SetScale(scl - owner->parent->transform->GetWorldScale());
+		SetScale(scl - owner->GetParent()->transform->GetWorldScale());
 	}
 	else
 	{
@@ -258,9 +269,9 @@ void Transform::SetMatrix()
 	quat rot = GetRotationQuat();
 //	matrix = mat4(1);
 
-	if(owner->parent)
+	if(owner->GetParent())
 	{
-		matrix = owner->parent->transform->matrix;
+		matrix = owner->GetParent()->transform->matrix;
 	}
 	else
 	{
@@ -341,7 +352,7 @@ void Transform::Translate(vec3 pos)
 
 void Transform::Rotate(vec3 rot)
 {
-	SetRotation(rotation + rot);
+	SetRotation(GetRotation() + rot);
 
 	//rotationQuat = quat(rotation);
 	//_rotationQuat = rotate( _rotationQuat, rot.x, xdir );
@@ -352,7 +363,7 @@ void Transform::Rotate(vec3 rot)
 
 void Transform::Scale(vec3 scl)
 {
-	SetScale(scale * scl);
+	SetScale(GetScale() * scl);
 //	TriggerEvent("SetScale", scale);
 }
 
@@ -373,7 +384,7 @@ vec3 Transform::GetRight()
 
 vec3 Transform::GetUp()
 {
-	return matrix[1].xyz;
+	return -vec3(matrix[1].xyz);
 //	return cross(GetDirection(), GetRight());
 //	return up;
 }

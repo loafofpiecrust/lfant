@@ -155,9 +155,6 @@ void Voxel::Generate()
 
 void Voxel::BeginRender()
 {
-	glGenVertexArrays(1, &vertexArray);
-	glBindVertexArray(vertexArray);
-
 	shader->LoadFile("shaders/simple/Diffuse.vert", "shaders/simple/Diffuse.frag", "shaders/Voxel.geom");
 	texture->LoadFile("textures/Default.png");
 
@@ -176,13 +173,10 @@ void Voxel::BeginRender()
 			}
 		}
 	}
-
-	glBindVertexArray(0);
 }
 
 void Voxel::Render()
 {
-	glBindVertexArray(vertexArray);
 	shader->Bind();
 
 	mat4 mvp = game->scene->mainCamera->GetProjection() * game->scene->mainCamera->GetView() * owner->transform->GetMatrix();
@@ -203,7 +197,6 @@ void Voxel::Render()
 	}
 
 	shader->Unbind();
-	glBindVertexArray(0);
 }
 
 }

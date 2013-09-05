@@ -66,6 +66,8 @@ private:
 	void OnClickButton(CEGUI::Window* window);
 	void OnReceiveMessage(string sender, string msg);
 
+	void StartBall();
+
 	Entity* player;
 	/*
 	net::Client* client;

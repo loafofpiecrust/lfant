@@ -33,11 +33,11 @@ public:
 	Transform();
 	virtual ~Transform();
 
-	void Save(Properties *prop);
-	void Load(Properties *prop);
+	virtual void Save(Properties* prop);
+	virtual void Load(Properties* prop);
 
-	void Init();
-	void Update();
+	virtual void Init();
+	virtual void Update();
 
 	vec3 GetPosition();
 	void SetPosition(vec3 pos);

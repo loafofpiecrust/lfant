@@ -21,6 +21,7 @@
 #include <lfant/stdafx.h>
 
 // Internal
+#include <lfant/util/qumap.h>
 #include <lfant/ptr.h>
 #include <lfant/Range.h>
 #include <lfant/util/lexical_cast.h>
@@ -62,7 +63,7 @@ public:
 	Properties* GetChildById(string id);
 	deque<Properties*> GetChildren(string type = "");
 
-	map<string, string>& GetValues();
+	qumap<string, string>& GetValues();
 
 	Properties* AddChild(string type = "", string id = "");
 	Properties* AddChild(istream& stream, string type, string id, bool first = true);
@@ -70,8 +71,7 @@ public:
 	template<typename T>
 	void Set(string name, const T& value)
 	{
-		name = TrimSpace(name);
-		values[name] = lexical_cast<string>(value);
+		values[TrimSpace(name)] = lexical_cast<string>(value);
 	}
 
 	void AddValue(string name, string value);
@@ -80,17 +80,11 @@ public:
 	template<typename T>
 	void Get(string name, T& ref)
 	{
-	//	to_lower(name);
-		string val = values[name];
-		cout << "\tGetting '" << name << "'";
-		cout << " as string '" << val << "'";
-		if(val != "")
+		string value = values[name];
+		if(value != "")
 		{
-			ref = lexical_cast<T>(val);
-			cout << " and value '" << lexical_cast<string>(ref) << "'";
+			ref = lexical_cast<T>(values[name]);
 		}
-		cout << ".\n\n";
-	//	return ref;
 	}
 
 	void Get(string name, Entity*& ref);
@@ -99,10 +93,7 @@ public:
 	template<typename T = string>
 	T Get(string name)
 	{
-	//	to_lower(name);
-		cout << "Getting '"+name+"'.\n";
-		string val = values[name];
-		return lexical_cast<T>(val);
+		return lexical_cast<T>(values[name]);
 	}
 
 	template<typename T>
@@ -114,12 +105,11 @@ public:
 	template<typename T>
 	void GetEnum(string name, T& ref)
 	{
-		string val = enums[values[name]];
-		if(val != "")
+		string e = enums[Get<string>(name)];
+		if(e != "")
 		{
-			ref = (T)lexical_cast<int>(val);
+			ref = (T)lexical_cast<int>(e);
 		}
-	//	return ref;
 	}
 
 	void GetType(string& ref)
@@ -152,9 +142,9 @@ private:
 	string Expand(string value);
 	string GetIndent();
 
-	map<string, string> values;
-	map<string, string> enums;
-	deque< ptr<Properties> > children;
+	qumap<string, string> values;
+	qumap<string, string> enums;
+	deque<ptr<Properties>> children;
 	Properties* parent = nullptr;
 	bool getFirstLine = true;
 };

@@ -77,7 +77,6 @@
 // Define this to 1 to disable dynamic loading of winmm
 #define _GLFW_NO_DLOAD_WINMM 1
 
-
 // Define this to 1 if glfwInit should change the current directory
 #define _GLFW_USE_CHDIR 1
 // Define this to 1 if glfwCreateWindow should populate the menu bar

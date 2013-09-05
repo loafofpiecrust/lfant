@@ -21,9 +21,6 @@ DebugRenderer::DebugRenderer()
 	material = new Material;
 	material->LoadFile("materials/lines.mat");
 
-	glGenVertexArrays(1, &vertexArray);
-	glBindVertexArray(vertexArray);
-
 	if(material->shader->GetId() == 0)
 	{
 		material->shader->LoadFile("shaders/simple/Diffuse.vert", "shaders/simple/Diffuse.frag");
@@ -55,7 +52,6 @@ void DebugRenderer::Render()
 	glBindBuffer(GL_ARRAY_BUFFER, pointBuffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(uint32_t)*points.size(), &points[0], GL_STATIC_DRAW);
 
-	glBindVertexArray(vertexArray);
 	material->shader->Bind();
 
 	mat4 mvp = game->scene->mainCamera->GetProjection() * game->scene->mainCamera->GetView();
@@ -70,7 +66,6 @@ void DebugRenderer::Render()
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glDisableVertexAttribArray(0);
-	glBindVertexArray(0);
 	material->shader->Unbind();
 
 	points.clear();
