@@ -51,7 +51,7 @@ void ScriptSystem::Init()
 	Sqrat::DefaultVM::Set(vm.getVM());
 }
 
-void ScriptSystem::OnDestroy()
+void ScriptSystem::Deinit()
 {
 }
 

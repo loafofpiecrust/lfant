@@ -31,7 +31,6 @@
 #include <lfant/Sprite.h>
 #include <lfant/Entity.h>
 #include <lfant/Renderer.h>
-#include <lfant/Settings.h>
 #include <lfant/Scene.h>
 #include <lfant/Transform.h>
 #include <lfant/Rigidbody.h>
@@ -125,17 +124,17 @@ void Player::Update()
 	float value = 0.0f;
 	if((value = game->input->GetAxis("Horizontal")) != 0.0f)
 	{
-		TriggerEvent("Move", owner->transform->GetRight() * -value);
+		TriggerEvent("Move", game->scene->mainCamera->owner->transform->GetRight() * -value);
+	//	TriggerEvent("Move", owner->transform->GetRight() * value);
 	}
 	if((value = game->input->GetAxis("Vertical")) != 0.0f)
 	{
-	//	TriggerEvent("Move", game->scene->mainCamera->owner->transform->GetDirection() * value);
-		TriggerEvent("Move", owner->transform->GetDirection() * value);
-	//	TriggerEvent("Move", vec3(0,0,value));
+		TriggerEvent("Move", game->scene->mainCamera->owner->transform->GetDirection() * value);
+	//	TriggerEvent("Move", owner->transform->GetDirection() * value);
 	}
 	if((value = game->input->GetAxis("HRotation")) != 0.0f)
 	{
-		TriggerEventWithChildren("Look", vec3(0, value, 0));
+		TriggerEventWithChildren("Look", vec3(0, 0, value));
 	}
 	if((value = game->input->GetAxis("VRotation")) != 0.0f)
 	{
@@ -143,7 +142,7 @@ void Player::Update()
 	}
 	if((value = game->input->GetAxis("ZRotation")) != 0.0f)
 	{
-		TriggerEventWithChildren("Look", vec3(0, 0, value));
+		TriggerEventWithChildren("Look", vec3(0, value, 0));
 	}
 	if (game->input->GetButtonDown("ShowLoc"))
 	{

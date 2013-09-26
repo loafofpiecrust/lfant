@@ -25,23 +25,23 @@ class Connection : public net::Connection
 {
 	friend class Network;
 public:
-	virtual void GetData();
-	virtual void GetData(asio::ip::tcp::socket& sock);
-	virtual void SendData(string data);
-	virtual void SendData(string data, asio::ip::tcp::socket& sock);
-
-	asio::ip::tcp::socket socket;
-
-protected:
-	Connection();
 	Connection(asio::io_service& io);
 	virtual ~Connection();
 
-	void OnDestroy();
+	virtual void Deinit();
 
-	virtual void OnGetData(const boost::system::error_code& error);
-	virtual void OnGetData(const boost::system::error_code &error, asio::ip::tcp::socket *sock);
-	virtual void OnSendData(const boost::system::error_code& error, size_t bytes);
+	virtual void GetData();
+	virtual void SendData(string data);
+
+	virtual void OpenSocket();
+	
+	asio::ip::tcp::socket socket;
+
+protected:
+
+	void OnGetData(const boost::system::error_code &error);
+
+	void DoSendData(string data);
 
 };
 

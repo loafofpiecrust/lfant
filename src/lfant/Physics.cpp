@@ -28,6 +28,7 @@
 //#include <lfant/physics/DebugRenderer.h>
 #include <lfant/Game.h>
 #include <lfant/Time.h>
+#include <lfant/Scene.h>
 
 #include <lfant/Console.h>
 
@@ -60,7 +61,9 @@ void Physics::Load(Properties* prop)
 {
 	Subsystem::Load(prop);
 
-	prop->Get("gravity", initGravity);
+	vec3 grav = GetGravity();
+	prop->Get("gravity", grav);
+	SetGravity(grav);
 
 	for(auto& pgpt : prop->GetChildren("gravityPoint"))
 	{
@@ -78,8 +81,6 @@ void Physics::Load(Properties* prop)
 
 void Physics::Init()
 {
-	Subsystem::Init();
-
 	collisionConfig = new btDefaultCollisionConfiguration();
 	Log("Physics::Init: Collision config created.");
 	dispatcher = new btCollisionDispatcher(collisionConfig);
@@ -89,6 +90,8 @@ void Physics::Init()
 	solver = new btSequentialImpulseConstraintSolver();
 	Log("Physics::Init: Constraint solver created.");
 	world = new btDiscreteDynamicsWorld( dispatcher, broadphase, solver, collisionConfig );
+
+	world->setInternalTickCallback(&Physics::OnTick);
 //	debugRenderer = new physics::DebugRenderer;
 
 //	gContactAddedCallback = &Physics::OnCollideEnter;
@@ -97,14 +100,16 @@ void Physics::Init()
 
 	Log("Physics::Init: Contact callbacks set.");
 
-	SetGravity(initGravity);
+//	SetGravity(initGravity);
+
+	Subsystem::Init();
 }
 
 void Physics::Update()
 {
 //	if(world)
 	{
-		world->stepSimulation(game->time->deltaTime);
+		world->stepSimulation(game->time->deltaTime, 1);
 
 		/*
 		uint numManifolds = dispatcher->getNumManifolds();
@@ -148,7 +153,7 @@ void Physics::Update()
 	}
 }
 
-void Physics::OnDestroy()
+void Physics::Deinit()
 {
 	world.reset();
 }
@@ -266,6 +271,11 @@ bool Physics::OnCollideExit(void* userPersistentData)
 {
 	//	return OnCollide( "Exit", cp, colObj0, partId0, index0, colObj1, partId1, index1 );
 	return false;
+}
+
+void Physics::OnTick(btDynamicsWorld* world, float delta)
+{
+	game->scene->FixedUpdate();
 }
 
 void Physics::AddRigidbody(Rigidbody* ent)

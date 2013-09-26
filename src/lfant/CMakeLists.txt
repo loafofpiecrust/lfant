@@ -42,6 +42,7 @@ endif()
 
 list(REMOVE_ITEM SRC_FILES
 	${PROJECT_SOURCE_DIR}/ParticleSystem.cpp
+	${PROJECT_SOURCE_DIR}/net/udp/*.cpp
 	)
 
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ggdb")

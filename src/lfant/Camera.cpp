@@ -98,7 +98,7 @@ void Camera::Update()
 //	UpdateProjection();
 }
 
-void Camera::OnDestroy()
+void Camera::Deinit()
 {
 	Log("mainCamera = ", game->scene->mainCamera);
 }

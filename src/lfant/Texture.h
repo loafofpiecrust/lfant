@@ -98,7 +98,7 @@ public:
 	}
 
 	void InitData(byte* data);
-	void OnDestroy();
+	void Deinit();
 
 	void LoadFile(string path = "", int mode = 0);
 	virtual void Load(Properties* prop);

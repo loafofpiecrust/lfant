@@ -10,7 +10,7 @@ namespace lfant {
 namespace net {
 namespace udp {
 
-IMPLEMENT_TYPE(net::Connection, net::udp::Server)
+IMPLEMENT_TYPE(net::User, net::udp::Server)
 
 Server::Server()// :
 //	acceptor(*io)
@@ -47,7 +47,7 @@ void Server::OnAccept(const boost::system::error_code& error)
 	}
 
 	Log("Server::OnAccept: Server 'accepted'(?), do something with it.");
-	GetData();
+//	GetData();
 }
 
 } // tcp

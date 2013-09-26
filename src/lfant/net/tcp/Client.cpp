@@ -17,7 +17,7 @@ Client::Client():
 }
 
 Client::Client(asio::io_service &io) :
-	Connection(io),
+	User(io),
 	resolver(io)
 {
 }
@@ -30,30 +30,40 @@ void Client::Init()
 {
 }
 
-void Client::OnDestroy()
+void Client::Deinit()
 {
-	Disconnect();
-	Connection::OnDestroy();
+	User::Deinit();
 }
 
 void Client::Connect(string host, uint16 port, string password)
 {
+	auto con = AddConnection<net::tcp::Connection>();
+	con->remoteIp = host;
+	con->port = port;
+
 	boost::asio::ip::tcp::resolver::query query(host, lexical_cast<string>(port));
 	iterator = resolver.resolve(query);
 //	endpoint = *iterator;
 //	socket.async_connect(endpoint, boost::bind(&Client::OnConnect, this, boost::asio::placeholders::error));
-	boost::asio::async_connect(socket, iterator, boost::bind(&Client::OnConnect, this, boost::asio::placeholders::error));
+	boost::asio::async_connect(con->socket, iterator, boost::bind(&Client::OnConnect, this, boost::asio::placeholders::error, (net::Connection*)con));
 	started = true;
 }
 
-void Client::Disconnect()
+void Client::Disconnect(string ip)
 {
-	boost::system::error_code ec;
-	socket.shutdown( boost::asio::ip::tcp::socket::shutdown_both, ec );
-	socket.close( ec );
-	io->stop();
-//	io->post(boost::bind(&asio::ip::tcp::socket::close, &socket));
-	started = false;
+	for(uint i = 0; i < connections.size(); ++i)
+	{
+		if(connections[i]->remoteIp == ip)
+		{
+			connections[i]->Deinit();
+			connections.erase(connections.begin()+i);
+			break;
+		}
+	}
+	if(connections.size() <= 0)
+	{
+		started = false;
+	}
 }
 
 /*
@@ -76,33 +86,7 @@ void Client::SendData(Properties *prop, string path)
 }
 */
 
-void Client::SendFile(string path, string outpath)
-{
-	if(outpath == "")
-	{
-		outpath = path;
-	}
-	path = game->fileSystem->GetGamePath(path).string();
-
-	SendData(":/File "+outpath);
-	Log("File data block started...");
-
-	ifstream stream(path);
-	string line = "";
-	while(stream.good())
-	{
-		Log("Getting line in a sent file...");
-		getline(stream, line);
-		if(line != "")
-		{
-			SendData(line);
-		}
-	}
-
-	SendData(":\\File");
-}
-
-void Client::OnConnect(const boost::system::error_code& error)
+void Client::OnConnect(const boost::system::error_code& error, net::Connection* con)
 {
 	if (error)
 	{
@@ -110,15 +94,7 @@ void Client::OnConnect(const boost::system::error_code& error)
 		return;
 	}
 	TriggerEvent("Connect", error.message());
-	GetData();
-}
-
-void Client::OnGetData(const boost::system::error_code &error)
-{
-	if(error)
-	{
-		Disconnect();
-	}
+	con->GetData();
 }
 
 }

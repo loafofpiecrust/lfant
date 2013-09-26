@@ -46,11 +46,12 @@ public:
 	Movement();
 	~Movement();
 
-	void Save(Properties* prop);
-	void Load(Properties* prop);
+	virtual void Save(Properties* prop);
+	virtual void Load(Properties* prop);
 
-	void Init();
-	void Update();
+	virtual void Init();
+	virtual void Update();
+	virtual void FixedUpdate();
 
 	void Move(vec3 velocity);
 	void Jump();

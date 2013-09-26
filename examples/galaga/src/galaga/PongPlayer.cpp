@@ -39,14 +39,15 @@ void Player::Update()
 	val = game->input->GetAxis("Vertical");
 	if(val != 0.0f)
 	{
-		if(rigidbody)
-		{
-			rigidbody->ApplyCentralForce(vec3(0, val, 0));
-		}
-		else
-		{
-			owner->transform->Translate(vec3(0, val, 0) * game->time->deltaTime);
-		}
+		owner->transform->Translate(vec3(0, val, 0) * game->time->deltaTime);
+	}
+
+	owner->transform->Rotate(vec3(game->input->GetAxis("HRotation"), game->input->GetAxis("VRotation"), 0) * game->time->deltaTime * 8.0f);
+
+	if(game->input->GetButtonDown("ShowRot"))
+	{
+		Log("Player position: ", lexical_cast<string>(owner->transform->GetPosition()));
+		Log("Player rotation: ", lexical_cast<string>(owner->transform->GetRotation()));
 	}
 	/*
 	val = game->input->GetAxis("Horizontal");
@@ -63,7 +64,7 @@ void Player::Update()
 	}*/
 }
 
-void Player::OnDestroy()
+void Player::Deinit()
 {
 }
 

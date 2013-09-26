@@ -152,7 +152,7 @@ public:
 protected:
 	virtual void Init();
 	virtual void Update();
-	virtual void OnDestroy();
+	virtual void Deinit();
 
 	// Slots
 	void OnSetPos(vec3 pos);

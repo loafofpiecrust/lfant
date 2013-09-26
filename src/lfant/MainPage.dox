@@ -33,7 +33,7 @@
  *		`sfe` namespace isn't used, but you can do that for ease simply by adding: "using namespace sfs;".
  *		@par Game Loop
  *			The main functions that will be used for the manipulation of the game loop in all classes
- *			of SFE are: Init(), Update(), and OnDestroy(). If you want/need to overwrite any of these
+ *			of SFE are: Init(), Update(), and Deinit(). If you want/need to overwrite any of these
  *			methods, then you will usually want to call the parent class' version (eg. sfs::Game::Init()),
  *			but, for example, if you want to use a custom Time class, then you have to fully overwrite
  *			Init() in your main class (that inherits sfs::Game) that spawns all the subsystems.

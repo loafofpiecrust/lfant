@@ -22,7 +22,6 @@
 
 // Internal
 #include <lfant/Game.h>
-#include <lfant/Settings.h>
 #include <lfant/Scene.h>
 
 // External

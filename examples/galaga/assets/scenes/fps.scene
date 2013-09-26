@@ -2,19 +2,19 @@ scene FPS
 {
 	system Physics
 	{
-		gravity = (0,-9.81,0)
+		gravity = (0,0,-9.81)
 	}
 
 	entity Floor
 	{
 		component Transform
 		{
-			scale = (1, 0.1, 1)
+			scale = (15,15,0.1)
 		}
 
 		component Mesh
 		{
-			path = meshes/plane.obj
+			file = meshes/plane.obj
 			material = materials/Diffuse.mat
 		}
 
@@ -33,7 +33,7 @@ scene FPS
 	{
 		component Transform
 		{
-			position = (0,2,0)
+			position = (0,0,2)
 		}
 
 		component Player
@@ -46,7 +46,7 @@ scene FPS
 			jumpHeight = 5
 			usePhysics = true
 		}
-
+		/*
 		component BoxCollider
 		{
 			size = (1,1,1)
@@ -57,7 +57,7 @@ scene FPS
 			mass = 45
 			maxSpeed = 20
 		}
-
+		*/
 		entity Cam
 		{
 			component Camera
@@ -82,7 +82,7 @@ scene FPS
 
 		component Mesh
 		{
-			path = meshes/suzanne.obj
+			file = meshes/suzanne.obj
 			material = materials/Diffuse.mat
 		}
 
@@ -92,6 +92,9 @@ scene FPS
 
 		component Rigidbody
 		{
+			mass = 10
+			friction = 1.5f
+			restitution = 1.3f
 		}
 	}
 }

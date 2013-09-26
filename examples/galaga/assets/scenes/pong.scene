@@ -11,7 +11,8 @@ scene Pong
 
 		component Transform
 		{
-			position = (0,0,-6)
+			position = (0,0,6)
+			rotation = (90,0,0)
 		}
 
 		component Camera
@@ -29,12 +30,12 @@ scene Pong
 		{
 			position = (0.5f,0,0)
 			scale = (0.1, 0.1, 0.1)
-			rotation = (-90,0,0)
+		//	rotation = (-90,0,0)
 		}
 
 		component Mesh
 		{
-			path = meshes/plane.obj
+			file = meshes/plane.obj
 			material = materials/Diffuse.mat
 		}
 
@@ -44,7 +45,9 @@ scene Pong
 
 		component Rigidbody
 		{
-			lockPosition = (1,0,1)
+			mass = 0
+			restitution = 1
+		//	lockPosition = (1,0,1)
 		}
 
 		// Add Handle component
@@ -61,7 +64,14 @@ scene Pong
 
 		component Transform
 		{
-			position = (-5,0,0)
+			position = (-1.0f,0,0)
+			scale = (0.1, 0.1, 0.1)
+		}
+
+		component Mesh
+		{
+			file = meshes/plane.obj
+			material = materials/Diffuse.mat
 		}
 
 		component BoxCollider
@@ -70,6 +80,8 @@ scene Pong
 
 		component Rigidbody
 		{
+			mass = 0
+			restitution = 1
 		}
 
 		// Add Handle component
@@ -84,13 +96,13 @@ scene Pong
 		component Transform
 		{
 			position = (0,0,0)
-			rotation = (-90,0,0)
+		//	rotation = (-90,0,0)
 			scale = 0.1f
 		}
 
 		component Mesh
 		{
-			path = meshes/plane.obj
+			file = meshes/plane.obj
 			material = materials/Diffuse.mat
 		}
 
@@ -104,7 +116,7 @@ scene Pong
 		component Rigidbody
 		{
 			friction = 1.5f
-			restitution = 1.4f
+			restitution = 1.01f
 			lockPosition = (0,0,1)
 		}
 

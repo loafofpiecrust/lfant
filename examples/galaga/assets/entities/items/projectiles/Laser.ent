@@ -25,7 +25,7 @@ entity Bullet
 
 	component Mesh
 	{
-		path = meshes/plane.obj
+		file = meshes/plane.obj
 		material = materials/Rocket.mat
 	}
 }

@@ -122,8 +122,7 @@ class ScriptSystem : public Subsystem
 public:
 
 	virtual void Init();
-
-	void OnDestroy();
+	virtual void Deinit();
 
 	template<typename T>
 	void RegisterFunction(string decl, T* func);

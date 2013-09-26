@@ -224,9 +224,9 @@ void Item::Init()
 	}
 }
 
-void Item::OnDestroy()
+void Item::Deinit()
 {
-	Component::OnDestroy();
+	Component::Deinit();
 	inventory->RemoveItem(this);
 }
 

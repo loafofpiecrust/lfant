@@ -3,7 +3,7 @@ material Diffuse
 {
 	texture Diffuse
 	{
-		path = textures/StarShip.png
+		file = textures/StarShip.png
 		mipmap = false
 		filterMode = Bilinear
 		wrapMode = Clamp

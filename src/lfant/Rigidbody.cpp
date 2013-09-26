@@ -157,7 +157,7 @@ void Rigidbody::Update()
 	*/
 }
 
-void Rigidbody::OnDestroy()
+void Rigidbody::Deinit()
 {
 //	game->physics->RemoveRigidbody(this);
 }

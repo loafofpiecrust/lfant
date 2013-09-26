@@ -21,7 +21,7 @@ Shader* Shader::current;
 void Shader::Destroy()
 {
 	Object::Destroy();
-	delete this;
+//	delete this;
 }
 
 void Shader::Load(Properties *prop)
