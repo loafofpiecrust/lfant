@@ -49,7 +49,6 @@
 #include <lfant/Scene.h>
 #include <lfant/Camera.h>
 #include <lfant/FileSystem.h>
-#include <lfant/Settings.h>
 #include <lfant/UserInterface.h>
 
 #include <lfant/TextureLoader.h>
@@ -260,10 +259,10 @@ void Renderer::Update()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void Renderer::OnDestroy()
+void Renderer::Deinit()
 {
 	frameBuffer->EndRender();
-	Log("Renderer::OnDestroy(): Touch");
+	Log("Renderer::Deinit(): Touch");
 #if !ANDROID
 	glfwTerminate();
 #endif

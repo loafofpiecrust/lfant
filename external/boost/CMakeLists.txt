@@ -50,3 +50,6 @@ add_library(${PROJECT_NAME} STATIC ${SRC_FILES})
 include_directories(
 	.
 	)
+
+# Add when 2.8.11 is the primary package on Ubuntu?
+#TARGET_INCLUDE_DIRECTORIES(${PROJECT_NAME} PUBLIC "${PROJECT_SOURCE_DIR}")

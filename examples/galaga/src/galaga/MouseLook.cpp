@@ -70,8 +70,8 @@ void MouseLook::Look(vec3 rot)
 {
 	if(owner->GetParent())
 	{
-		owner->GetParent()->transform->Rotate(vec3(0,rot.y,0) * lookSpeed * game->time->deltaTime);
-		owner->transform->Rotate(vec3(rot.x,0,rot.z) * lookSpeed * game->time->deltaTime);
+		owner->GetParent()->transform->Rotate(vec3(0,0,rot.z) * lookSpeed * game->time->deltaTime);
+		owner->transform->Rotate(vec3(rot.x,rot.y,0) * lookSpeed * game->time->deltaTime);
 
 	//	Log("Parent rot: ", lexical_cast<string>(owner->GetParent()->transform->GetWorldRotation()));
 	//	Log("Camera rot: ", lexical_cast<string>(owner->transform->GetWorldRotation()));

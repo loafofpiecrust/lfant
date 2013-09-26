@@ -56,7 +56,7 @@ public:
 
 protected:
 	virtual void Update();
-	virtual void OnDestroy();
+	virtual void Deinit();
 
 
 private:

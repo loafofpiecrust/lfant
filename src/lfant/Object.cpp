@@ -62,9 +62,14 @@ void Object::Update()
 	}
 }
 
+void Object::FixedUpdate()
+{
+	
+}
+
 void Object::Destroy()
 {
-	OnDestroy();
+	Deinit();
 	/*
 	for(auto& evt : events)
 	{
@@ -73,7 +78,7 @@ void Object::Destroy()
 	*/
 }
 
-void Object::OnDestroy()
+void Object::Deinit()
 {
 	for(auto& s : senders)
 	{
@@ -129,7 +134,7 @@ void Object::Bind()
 	inst.Func("Init", &Object::Init);
 	inst.Func("Update", &Object::Update);
 	inst.Func("Destroy", &Object::Destroy);
-	inst.Func("OnDestroy", &Object::OnDestroy);
+	inst.Func("Deinit", &Object::Deinit);
 	inst.Func("ConnectEvent", &Object::ConnectScriptEvent);
 	inst.Func("SetTimer", &Object::SetTimer);
 	inst.Func("CancelTimer", &Object::CancelTimer);

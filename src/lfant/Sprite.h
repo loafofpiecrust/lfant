@@ -82,7 +82,7 @@ public:
 	// Loop functions
 //	virtual void Init();
 	virtual void Update();
-//	virtual void OnDestroy();
+//	virtual void Deinit();
 
 	void Load(Properties *props);
 

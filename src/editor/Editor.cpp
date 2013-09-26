@@ -94,9 +94,9 @@ void Editor::Update()
 	Destroy();
 }
 
-void Editor::OnDestroy()
+void Editor::Deinit()
 {
-	Game::OnDestroy();
+	Game::Deinit();
 }
 
 }

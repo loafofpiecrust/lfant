@@ -24,7 +24,7 @@
 #include <lfant/Console.h>
 #include <lfant/Thread.h>
 
-#include <lfant/net/Connection.h>
+#include <lfant/net/User.h>
 
 // External
 
@@ -49,23 +49,23 @@ void Network::Init()
 
 void Network::Update()
 {
-	for(auto& con : connections)
+	for(auto& usr : users)
 	{
-		con->Update();
+		usr->Update();
 	}
 }
 
 void Network::Save(Properties *prop) const
 {
-	for(auto& con : connections)
+	for(auto& usr : users)
 	{
-		con->Save(prop->AddChild());
+		usr->Save(prop->AddChild());
 	}
 }
 
 void Network::Load(Properties *prop)
 {
-	deque<Properties*> cons = prop->GetChildren("connection");
+	deque<Properties*> cons = prop->GetChildren("user");
 	for(auto& pcon : cons)
 	{
 	//	net::Connection* con = new net::Connection;
@@ -74,21 +74,21 @@ void Network::Load(Properties *prop)
 	}
 }
 
-net::Connection* Network::GetConnection(string name) const
+net::User* Network::GetUser(string name) const
 {
-	for(auto& con : connections)
+	for(auto& usr : users)
 	{
-		if(con->name == name)
+		if(usr->name == name)
 		{
-			return con;
+			return usr;
 		}
 	}
 	return nullptr;
 }
 
-net::Connection* Network::AddConnection(string type)
+net::User* Network::AddUser(string type)
 {
-	return net::Connection::registry.New(type);
+	return net::User::registry.New(type);
 }
 
 }

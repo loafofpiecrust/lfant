@@ -4,7 +4,7 @@
 
 // Internal
 #include <lfant/TypeRegistry.h>
-#include <lfant/net/udp/Connection.h>
+#include <lfant/net/User.h>
 
 // External
 
@@ -12,9 +12,9 @@ namespace lfant {
 namespace net {
 namespace udp {
 
-class Server : public Connection
+class Server : public net::User
 {
-	DECLARE_TYPE(net::Connection, net::udp::Server)
+	DECLARE_TYPE(net::User, net::udp::Server)
 public:
 	Server();
 	virtual ~Server();

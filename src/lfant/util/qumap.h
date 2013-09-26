@@ -22,6 +22,11 @@ public:
 		first(f), second(s)
 	{
 	}
+
+	qupair(T1 f) :
+		first(f)
+	{
+	}
 };
 
 template<typename T1, typename T2>
@@ -30,16 +35,22 @@ class qumap : public std::deque<qupair<T1, T2>>
 	typedef qupair<T1, T2> valType;
 	typedef std::deque<valType> parType;
 public:
+	using parType::operator[];
+	using parType::erase;
+
 	T2& operator[](const T1& key)
 	{
-		for(int i = 0; i < this->size(); ++i)
+		for(auto& i : *this)
 		{
-			if(this->at(i).first == key)
+			if(i.first == key)
 			{
-				return this->at(i).second;
+				return i.second;
 			}
 		}
-		this->emplace_back(key, T2());
+	//	valType* v = new valType(key);
+	//	this->push_back(*v);
+	//	return v->second;
+		this->emplace_back(key);
 		return this->at(this->size()-1).second;
 	}
 

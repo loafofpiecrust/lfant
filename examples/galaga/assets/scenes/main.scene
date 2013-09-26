@@ -73,7 +73,7 @@ scene Demo
 		*/
 		component Mesh
 		{
-			path = meshes/plane.obj
+			file = meshes/plane.obj
 			material = materials/Diffuse.mat
 		}
 		
@@ -102,7 +102,7 @@ scene Demo
 			
 			component Mesh
 			{
-				path = meshes/suzanne.obj
+				file = meshes/suzanne.obj
 				material = materials/Diffuse.mat
 			}
 			

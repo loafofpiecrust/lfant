@@ -81,9 +81,9 @@ protected:
 	quat rotationQuat;
 	mat4 matrix = mat4(1);
 
-	vec3 up;
+/*	vec3 up;
 	vec3 right;
-	vec3 direction;
+	vec3 direction;*/
 
 	Transform* parent = nullptr;
 	bool updateMatrix = false;

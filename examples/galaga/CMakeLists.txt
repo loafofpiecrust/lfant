@@ -67,6 +67,7 @@ link_directories(
 add_library(${PROJECT_NAME} SHARED ${GAME_SRC})
 target_link_libraries(${PROJECT_NAME}
 	lfant
+	CEGUI
 	)
 
 if(NOT ANDROID)

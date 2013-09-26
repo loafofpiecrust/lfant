@@ -31,7 +31,7 @@
 namespace lfant
 {
 
-IMPLEMENT_TYPE(net::Connection, ChatClient)
+IMPLEMENT_TYPE(net::User, ChatClient)
 
 ChatClient::ChatClient()
 {
@@ -51,7 +51,7 @@ void ChatClient::Init()
 {
 }
 
-void ChatClient::SendData(string msg)
+void ChatClient::SendMessage(string msg)
 {
 	if(msg[0] == '/')
 	{
@@ -59,56 +59,42 @@ void ChatClient::SendData(string msg)
 	}
 
 	msg = name+":"+msg;
-	Client::SendData(msg);
+	for(auto& con : connections)
+	{
+		con->SendData(msg);
+	}
 	messages.push_back(msg);
 	Log("Message sent: '"+msg+"'.");
 }
 
-void ChatClient::Disconnect()
+void ChatClient::Disconnect(string ip)
 {
-	SendData("[RemoveClient "+name+"]");
-	Client::Disconnect();
-}
-
-void ChatClient::OnDestroy()
-{
-	Disconnect();
-}
-
-void ChatClient::OnConnect(const boost::system::error_code &error)
-{
-	Client::OnConnect(error);
-	Log("ChatClient::OnConnect: Success.");
-	SendData("[AddClient "+name+" "+socket.remote_endpoint().address().to_string()+"]");
-//	GetData();
-}
-
-void ChatClient::OnGetData(const boost::system::error_code &error)
-{
-	Client::OnGetData(error);
-
-	string data = lastData;
-
-	// Receive normal message
-	string sender = "";
-	uint pos = data.find_first_of(':');
-	if(pos != -1)
+	for(auto& con : connections)
 	{
-		for(uint i = 0; i < pos; ++i)
-		{
-			sender.push_back(data[i]);
-		}
-		data.erase(data.begin(), data.begin()+pos+1);
+		con->SendData("[RemoveClient "+name+"]");
 	}
-	TriggerEvent("ReceiveMessage", sender, data);
-	Log("Received message: '"+data+"' from '"+sender+"'.\n");
-	messages.push_back(data);
+	Client::Disconnect(ip);
 }
 
-void ChatClient::OnSendData(const boost::system::error_code &error, size_t bytes)
+void ChatClient::Deinit()
 {
-	Log("ChatClient::OnSendData: Touch.");
-	Client::OnSendData(error, bytes);
+	Client::Deinit();
+}
+
+void ChatClient::OnConnect(const boost::system::error_code &error, net::Connection* con)
+{
+	if(error) return;
+	Client::OnConnect(error, con);
+	
+	con->SendData("Yola");
+
+	Log("ChatClient::OnConnect: Success.");
+}
+
+void ChatClient::OnGetData(string data, net::Connection* con)
+{
+	Client::OnGetData(data, con);
+	TriggerEvent("ReceiveMessage", string(""), data);
 }
 
 }

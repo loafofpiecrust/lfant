@@ -54,7 +54,8 @@ public:
 
 	virtual void Init();
 	virtual void Update();
-	virtual void OnDestroy();
+	virtual void Deinit();
+	virtual void FixedUpdate();
 
 	/**
 	 *	Gets the first entity with a certain name.
@@ -100,6 +101,8 @@ public:
 	 *	@param file File to load from, without extension.
 	 */
 	virtual void Load(Properties* prop);
+
+	void Clear();
 
 	/**
 	 *	Spawns an entity in this Scene. Use this for any creation

@@ -131,7 +131,7 @@ public:
 
 	virtual void Init();
 	virtual void Update();
-	virtual void OnDestroy();
+	virtual void Deinit();
 
 	void SetInput(string path);
 	void SetTexture(string name);

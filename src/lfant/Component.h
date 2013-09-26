@@ -92,7 +92,7 @@ protected:
 	virtual void Update();
 	virtual void PostUpdate();
 	virtual void Destroy();
-	virtual void OnDestroy();
+	virtual void Deinit();
 	virtual void OnEnable();
 	virtual void OnDisable();
 

@@ -10,13 +10,7 @@ namespace lfant {
 namespace net {
 namespace udp {
 
-Connection::Connection() :
-	socket(*io)
-{
-}
-
 Connection::Connection(asio::io_service &io) :
-	net::Connection(io),
 	socket(io)
 {
 }
@@ -25,35 +19,21 @@ Connection::~Connection()
 {
 }
 
-void Connection::OnDestroy()
+void Connection::Deinit()
 {
-	io->stop();
+	boost::system::error_code ec;
+	socket.shutdown( boost::asio::ip::udp::socket::shutdown_both, ec );
+	socket.close( ec );
 }
 
 void Connection::OnGetData(const boost::system::error_code &error)
 {
-	Log("tcp::Connection::OnGetData: Touch.");
-	if(error)
-	{
-		Log("Connection::OnGetData: Error '"+error.message()+"'.");
-	//	return;
-	}
-
-	GetData();
+	net::Connection::OnGetData(error);
 }
 
 void Connection::OnSendData(const boost::system::error_code &error, size_t bytes)
 {
-	Log("Connection::OnSendData: Touch.");
-	if(error)
-	{
-		Log("Connection::OnSendData: Error '"+error.message()+"'.");
-		return;
-	}
-	else
-	{
-	//	this->OnSendData(error, bytes);
-	}
+	net::Connection::OnSendData(error, bytes);
 }
 
 void Connection::GetData()

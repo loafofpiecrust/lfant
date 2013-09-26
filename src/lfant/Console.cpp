@@ -22,7 +22,6 @@
 
 // Internal
 #include <lfant/util/String.h>
-#include <lfant/Settings.h>
 
 // External
 #include <lfant/util/lexical_cast.h>
@@ -61,7 +60,7 @@ void Console::Update()
 {
 }
 
-void Console::OnDestroy()
+void Console::Deinit()
 {
 	logFile.close();
 }

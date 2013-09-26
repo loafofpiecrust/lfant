@@ -97,9 +97,8 @@ void Transform::SetPosition(vec3 pos)
 
 quat Transform::GetRotationQuat()
 {
-	vec3 rot = radians(rotation);
-	rot.y = -rot.y;
-//	rot.x = -rot.x;
+//	vec3 rot = radians(vec3(rotation.x, rotation.z, -rotation.y));
+	vec3 rot = radians(vec3(rotation.x+180, -rotation.y, -(rotation.z+180)));
 	return quat(rot);
 //	return quat(radians(rotation));
 }
@@ -256,6 +255,7 @@ void Transform::Update()
 
 void Transform::SetMatrix()
 {
+//	vec3 scl = vec3(scale.x, scale.z, scale.y);
 	vec3 scl = GetScale();
 	if(scl == vec3(0))
 	{
@@ -263,10 +263,10 @@ void Transform::SetMatrix()
 		return;
 	}
 	
+//	vec3 pos = vec3(position.x, position.z, position.y);
 	vec3 pos = GetPosition();
-//	pos.x = -pos.x;
-//	vec3 rot = radians(GetRotation());
 	quat rot = GetRotationQuat();
+//	vec3 rot = radians(vec3(rotation.x, -rotation.y, -rotation.z));
 //	matrix = mat4(1);
 
 	if(owner->GetParent())
@@ -287,9 +287,9 @@ void Transform::SetMatrix()
 	
 //	if(rot != vec3(0))
 	{
-	//	matrix = glm::rotate(matrix, rot.x, vec3(1,0,0));
 	//	matrix = glm::rotate(matrix, rot.y, vec3(0,1,0));
 	//	matrix = glm::rotate(matrix, rot.z, vec3(0,0,1));
+	//	matrix = glm::rotate(matrix, rot.x, vec3(1,0,0));
 		matrix *= mat4_cast(rot);
 	}
 	
@@ -369,24 +369,19 @@ void Transform::Scale(vec3 scl)
 
 vec3 Transform::GetDirection()
 {
-	return matrix[2].xyz;
-//	return vec3(-matrix[2].x, matrix[2].y, -matrix[2].z);
-//	return direction;
+//	return matrix[2].xyz;
+	return matrix[1].xyz;
 }
 
 vec3 Transform::GetRight()
 {
-//	Log("Getting right, ", lexical_cast<string>(right));
 	return matrix[0].xyz;
-//	return vec3(-matrix[0].x, matrix[0].y, -matrix[0].z);
-//	return right;
 }
 
 vec3 Transform::GetUp()
 {
-	return -vec3(matrix[1].xyz);
-//	return cross(GetDirection(), GetRight());
-//	return up;
+//	return -vec3(matrix[1].xyz);
+	return matrix[2].xyz;
 }
 
 }

@@ -29,6 +29,7 @@
 
 class btManifoldPoint;
 struct btCollisionObjectWrapper;
+class btDynamicsWorld;
 class btDiscreteDynamicsWorld;
 class btBroadphaseInterface;
 class btCollisionDispatcher;
@@ -102,12 +103,12 @@ public:
 	Physics();
 	virtual ~Physics();
 
-	void Save(Properties* prop);
-	void Load(Properties* prop);
+	virtual void Save(Properties* prop);
+	virtual void Load(Properties* prop);
 
 	virtual void Init();
 	virtual void Update();
-	virtual void OnDestroy();
+	virtual void Deinit();
 
 	//void AddConstraint(ConstraintType ct, Entity *p1, Entity *p2);
 	void AddJoint(Joint* joint);
@@ -170,6 +171,8 @@ private:
 
 	static bool OnCollideExit(void* userPersistentData);
 
+	static void OnTick(btDynamicsWorld* world, float delta);
+
 	ptr<btDiscreteDynamicsWorld> world;
 	ptr<btBroadphaseInterface> broadphase;
 	ptr<btCollisionDispatcher> dispatcher;
@@ -180,7 +183,7 @@ private:
 //	ptr<physics::DebugRenderer> debugRenderer;
 
 	deque<GravPoint> gravityPoints;
-	vec3 initGravity = vec3(0, -9.81, 0);
+//	vec3 initGravity = vec3(0, -9.81, 0);
 };
 
 /** @} */

@@ -57,7 +57,7 @@ public:
 
 	virtual void Init();
 	virtual void Update();
-	virtual void OnDestroy();
+	virtual void Deinit();
 
 	virtual void Save(Properties* prop) const;
 	virtual void Load(Properties* prop);

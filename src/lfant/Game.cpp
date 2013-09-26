@@ -27,15 +27,10 @@
 #include <lfant/Input.h>
 #include <lfant/Time.h>
 #include <lfant/Physics.h>
-#include <lfant/Settings.h>
-
 #include <lfant/Audio.h>
 #include <lfant/Scene.h>
 #include <lfant/FileSystem.h>
-
-#include <lfant/Console.h>
 #include <lfant/SystemInfo.h>
-
 #include <lfant/Console.h>
 #include <lfant/UserInterface.h>
 #include <lfant/Network.h>
@@ -102,9 +97,9 @@ void Game::Init()
 #endif
 	input->Init();
 //	audio->Init();
-//	network->Init();
+	network->Init();
 	scriptSystem->Init();
-//	userInterface->Init();
+	userInterface->Init();
 	scene->Init();
 
 	Log("About to load '"+defaultScene+"' as default.");
@@ -122,8 +117,8 @@ void Game::Update()
 	scene->Update();
 	physics->Update();
 	input->Update();
-//	userInterface->Update();
-//	network->Update();
+	userInterface->Update();
+	network->Update();
 	renderer->Update();
 }
 

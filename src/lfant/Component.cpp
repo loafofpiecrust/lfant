@@ -98,9 +98,9 @@ void Component::Destroy()
 	owner->RemoveComponent(this);
 }
 
-void Component::OnDestroy()
+void Component::Deinit()
 {
-	Object::OnDestroy();
+	Object::Deinit();
 }
 
 void Component::OnEnable()

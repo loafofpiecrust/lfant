@@ -27,43 +27,29 @@
 #include <lfant/TypeRegistry.h>
 #include <lfant/net/tcp/Server.h>
 
-namespace lfant
-{
-
-class ChatClient;
-
-struct Peer
-{
-	string name = "client";
-	string ip = "127.0.0.1";
-};
+namespace lfant {
 
 /**
  *
  */
 class ChatServer : public net::tcp::Server
 {
-	DECLARE_TYPE(net::Connection, ChatServer)
+	DECLARE_TYPE(net::User, ChatServer)
 public:
 	ChatServer();
 	virtual ~ChatServer();
 
 	virtual void Init();
 
-//	void SendMessage(string msg);
-	void SendData(string msg, string sender);
-	void SendData(string msg);
-	void GetData();
+	virtual void OnAddConnection(net::Connection* con);
+
+	void SendMessage(string msg);
 
 protected:
-	virtual void OnGetData(const boost::system::error_code& error);
-	virtual void OnGetData(const boost::system::error_code &error, asio::ip::tcp::socket* sock);
-	void OnAccept(const boost::system::error_code &error);
-	void Accept(asio::ip::tcp::socket& sock);
-	void OnAddClient(string name, string ip);
-
+	void OnAccept(const boost::system::error_code &error, net::Connection* con);
+	void Accept();
+	
 private:
-	deque< ptr<ChatClient> > clients;
 	deque<string> messages;
 };
 

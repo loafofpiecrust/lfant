@@ -41,7 +41,7 @@ protected:
 
 	virtual void Init();
 	virtual void PostUpdate();
-	virtual void OnDestroy();
+	virtual void Deinit();
 
 	virtual void BeginRender();
 	virtual void Render() = 0;

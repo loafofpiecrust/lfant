@@ -146,13 +146,13 @@ void Properties::LoadStream(istream& stream)
 
 		if(line[0] == '=')
 		{
-			Log("Incorrect '='.");
+		//	Log("Incorrect '='.");
 		}
 
 		if(line[0] == '#')
 		{
 			// Preprocessor magictastics!
-			Log("Doing some preprocessor stuff...");
+		//	Log("Doing some preprocessor stuff...");
 		//	Preprocess(string(&line[1]));
 			continue;
 		}
@@ -248,7 +248,7 @@ void Properties::LoadStream(istream& stream)
 				value.push_back(line[i]);
 			}
 		//	to_lower(name);
-			Log("\tSetting, '"+TrimSpace(name)+"' = '"+TrimSpace(value, true)+"'.");
+		//	Log("\tSetting, '"+TrimSpace(name)+"' = '"+TrimSpace(value, true)+"'.");
 			Set(name, TrimSpace(value, true));
 			name = "";
 			value = "";
@@ -262,20 +262,20 @@ void Properties::LoadStream(istream& stream)
 		toks = Split(line, " ", "{}");
 		if(toks[0] != "{" && toks[0] != "}")
 		{
-			Log("Setting name.");
+		//	Log("Setting name.");
 			name = toks[0];
 			to_lower(name);
 		}
 		if(toks.size() > 1 && toks[1] != "{")
 		{
-			Log("Setting value");
+		//	Log("Setting value");
 			value = toks[1];
 			if(toks.size() > 2 && toks[2] == "{")
 			{
-				Log("Namespace brace same line");
+			//	Log("Namespace brace same line");
 				if(toks.size() > 3 && toks[toks.size()-1] == "}")
 				{
-					Log("One line class");
+				//	Log("One line class");
 					if(toks.size() > 4)
 					{
 						AddChild(stream, name, value, false);
@@ -301,7 +301,7 @@ void Properties::LoadStream(istream& stream)
 		}
 	//	if(toks.size() > 1 && toks[toks.size()-1] == "{")
 		{
-			Log("Namespace begins same line");
+		//	Log("Namespace begins same line");
 		//	children.push_back(new Properties(stream, name, value, this));
 		}
 		/*
@@ -344,7 +344,7 @@ void Properties::LoadStream(istream& stream)
 
 		if((line[0] == '}' || stream.get() == '}'))
 		{
-			Log("First char is finishing brace");
+		//	Log("First char is finishing brace");
 			// Ends a namespace
 			return;
 		}

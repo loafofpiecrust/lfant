@@ -65,13 +65,13 @@ public:
 	Renderer();
 	~Renderer();
 
-	void Load(Properties *prop);
-	void Save(Properties *prop);
+	virtual void Load(Properties *prop);
+	virtual void Save(Properties *prop);
 
-	void Init();
-	void PreUpdate();
-	void Update();
-	void OnDestroy();
+	virtual void Init();
+	virtual void PreUpdate();
+	virtual void Update();
+	virtual void Deinit();
 
 	/**
 	 *	Opens a new window, using member settings.

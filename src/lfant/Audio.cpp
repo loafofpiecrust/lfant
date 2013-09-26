@@ -50,7 +50,7 @@ void Audio::Update()
 
 }
 
-void Audio::OnDestroy()
+void Audio::Deinit()
 {
 }
 

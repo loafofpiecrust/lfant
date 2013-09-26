@@ -32,12 +32,12 @@ public:
 	Terrain();
 	~Terrain();
 
-	void Init();
-	void Update();
+	virtual void Init();
+	virtual void Update();
 
-	void BeginRender();
-	void Render();
-	void EndRender();
+	virtual void BeginRender();
+	virtual void Render();
+	virtual void EndRender();
 
 	void Generate();
 

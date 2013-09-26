@@ -9,6 +9,6 @@ entity Bullet
 	}
 	component Mesh
 	{
-		path = meshes/suzanne.obj
+		file = meshes/suzanne.obj
 	}
 }

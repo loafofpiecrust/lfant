@@ -90,7 +90,7 @@ public:
 
 	virtual void Init();
 	virtual void Update();
-	virtual void OnDestroy();
+	virtual void Deinit();
 
 	void Load(Properties *prop);
 	void Save(Properties *prop);
@@ -98,10 +98,10 @@ public:
 	virtual void CreateWindow(Properties* prop, CEGUI::Window *parent = nullptr);
 	virtual void RemoveWindow(string fileName);
 
-	virtual void OnKey(uint16 key, int mode);
+	virtual void OnKey(uint16_t key, int mode);
 	virtual void OnChar(char key);
 	virtual void OnMouseButton(uint16 btn, int mode);
-	virtual void OnMouseMove(int x, int y);
+	virtual void OnMouseMove(vec2 pos);
 	virtual void OnWindowResize(uint width, uint height);
 
 

@@ -55,7 +55,7 @@ void Mesh::Load(Properties *prop)
 {
 	Component::Load(prop);
 
-	prop->Get("path", file);
+	prop->Get("file", file);
 
 	if(Properties* pmat = prop->GetChild("material"))
 	{
@@ -76,7 +76,7 @@ void Mesh::Save(Properties *prop) const
 {
 	Component::Save(prop);
 
-	prop->Set("path", file);
+	prop->Set("file", file);
 
 	material->Save(prop->AddChild("material"));
 }
@@ -98,9 +98,9 @@ void Mesh::Update()
 	Renderable::Update();
 }
 
-void Mesh::OnDestroy()
+void Mesh::Deinit()
 {
-	Renderable::OnDestroy();
+	Renderable::Deinit();
 }
 
 void Mesh::BeginRender()

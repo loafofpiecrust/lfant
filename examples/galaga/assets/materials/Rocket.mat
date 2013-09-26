@@ -3,7 +3,7 @@ material Diffuse
 {
 	texture Diffuse
 	{
-		path = textures/Rocket.png
+		file = textures/Rocket.png
 		mipmap = false
 		filterMode = Bilinear
 		wrapMode = Clamp

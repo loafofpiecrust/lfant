@@ -1,0 +1,149 @@
+scene Scene
+{
+	entity Observer
+	{
+		id = 1
+		tags = {  }
+		layer = Other
+		active = true
+		lifetime = 0
+		component Transform
+		{
+			enabled = true
+		}
+		component Camera
+		{
+			enabled = true
+			fov = 90
+			aspectRatio = 1.77777779
+			viewRange = 0.00999999978-1000
+			dof = 20
+			dofWidth = 10
+		}
+	}
+	entity Player1
+	{
+		id = 2
+		tags = {  }
+		layer = Players
+		active = true
+		lifetime = 0
+		component Transform
+		{
+			enabled = true
+		}
+		component Mesh
+		{
+			enabled = true
+			file = meshes/plane.obj
+			material 
+			{
+				texture 
+				{
+					file = /home/taylorsnead/lazyfox/lfant/examples/galaga/bin/x64/linux/../../../assets/textures/Default.png
+					anisoLevel = 1
+				}
+				 
+				{
+					vertex = shaders/simple/Diffuse.vert
+					fragment = shaders/simple/Diffuse.frag
+					geometry = 
+				}
+			}
+		}
+		component BoxCollider
+		{
+			enabled = true
+		}
+		component Rigidbody
+		{
+			enabled = true
+		}
+		component Player
+		{
+			enabled = true
+		}
+	}
+	entity Player2
+	{
+		id = 3
+		tags = {  }
+		layer = Players
+		active = true
+		lifetime = 0
+		component Transform
+		{
+			enabled = true
+		}
+		component Mesh
+		{
+			enabled = true
+			file = meshes/plane.obj
+			material 
+			{
+				texture 
+				{
+					file = /home/taylorsnead/lazyfox/lfant/examples/galaga/bin/x64/linux/../../../assets/textures/Default.png
+					anisoLevel = 1
+				}
+				 
+				{
+					vertex = shaders/simple/Diffuse.vert
+					fragment = shaders/simple/Diffuse.frag
+					geometry = 
+				}
+			}
+		}
+		component BoxCollider
+		{
+			enabled = true
+		}
+		component Rigidbody
+		{
+			enabled = true
+		}
+	}
+	entity Ball
+	{
+		id = 4
+		tags = {  }
+		layer = Pucks
+		active = true
+		lifetime = 0
+		component Transform
+		{
+			enabled = true
+		}
+		component Mesh
+		{
+			enabled = true
+			file = meshes/plane.obj
+			material 
+			{
+				texture 
+				{
+					file = /home/taylorsnead/lazyfox/lfant/examples/galaga/bin/x64/linux/../../../assets/textures/Default.png
+					anisoLevel = 1
+				}
+				 
+				{
+					vertex = shaders/simple/Diffuse.vert
+					fragment = shaders/simple/Diffuse.frag
+					geometry = 
+				}
+			}
+		}
+		component BoxCollider
+		{
+			enabled = true
+		}
+		component Rigidbody
+		{
+			enabled = true
+		}
+		component Ball
+		{
+			enabled = true
+		}
+	}
+}

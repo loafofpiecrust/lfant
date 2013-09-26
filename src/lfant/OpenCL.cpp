@@ -48,7 +48,7 @@ OpenCL::~OpenCL()
 }
 
 void OpenCL::Init() {}
-void OpenCL::OnDestroy() {}
+void OpenCL::Deinit() {}
 
 OpenCL::Kernel* OpenCL::LoadFile(string path, string entry) { return nullptr; }
 
@@ -95,7 +95,7 @@ OpenCL::Kernel* OpenCL::LoadFile(string path, string entry)
 	return kernel;
 }
 
-void OpenCL::OnDestroy()
+void OpenCL::Deinit()
 {
 }
 

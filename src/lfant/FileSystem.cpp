@@ -25,10 +25,7 @@
 #include <boost/assign/list_of.hpp>
 
 // Internal
-
 #include <lfant/Game.h>
-#include <lfant/Settings.h>
-
 #include <lfant/Console.h>
 
 using namespace boost::filesystem;

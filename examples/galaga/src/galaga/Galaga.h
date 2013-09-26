@@ -68,13 +68,13 @@ private:
 
 	void StartBall();
 
-	Entity* player;
+	Entity* player = nullptr;
 	/*
 	net::Client* client;
 	net::Client* client2;
 	*/
-	ChatClient* client;
-	ChatServer* server;
+	ChatClient* client = nullptr;
+	ChatServer* server = nullptr;
 };
 
 /// \}

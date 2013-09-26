@@ -34,7 +34,7 @@ namespace lfant
 {
 
 namespace net {
-class Connection;
+class User;
 }
 
 /**	@addtogroup Game
@@ -63,22 +63,22 @@ public:
 	virtual void Load(Properties *prop);
 
 	template<typename C>
-	auto AddConnection() -> typename enable_if<boost::is_base_of<net::Connection, C>::value, C*>::type
+	C* AddUser()
 	{
-		C* con = new C;
-		connections.push_back(con);
-		return con;
+		C* usr = new C;
+		users.push_back(usr);
+		return usr;
 	}
 
-	net::Connection* AddConnection(string type);
+	net::User* AddUser(string type);
 
-	net::Connection* GetConnection(string name) const;
+	net::User* GetUser(string name) const;
 
 protected:
 //	byte GetPacketId(RakNet::Packet* p);
 
 public:
-	deque< ptr<net::Connection> > connections;
+	deque< ptr<net::User> > users;
 
 private:
 

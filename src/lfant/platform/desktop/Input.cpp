@@ -180,6 +180,7 @@ void Input::OnMouseMove(GLFWwindow* win, double x, double y)
 {
 	game->input->TriggerEvent("MouseMove", (int)x, (int)y);
 	game->input->TriggerEvent("MouseMove", ivec2(x, y));
+	game->input->TriggerEvent("MouseMove", vec2(x, y));
 	if(game->input->lockMouse)
 	{
 		game->input->SetMousePos(game->renderer->GetResolution() / 2);
@@ -194,6 +195,7 @@ void Input::OnCharPress(GLFWwindow* win, uint32_t key)
 
 void Input::OnMouseButton(GLFWwindow* win, int btn, int action, int mods)
 {
+	btn = 400+btn;
 	game->input->TriggerEvent("MouseButton", (uint16_t)btn, action);
 	if(action == GLFW_PRESS)
 	{
@@ -203,7 +205,7 @@ void Input::OnMouseButton(GLFWwindow* win, int btn, int action, int mods)
 	{
 		game->input->TriggerEvent("MouseUp", (uint16_t)btn);
 	}
-	OnKeyPress(win, 400+btn, 0, action, mods);
+	OnKeyPress(win, btn, 0, action, mods);
 }
 
 void Input::GetJoystickAxes()

@@ -2,48 +2,36 @@
 #pragma once
 #include <lfant/stdafx.h>
 
-// Internal
-#include <lfant/TypeRegistry.h>
+// internal
 #include <lfant/Object.h>
 
-// External
-#include <boost/asio/io_service.hpp>
-#include <array>
-
-namespace asio = boost::asio;
+// external
+#include <boost/asio.hpp>
 
 namespace lfant {
 namespace net {
 
-class Connection : public Object
+class Connection : public lfant::Object
 {
-	DECLARE_REGISTRY(net::Connection)
-	
 public:
-	virtual ~Connection();
+	virtual ~Connection() {}
 
-	void Update();
+	virtual void GetData() {}
+	virtual void SendData(string data) {}
+	virtual void Deinit() {}
 
-	virtual void GetData() = 0;
-	virtual void SendData(string data) = 0;
+	virtual void OpenSocket() {}
 
-	virtual void OnGetData(const boost::system::error_code& error) = 0;
-	virtual void OnSendData(const boost::system::error_code& error, size_t bytes) = 0;
-
-	uint16 GetPort();
-
-	string name = "";
-	string host = "127.0.0.1";
+	string remoteIp = "127.0.0.1";
+	uint16_t port = 0;
+	char lastData[256];
 
 protected:
-	Connection();
-	Connection(asio::io_service& io);
+	virtual void OnSendData(const boost::system::error_code &error, size_t bytes);
+	virtual void OnGetData(const boost::system::error_code &error);
 
-	uint16 port = 0;
-	bool started = false;
-	shared_ptr<asio::io_service> io {new asio::io_service};
+private:
 
-	char lastData[256];
 };
 
 }
