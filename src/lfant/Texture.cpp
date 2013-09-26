@@ -61,7 +61,7 @@ Texture::Texture() :
 
 void Texture::Load(Properties *prop)
 {
-	prop->Get("path", path);
+	prop->Get("file", path);
 	Log("Tex path: '"+path+"'.");
 	prop->Get("anisoLevel", anisoLevel);
 
@@ -72,7 +72,7 @@ void Texture::Save(Properties *prop)
 {
 	Object::Save(prop);
 
-	prop->Set("path", path);
+	prop->Set("file", path);
 	prop->Set("anisoLevel", anisoLevel);
 }
 
@@ -120,7 +120,7 @@ void Texture::InitData(byte* data)
 	Unbind();
 }
 
-void Texture::OnDestroy()
+void Texture::Deinit()
 {
 	for(uint i = 0; i < textures.size(); ++i)
 	{

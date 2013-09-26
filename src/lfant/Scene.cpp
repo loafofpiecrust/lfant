@@ -35,20 +35,20 @@ namespace lfant
 
 Scene::Scene()
 {
-	// TODO Auto-generated constructor stub
 }
 
 Scene::~Scene()
 {
-	// TODO Auto-generated destructor stub
 }
 
 void Scene::Init()
 {
+	Subsystem::Init();
 }
 
 void Scene::Update()
 {
+	Subsystem::Update();
 	for(auto& ent : entities)
 	{
 		if(!ent)
@@ -63,28 +63,51 @@ void Scene::Update()
 	}
 }
 
-void Scene::OnDestroy()
+void Scene::FixedUpdate()
 {
 	for(auto& ent : entities)
 	{
+		if(!ent)
+		{
+			continue;
+		}
+
+		if(ent->active)
+		{
+			ent->FixedUpdate();
+		}
+	}
+}
+
+void Scene::Deinit()
+{
+	Subsystem::Deinit();
+	for(auto& ent : entities)
+	{
 		Log("Scene::Destroy: Destroying ", ent->name);
-		ent->UnsafeDestroy();
+		ent->Deinit();
 	}
 //	entities.clear();
 }
 
+void Scene::Clear()
+{
+	Deinit();
+	entities.clear();
+}
+
 void Scene::RemoveEntity(Entity* ent, bool destroy)
 {
-	for(uint i = 0; i < entities.size(); ++i)
+	for(auto i = entities.begin(); i != entities.end(); ++i)
 	{
-		if(entities[i] == ent)
+		if(*i == ent)
 		{
 			Log("Scene::RemoveEntity: Touch.");
 			if(!destroy)
 			{
-				entities[i] = nullptr;
+				*i = nullptr;
 			}
-			entities.erase(entities.begin()+i);
+			entities.erase(i);
 			return;
 		}
 	}
@@ -129,6 +152,7 @@ Entity* Scene::GetEntityById(uint32_t id, bool recursive) const
 			}
 		}
 	}
+	return nullptr;
 }
 
 uint32_t Scene::GenerateEntityId()
@@ -172,11 +196,11 @@ void Scene::Load(Properties *prop)
 	double t = game->time->GetTime();
 	currentId = 0;
 	Log("Scene::Load: Loading scene node");
-	Entity* ent = nullptr;
 	for(auto& i : prop->GetChildren("system"))
 	{
 		if(i->id == "Physics")
 		{
+			Log("Loading physics from scene");
 			game->physics->Load(i);
 		}
 		else if(i->id == "Network")
@@ -184,6 +208,8 @@ void Scene::Load(Properties *prop)
 			game->network->Load(i);
 		}
 	}
+
+	Entity* ent = nullptr;
 	for(auto& i : prop->GetChildren("entity"))
 	{
 		Log("About to spawn");

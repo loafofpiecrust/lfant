@@ -2,12 +2,14 @@
 #pragma once
 #include <lfant/stdafx.h>
 
+// Internal
+#include <lfant/net/User.h>
+#include <lfant/net/tcp/Connection.h>
+
 // External
 #include <boost/asio.hpp>
 #include <array>
 
-// Internal
-#include <lfant/net/tcp/Connection.h>
 
 namespace lfant {
 namespace net {
@@ -16,7 +18,7 @@ namespace tcp {
 /**
  *	Allows broadcasting, multicasting, and onecasting.
  */
-class Client : public Connection
+class Client : public net::User
 {
 public:
 	Client();
@@ -28,17 +30,14 @@ public:
 
 	// Main Loop Functions
 	virtual void Init();
-	virtual void OnDestroy();
+	virtual void Deinit();
 
 	// Networking Functions
-	void Connect(string host = "127.0.0.1", uint16 port = 22222, string password = "");
-	void Disconnect();
-
-	void SendFile(string path, string outpath = "");
+	virtual void Connect(string host = "127.0.0.1", uint16 port = 22222, string password = "");
+	virtual void Disconnect(string ip);
 
 	// Asio Callbacks
-	virtual void OnConnect(const boost::system::error_code& error);
-	virtual void OnGetData(const boost::system::error_code &error);
+	virtual void OnConnect(const boost::system::error_code& error, net::Connection* con);
 
 //	asio::ip::tcp::acceptor acceptor;
 //	asio::ip::tcp::socket socket;

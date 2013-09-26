@@ -58,7 +58,7 @@ public:
 	Kernel* LoadFile(string path, string entry);
 
 	void Init();
-	void OnDestroy();
+	void Deinit();
 
 //protected:
 //	boost::compute::platform platform;

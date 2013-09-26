@@ -47,7 +47,7 @@ public:
 
 	void reset(T* v = nullptr)
 	{
-		if(value != nullptr)
+		if(value)
 		{
 			delete value;
 		}

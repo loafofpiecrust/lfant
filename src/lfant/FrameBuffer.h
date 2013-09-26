@@ -38,7 +38,7 @@ public:
 	~FrameBuffer();
 
 	virtual void Init();
-	virtual void OnDestroy();
+	virtual void Deinit();
 
 	void DrawBuffers();
 

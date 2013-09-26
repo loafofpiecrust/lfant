@@ -51,9 +51,9 @@ void Renderable::PostUpdate()
 	}
 }
 
-void Renderable::OnDestroy()
+void Renderable::Deinit()
 {
-	Component::OnDestroy();
+	Component::Deinit();
 	if(loaded)
 	{
 		EndRender();

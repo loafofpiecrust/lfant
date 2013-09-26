@@ -30,14 +30,12 @@
 namespace lfant
 {
 
-struct Peer;
-
 /**
  *
  */
 class ChatClient : public net::tcp::Client
 {
-	DECLARE_TYPE(net::Connection, ChatClient)
+	DECLARE_TYPE(net::User, ChatClient)
 	
 public:
 	ChatClient();
@@ -46,21 +44,18 @@ public:
 
 	virtual void Init();
 
-	void SendData(string msg);
-	void Disconnect();
+	void SendMessage(string msg);
+	void Disconnect(string ip = "127.0.0.1");
 
 protected:
 
-	void OnDestroy();
+	void Deinit();
 
 	// Callbacks
-	virtual void OnConnect(const boost::system::error_code& error);
+	virtual void OnConnect(const boost::system::error_code& error, net::Connection* con);
 	void OnDisconnect(const boost::system::error_code& error);
-	void OnGetData(const boost::system::error_code& error);
-	void OnSendData(const boost::system::error_code &error, size_t bytes);
+	virtual void OnGetData(string data, net::Connection* con);
 
-//	string name = "lfantClient";
-	deque< ptr<Peer> > peers;
 	deque<string> messages;
 
 private:

@@ -28,7 +28,6 @@
 #include <lfant/Input.h>
 #include <lfant/Scene.h>
 #include <lfant/Camera.h>
-#include <lfant/Settings.h>
 #include <lfant/Time.h>
 #include <lfant/Thread.h>
 #include <lfant/Renderer.h>
@@ -134,7 +133,7 @@ void UserInterface::Update()
 	}
 }
 
-void UserInterface::OnDestroy()
+void UserInterface::Deinit()
 {
 	gameswf::set_render_handler(nullptr);
 }
@@ -306,6 +305,8 @@ void UserInterface::CreateWindow(Properties* prop, CEGUI::Window* parent)
 
 void UserInterface::Load(Properties *prop)
 {
+	if(!prop) return;
+	Subsystem::Load(prop);
 	Log("UserInterface::Load: Touch.");
 	deque<string> schemes;
 	string pfont = "";
@@ -394,6 +395,7 @@ void UserInterface::Init()
 	ConnectEvent(SENDER(game->renderer, SetResolution), RECEIVER(this, OnWindowResize));
 
 	Log("UserInterface::Init: Calling Subsystem::Init at end.");
+
 	Subsystem::Init();
 }
 
@@ -414,7 +416,7 @@ void UserInterface::Update()
 	windowManager->cleanDeadPool();
 }
 
-void UserInterface::OnDestroy()
+void UserInterface::Deinit()
 {
 	system->destroy();
 }
@@ -460,6 +462,7 @@ void UserInterface::OnKey(uint16 key, int mode)
 	else if(key == Key["Home"]) { newKey = CEGUI::Key::Home; }
 	else if(key == Key["End"]) { newKey = CEGUI::Key::End; }
 	else if(key == Key["NumEnter"]) { newKey = CEGUI::Key::NumpadEnter; }
+	else { newKey = (CEGUI::Key::Scan)key; }
 
 	if(mode == GLFW_PRESS)
 	{
@@ -514,9 +517,9 @@ void UserInterface::OnMouseButton(uint16 btn, int mode)
 	}
 }
 
-void UserInterface::OnMouseMove(int x, int y)
+void UserInterface::OnMouseMove(vec2 pos)
 {
-	context->injectMousePosition(x, y);
+	context->injectMousePosition(pos.x, pos.y);
 	//context->getMouseCursor().setPosition(vec2_cast<CEGUI::Vector2f>(vec2(x,y)));
 }
 
@@ -533,11 +536,12 @@ void UserInterface::OnWindowResize(uint width, uint height)
 bool UserInterface::OnClickButton(const CEGUI::EventArgs &evt)
 {
 	Log("BUTTON CLICKED!");
-//	const CEGUI::WindowEventArgs* args = dynamic_cast<const CEGUI::WindowEventArgs*>(&evt);
-//	if(!args) return false;
+	const CEGUI::WindowEventArgs* args = dynamic_cast<const CEGUI::WindowEventArgs*>(&evt);
+	if(!args) return false;
 
-//	TriggerEvent("ClickButton", args->window);
+	TriggerEvent("ClickButton", (CEGUI::Window*)args->window);
 	Log("Triggad");
+	return true;
 }
 
 bool UserInterface::OnCloseWindow(const CEGUI::EventArgs &evt)
@@ -550,7 +554,7 @@ bool UserInterface::OnCloseWindow(const CEGUI::EventArgs &evt)
 	args->window->destroy();
 }
 
-#else
+#else // if we are mobile...
 
 void UserInterface::CreateWindow(Properties* prop, CEGUI::Window* parent)
 {
@@ -573,7 +577,7 @@ void UserInterface::Update()
 {
 }
 
-void UserInterface::OnDestroy()
+void UserInterface::Deinit()
 {
 }
 

@@ -28,7 +28,6 @@
 #include <lfant/Input.h>
 #include <lfant/Time.h>
 #include <lfant/Physics.h>
-#include <lfant/Settings.h>
 #include <lfant/Audio.h>
 #include <lfant/Scene.h>
 #include <lfant/FileSystem.h>
@@ -78,13 +77,14 @@ void Galaga::OnHost()
 	//	client->SendFile("scenes/init.scene", "scenes/new.scene");
 }
 
-void Galaga::OnClickButton(CEGUI::Window *window)
+void Galaga::OnClickButton(CEGUI::Window* window)
 {
+	Log("Got btn click galaga");
 	if(window->getName() == "Submit")
 	{
 		string msg = "";
-		CEGUI::Window* input; //= userInterface->rootWindow->getChild("Console")->getChild("Input");
-		CEGUI::Window* history; //= userInterface->rootWindow->getChild("Console")->getChild("History");
+		CEGUI::Window* input = userInterface->rootWindow->getChild("Console")->getChild("Input");
+		CEGUI::Window* history = userInterface->rootWindow->getChild("Console")->getChild("History");
 		if(history && input)
 		{
 			msg = input->getText();
@@ -94,16 +94,18 @@ void Galaga::OnClickButton(CEGUI::Window *window)
 
 		if(msg == "host" && !client)
 		{
-			server = network->AddConnection<ChatServer>();
+			Log("Hosting.");
+			server = network->AddUser<ChatServer>();
 			server->Host(22222);
-			ConnectEvent(SENDER(server, Host), RECEIVER(this, OnHost));
+		//	ConnectEvent(SENDER(server, Host), RECEIVER(this, OnHost));
 			ConnectEvent(SENDER(server, ReceiveMessage), RECEIVER(this, OnReceiveMessage));
 		}
 		else if(msg == "connect" && !server)
 		{
-			client = network->AddConnection<ChatClient>();
+			Log("Connecting.");
+			client = network->AddUser<ChatClient>();
 			client->Connect("127.0.0.1", 22222);
-			ConnectEvent(SENDER(client, Connect), RECEIVER(this, OnHost));
+		//	ConnectEvent(SENDER(client, Connect), RECEIVER(this, OnHost));
 			ConnectEvent(SENDER(client, ReceiveMessage), RECEIVER(this, OnReceiveMessage));
 		}
 		else if(msg == "disconnect")
@@ -111,6 +113,20 @@ void Galaga::OnClickButton(CEGUI::Window *window)
 			if(client)
 			{
 				// Client::Destroy calls Disconnect() for us, if a connection is currently established.
+				client->SendMessage("[RemoveClient client]");
+			//	client->Destroy();
+			}
+			else if(server)
+			{
+				// Close server?
+				server->SendMessage("[RemoveAllClients]");
+			//	server->Destroy();
+			}
+		}
+		else if(msg == "destroy")
+		{
+			if(client)
+			{
 				client->Destroy();
 			}
 			else if(server)
@@ -123,11 +139,11 @@ void Galaga::OnClickButton(CEGUI::Window *window)
 		{
 			if(client)
 			{
-				client->SendData(msg);
+				client->SendMessage(msg);
 			}
 			else if(server)
 			{
-				server->SendData(msg);
+				server->SendMessage(msg);
 			}
 		}
 	}
@@ -135,7 +151,8 @@ void Galaga::OnClickButton(CEGUI::Window *window)
 
 void Galaga::OnReceiveMessage(string sender, string msg)
 {
-	CEGUI::Window* history; //= userInterface->rootWindow->getChild("Console")->getChild("History");
+	Log("Galaga::OnReceiveMessage: Touch.");
+	CEGUI::Window* history = userInterface->rootWindow->getChild("Console")->getChild("History");
 	if(history)
 	{
 		history->appendText(sender+": "+msg);
@@ -169,7 +186,7 @@ void Galaga::Init()
 //	client->Connect("127.0.0.1");
 //	client2->Connect();
 
-//	ConnectEvent(SENDER(userInterface, ClickButton), RECEIVER(this, OnClickButton));
+	ConnectEvent(SENDER(userInterface, ClickButton), RECEIVER(this, OnClickButton));
 
 	//	client->SendData("12345678");
 
@@ -179,6 +196,15 @@ void Galaga::Init()
 void Galaga::Update()
 {
 	Game::Update();
+
+	if(input->GetButtonDown("ShowFPS") == 1)
+	{
+		Log("FPS: ", time->frameRate);
+		if(server)
+		{
+			Log("Client count: ", server->GetConnectionCount());
+		}
+	}
 }
 
 void Galaga::Destroy()

@@ -163,6 +163,24 @@ void Entity::Update()
 	}
 }
 
+void Entity::FixedUpdate()
+{
+	for(auto& comp : components)
+	{
+		if(comp->IsEnabled())
+		{
+			comp->FixedUpdate();
+		}
+	}
+	for(auto& child : children)
+	{
+		if(child->active)
+		{
+			child->FixedUpdate();
+		}
+	}
+}
+
 void Entity::AddChild(Entity* ent)
 {
 	children.push_back(ent);
@@ -191,21 +209,21 @@ void Entity::AddComponent(Component* comp)
 	TriggerEvent("SetComponent"+type::Unscope(type::Name(comp)), comp);
 }
 
-void Entity::UnsafeDestroy()
+void Entity::Deinit()
 {
-	Object::Destroy();
+	Object::Deinit();
 
 	Log("Entity::Destroy: Destroying ", components.size()," components.");
 	for(auto& compo : components)
 	{
-		compo->OnDestroy();
+		compo->Deinit();
 	}
 //	components.clear();
 
 	Log("Entity::Destroy: Destroying ", children.size()," children.");
 	for(auto& child : children)
 	{
-		child->UnsafeDestroy();
+		child->Deinit();
 	}
 }
 
@@ -214,18 +232,6 @@ void Entity::Destroy()
 	Log("Entity::Destroy: Touch.");
 	Object::Destroy();
 	Log("Entity::Destroy: super called.");
-
-	for(auto& compo : components)
-	{
-		compo->Destroy();
-	}
-	//	components.clear();
-	Log("Entity::Destroy: Components destroyed.");
-
-	for(auto& child : children)
-	{
-		child->Destroy();
-	}
 
 	if(!parent)
 	{

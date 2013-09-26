@@ -117,7 +117,7 @@ public:
 	virtual void Init();
 	virtual void Update();
 	virtual void PostUpdate();
-	virtual void OnDestroy();
+	virtual void Deinit();
 
 	void BeginRender();
 	void Render();

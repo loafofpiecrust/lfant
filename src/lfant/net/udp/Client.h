@@ -9,6 +9,7 @@
 // Internal
 #include <lfant/TypeRegistry.h>
 #include <lfant/net/udp/Connection.h>
+#include <lfant/net/User.h>
 
 namespace lfant {
 namespace net {
@@ -17,9 +18,9 @@ namespace udp {
 /**
  *	Allows broadcasting, multicasting, and onecasting.
  */
-class Client : public Connection
+class Client : public net::User
 {
-	DECLARE_TYPE(net::Connection, net::udp::Client)
+	DECLARE_TYPE(net::User, net::udp::Client)
 public:
 	Client();
 	Client(asio::io_service& io);
@@ -30,16 +31,14 @@ public:
 
 	// Main Loop Functions
 	virtual void Init();
-	virtual void OnDestroy();
+	virtual void Deinit();
 
 	// Networking Functions
 	void Connect(string host = "127.0.0.1", uint16 port = 22222, string password = "");
-	void Disconnect();
-
-	void SendFile(string path, string outpath = "");
+	void Disconnect(string ip);
 
 	// Asio Callbacks
-	virtual void OnConnect(const boost::system::error_code& error);
+	virtual void OnConnect(const boost::system::error_code& error, net::Connection* con);
 
 //	asio::ip::tcp::acceptor acceptor;
 //	asio::ip::tcp::socket socket;

@@ -97,7 +97,7 @@ void ParticleSystem::PostUpdate()
 	Render();
 }
 
-void ParticleSystem::OnDestroy()
+void ParticleSystem::Deinit()
 {
 	EndRender();
 }

@@ -1,22 +1,25 @@
 
-#include <lfant/Component.h>
-#include <lfant/Rigidbody.h>
+#include <lfant/stdafx.h>
 
-namespace pong {
+// internal
+#include <lfant/Component.h>
+
+// external
+
+namespace dftf {
 
 class Player : public lfant::Component
 {
-	DECLARE_COMP(pong::Player)
+	DECLARE_COMP(dftf::Player)
 public:
-	Player();
-	~Player();
-
 	virtual void Init();
 	virtual void Update();
 	virtual void Deinit();
+protected:
+
+	float health = 5.0f;
 
 private:
-	lfant::Rigidbody* rigidbody = nullptr;
 };
 
 }

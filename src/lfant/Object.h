@@ -446,6 +446,8 @@ public:
 	 */
 	virtual void Update();
 
+	virtual void FixedUpdate();
+
 	/**
 	 *	Call this to destroy the object.
 	 */
@@ -464,7 +466,7 @@ protected:
 	/**
 	 *	Called just before the object is destroyed.
 	 */
-	virtual void OnDestroy();
+	virtual void Deinit();
 
 	bool initBeforeLoad = false;
 

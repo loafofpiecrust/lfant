@@ -56,12 +56,12 @@ public:
 	{
 	}
 
-	void Destroy();
+	virtual void Destroy();
 
-	void Load(Properties *prop);
-	void Save(Properties* prop);
+	virtual void Load(Properties *prop);
+	virtual void Save(Properties* prop);
 //	void LoadFile(string file = "");
-	void LoadFile(string file);
+	virtual void LoadFile(string file);
 	void LoadFile(string vert, string frag, string geom = "", string comp = "");
 	void Compile();
 

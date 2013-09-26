@@ -20,11 +20,11 @@ entity Rifle
 		reloadTime = 2
 		fireRate = 2
 		automatic = true
-		projectilePath = entities/items/projectiles/Laser.ent
+		projectilefile = entities/items/projectiles/Laser.ent
 	}
 
 	component Mesh
 	{
-		path = meshes/suzanne.obj
+		file = meshes/suzanne.obj
 	}
 }

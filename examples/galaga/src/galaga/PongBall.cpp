@@ -23,11 +23,19 @@ Ball::~Ball()
 
 void Ball::Init()
 {
-	ConnectEvent(SENDER(game->input, Jump_Down), RECEIVER(this, StartGame));
+//	ConnectEvent(SENDER(game->input, Jump_Down), RECEIVER(this, StartGame));
 }
 
 void Ball::Update()
 {
+}
+
+void Ball::FixedUpdate()
+{
+	if(game->input->GetButtonDown("Jump"))
+	{
+		owner->TriggerEvent("ApplyCentralForce", vec3(100,100,0));
+	}
 }
 
 void Ball::StartGame()

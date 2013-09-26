@@ -26,6 +26,7 @@
 #include <lfant/Transform.h>
 #include <lfant/Rigidbody.h>
 #include <lfant/Console.h>
+#include <lfant/Input.h>
 
 // External
 
@@ -76,6 +77,10 @@ void Movement::Update()
 	Component::Update();
 }
 
+void Movement::FixedUpdate()
+{
+}
+
 void Movement::Move(vec3 velocity)
 {
 	if(rigidbody && usePhysics)
@@ -93,7 +98,7 @@ void Movement::Jump()
 {
 	if(rigidbody && usePhysics)
 	{
-	//	Log("Jumpheight: ", jumpHeight / game->time->deltaTime);
+		Log("Jumpheight: ", jumpHeight / game->time->deltaTime);
 		rigidbody->Accelerate(vec3(0, jumpHeight / game->time->deltaTime, 0));
 	}
 	else

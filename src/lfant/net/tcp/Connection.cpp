@@ -10,13 +10,7 @@ namespace lfant {
 namespace net {
 namespace tcp {
 
-Connection::Connection() :
-	socket(*io)
-{
-}
-
 Connection::Connection(asio::io_service &io) :
-	net::Connection(io),
 	socket(io)
 {
 }
@@ -25,60 +19,31 @@ Connection::~Connection()
 {
 }
 
-void Connection::OnDestroy()
+void Connection::OpenSocket()
 {
-	io->stop();
+	socket.open(boost::asio::ip::tcp::v4());
 }
 
-void Connection::OnGetData(const boost::system::error_code &error)
+void Connection::Deinit()
 {
-	OnGetData(error, &socket);
-}
-
-void Connection::OnGetData(const boost::system::error_code &error, asio::ip::tcp::socket* sock)
-{
-	Log("tcp::Connection::OnGetData: Touch.");
-	if(error)
-	{
-		Log("Connection::OnGetData: Error '"+error.message()+"'.");
-	//	return;
-	}
-
-	GetData(*sock);
-}
-
-void Connection::OnSendData(const boost::system::error_code &error, size_t bytes)
-{
-	Log("Connection::OnSendData: Touch.");
-	if(error)
-	{
-		Log("Connection::OnSendData: Error '"+error.message()+"'.");
-		return;
-	}
-	else
-	{
-	//	this->OnSendData(error, bytes);
-	}
+	boost::system::error_code ec;
+	socket.shutdown( boost::asio::ip::tcp::socket::shutdown_both, ec );
+	socket.close( ec );
 }
 
 void Connection::GetData()
 {
-	GetData(socket);
-}
-
-void Connection::GetData(asio::ip::tcp::socket &sock)
-{
-	boost::asio::async_read(sock, boost::asio::buffer(lastData, 256),
-							boost::bind(&Connection::OnGetData, this, boost::asio::placeholders::error, &sock)
+	boost::asio::async_read(socket, boost::asio::buffer(lastData, 256),
+							boost::bind(&Connection::OnGetData, this, boost::asio::placeholders::error)
 							);
 }
 
 void Connection::SendData(string data)
 {
-	SendData(data, socket);
+	DoSendData(data);
 }
 
-void Connection::SendData(string data, asio::ip::tcp::socket &sock)
+void Connection::DoSendData(string data)
 {
 	Log("Connection::SendData: Touch.");
 	uint i = 0;
@@ -92,7 +57,12 @@ void Connection::SendData(string data, asio::ip::tcp::socket &sock)
 	}
 
 	Log("Connection::SendData: About to write the data.");
-	asio::async_write(sock, asio::buffer(lastData), boost::bind(&tcp::Connection::OnSendData, this, asio::placeholders::error, asio::placeholders::bytes_transferred));
+	asio::async_write(socket, boost::asio::buffer(lastData, 256), boost::bind(&Connection::OnSendData, this, asio::placeholders::error, asio::placeholders::bytes_transferred));
+}
+
+void Connection::OnGetData(const boost::system::error_code &error)
+{
+	net::Connection::OnGetData(error);
 }
 
 }

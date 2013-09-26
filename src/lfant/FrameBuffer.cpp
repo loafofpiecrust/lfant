@@ -129,7 +129,7 @@ void FrameBuffer::Init()
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void FrameBuffer::OnDestroy()
+void FrameBuffer::Deinit()
 {
 	EndRender();
 	for(auto& tex : textures)

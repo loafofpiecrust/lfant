@@ -172,11 +172,12 @@ protected:
 
 	virtual void Init();
 	virtual void Update();
-	virtual void OnDestroy() {}
+	virtual void FixedUpdate();
+//	virtual void Deinit();
 
 	void AddChild(Entity* ent);
 	void RemoveChild(Entity* ent);
-	void UnsafeDestroy();
+	void Deinit();
 
 	template<typename... P>
 	void TriggerEventWithChildren(string name, P... args)
