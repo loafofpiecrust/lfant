@@ -133,7 +133,7 @@ scene Scene
 				}
 			}
 		}
-		component BoxCollider
+		component SphereCollider
 		{
 			enabled = true
 		}
@@ -142,6 +142,162 @@ scene Scene
 			enabled = true
 		}
 		component Ball
+		{
+			enabled = true
+		}
+	}
+	entity LeftWall
+	{
+		id = 5
+		tags = {  }
+		layer = Walls
+		active = true
+		lifetime = 0
+		component Transform
+		{
+			enabled = true
+		}
+		component Mesh
+		{
+			enabled = true
+			file = meshes/plane.obj
+			material 
+			{
+				texture 
+				{
+					file = /home/taylorsnead/lazyfox/lfant/examples/galaga/bin/x64/linux/../../../assets/textures/Default.png
+					anisoLevel = 1
+				}
+				 
+				{
+					vertex = shaders/simple/Diffuse.vert
+					fragment = shaders/simple/Diffuse.frag
+					geometry = 
+				}
+			}
+		}
+		component BoxCollider
+		{
+			enabled = true
+		}
+		component Rigidbody
+		{
+			enabled = true
+		}
+	}
+	entity RightWall
+	{
+		id = 6
+		tags = {  }
+		layer = Walls
+		active = true
+		lifetime = 0
+		component Transform
+		{
+			enabled = true
+		}
+		component Mesh
+		{
+			enabled = true
+			file = meshes/plane.obj
+			material 
+			{
+				texture 
+				{
+					file = /home/taylorsnead/lazyfox/lfant/examples/galaga/bin/x64/linux/../../../assets/textures/Default.png
+					anisoLevel = 1
+				}
+				 
+				{
+					vertex = shaders/simple/Diffuse.vert
+					fragment = shaders/simple/Diffuse.frag
+					geometry = 
+				}
+			}
+		}
+		component BoxCollider
+		{
+			enabled = true
+		}
+		component Rigidbody
+		{
+			enabled = true
+		}
+	}
+	entity UpperWall
+	{
+		id = 7
+		tags = {  }
+		layer = Walls
+		active = true
+		lifetime = 0
+		component Transform
+		{
+			enabled = true
+		}
+		component Mesh
+		{
+			enabled = true
+			file = meshes/plane.obj
+			material 
+			{
+				texture 
+				{
+					file = /home/taylorsnead/lazyfox/lfant/examples/galaga/bin/x64/linux/../../../assets/textures/Default.png
+					anisoLevel = 1
+				}
+				 
+				{
+					vertex = shaders/simple/Diffuse.vert
+					fragment = shaders/simple/Diffuse.frag
+					geometry = 
+				}
+			}
+		}
+		component BoxCollider
+		{
+			enabled = true
+		}
+		component Rigidbody
+		{
+			enabled = true
+		}
+	}
+	entity LowerWall
+	{
+		id = 8
+		tags = {  }
+		layer = Walls
+		active = true
+		lifetime = 0
+		component Transform
+		{
+			enabled = true
+		}
+		component Mesh
+		{
+			enabled = true
+			file = meshes/plane.obj
+			material 
+			{
+				texture 
+				{
+					file = /home/taylorsnead/lazyfox/lfant/examples/galaga/bin/x64/linux/../../../assets/textures/Default.png
+					anisoLevel = 1
+				}
+				 
+				{
+					vertex = shaders/simple/Diffuse.vert
+					fragment = shaders/simple/Diffuse.frag
+					geometry = 
+				}
+			}
+		}
+		component BoxCollider
+		{
+			enabled = true
+		}
+		component Rigidbody
 		{
 			enabled = true
 		}

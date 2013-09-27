@@ -30,6 +30,7 @@
 #include <lfant/Mesh.h>
 #include <lfant/Console.h>
 #include <lfant/Rigidbody.h>
+#include <lfant/physics/MotionState.h>
 
 namespace lfant {
 
@@ -63,7 +64,7 @@ void Rigidbody::Load(Properties* prop)
 {
 	Component::Load(prop);
 
-	float friction = 1.0f, restitution = 0.0f, mass = 1.0f;
+	float friction = 1.0f, restitution = 1.0f, mass = 1.0f;
 	vec3 vel(0);
 
 	prop->Get("mass", mass);
@@ -99,7 +100,7 @@ void Rigidbody::Init()
 	Component::Init();
 
 	Log("Rigidbody::Init: Touch. Entity name: ", owner->name);
-	motionState = new btDefaultMotionState;
+	motionState = new physics::MotionState(this);
 	Log("Rigidbody::Init: Spawning underlying btRigidBody.");
 	if((collider = owner->GetComponent<Collider>()))
 	{
@@ -134,12 +135,13 @@ void Rigidbody::Init()
 
 void Rigidbody::Update()
 {
+	/*
 	vec3 pos = vec3_cast<vec3>(body->getWorldTransform().getOrigin());
 	if(pos != owner->transform->GetPosition())
 	{
 		owner->transform->SetPosition(pos);
 	}
-
+	*/
 	/*
 	vec3 rot = degrees(eulerAngles(quat_cast<quat>(body->getWorldTransform().getRotation())));
 	Log(lexical_cast<string>(rot));
@@ -171,23 +173,23 @@ void Rigidbody::Deinit()
 
 void Rigidbody::OnSetPos( vec3 pos )
 {
-	if(pos == vec3_cast<vec3>(body->getWorldTransform().getOrigin()))
+/*	if(pos == vec3_cast<vec3>(body->getWorldTransform().getOrigin()))
 	{
 		return;
-	}
+	}*/
 //	Log("OnSetPos: Touch.");
 	body->getWorldTransform().setOrigin(vec3_cast<btVector3>(pos));
 }
 
 void Rigidbody::OnSetRot( vec3 rot )
-{
+{/*
 //	Log("Setting rot");
 	btQuaternion q = quat_cast<btQuaternion>(quat(radians(rot)));
 	if(q == body->getWorldTransform().getRotation())
 	{
 		return;
 	}
-	body->getWorldTransform().setRotation(q);
+	body->getWorldTransform().setRotation(q);*/
 }
 
 /*******************************************************************************
