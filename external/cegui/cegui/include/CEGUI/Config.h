@@ -108,6 +108,24 @@ setting CMake options and regenerating, rather than editing directly.
 #endif
 
 //////////////////////////////////////////////////////////////////////////
+// Defines for Ogre version we were built against
+// (Will be all zeroes if Ogre was not found)
+//////////////////////////////////////////////////////////////////////////
+#ifndef CEGUI_OGRE_VERSION_MAJOR
+#   define CEGUI_OGRE_VERSION_MAJOR 
+#endif
+#ifndef CEGUI_OGRE_VERSION_MINOR
+#   define CEGUI_OGRE_VERSION_MINOR 
+#endif
+#ifndef CEGUI_OGRE_VERSION_PATCH
+#   define CEGUI_OGRE_VERSION_PATCH 
+#endif
+#ifndef CEGUI_OGRE_VERSION
+#   define CEGUI_OGRE_VERSION ((CEGUI_OGRE_VERSION_MAJOR << 16) | (CEGUI_OGRE_VERSION_MINOR << 8) | CEGUI_OGRE_VERSION_PATCH)
+#endif
+
+
+//////////////////////////////////////////////////////////////////////////
 // The following controls whether freetype based font support will be
 // compiled in (default).  If you want to build CEGUI /without/ freetype
 // support, comment the following line.
@@ -175,6 +193,11 @@ setting CMake options and regenerating, rather than editing directly.
 #else
 #   define CEGUI_MODULE_DIR "/usr/local//"
 #endif
+
+// This is defined when iconv is expecting a const char** and not a char**
+// as type for its inbuf parameter. This is only used when building cegui
+// itself, and likely will not be useful externally.
+/* #undef CEGUI_ICONV_USES_CONST_INBUF */
 
 #endif	// end of guard _CEGUIConfig_h_
 

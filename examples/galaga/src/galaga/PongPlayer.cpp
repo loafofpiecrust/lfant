@@ -28,7 +28,7 @@ void Player::Init()
 {
 	rigidbody = owner->GetComponent<Rigidbody>();
 	float t = game->time->GetTime();
-	ConnectEvent(SENDER(owner, SetComponentRigidbody), &rigidbody);
+	ConnectEvent(SENDER(owner, OnSetComponentRigidbody), &rigidbody);
 	Log("pong::Player::Init: ConnectEvent took ", (game->time->GetTime() - t)*1000, " milliseconds");
 }
 
@@ -48,6 +48,7 @@ void Player::Update()
 	{
 		Log("Player position: ", lexical_cast<string>(owner->transform->GetPosition()));
 		Log("Player rotation: ", lexical_cast<string>(owner->transform->GetRotation()));
+		Log("Player direction: ", lexical_cast<string>(owner->transform->GetDirection()));
 	}
 	/*
 	val = game->input->GetAxis("Horizontal");

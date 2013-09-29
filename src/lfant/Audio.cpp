@@ -26,6 +26,8 @@
 
 // External
 //#include <bass.h>
+#include <AL/al.h>
+#include <AL/alc.h>
 
 namespace lfant
 {
@@ -43,6 +45,21 @@ Audio::~Audio()
 void Audio::Init()
 {
 	Subsystem::Init();
+
+	device = alcOpenDevice(0);
+	if(!device)
+	{
+		// failed to create
+	}
+
+	context = alcCreateContext(device, 0);
+	alcMakeContextCurrent(context);
+	if(!context)
+	{
+		// failed to create
+	}
+
+	
 }
 
 void Audio::Update()
@@ -53,15 +70,5 @@ void Audio::Update()
 void Audio::Deinit()
 {
 }
-
-/*
- Audio::PlaySound(string file, bool loop)
-{
-}
-
- Audio::PlaySound3d(string file, vec3 position, bool loop)
-{
-}
-*/
 
 }

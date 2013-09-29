@@ -26,12 +26,7 @@
 // Internal
 #include <lfant/Component.h>
 #include <lfant/Range.h>
-
-namespace FMOD
-{
-class Sound;
-class Channel;
-}
+#include <lfant/Sound.h>
 
 namespace lfant
 {
@@ -54,25 +49,20 @@ public:
 
 	virtual void Init();
 
-	virtual void Play();
-	virtual void Pause();
-	virtual void Stop();
-	virtual void Restart();
-
-	void SetSource(string file);
-
-	void SetVolume(float volume);
+	Sound* AddSound(string name);
+	Sound* GetSound(string name);
 
 protected:
 
 	void OnSetPosition();
+	void OnSetRotation();
+	void OnSetVelocity(vec3 vel);
 
-	uint32 sourceId = 0;
-
-	FMOD::Sound* sound;
-	FMOD::Channel* channel;
+	float pitch;
 	float volume;
 	Range<float> distanceLimits;
+
+	deque<Sound> sounds;
 
 private:
 	string inputFile = "";
