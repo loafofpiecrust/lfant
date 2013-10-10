@@ -124,7 +124,7 @@ void Player::Update()
 	float value = 0.0f;
 	if((value = game->input->GetAxis("Horizontal")) != 0.0f)
 	{
-		TriggerEvent("Move", game->scene->mainCamera->owner->transform->GetRight() * -value);
+		TriggerEvent("Move", game->scene->mainCamera->owner->transform->GetRight() * value);
 	//	TriggerEvent("Move", owner->transform->GetRight() * value);
 	}
 	if((value = game->input->GetAxis("Vertical")) != 0.0f)
@@ -152,7 +152,7 @@ void Player::Update()
 	{
 		Log("Player rotation: ", lexical_cast<string>(owner->transform->GetRotation()));
 		Log("Camera rotation: ", lexical_cast<string>(game->scene->mainCamera->owner->transform->GetRotation()));
-	//	Log("Camera direction: ", lexical_cast<string>(game->scene->mainCamera->owner->transform->GetDirection()));
+		Log("Camera direction: ", lexical_cast<string>(game->scene->mainCamera->owner->transform->GetDirection()));
 	//	Log("Camera right: ", lexical_cast<string>(game->scene->mainCamera->owner->transform->GetRight()));
 	//	Log("Camera up: ", lexical_cast<string>(game->scene->mainCamera->owner->transform->GetUp()));
 	//	Log("Camera matrix: ", lexical_cast<string>(game->scene->mainCamera->owner->transform->GetMatrix()));

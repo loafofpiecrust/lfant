@@ -414,6 +414,8 @@ void UserInterface::Update()
 	context->draw();
 	renderer->endRendering();
 	windowManager->cleanDeadPool();
+
+	glEnable(GL_DEPTH_TEST);
 }
 
 void UserInterface::Deinit()

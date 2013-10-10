@@ -79,19 +79,18 @@ if(PLATFORM STREQUAL "windows")
 else()
 	list(REMOVE_ITEM SRC_FILES
 		${PROJECT_SOURCE_DIR}/cegui/src/Win32StringTranscoder.cpp
+		${PROJECT_SOURCE_DIR}/cegui/src/Win32ClipboardProvider.cpp
 		${PROJECT_SOURCE_DIR}/cegui/src/RendererModules/OpenGL/WGLPBTextureTarget.cpp
 		)
 endif()
 
-if(PLATFORM STREQUAL "macosx")
-else()
+if(NOT PLATFORM STREQUAL "macosx")
 	list(REMOVE_ITEM SRC_FILES
 		${PROJECT_SOURCE_DIR}/cegui/src/RendererModules/OpenGL/ApplePBTextureTarget.cpp
 		)
 endif()
 
-if(PLATFORM STREQUAL "linux")
-else()
+if(NOT PLATFORM STREQUAL "linux")
 	list(REMOVE_ITEM SRC_FILES
 		${PROJECT_SOURCE_DIR}/cegui/src/RendererModules/OpenGL/GLXPBTextureTarget.cpp
 		)

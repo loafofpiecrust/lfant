@@ -92,7 +92,7 @@ public:
 	{
 		C* comp = new C();
 		AddComponent(comp);
-		TriggerEvent("SetComponent"+type::Unscope(type::Name(comp)), comp);
+		TriggerEvent("OnSetComponent"+type::Unscope(type::Name(comp)), comp);
 		return comp;
 	}
 

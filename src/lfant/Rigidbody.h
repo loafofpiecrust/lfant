@@ -31,10 +31,15 @@ class btTransform;
 class btVector3;
 class btCollisionShape;
 
-namespace lfant
-{
+namespace lfant {
+
+namespace physics {
+	class MotionState;
+}
+
 class Collider;
 class Mesh;
+
 
 /** @addtogroup Game
  *	 @{
@@ -54,6 +59,7 @@ class Mesh;
 class Rigidbody : public Component
 {
 	friend class Physics;
+	friend class physics::MotionState;
 	DECLARE_COMP(Rigidbody)
 public:
 

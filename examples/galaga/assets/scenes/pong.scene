@@ -11,7 +11,7 @@ scene Pong
 
 		component Transform
 		{
-			position = (0,0,6)
+			position = (0,0,8)
 			rotation = (90,0,0)
 		}
 
@@ -29,7 +29,7 @@ scene Pong
 		component Transform
 		{
 			position = (0.5f,0,0)
-			scale = (0.1, 0.1, 0.1)
+			scale = (0.05, 0.3, 0.1)
 		//	rotation = (-90,0,0)
 		}
 
@@ -65,7 +65,7 @@ scene Pong
 		component Transform
 		{
 			position = (-1.0f,0,0)
-			scale = (0.1, 0.1, 0.1)
+			scale = (0.05, 0.3, 0.1)
 		}
 
 		component Mesh
@@ -108,20 +108,130 @@ scene Pong
 
 		// Add Ball/Puck comp
 
-		component BoxCollider
+		component SphereCollider
 		{
 			// Set size?
+			size = (1,1,1)
 		}
 
 		component Rigidbody
 		{
-			friction = 1.5f
+			friction = 1.3f
 			restitution = 1.01f
 			lockPosition = (0,0,1)
+			lockRotation = (1,1,1)
 		}
 
 		component pong::Ball
 		{
+		}
+	}
+
+	entity LeftWall
+	{
+		layer = Walls
+
+		component Transform
+		{
+			position = (-1.5f,0,0)
+			scale = (0.02, 1.0, 0.1)
+		}
+
+		component Mesh
+		{
+			file = meshes/plane.obj
+			material = materials/Diffuse.mat
+		}
+
+		component BoxCollider
+		{
+		}
+
+		component Rigidbody
+		{
+			mass = 0
+			restitution = 1
+		}
+	}
+
+	entity RightWall
+	{
+		layer = Walls
+
+		component Transform
+		{
+			position = (1.5f,0,0)
+			scale = (0.02, 1.0, 0.1)
+		}
+
+		component Mesh
+		{
+			file = meshes/plane.obj
+			material = materials/Diffuse.mat
+		}
+
+		component BoxCollider
+		{
+		}
+
+		component Rigidbody
+		{
+			mass = 0
+			restitution = 1
+		}
+	}
+
+	entity UpperWall
+	{
+		layer = Walls
+
+		component Transform
+		{
+			position = (0,1.0f,0)
+			scale = (1.0, 0.02, 0.1)
+		}
+
+		component Mesh
+		{
+			file = meshes/plane.obj
+			material = materials/Diffuse.mat
+		}
+
+		component BoxCollider
+		{
+		}
+
+		component Rigidbody
+		{
+			mass = 0
+			restitution = 1
+		}
+	}
+
+	entity LowerWall
+	{
+		layer = Walls
+
+		component Transform
+		{
+			position = (0,-1.0f,0)
+			scale = (1.0, 0.02, 0.1)
+		}
+
+		component Mesh
+		{
+			file = meshes/plane.obj
+			material = materials/Diffuse.mat
+		}
+
+		component BoxCollider
+		{
+		}
+
+		component Rigidbody
+		{
+			mass = 0
+			restitution = 1
 		}
 	}
 }

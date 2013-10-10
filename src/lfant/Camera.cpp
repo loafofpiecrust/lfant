@@ -27,9 +27,10 @@
 #include <lfant/util/Math.h>
 #include <lfant/Console.h>
 #include <lfant/Scene.h>
+#include <lfant/Time.h>
+#include <lfant/Input.h>
 
-namespace lfant
-{
+namespace lfant {
 
 IMPLEMENT_COMP(Camera)
 
@@ -60,8 +61,8 @@ void Camera::Save(Properties* prop) const
 	prop->Set("fov", fov);
 	prop->Set("aspectRatio", aspectRatio);
 	prop->Set("viewRange", viewRange);
-	prop->Set("dof", dof);
-	prop->Set("dofWidth", dofWidth);
+	prop->Set("focalLength", focalLength);
+	prop->Set("focalDepth", focalDepth);
 //	prop->Set("mode", (short)mode);
 }
 
@@ -72,8 +73,8 @@ void Camera::Load(Properties* prop)
 	prop->Get("fov", fov);
 	prop->Get("aspectRatio", aspectRatio);
 	prop->Get("viewRange", viewRange);
-	prop->Get("dof", dof);
-	prop->Get("dofWidth", dofWidth);
+	prop->Get("focalLength", focalLength);
+	prop->Get("focalDepth", focalDepth);
 //	mode = (Mode)prop->Get<short>("mode");
 
 	UpdateProjection();
@@ -96,6 +97,15 @@ void Camera::Update()
 {
 	UpdateView();
 //	UpdateProjection();
+
+	focalLength += game->time->deltaTime * game->input->GetAxis("SetFocalLength");
+	focalDepth += game->time->deltaTime * game->input->GetAxis("SetFocalDepth");
+	fstop += game->time->deltaTime * game->input->GetAxis("SetFstop");
+
+	if(game->input->GetButtonDown("ShowDof"))
+	{
+		Log("focalLength: ", focalLength, ", focalDepth: ", focalDepth, "Fstop: ", fstop);
+	}
 }
 
 void Camera::Deinit()
@@ -120,6 +130,7 @@ void Camera::UpdateProjection()
 			Log(lexical_cast<string>(aspectRatio));
 			Log(lexical_cast<string>(viewRange));
 			projection = glm::perspective(fov/aperture, aspectRatio, viewRange.min, viewRange.max);
+		//	projection[10] = -projection[10];
 			Log("projection: ", lexical_cast<string>(projection));
 			break;
 		}
