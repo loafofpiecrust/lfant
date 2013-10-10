@@ -206,7 +206,7 @@ void Entity::AddComponent(Component* comp)
 	comp->Init();
 	TriggerEvent("AddComponent", comp);
 	Log("Entity::AddComponent: Calling ", "SetComponent"+type::Unscope(type::Name(comp)));
-	TriggerEvent("SetComponent"+type::Unscope(type::Name(comp)), comp);
+	TriggerEvent("OnSetComponent"+type::Unscope(type::Name(comp)), comp);
 }
 
 void Entity::Deinit()
@@ -290,7 +290,7 @@ void Entity::RemoveComponent(Component* comp)
 		if(components[i] == comp)
 		{
 			TriggerEvent("RemoveComponent", comp);
-			TriggerEvent("SetComponent"+type::Unscope(type::Name(comp)), comp);
+			TriggerEvent("OnSetComponent"+type::Unscope(type::Name(comp)), comp);
 			components.erase(components.begin()+i);
 			break;
 		}
@@ -307,9 +307,9 @@ void Entity::RemoveComponent()
 		if(type::Name<T>() == type::Name(comp))
 		{
 			TriggerEvent("RemoveComponent", comp);
-			TriggerEvent("SetComponent"+type::Unscope(type::Name(comp)), comp);
 			comp->Destroy();
 			components.erase(components.begin()+i);
+			TriggerEvent("OnSetComponent"+type::Unscope(type::Name<T>()), nullptr);
 		}
 	}
 }
@@ -323,9 +323,9 @@ void Entity::RemoveComponent(string type)
 		if(t == type || type::Unscope(t) == type)
 		{
 			TriggerEvent("RemoveComponent", comp);
-			TriggerEvent("SetComponent"+type::Unscope(t), comp);
 			comp->Destroy();
 			components.erase(components.begin()+i);
+			TriggerEvent("OnSetComponent"+type::Unscope(t), nullptr);
 		}
 	}
 }

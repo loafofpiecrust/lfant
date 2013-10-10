@@ -70,6 +70,12 @@ public:
 		return *this;
 	}
 
+	T& operator[](unsigned int idx)
+	{
+		if(idx == 0) return min;
+		return max;
+	}
+
 	Range() {}
 };
 

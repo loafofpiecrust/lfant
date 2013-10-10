@@ -70,6 +70,7 @@ include_directories(
 	${ROOT}/external/cegui/cegui/include
 	${ROOT}/external/squirrel/include
 	${ROOT}/external/devil/include
+	${ROOT}/external/openal/include
 #	"${ROOT}/external/gameswf"
 	)
 
@@ -82,6 +83,7 @@ target_link_libraries(${PROJECT_NAME}
 	z
 	squirrel
 	jpeg
+	openal
 	)
 
 if(NOT ANDROID)

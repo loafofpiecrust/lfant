@@ -21,7 +21,8 @@
 #include <lfant/AudioSource.h>
 
 // External
-//#include <fmod.hpp>
+#include <AL/al.h>
+#include <AL/alc.h>
 
 // Internal
 #include <lfant/Transform.h>
@@ -44,45 +45,53 @@ AudioSource::~AudioSource()
 
 void AudioSource::Init()
 {
-	if(inputFile != "")
+	ConnectEvent(SENDER(owner, OnSetPosition), RECEIVER(this, OnSetPosition));
+	ConnectEvent(SENDER(owner, OnSetRotation), RECEIVER(this, OnSetRotation));
+	ConnectEvent(SENDER(owner, OnSetVelocity), RECEIVER(this, OnSetVelocity));
+}
+
+Sound* AudioSource::AddSound(string name)
+{
+	sounds.emplace_back(this, name);
+	return &sounds[sounds.size()-1];
+}
+
+Sound* AudioSource::GetSound(string name)
+{
+	for(auto& snd : sounds)
 	{
-		SetSource(inputFile);
+		if(snd.name == name)
+		{
+			return &snd;
+		}
 	}
-
-	ConnectEvent(SENDER(owner, SetPosition), RECEIVER(this, OnSetPosition));
-}
-
-void AudioSource::SetSource(string file)
-{
-//	game->audio->soundSystem->createSound(file.c_str(), FMOD_SOFTWARE | FMOD_3D, 0, &sound);
-//	sound->set3DMinMaxDistance(distanceLimits.min, distanceLimits.max);
-
-}
-
-void AudioSource::Play()
-{
-}
-
-void AudioSource::Pause()
-{
-}
-
-void AudioSource::Stop()
-{
-}
-
-void AudioSource::Restart()
-{
+	return nullptr;
 }
 
 void AudioSource::OnSetPosition()
 {
-
+	vec3 pos = owner->transform->GetWorldPosition();
+	for(auto& snd : sounds)
+	{
+		alSource3f(snd.id, AL_POSITION, pos.x, pos.y, pos.z);
+	}
 }
 
-void AudioSource::SetVolume(float volume)
+void AudioSource::OnSetRotation()
 {
-	this->volume = volume;
+	vec3 dir = owner->transform->GetDirection();
+	for(auto& snd : sounds)
+	{
+		alSource3f(snd.id, AL_DIRECTION, dir.x, dir.y, dir.z);
+	}
+}
+
+void AudioSource::OnSetVelocity(vec3 vel)
+{
+	for(auto& snd : sounds)
+	{
+		alSource3f(snd.id, AL_VELOCITY, vel.x, vel.y, vel.z);
+	}
 }
 
 }

@@ -25,6 +25,9 @@
 // Internal
 #include <lfant/Subsystem.h>
 
+struct ALCdevice_struct;
+struct ALCcontext_struct;
+
 namespace lfant
 {
 /**	@addtogroup Game
@@ -58,7 +61,8 @@ protected:
 	virtual void Update();
 	virtual void Deinit();
 
-
+	ALCdevice_struct* device;
+	ALCcontext_struct* context;
 private:
 };
 

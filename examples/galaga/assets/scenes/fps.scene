@@ -47,7 +47,7 @@ scene FPS
 			usePhysics = true
 		}
 		/*
-		component BoxCollider
+		component BoxCollider 
 		{
 			size = (1,1,1)
 		}
@@ -64,6 +64,9 @@ scene FPS
 			{
 				mode = 0
 				fov = 90
+				focalLength = 35
+				focalDepth = 6.6
+				fstop = 2.0
 			}
 			component MouseLook
 			{
@@ -86,7 +89,7 @@ scene FPS
 			material = materials/Diffuse.mat
 		}
 
-		component BoxCollider
+	/*	component BoxCollider
 		{
 		}
 
@@ -95,6 +98,6 @@ scene FPS
 			mass = 10
 			friction = 1.5f
 			restitution = 1.3f
-		}
+		}*/
 	}
 }

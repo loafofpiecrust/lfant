@@ -41,10 +41,4 @@ btCollisionShape *BoxCollider::GetShape()
 	return shape;
 }
 
-void BoxCollider::SetSize(vec3 size)
-{
-	Collider::SetSize(size);
-	shape->setLocalScaling(vec3_cast<btVector3>(size));
-}
-
 }

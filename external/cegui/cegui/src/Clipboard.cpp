@@ -41,7 +41,6 @@ Clipboard::Clipboard():
     d_mimeType("text/plain"), // reasonable default I think
     d_buffer(0),
     d_bufferSize(0),
-    
     d_nativeProvider(0)
 {}
 
@@ -145,18 +144,22 @@ String Clipboard::getText()
     String mimeType;
     const void* buffer;
     size_t size;
-    
+
     // we have to use this, can't use the member variables directly because of
     // the native clipboard provider!
     getData(mimeType, buffer, size);
-    
+
     if (mimeType == "text/plain" && size != 0)
     {
         // d_buffer an utf8 or ASCII C string (ASCII if std::string is used)
-        
+
         // !!! However it is not null terminated !!! So we have to tell String
         // how many code units (not code points!) there are.
+#if CEGUI_STRING_CLASS == CEGUI_STRING_CLASS_UNICODE
+        return String(reinterpret_cast<const utf8*>(d_buffer), d_bufferSize);
+#else
         return String(static_cast<const char*>(d_buffer), d_bufferSize);
+#endif
     }
     else
     {

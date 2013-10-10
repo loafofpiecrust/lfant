@@ -115,7 +115,7 @@ protected:
 	template<typename T>
 	void RequireComponent(T*& val)
 	{
-		ConnectEvent(owner, "SetComponent"+RemoveScoping(Type(*val)), val);
+		ConnectEvent(owner, "OnSetComponent"+RemoveScoping(Type(*val)), val);
 		if(T* t = owner->GetComponent<T>())
 		{
 			val = t;
@@ -127,7 +127,7 @@ protected:
 	template<typename T>
 	void RequireComponent(string type, T*& val)
 	{
-		ConnectEvent(owner, "SetComponent"+type, val);
+		ConnectEvent(owner, "OnSetComponent"+type, val);
 		if(Component* comp = owner->GetComponent(type))
 		{
 			val = dynamic_cast<T*>(comp);

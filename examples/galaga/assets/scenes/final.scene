@@ -1,31 +1,10 @@
 scene Scene
 {
-	entity Observer
+	entity Floor
 	{
 		id = 1
 		tags = {  }
-		layer = Other
-		active = true
-		lifetime = 0
-		component Transform
-		{
-			enabled = true
-		}
-		component Camera
-		{
-			enabled = true
-			fov = 90
-			aspectRatio = 1.77777779
-			viewRange = 0.00999999978-1000
-			dof = 20
-			dofWidth = 10
-		}
-	}
-	entity Player1
-	{
-		id = 2
-		tags = {  }
-		layer = Players
+		layer = Main
 		active = true
 		lifetime = 0
 		component Transform
@@ -56,6 +35,18 @@ scene Scene
 			enabled = true
 		}
 		component Rigidbody
+		{
+			enabled = true
+		}
+	}
+	entity Player
+	{
+		id = 2
+		tags = {  }
+		layer = Main
+		active = true
+		lifetime = 0
+		component Transform
 		{
 			enabled = true
 		}
@@ -63,51 +54,41 @@ scene Scene
 		{
 			enabled = true
 		}
-	}
-	entity Player2
-	{
-		id = 3
-		tags = {  }
-		layer = Players
-		active = true
-		lifetime = 0
-		component Transform
+		component Movement
 		{
 			enabled = true
 		}
-		component Mesh
+		entity Cam
 		{
-			enabled = true
-			file = meshes/plane.obj
-			material 
+			id = 3
+			tags = {  }
+			layer = Main
+			active = true
+			lifetime = 0
+			component Transform
 			{
-				texture 
-				{
-					file = /home/taylorsnead/lazyfox/lfant/examples/galaga/bin/x64/linux/../../../assets/textures/Default.png
-					anisoLevel = 1
-				}
-				 
-				{
-					vertex = shaders/simple/Diffuse.vert
-					fragment = shaders/simple/Diffuse.frag
-					geometry = 
-				}
+				enabled = true
+			}
+			component Camera
+			{
+				enabled = true
+				fov = 90
+				aspectRatio = 1.77777779
+				viewRange = 0.00999999978-1000
+				focalLength = 35
+				focalDepth = 6.5999999
+			}
+			component MouseLook
+			{
+				enabled = false
 			}
 		}
-		component BoxCollider
-		{
-			enabled = true
-		}
-		component Rigidbody
-		{
-			enabled = true
-		}
 	}
-	entity Ball
+	entity HeadThing
 	{
 		id = 4
 		tags = {  }
-		layer = Pucks
+		layer = Main
 		active = true
 		lifetime = 0
 		component Transform
@@ -117,7 +98,7 @@ scene Scene
 		component Mesh
 		{
 			enabled = true
-			file = meshes/plane.obj
+			file = meshes/suzanne.obj
 			material 
 			{
 				texture 
@@ -132,18 +113,6 @@ scene Scene
 					geometry = 
 				}
 			}
-		}
-		component BoxCollider
-		{
-			enabled = true
-		}
-		component Rigidbody
-		{
-			enabled = true
-		}
-		component Ball
-		{
-			enabled = true
 		}
 	}
 }

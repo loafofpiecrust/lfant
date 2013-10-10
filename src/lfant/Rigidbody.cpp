@@ -30,6 +30,7 @@
 #include <lfant/Mesh.h>
 #include <lfant/Console.h>
 #include <lfant/Rigidbody.h>
+#include <lfant/physics/MotionState.h>
 
 namespace lfant {
 
@@ -63,7 +64,7 @@ void Rigidbody::Load(Properties* prop)
 {
 	Component::Load(prop);
 
-	float friction = 1.0f, restitution = 0.0f, mass = 1.0f;
+	float friction = 1.0f, restitution = 1.0f, mass = 1.0f;
 	vec3 vel(0);
 
 	prop->Get("mass", mass);
@@ -99,7 +100,7 @@ void Rigidbody::Init()
 	Component::Init();
 
 	Log("Rigidbody::Init: Touch. Entity name: ", owner->name);
-	motionState = new btDefaultMotionState;
+	motionState = new physics::MotionState(this);
 	Log("Rigidbody::Init: Spawning underlying btRigidBody.");
 	if((collider = owner->GetComponent<Collider>()))
 	{
@@ -117,9 +118,12 @@ void Rigidbody::Init()
 	Log("Rigidbody::Init: Adding Rigidbody to physics system.");
 	game->physics->AddRigidbody(this);
 
-	ConnectEvent(SENDER(owner, SetPosition), RECEIVER(this, OnSetPos));
-	ConnectEvent(SENDER(owner, SetRotation), RECEIVER(this, OnSetRot));
-	ConnectEvent(SENDER(owner, SetComponentCollider), RECEIVER(this, OnSetCollider));
+	// reactions
+	ConnectEvent(SENDER(owner, OnSetPosition), RECEIVER(this, OnSetPos));
+	ConnectEvent(SENDER(owner, OnSetRotation), RECEIVER(this, OnSetRot));
+	ConnectEvent(SENDER(owner, OnSetComponentCollider), RECEIVER(this, OnSetCollider));
+
+	// actions
 	ConnectEvent(SENDER(owner, ApplyForce), RECEIVER(this, ApplyForce));
 	ConnectEvent(SENDER(owner, ApplyCentralForce), RECEIVER(this, ApplyCentralForce));
 	ConnectEvent(SENDER(owner, Accelerate), RECEIVER(this, Accelerate));
@@ -134,12 +138,13 @@ void Rigidbody::Init()
 
 void Rigidbody::Update()
 {
+	/*
 	vec3 pos = vec3_cast<vec3>(body->getWorldTransform().getOrigin());
 	if(pos != owner->transform->GetPosition())
 	{
 		owner->transform->SetPosition(pos);
 	}
-
+	*/
 	/*
 	vec3 rot = degrees(eulerAngles(quat_cast<quat>(body->getWorldTransform().getRotation())));
 	Log(lexical_cast<string>(rot));
@@ -171,23 +176,25 @@ void Rigidbody::Deinit()
 
 void Rigidbody::OnSetPos( vec3 pos )
 {
-	if(pos == vec3_cast<vec3>(body->getWorldTransform().getOrigin()))
+/*	if(pos == vec3_cast<vec3>(body->getWorldTransform().getOrigin()))
 	{
 		return;
-	}
+	}*/
 //	Log("OnSetPos: Touch.");
 	body->getWorldTransform().setOrigin(vec3_cast<btVector3>(pos));
 }
 
 void Rigidbody::OnSetRot( vec3 rot )
-{
+{/*
 //	Log("Setting rot");
 	btQuaternion q = quat_cast<btQuaternion>(quat(radians(rot)));
 	if(q == body->getWorldTransform().getRotation())
 	{
 		return;
 	}
-	body->getWorldTransform().setRotation(q);
+	body->getWorldTransform().setRotation(q);*/
+	rot = radians(rot);
+	body->getWorldTransform().setRotation(quat_cast<btQuaternion>(quat(rot)));
 }
 
 /*******************************************************************************
@@ -245,6 +252,7 @@ vec3 Rigidbody::GetVelocity()
 void Rigidbody::SetVelocity(vec3 vel)
 {
 	body->setLinearVelocity(vec3_cast<btVector3>(vel));
+	TriggerEvent("OnSetVelocity", vel);
 }
 
 void Rigidbody::OnSetCollider(Collider *collider)
@@ -275,6 +283,8 @@ void Rigidbody::ApplyCentralForce(vec3 force)
 	}*/
 //	Log("Applying central force: ", lexical_cast<string>(force));
 	body->applyCentralForce(vec3_cast<btVector3>(force));
+	TriggerEvent("OnApplyForce", force, vec3(0));
+	TriggerEvent("OnSetVelocity", vec3_cast<vec3>(body->getLinearVelocity()));
 }
 
 void Rigidbody::ApplyForce(vec3 force, vec3 pos)
@@ -287,6 +297,8 @@ void Rigidbody::ApplyForce(vec3 force, vec3 pos)
 		if(abs(vel[2]) >= maxSpeed) force.z = 0.0f;
 	}*/
 	body->applyForce(vec3_cast<btVector3>(force), vec3_cast<btVector3>(pos));
+	TriggerEvent("OnApplyForce", force, pos);
+	TriggerEvent("OnSetVelocity", vec3_cast<vec3>(body->getLinearVelocity()));
 }
 
 void Rigidbody::Accelerate(vec3 force)

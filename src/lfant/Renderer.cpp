@@ -165,8 +165,8 @@ void Renderer::Init()
 
 	// Backface culling
 	glEnable(GL_CULL_FACE);
-//	glCullFace(GL_BACK);
-//	glFrontFace(GL_CCW);
+	glCullFace(GL_BACK);
+	glFrontFace(GL_CCW);
 
 	// Texture and shading
 	glEnable(GL_TEXTURE_2D);
@@ -190,7 +190,7 @@ void Renderer::Init()
 	frameBuffer->AddTexture("positionTex", Texture::Format::RGB32F, Texture::Format::RGB);
 	frameBuffer->AddTexture("normalTex", Texture::Format::RGB32F, Texture::Format::RGB);
 //	frameBuffer->AddTexture("specularTex", Texture::Format::RGBA, Texture::Format::RGBA);
-//	frameBuffer->AddDepthTexture("depthTex");
+	frameBuffer->AddDepthTexture("depthTex");
 
 	frameBuffer->SetRect({0,0,resolution.x,resolution.y});
 	frameBuffer->hasDepth = true;
@@ -217,6 +217,13 @@ static bool fboDrawn = false;
 
 void Renderer::PreUpdate()
 {
+#if !ANDROID
+	glfwSwapBuffers(window);
+	glfwPollEvents();
+#endif
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+//	glEnable(GL_DEPTH_TEST);
 	frameBuffer->Bind();
 	glViewport(0,0,resolution.x,resolution.y);
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -243,7 +250,7 @@ void Renderer::Update()
 	//	glEnable(GL_DEPTH_TEST);
 	}
 
-	glEnable(GL_DEPTH_TEST);
+//	glEnable(GL_DEPTH_TEST);
 
 	// Rendering to the framebuffer
 
@@ -251,12 +258,6 @@ void Renderer::Update()
 	glViewport(0,0,resolution.x,resolution.y);
 
 	frameBuffer->Render();
-
-#if !ANDROID
-	glfwSwapBuffers(window);
-	glfwPollEvents();
-#endif
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void Renderer::Deinit()
