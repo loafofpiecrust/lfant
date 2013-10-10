@@ -65,7 +65,7 @@ public:
 
 	void SetDirection();
 	void SetMatrix();
-	mat4 GetMatrix();
+	const mat4& GetMatrix();
 
 	vec3 GetDirection();
 	vec3 GetRight();

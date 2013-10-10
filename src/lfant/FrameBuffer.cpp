@@ -27,6 +27,7 @@
 #include <lfant/Camera.h>
 #include <lfant/Scene.h>
 #include <lfant/Transform.h>
+#include <lfant/Input.h>
 
 // External
 #if !ANDROID
@@ -105,6 +106,7 @@ void FrameBuffer::Init()
 		if(depthTexture)
 		{
 			depthTexture->SetFormat(Texture::Format::Depth32F, Texture::Format::Depth);
+			depthTexture->wrapMode = Texture::WrapMode::Clamp;
 		//	depthTexture->dataType = Texture::DataType::Float;
 			depthTexture->size = uvec2(rect.width, rect.height);
 			tex->SetIndex(startIndex+textures.size());
@@ -276,8 +278,11 @@ void FrameBuffer::BeginRender()
 		shader->AddUniform(depthTexName);
 	}
 	
-	shader->AddUniform("cameraPosition");
-	shader->AddUniform("cameraDof");
+	shader->AddUniform("cameraRange");
+	shader->AddUniform("focalDepth");
+	shader->AddUniform("focalLength");
+	shader->AddUniform("fstop");
+	shader->AddUniform("textureSize");
 
 	posBuffer.push_back(vec2(-1, -1));
 	posBuffer.push_back(vec2(1, -1));
@@ -303,8 +308,13 @@ void FrameBuffer::Render()
 		shader->SetUniform(depthTexName, depthTexture);
 	}
 	
-	shader->SetUniform("cameraPosition", game->scene->mainCamera->owner->transform->GetWorldPosition());
-	shader->SetUniform("cameraDof", vec2(game->scene->mainCamera->dof, game->scene->mainCamera->dofWidth));
+//	shader->SetUniform("cameraPosition", game->scene->mainCamera->owner->transform->GetWorldPosition());
+//	shader->SetUniform("cameraDof", vec2(game->scene->mainCamera->dof - game->scene->mainCamera->dofWidth, game->scene->mainCamera->dof + game->scene->mainCamera->dofWidth));
+	shader->SetUniform("focalDepth", game->scene->mainCamera->focalDepth);
+	shader->SetUniform("focalLength", game->scene->mainCamera->focalLength);
+	shader->SetUniform("fstop", game->scene->mainCamera->fstop);
+	shader->SetUniform("textureSize", (vec2)game->renderer->GetResolution());
+	shader->SetUniform("cameraRange", vec2_cast<vec2>(game->scene->mainCamera->GetViewRange()));
 
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, posBuffer);

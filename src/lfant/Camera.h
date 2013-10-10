@@ -105,8 +105,9 @@ public:
 	};
 	Mode mode = Mode::Perspective;
 	
-	float dofWidth = 10.0f;
-	float dof = 20.0f;
+	float focalLength = 35.0f;
+	float focalDepth = 6.6f;
+	float fstop = 1.0f;
 
 protected:
 

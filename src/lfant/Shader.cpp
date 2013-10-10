@@ -11,6 +11,7 @@
 
 // External
 #include <GL/glew.h>
+#include <boost/range/algorithm/remove_if.hpp>
 
 namespace lfant
 {
@@ -182,9 +183,27 @@ uint32 Shader::Compile(uint32 type, const string &path)
 	string line = "";
 	string source = "";
 
+	deque<string> str;
 	while(stream.good())
 	{
 		getline(stream, line);
+		// extra parsing code?
+		if(line[0] == '#')
+		{
+			str = Split(line, "\t <>\"");
+			if(str[0] == "#include")
+			{
+				ifstream stream2(game->fileSystem->GetGamePath(str[1]));
+				string line = "";
+				while(stream2.good())
+				{
+					getline(stream2, line);
+					source += "\n"+line;
+				}
+				stream2.close();
+				continue;
+			}
+		}
 		source += "\n"+line;
 	}
 	stream.close();
@@ -225,6 +244,16 @@ void Shader::CheckErrors()
 void Shader::SetUniform(string name, float val)
 {
 	glUniform1f(GetUniform(name), val);
+}
+
+void Shader::SetUniform(string name, int val)
+{
+	glUniform1i(GetUniform(name), val);
+}
+
+void Shader::SetUniform(string name, unsigned int val)
+{
+	glUniform1ui(GetUniform(name), val);
 }
 
 void Shader::SetUniform(string name, const vec2& val)

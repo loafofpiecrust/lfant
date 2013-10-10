@@ -75,8 +75,8 @@ scene Scene
 				fov = 90
 				aspectRatio = 1.77777779
 				viewRange = 0.00999999978-1000
-				dof = 20
-				dofWidth = 10
+				focalLength = 35
+				focalDepth = 6.5999999
 			}
 			component MouseLook
 			{
@@ -113,14 +113,6 @@ scene Scene
 					geometry = 
 				}
 			}
-		}
-		component BoxCollider
-		{
-			enabled = true
-		}
-		component Rigidbody
-		{
-			enabled = true
 		}
 	}
 }

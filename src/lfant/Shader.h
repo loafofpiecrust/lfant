@@ -76,6 +76,8 @@ public:
 	void AddUniform(string name);
 	
 	void SetUniform(string name, float val);
+	void SetUniform(string name, int val);
+	void SetUniform(string name, unsigned int val);
 	void SetUniform(string name, const vec2& val);
 	void SetUniform(string name, const vec3& val);
 	void SetUniform(string name, const vec4& val);
