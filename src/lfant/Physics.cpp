@@ -43,7 +43,7 @@ Physics::~Physics()
 {
 }
 
-void Physics::Save(Properties* prop)
+void Physics::Save(Properties* prop) const
 {
 	Subsystem::Save(prop);
 
@@ -155,7 +155,8 @@ void Physics::Update()
 
 void Physics::Deinit()
 {
-	world.reset();
+	Subsystem::Deinit();
+//	world.reset();
 }
 
 /*******************************************************************************
@@ -164,7 +165,7 @@ void Physics::Deinit()
 *
 *******************************************************************************/
 
-vec3 Physics::GetGravity()
+vec3 Physics::GetGravity() const
 {
 	return vec3_cast<vec3>(world->getGravity());
 }

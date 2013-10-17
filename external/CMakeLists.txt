@@ -11,6 +11,7 @@ add_subdirectory(zlib)
 add_subdirectory(png)
 add_subdirectory(jpeg)
 add_subdirectory(openal)
+add_subdirectory(wxwidgets)
 
 if(NOT ANDROID)
 add_subdirectory(glew)

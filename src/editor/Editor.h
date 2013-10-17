@@ -2,12 +2,11 @@
 #pragma once
 #include <lfant/stdafx.h>
 
-// External
-#include <forward_list>
-
 // Internal
 #include <lfant/Game.h>
 
+// External
+#include <forward_list>
 
 namespace lfant {
 namespace editor {

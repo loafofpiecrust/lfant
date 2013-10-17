@@ -59,7 +59,7 @@ Texture::Texture() :
 {
 }
 
-void Texture::Load(Properties *prop)
+void Texture::Load(Properties* prop)
 {
 	prop->Get("file", path);
 	Log("Tex path: '"+path+"'.");
@@ -68,7 +68,7 @@ void Texture::Load(Properties *prop)
 	LoadFile(path);
 }
 
-void Texture::Save(Properties *prop)
+void Texture::Save(Properties* prop) const
 {
 	Object::Save(prop);
 
@@ -132,7 +132,7 @@ void Texture::Deinit()
 	glDeleteTextures(1, &id);
 }
 
-void Texture::SetIndex(uint32 idx)
+void Texture::SetIndex(uint32_t idx)
 {
 	index = idx;
 }

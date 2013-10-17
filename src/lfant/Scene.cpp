@@ -27,6 +27,7 @@
 #include <lfant/Time.h>
 #include <lfant/Physics.h>
 #include <lfant/Network.h>
+#include <lfant/Renderer.h>
 
 // External
 
@@ -51,31 +52,29 @@ void Scene::Update()
 	Subsystem::Update();
 	for(auto& ent : entities)
 	{
-		if(!ent)
-		{
+		if(!ent || !ent->active)
 			continue;
-		}
 		
-		if(ent->active)
-		{
-			ent->Update();
-		}
+		ent->Update();
+		ent->Render();
 	}
+/*	for(auto& ent : entities)
+	{
+		if(!ent || !ent->active)
+			continue;
+		
+		ent->Render();
+	}*/
 }
 
 void Scene::FixedUpdate()
 {
 	for(auto& ent : entities)
 	{
-		if(!ent)
-		{
+		if(!ent || !ent->active)
 			continue;
-		}
 
-		if(ent->active)
-		{
-			ent->FixedUpdate();
-		}
+		ent->FixedUpdate();
 	}
 }
 
@@ -207,6 +206,10 @@ void Scene::Load(Properties *prop)
 		{
 			game->network->Load(i);
 		}
+	/*	else if(i->id == "Renderer")
+		{
+			game->renderer->Load(i);
+		}*/
 	}
 
 	Entity* ent = nullptr;

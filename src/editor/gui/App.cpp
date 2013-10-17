@@ -4,8 +4,13 @@
 // Internal
 #include <editor/gui/Window.h>
 #include <lfant/Rect.h>
+#include <lfant/Console.h>
+#include <editor/Editor.h>
 
 // External
+#include <wx/wx.h>
+
+IMPLEMENT_APP(lfant::editor::gui::App)
 
 namespace lfant {
 namespace editor {
@@ -22,16 +27,46 @@ App::~App()
 
 bool App::OnInit()
 {
+//	Log("Called OnInit, ", this);
+	game = new Editor;
+	game->Init();
 	window = new Window("lfant", Rect(100, 50, 450, 340));
 	window->Show(true);
 	window->Init();
 	SetTopWindow(window);
+
+	ActivateRenderLoop(true);
+
+//	Connect( wxID_ANY, wxEVT_IDLE, wxIdleEventHandler(App::OnIdle) );
 	return true;
 }
 
-int App::MainLoop()
+void App::ActivateRenderLoop(bool on)
 {
-	
+//	if(!this) Log("Um this gone? ", this); return;
+	if(on && !render_loop_on)
+	{
+		Connect( wxID_ANY, wxEVT_IDLE, wxIdleEventHandler(App::OnIdle) );
+		render_loop_on = true;
+	}
+	else if(!on && render_loop_on)
+	{
+		Disconnect( wxEVT_IDLE, wxIdleEventHandler(App::OnIdle) );
+		render_loop_on = false;
+	}
+}
+
+void App::OnIdle(wxIdleEvent& evt)
+{
+//	if(render_loop_on)
+	{
+	//	std::cout << "App::OnIdle: Touch.\n";
+	//	Log("App::OnIdle: Touch.");
+	//  drawPane->paintNow();
+	//	window->paint();
+	//	game->Update();
+		evt.RequestMore(); // render continuously, not only once on idle
+	}
 }
 
 }

@@ -56,15 +56,15 @@ protected:
 	{
 	}
 
-	void Save(Properties* prop);
-	void Load(Properties* prop);
+	virtual void Save(Properties* prop) const;
+	virtual void Load(Properties* prop);
 
 	virtual void Init();
 	virtual void OnSetScale(vec3 scale);
 
 	virtual btCollisionShape* GetShape() = 0;
 
-	virtual vec3 GetSize() { return size; }
+	virtual vec3 GetSize() const { return size; }
 	virtual void SetSize(vec3 size) { this->size = size; }
 
 	Rigidbody* rigidbody;

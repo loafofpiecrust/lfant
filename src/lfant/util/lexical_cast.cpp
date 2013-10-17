@@ -197,7 +197,7 @@ string lexical_cast<string, bool>(const bool& src)
 template<>
 string lexical_cast<string, float>(const float& src)
 {
-	return boost::lexical_cast<string>(src);
+	return to_string(src);
 }
 
 template<>

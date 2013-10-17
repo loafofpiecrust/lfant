@@ -80,15 +80,12 @@ public:
 	virtual ~Sprite();
 
 	// Loop functions
-//	virtual void Init();
+	virtual void Init();
 	virtual void Update();
-//	virtual void Deinit();
+	virtual void Render();
+	virtual void Deinit();
 
-	void Load(Properties *props);
-
-	void BeginRender();
-	void Render();
-	void EndRender();
+	virtual void Load(Properties *props);
 
 	void PlayAnim(string name, Animation::Mode mode = Animation::Mode::Default, bool reverse = false);
 	void PlayLastAnim();

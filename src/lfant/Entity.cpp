@@ -163,6 +163,25 @@ void Entity::Update()
 	}
 }
 
+void Entity::Render()
+{
+	for(auto& comp : components)
+	{
+		if(comp->IsEnabled())
+		{
+			comp->Render();
+		}
+	}
+
+	for(auto& child : children)
+	{
+		if(child->active)
+		{
+			child->Render();
+		}
+	}
+}
+
 void Entity::FixedUpdate()
 {
 	for(auto& comp : components)
@@ -205,8 +224,8 @@ void Entity::AddComponent(Component* comp)
 	comp->owner = this;
 	comp->Init();
 	TriggerEvent("AddComponent", comp);
-	Log("Entity::AddComponent: Calling ", "SetComponent"+type::Unscope(type::Name(comp)));
-	TriggerEvent("OnSetComponent"+type::Unscope(type::Name(comp)), comp);
+	Log("Entity::AddComponent: Calling ", "SetComponent"+type::Descope(type::Name(comp)));
+	TriggerEvent("OnSetComponent"+type::Descope(type::Name(comp)), comp);
 }
 
 void Entity::Deinit()
@@ -247,10 +266,10 @@ void Entity::Destroy()
 
 Component* Entity::GetComponent(string type)
 {
-	string unscoped = type::Unscope(type);
+	string unscoped = type::Descope(type);
 	for(auto& comp : components)
 	{
-		if(type::Name(comp) == type || type::Name(comp) == unscoped || type::Unscope(type::Name(comp)).find(unscoped) != -1)
+		if(type::Name(comp) == type || type::Name(comp) == unscoped || type::Descope(type::Name(comp)).find(unscoped) != -1)
 		{
 			return comp;
 		}
@@ -290,7 +309,7 @@ void Entity::RemoveComponent(Component* comp)
 		if(components[i] == comp)
 		{
 			TriggerEvent("RemoveComponent", comp);
-			TriggerEvent("OnSetComponent"+type::Unscope(type::Name(comp)), comp);
+			TriggerEvent("OnSetComponent"+type::Descope(type::Name(comp)), comp);
 			components.erase(components.begin()+i);
 			break;
 		}
@@ -309,7 +328,7 @@ void Entity::RemoveComponent()
 			TriggerEvent("RemoveComponent", comp);
 			comp->Destroy();
 			components.erase(components.begin()+i);
-			TriggerEvent("OnSetComponent"+type::Unscope(type::Name<T>()), nullptr);
+			TriggerEvent("OnSetComponent"+type::Descope(type::Name<T>()), nullptr);
 		}
 	}
 }
@@ -320,12 +339,12 @@ void Entity::RemoveComponent(string type)
 	{
 		Component* comp = components[i];
 		string t = type::Name(comp);
-		if(t == type || type::Unscope(t) == type)
+		if(t == type || type::Descope(t) == type)
 		{
 			TriggerEvent("RemoveComponent", comp);
 			comp->Destroy();
 			components.erase(components.begin()+i);
-			TriggerEvent("OnSetComponent"+type::Unscope(t), nullptr);
+			TriggerEvent("OnSetComponent"+type::Descope(t), nullptr);
 		}
 	}
 }
@@ -513,7 +532,7 @@ void Entity::Load(Properties* prop)
 		Log("Loading entity from file path");
 		ptr<Properties> fp {new Properties};
 		fp->LoadFile(file);
-		string type = type::Unscope(type::Name(this));
+		string type = type::Descope(type::Name(this));
 		to_lower(type);
 		if(Properties* pc = fp->GetChild(type))
 		{

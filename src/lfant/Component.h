@@ -54,6 +54,7 @@ namespace lfant {
  */
 class Component : public Object
 {
+//	friend class lfant::editor::gui::Window;
 	friend class Entity;
 	DECLARE_REGISTRY(Component)
 public:
@@ -68,6 +69,8 @@ public:
 
 	virtual void Load(Properties* prop);
 	virtual void Save(Properties* prop) const;
+
+	virtual void Destroy() final;
 
 	static void Bind() __attribute__((constructor));
 
@@ -91,8 +94,9 @@ protected:
 	virtual void Init();
 	virtual void Update();
 	virtual void PostUpdate();
-	virtual void Destroy();
-	virtual void Deinit();
+	virtual void Render();
+	virtual void Deinit(); // Rename to OnDestroy()?
+
 	virtual void OnEnable();
 	virtual void OnDisable();
 

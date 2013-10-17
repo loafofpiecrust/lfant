@@ -53,7 +53,7 @@ void Transform::Init()
 	}
 }
 
-void Transform::Save(Properties *prop)
+void Transform::Save(Properties *prop) const
 {
 	Component::Save(prop);
 

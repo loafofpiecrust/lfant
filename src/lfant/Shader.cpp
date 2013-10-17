@@ -33,7 +33,7 @@ void Shader::Load(Properties *prop)
 	LoadFile(vertex, fragment, geometry);
 }
 
-void Shader::Save(Properties *prop)
+void Shader::Save(Properties *prop) const
 {
 	prop->Set("vertex", vertex);
 	prop->Set("fragment", fragment);

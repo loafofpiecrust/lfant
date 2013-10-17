@@ -38,10 +38,45 @@ string Demangle(string type)
 	return string(abi::__cxa_demangle(type.c_str(), 0, 0, (int*)0));
 }
 
-string Unscope(string type)
+string Descope(string type, int amount)
 {
-	deque<string> toks = Split(type, ":");
-	return toks[toks.size()-1];
+	if(amount == 0) return type;
+	if(amount == -1)
+	{
+		deque<string> result = Split(type, ":");
+		return result[result.size()-1];
+	}
+
+	for(uint i = 0; i < type.size(); ++i)
+	{
+		if(type[i] == ':' && type[i+1] == ':')
+		{
+			++i;
+			type.erase(type.begin(), type.begin()+i+1);
+			--amount;
+			if(amount == 0) break;
+		}
+	}
+	return type;
+}
+
+string Descope(string type, string nspace)
+{
+	int start = 0;
+	for(uint i = 0; i < type.size(); ++i)
+	{
+		if(type[i] == ':' && type[i+1] == ':')
+		{
+			if(type.substr(start, i) == nspace)
+			{
+				type.erase(type.begin(), type.begin()+i+1);
+				break;
+			}
+			start = i+2; ++i;
+		}
+	}
+	return type;
+
 }
 
 }

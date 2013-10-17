@@ -6,6 +6,7 @@
 #include <lfant/Rect.h>
 #include <lfant/ptr.h>
 #include <lfant/util/qumap.h>
+#include <lfant/Entity.h>
 
 // External
 #include <wx/frame.h>
@@ -55,30 +56,30 @@ public:
 	void OnQuit(wxCommandEvent& event);
 	void OnAbout(wxCommandEvent& event);
 
-	int GetId(string name);
+	int GetId(string name = "");
 	int AddId(string name);
 
 	wxAuiNotebook* AddPane(string name, string label);
 	wxAuiNotebook* GetPane(string name);
 
-	wxAuiNotebook* StartAuiNotebook(string name, string label = "");
+	wxAuiNotebook* StartAuiNotebook(string name, string label = "", int pos = -1);
 	wxPanel* StartPanel(string name, string label = "");
 	wxBoxSizer* StartBoxSizer(int orient);
 
 	wxMenu* StartMenu(string label);
 	void EndMenu();
-	void AddMenuItem(string name, string label);
+	void AddMenuItem(string name, string label, wxObjectEventFunction evt = nullptr);
 	void AddMenuSeparator();
 
-	void StartWidget(wxWindow* widget);
-	void AddWidget(wxWindow* widget);
+	void StartWidget(wxWindow* widget, int flags = -1);
+	void AddWidget(wxWindow* widget, int flags = -1);
 	void EndWidget();
 	wxWindow* GetLastWidget(int back = 1);
 	wxObject* GetLastObject(int back = 1);
 
 protected:
 	qumap<string, int> ids;
-	int currId = 0;
+	int currId = 1;
 	ptr<wxAuiManager> manager;
 	deque<ptr<wxAuiNotebook>> notebooks;
 
@@ -88,6 +89,8 @@ protected:
 	ptr<wxMenuBar> menuBar;
 	ptr<wxGLCanvas> canvas;
 	ptr<wxGLContext> context;
+
+	Entity* currentEnt = nullptr;
 
 private:
 };

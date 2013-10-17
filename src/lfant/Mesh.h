@@ -129,10 +129,6 @@ public:
 
 	void SetShape(string preset);
 
-	virtual void Init();
-	virtual void Update();
-	virtual void Deinit();
-
 	void SetInput(string path);
 	void SetTexture(string name);
 
@@ -152,9 +148,10 @@ public:
 
 protected:
 
-	virtual void BeginRender();
+	virtual void Init();
+	virtual void Update();
 	virtual void Render();
-	virtual void EndRender();
+	virtual void Deinit();
 
 	string file = "";
 

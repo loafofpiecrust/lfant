@@ -43,11 +43,11 @@ public:
 	Light();
 	~Light();
 
-	void Save(Properties* prop);
-	void Load(Properties* prop);
+	virtual void Save(Properties* prop) const;
+	virtual void Load(Properties* prop);
 
-	void Init();
-	void Update();
+	virtual void Init();
+	virtual void Update();
 
 	virtual void BeginRender() {};
 	virtual void Render();

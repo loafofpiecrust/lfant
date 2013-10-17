@@ -46,7 +46,7 @@ void Light::Load(Properties* prop)
 	prop->Get("color", color);
 }
 
-void Light::Save(Properties* prop)
+void Light::Save(Properties* prop) const
 {
 	Component::Save(prop);
 

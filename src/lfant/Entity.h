@@ -36,6 +36,13 @@
 
 namespace lfant {
 
+namespace editor {
+namespace gui
+{
+	class Window;
+}
+}
+
 class Component;
 class Item;
 class Transform;
@@ -63,6 +70,7 @@ bool EntityActive(Entity* ent);
  */
 class Entity : public Object
 {
+	friend class lfant::editor::gui::Window;
 	friend class Scene;
 	friend class Component;
 	friend class Renderer;
@@ -92,7 +100,7 @@ public:
 	{
 		C* comp = new C();
 		AddComponent(comp);
-		TriggerEvent("OnSetComponent"+type::Unscope(type::Name(comp)), comp);
+		TriggerEvent("OnSetComponent"+type::Descope(type::Name(comp)), comp);
 		return comp;
 	}
 
@@ -173,6 +181,7 @@ protected:
 	virtual void Init();
 	virtual void Update();
 	virtual void FixedUpdate();
+	virtual void Render();
 //	virtual void Deinit();
 
 	void AddChild(Entity* ent);

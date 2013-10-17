@@ -45,7 +45,7 @@ Sprite::~Sprite()
 {
 }
 
-void Sprite::BeginRender()
+void Sprite::Init()
 {
 
 	vertexBuffer.push_back(vec3(0, 0, 0));
@@ -68,7 +68,7 @@ void Sprite::BeginRender()
 	currentFrame.width = 50;
 	currentFrame.height = 50;
 
-	Mesh::BeginRender();
+	Mesh::Init();
 }
 
 void Sprite::Render()
@@ -236,14 +236,14 @@ void Sprite::Load(Properties *props)
 	}
 }
 
-void Sprite::EndRender()
+void Sprite::Deinit()
 {
 	vertexBuffer.Destroy();
 	uvBuffer.Destroy();
 	indexBuffer.Destroy();
 	material->texture->Destroy();
 
-	Renderable::EndRender();
+	Renderable::Deinit();
 }
 
 void Sprite::PlayAnim(string name, Animation::Mode mode, bool reverse)

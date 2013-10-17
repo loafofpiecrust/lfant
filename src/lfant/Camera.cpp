@@ -61,6 +61,7 @@ void Camera::Save(Properties* prop) const
 	prop->Set("fov", fov);
 	prop->Set("aspectRatio", aspectRatio);
 	prop->Set("viewRange", viewRange);
+	prop->Set("aperture", aperture);
 	prop->Set("focalLength", focalLength);
 	prop->Set("focalDepth", focalDepth);
 //	prop->Set("mode", (short)mode);
@@ -73,6 +74,7 @@ void Camera::Load(Properties* prop)
 	prop->Get("fov", fov);
 	prop->Get("aspectRatio", aspectRatio);
 	prop->Get("viewRange", viewRange);
+	prop->Get("aperture", aperture);
 	prop->Get("focalLength", focalLength);
 	prop->Get("focalDepth", focalDepth);
 //	mode = (Mode)prop->Get<short>("mode");
@@ -100,11 +102,11 @@ void Camera::Update()
 
 	focalLength += game->time->deltaTime * game->input->GetAxis("SetFocalLength");
 	focalDepth += game->time->deltaTime * game->input->GetAxis("SetFocalDepth");
-	fstop += game->time->deltaTime * game->input->GetAxis("SetFstop");
+	aperture += game->time->deltaTime * game->input->GetAxis("SetFstop");
 
 	if(game->input->GetButtonDown("ShowDof"))
 	{
-		Log("focalLength: ", focalLength, ", focalDepth: ", focalDepth, "Fstop: ", fstop);
+		Log("focalLength: ", focalLength, ", focalDepth: ", focalDepth, ", aperture: ", aperture);
 	}
 }
 

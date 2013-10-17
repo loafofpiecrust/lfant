@@ -144,7 +144,7 @@ void ParticleSystem::Load(Properties *prop)
 	material->LoadFile(prop->Get("material"));
 }
 
-void ParticleSystem::Save(Properties *prop)
+void ParticleSystem::Save(Properties *prop) const
 {
 	Component::Save(prop);
 

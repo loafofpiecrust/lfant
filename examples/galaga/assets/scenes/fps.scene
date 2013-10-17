@@ -1,4 +1,4 @@
-scene FPS
+scene scene
 {
 	system Physics
 	{
@@ -24,7 +24,7 @@ scene FPS
 
 		component Rigidbody
 		{
-			mass = 0
+			mass = 0.0
 			restitution = 0.7f
 		}
 	}
@@ -47,7 +47,7 @@ scene FPS
 			usePhysics = true
 		}
 		/*
-		component BoxCollider 
+		component BoxCollider
 		{
 			size = (1,1,1)
 		}
@@ -64,9 +64,9 @@ scene FPS
 			{
 				mode = 0
 				fov = 90
-				focalLength = 35
+				focalLength = 35.0
 				focalDepth = 6.6
-				fstop = 2.0
+				aperture = 2.0
 			}
 			component MouseLook
 			{
@@ -97,7 +97,7 @@ scene FPS
 		{
 			mass = 10
 			friction = 1.5f
-			restitution = 1.3f
+			restitution = 1.0f
 		}*/
 	}
 }

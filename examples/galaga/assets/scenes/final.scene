@@ -75,6 +75,7 @@ scene Scene
 				fov = 90
 				aspectRatio = 1.77777779
 				viewRange = 0.00999999978-1000
+				aperture = 2
 				focalLength = 35
 				focalDepth = 6.5999999
 			}

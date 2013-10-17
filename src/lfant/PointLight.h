@@ -35,17 +35,17 @@ public:
 	PointLight();
 	~PointLight();
 
-	void Save(Properties* prop);
-	void Load(Properties* prop);
+	virtual void Save(Properties* prop) const;
+	virtual void Load(Properties* prop);
 
-	void Init();
+	virtual void Init();
 	void PostUpdate();
 
 	void BeginRender();
-	void Render();
+	virtual void Render();
 	void EndRender();
 
-	void LoadFile(string path);
+	virtual void LoadFile(string path);
 
 protected:
 	float ambientIntensity = 1.0f;

@@ -46,6 +46,7 @@ class Entity;
  */
 class Properties
 {
+//	friend class lfant::editor::gui::Window;
 public:
 
 	Properties();
@@ -131,6 +132,8 @@ public:
 	string type = "";
 	string id = "";
 
+	qumap<string, string> values;
+
 protected:
 
 private:
@@ -142,7 +145,10 @@ private:
 	string Expand(string value);
 	string GetIndent();
 
-	qumap<string, string> values;
+	string ParseValue(string val);
+
+	Properties* GetTopParent();
+
 	qumap<string, string> enums;
 	deque<ptr<Properties>> children;
 	Properties* parent = nullptr;

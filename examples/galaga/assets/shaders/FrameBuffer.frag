@@ -2,7 +2,6 @@
 
 #define PI  3.14159265f
 
-
 //uniform sampler2D textureSampler;
 //uniform vec2 tiling;
 uniform sampler2D diffuseTex;
@@ -16,6 +15,7 @@ uniform vec2 textureSize;
 uniform float focalDepth;  //focal distance value in meters, but you may use autofocus option below
 uniform float focalLength; //focal length in mm
 uniform float fstop; //f-stop value
+uniform float focus;
 uniform vec2 cameraRange;
 
 // in
@@ -29,7 +29,7 @@ layout(location = 0) out vec4 outColor;
 
 void main()
 {
-	vec3 dofColor = depthOfField(textureSize, cameraRange, UV, focalDepth, focalLength, fstop);
+	vec3 dofColor = depthOfField(textureSize, cameraRange, UV, focalDepth, focalLength, fstop, focus);
 
 	outColor = vec4(dofColor, 1);
 }

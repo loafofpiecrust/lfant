@@ -118,7 +118,7 @@ struct SQOuter;
 #endif
 
 #else
-typedef unsigned short wchar_t;
+//typedef uint16_t wchar_t;
 #endif
 
 typedef wchar_t SQChar;

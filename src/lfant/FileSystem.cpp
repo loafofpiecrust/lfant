@@ -43,7 +43,12 @@ string GetProgramDir()
 		tmp[len] = '\0';
 	}
 	string result = tmp;
-	if(uint pos = result.find("/launcher"))
+	uint pos = -1;
+	if((pos = result.find("/launcher")) != -1)
+	{
+		result.erase(result.begin()+pos, result.end());
+	}
+	else if((pos = result.find("/editor")) != -1)
 	{
 		result.erase(result.begin()+pos, result.end());
 	}

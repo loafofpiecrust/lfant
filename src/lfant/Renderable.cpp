@@ -39,38 +39,12 @@ Renderable::~Renderable()
 void Renderable::Init()
 {
 	Component::Init();
-//	BeginRender();
-}
-
-void Renderable::PostUpdate()
-{
-	Component::PostUpdate();
-	if(loaded)
-	{
-		Render();
-	}
+	loaded = true;
 }
 
 void Renderable::Deinit()
 {
 	Component::Deinit();
-	if(loaded)
-	{
-		EndRender();
-	}
-}
-
-void Renderable::BeginRender()
-{
-	if(loaded)
-	{
-		EndRender();
-	}
-	loaded = true;
-}
-
-void Renderable::EndRender()
-{
 	loaded = false;
 }
 

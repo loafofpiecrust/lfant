@@ -10,25 +10,24 @@
 #include <lfant/Renderer.h>
 #include <lfant/Input.h>
 #include <lfant/Physics.h>
-#include <lfant/ScriptSystem.h>
+//#include <lfant/ScriptSystem.h>
 #include <lfant/Console.h>
 #include <lfant/SystemInfo.h>
 #include <lfant/FileSystem.h>
+#include <lfant/Network.h>
 
 #include <editor/gui/App.h>
 
-namespace lfant
-{
-namespace editor
-{
+namespace lfant {
+namespace editor {
 
 void Launch()
 {
 	printf("YOOO");
-	game = new Editor();
-	game->standAlone = false;
+	game = new Editor;
 	game->Init();
 	game->Update();
+	game->Destroy();
 	delete game;
 }
 
@@ -48,12 +47,15 @@ void Editor::Init()
 	console->Init();
 	Log("Creating gui app...");
 
-	app = new gui::App;
-	wxApp::SetInstance(app);
-	int i = 0;
-	wxEntryStart(i, (char**)0);
-	app->OnInit();
-	app->OnRun();
+//	app = new gui::App;
+//	wxApp::SetInstance(app);
+//	int i = 0;
+//	char* argv[1] = {""};
+//	wxEntry(i, argv);
+//	Log("Post entry, ", app.get());
+
+//	app->OnInit();
+//	app->OnRun();
 //	app->OnExit();
 	
 	Log("Loading other stuff.");
@@ -63,11 +65,11 @@ void Editor::Init()
 	time->Init();
 	physics->Init();
 //	renderer->Init();
-	scene->Init();
 	input->Init();
 //	audio->Init();
-//	network->Init();
+	network->Init();
 //	scriptSystem->Init();
+	scene->Init();
 
 	/// @todo Init renderer as Editor, eg. without the window opening process
 	///			split 'window' into it's own subsystem?
@@ -75,23 +77,21 @@ void Editor::Init()
 
 void Editor::Update()
 {
-	while(!IsExited())
-	{
-
+//	while(!IsExited())
+//	{
 		if(playing)
 		{
 			time->Update();
 			physics->Update();
-			scene->Update();
 			input->Update();
 		//	userInterface->Update();
-		//	renderer->Update();
 		//	network->Update();
 		}
 		// Call Editor subsystems
 		// eg. ?
-	}
-	Destroy();
+	//	scene->Update();
+	//	renderer->Update();
+//	}
 }
 
 void Editor::Deinit()

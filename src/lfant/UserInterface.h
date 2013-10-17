@@ -92,8 +92,8 @@ public:
 	virtual void Update();
 	virtual void Deinit();
 
-	void Load(Properties *prop);
-	void Save(Properties *prop);
+	virtual void Load(Properties *prop);
+	virtual void Save(Properties *prop) const;
 
 	virtual void CreateWindow(Properties* prop, CEGUI::Window *parent = nullptr);
 	virtual void RemoveWindow(string fileName);

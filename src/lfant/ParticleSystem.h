@@ -41,8 +41,9 @@ namespace lfant
  *	 @{
  */
 
-struct Particle
+class Particle
 {
+public:
 	vec4 pos;
 	vec4 color;
 	vec4 vel;

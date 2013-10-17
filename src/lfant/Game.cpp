@@ -162,6 +162,7 @@ void Game::Bind()
 
 void Game::Destroy()
 {
+	Deinit();
 	fileSystem->Destroy();
 	systemInfo->Destroy();
 	time->Destroy();

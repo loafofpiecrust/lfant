@@ -138,7 +138,7 @@ void UserInterface::Deinit()
 	gameswf::set_render_handler(nullptr);
 }
 
-void UserInterface::Save(Properties *prop)
+void UserInterface::Save(Properties *prop) const
 {
 
 }
@@ -267,7 +267,7 @@ void UserInterface::CreateWindow(Properties* prop, CEGUI::Window* parent)
 {
 	CEGUI::Window* win = windowManager->createWindow(prop->Get<string>("type"), prop->id);
 
-	string type = type::Unscope(type::Name(win));
+	string type = type::Descope(type::Name(win));
 	if(type == "PushButton")
 	{
 		win->subscribeEvent(CEGUI::PushButton::EventClicked, &UserInterface::OnClickButton, this);
@@ -348,7 +348,7 @@ void UserInterface::Load(Properties *prop)
 	}
 }
 
-void UserInterface::Save(Properties* prop)
+void UserInterface::Save(Properties* prop) const
 {
 	Subsystem::Save(prop);
 }
@@ -416,6 +416,7 @@ void UserInterface::Update()
 	windowManager->cleanDeadPool();
 
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
 }
 
 void UserInterface::Deinit()
@@ -566,7 +567,7 @@ void UserInterface::Load(Properties *prop)
 {
 }
 
-void UserInterface::Save(Properties* prop)
+void UserInterface::Save(Properties* prop) const
 {
 	Subsystem::Save(prop);
 }

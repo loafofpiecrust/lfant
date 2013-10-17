@@ -88,7 +88,7 @@ void Renderer::Load(Properties* prop)
 	Log("OpenGL Version loaded: ", lexical_cast<string>(version));
 }
 
-void Renderer::Save(Properties *prop)
+void Renderer::Save(Properties *prop) const
 {
 	Subsystem::Save(prop);
 
@@ -193,7 +193,7 @@ void Renderer::Init()
 	frameBuffer->AddDepthTexture("depthTex");
 
 	frameBuffer->SetRect({0,0,resolution.x,resolution.y});
-	frameBuffer->hasDepth = true;
+//	frameBuffer->hasDepth = true;
 	frameBuffer->Init();
 	frameBuffer->Bind();
 	frameBuffer->BeginRender();
@@ -282,8 +282,8 @@ bool Renderer::OpenWindow()
 //	{
 	Log("Renderer::OpenWindow: About to set window hints.");
 	glfwWindowHint(GLFW_SAMPLES, fsaa);
-//	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, version.major);
-//	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, version.minor);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, version.major);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, version.minor);
 //	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_RESIZABLE, windowResizable);
 

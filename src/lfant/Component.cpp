@@ -63,6 +63,7 @@ void Component::Clone(Component* comp, Entity* owner) const
 
 Component* Component::Clone(Entity* owner) const
 {
+	Component* comp = owner->AddComponent(type::Descope(type::Name(this), "lfant"));
 }
 
 void Component::Load(Properties* prop)
@@ -73,7 +74,7 @@ void Component::Load(Properties* prop)
 void Component::Save(Properties *prop) const
 {
 	prop->type = "component";
-	prop->id = type::Unscope(type::Name(this));
+	prop->id = type::Descope(type::Name(this));
 	prop->Set("enabled", enabled);
 }
 
@@ -89,6 +90,10 @@ void Component::Update()
 }
 
 void Component::PostUpdate()
+{
+}
+
+void Component::Render()
 {
 }
 

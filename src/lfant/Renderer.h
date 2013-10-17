@@ -65,8 +65,8 @@ public:
 	Renderer();
 	~Renderer();
 
-	virtual void Load(Properties *prop);
-	virtual void Save(Properties *prop);
+	virtual void Load(Properties* prop);
+	virtual void Save(Properties* prop) const;
 
 	virtual void Init();
 	virtual void PreUpdate();

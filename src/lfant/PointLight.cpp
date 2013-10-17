@@ -103,7 +103,7 @@ void PointLight::Load(Properties* prop)
 	prop->Get("specularIntensity", specularIntensity);
 }
 
-void PointLight::Save(Properties* prop)
+void PointLight::Save(Properties* prop) const
 {
 	Light::Save(prop);
 
