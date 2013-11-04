@@ -38,7 +38,7 @@
 
 namespace lfant {
 
-IMPLEMENT_COMP(PointLight)
+IMPLEMENT_TYPE(Component, PointLight)
 
 PointLight::PointLight()
 {

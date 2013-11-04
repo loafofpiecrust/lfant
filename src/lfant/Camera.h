@@ -42,7 +42,7 @@ namespace lfant
  */
 class Camera : public Component
 {
-	DECLARE_COMP(Camera)
+	DECLARE_TYPE(Component, Camera)
 	friend class Renderer;
 public:
 	Camera();

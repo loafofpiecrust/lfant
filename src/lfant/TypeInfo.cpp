@@ -69,7 +69,7 @@ string Descope(string type, string nspace)
 		{
 			if(type.substr(start, i) == nspace)
 			{
-				type.erase(type.begin(), type.begin()+i+1);
+				type.erase(type.begin(), type.begin()+i+2);
 				break;
 			}
 			start = i+2; ++i;

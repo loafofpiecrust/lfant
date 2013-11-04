@@ -26,7 +26,7 @@ public:
 	void OnIdle(wxIdleEvent& evt);
 
 protected:
-	ptr<Window> window = nullptr;
+	Window* window = nullptr;
 	bool render_loop_on = false;
 
 private:

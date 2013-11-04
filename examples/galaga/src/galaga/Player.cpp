@@ -40,7 +40,7 @@
 namespace lfant {
 namespace galaga {
 
-IMPLEMENT_COMP(Player)
+IMPLEMENT_TYPE(lfant::Component, Player)
 
 void Player::Init()
 {
@@ -161,16 +161,6 @@ void Player::Update()
 	{
 		Log("deltaTime: ", game->time->deltaTime);
 		Log("Game FPS: ", game->time->frameRate);
-	}
-	float hrot = game->input->GetAxis("HRotation");
-	if (hrot != 0.0f)
-	{
-		owner->transform->Rotate(vec3(0, -hrot * lookSpeed * game->time->deltaTime, 0));
-	}
-	float vrot = game->input->GetAxis("VRotation");
-	if (vrot != 0.0f)
-	{
-		owner->transform->Rotate(vec3(vrot * lookSpeed * game->time->deltaTime, 0, 0));
 	}
 	if (game->input->GetButtonDown("Quit"))
 	{

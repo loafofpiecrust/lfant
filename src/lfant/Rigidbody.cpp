@@ -34,7 +34,7 @@
 
 namespace lfant {
 
-IMPLEMENT_COMP(Rigidbody)
+IMPLEMENT_TYPE(Component, Rigidbody)
 
 Rigidbody::Rigidbody()
 {

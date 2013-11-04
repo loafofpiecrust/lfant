@@ -34,9 +34,9 @@
 namespace lfant {
 namespace galaga {
 
-IMPLEMENT_COMP(Weapon)
-IMPLEMENT_COMP(Weapon::Part)
-IMPLEMENT_COMP(Weapon::Body)
+IMPLEMENT_TYPE(lfant::Component, Weapon)
+IMPLEMENT_TYPE(lfant::Component, Weapon::Part)
+IMPLEMENT_TYPE(lfant::Component, Weapon::Body)
 
 Weapon::Weapon()
 {

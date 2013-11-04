@@ -6,7 +6,7 @@ namespace pong {
 
 class Player : public lfant::Component
 {
-	DECLARE_COMP(pong::Player)
+	DECLARE_TYPE(lfant::Component, pong::Player)
 public:
 	Player();
 	~Player();

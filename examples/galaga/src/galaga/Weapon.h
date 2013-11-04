@@ -39,12 +39,12 @@ namespace galaga {
  */
 class Weapon : public Item
 {
-	DECLARE_COMP(Weapon)
+	DECLARE_TYPE(lfant::Component, Weapon)
 public:
 
 	class Part : public Item
 	{
-		DECLARE_COMP(Part)
+		DECLARE_TYPE(lfant::Component, Part)
 		friend class Weapon;
 	public:
 		enum class Type : byte
@@ -84,7 +84,7 @@ public:
 
 	class Body : public Part
 	{
-		DECLARE_COMP(Body)
+		DECLARE_TYPE(lfant::Component, Body)
 	public:
 		Body();
 		virtual ~Body() {}

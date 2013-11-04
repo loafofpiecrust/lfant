@@ -77,6 +77,21 @@ void Properties::Set(string name, Entity* const& value)
 	Set(name, value->GetId());
 }
 
+void Properties::Set(string name, string value)
+{
+	values[TrimSpace(name)] = value;
+/*	name = TrimSpace(name);
+	for(auto& val : values)
+	{
+		if(val.first == name)
+		{
+			val.second = value;
+			return;
+		}
+	}
+	values.emplace_back(name, value);*/
+}
+
 void Properties::LoadFile(string path)
 {
 	ifstream stream(game->fileSystem->GetGamePath(path).string());
@@ -457,9 +472,30 @@ deque<Properties*> Properties::GetChildren(string type)
 	return props;
 }
 
+const deque<ptr<Properties>>& Properties::GetChildren()
+{
+	return children;
+}
+
 qumap<string, string>& Properties::GetValues()
 {
 	return values;
+}
+
+Properties* Properties::AddChild(Properties* prop)
+{
+	if(prop->parent)
+	{
+		for(uint i = 0; i < prop->parent->children.size(); ++i)
+		{
+			if(prop->parent->children[i] == prop)
+			{
+				prop->parent->children.erase(prop->parent->children.begin()+i);
+			}
+		}
+	}
+	prop->parent = this;
+	children.push_back(prop);
 }
 
 Properties* Properties::AddChild(string type, string id)
@@ -502,31 +538,23 @@ void Properties::SkipSpace(istream &stream)
 
 string Properties::TrimSpace(string str, bool onlyIndent)
 {
-	Log("Trimming space on '"+str+"'");
+//	Log("Trimming space on '"+str+"'");
 	uint pos = 0;
+	string result = "";
 	for(uint i = 0; i < str.size(); ++i)
 	{
-		if(onlyIndent)
+		if(str[i] != ' ' && str[i] != '\t')
 		{
-			if(str[i] == ' ' || str[i] == '\t')
+			result.push_back(str[i]);
+			if(onlyIndent)
 			{
-				++pos;
-			}
-			else
-			{
-				str.erase(0, pos);
-			}
-		}
-		else
-		{
-			if(str[i] == ' ' || str[i] == '\t')
-			{
-				str.erase(i, 1);
+				result.append(str.substr(i+1, str.size()-(i+1)));
+				break;
 			}
 		}
 	}
 
-	return str;
+	return result;
 }
 
 string Properties::Expand(string value)

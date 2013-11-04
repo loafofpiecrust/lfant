@@ -29,7 +29,7 @@
 namespace lfant {
 namespace galaga {
 
-IMPLEMENT_COMP(Inventory)
+IMPLEMENT_TYPE(lfant::Component, Inventory)
 
 Inventory::Inventory()
 {
@@ -181,7 +181,7 @@ Item* Inventory::Equip(uint32_t idx)
 }
 
 
-IMPLEMENT_COMP(Item)
+IMPLEMENT_TYPE(lfant::Component, Item)
 
 Item::Item()
 {

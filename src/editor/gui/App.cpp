@@ -22,19 +22,20 @@ App::App()
 
 App::~App()
 {
-
 }
 
 bool App::OnInit()
 {
 //	Log("Called OnInit, ", this);
 	game = new Editor;
-	game->Init();
+	game->standAlone = false;
 	window = new Window("lfant", Rect(100, 50, 450, 340));
 	window->Show(true);
 	window->Init();
 	SetTopWindow(window);
 
+//	game->Init();
+	
 	ActivateRenderLoop(true);
 
 //	Connect( wxID_ANY, wxEVT_IDLE, wxIdleEventHandler(App::OnIdle) );
@@ -63,8 +64,8 @@ void App::OnIdle(wxIdleEvent& evt)
 	//	std::cout << "App::OnIdle: Touch.\n";
 	//	Log("App::OnIdle: Touch.");
 	//  drawPane->paintNow();
-	//	window->paint();
-	//	game->Update();
+		window->Render();
+		game->Update();
 		evt.RequestMore(); // render continuously, not only once on idle
 	}
 }

@@ -317,19 +317,20 @@ void Entity::RemoveComponent(Component* comp)
 	Log("Removed component");
 }
 
-template<typename T>
+template<typename C>
 void Entity::RemoveComponent()
 {
-	for(uint i = 0; i < components.size(); ++i)
+	uint i = 0;
+	for(auto& comp : components)
 	{
-		Component* comp = components[i];
-		if(type::Name<T>() == type::Name(comp))
+		if(type::Name<C>() == type::Name(comp))
 		{
-			TriggerEvent("RemoveComponent", comp);
+			TriggerEvent("RemoveComponent", comp.get());
 			comp->Destroy();
 			components.erase(components.begin()+i);
-			TriggerEvent("OnSetComponent"+type::Descope(type::Name<T>()), nullptr);
+			TriggerEvent("OnSetComponent"+type::Descope(type::Name<C>()), nullptr);
 		}
+		++i;
 	}
 }
 
@@ -446,6 +447,7 @@ void Entity::Bind()
 
 void Entity::Save(Properties* prop) const
 {
+	Log("Saving entity to ", prop);
 	prop->type = "entity";
 	prop->id = name;
 
@@ -457,7 +459,9 @@ void Entity::Save(Properties* prop) const
 
 	for(auto& comp : components)
 	{
-		comp->Save(prop->AddChild());
+		auto cp = prop->AddChild();
+		Log("Saving comp: ", type::Name(comp), " to ", cp);
+		comp->Save(cp);
 	}
 
 	for(auto& child : children)
@@ -471,7 +475,7 @@ void Entity::Load(Properties* prop)
 
 	prop->GetId(name);
 	prop->Get("id", id);
-	prop->Get("tags", tags);
+//	prop->Get("tags", tags);
 	prop->Get("layer", layer);
 	prop->Get("active", active);
 	prop->Get("lifetime", lifetime);
@@ -486,7 +490,7 @@ void Entity::Load(Properties* prop)
 		Log("Loading component props, '"+comp->type+" "+comp->id+"'.");
 		if(comp->id != "Transform")
 		{
-			if(component = GetComponent(comp->id))
+			if((component = GetComponent(comp->id)))
 			{
 				component->Load(comp);
 			}
@@ -495,11 +499,6 @@ void Entity::Load(Properties* prop)
 				component = AddComponent(comp->id, comp);
 			}
 			Log("Entity::Load: Added component, owner = ", component->owner);
-			if(comp->id == "Camera")
-			{
-				game->scene->mainCamera = dynamic_cast<Camera*>(component);
-				Log("Added Camera component, now mainCamera = ", game->scene->mainCamera);
-			}
 		}
 		else
 		{
@@ -516,13 +515,20 @@ void Entity::Load(Properties* prop)
 		//	component->Load(comp);
 	}
 
-	c = prop->GetChildren("entity");
-	Log("Entity::Load: Children nodes loaded.");
-	Entity* ent = nullptr;
-	for(auto& child : c)
 	{
-		ent = game->scene->SpawnAndLoad(child, child->id, this);
-	//	ent->Load(child);
+		c = prop->GetChildren("entity");
+		Entity* ent = nullptr;
+		for(auto& child : c)
+		{
+			if((ent = GetChild(child->id)))
+			{
+				ent->Load(child);
+			}
+			else
+			{
+				game->scene->SpawnAndLoad(child, child->id, this);
+			}
+		}
 	}
 
 	string file = "";
@@ -580,11 +586,6 @@ Component* Entity::AddComponent(string type, Properties* prop)
 			if(prop) result->Load(prop);
 			AddComponent(result);
 		}
-	}
-
-	if(type == "Camera")
-	{
-		game->scene->mainCamera = dynamic_cast<Camera*>(result);
 	}
 
 	return result;

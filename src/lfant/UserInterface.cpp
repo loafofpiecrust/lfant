@@ -316,6 +316,7 @@ void UserInterface::Load(Properties *prop)
 	prop->Get("font", pfont);
 	prop->Get("cursor", pcursor);
 	prop->Get("file", file);
+	prop->Get("rootFolder", rootResFolder);
 
 	Log("UserInterface, file to load: '"+file+"'.");
 	if(file != "")
@@ -365,16 +366,16 @@ void UserInterface::Init()
 	renderer->enableExtraStateSettings(true);
 
 	CEGUI::DefaultResourceProvider* rp = static_cast<CEGUI::DefaultResourceProvider*>(system->getResourceProvider());
-	rp->setResourceGroupDirectory("assets", game->fileSystem->GetGamePath("").string());
-	rp->setDefaultResourceGroup("assets");
+	rp->setResourceGroupDirectory("root", game->fileSystem->GetGamePath(rootResFolder).string());
+	rp->setDefaultResourceGroup("root");
 
-	rp->setResourceGroupDirectory("imagesets", game->fileSystem->GetGamePath("gui/imagesets").string());
-	rp->setResourceGroupDirectory("schemes", game->fileSystem->GetGamePath("gui/schemes").string());
-	rp->setResourceGroupDirectory("xml_schemas", game->fileSystem->GetGamePath("gui/xml_schemas").string());
-	rp->setResourceGroupDirectory("styles", game->fileSystem->GetGamePath("gui/styles").string());
-	rp->setResourceGroupDirectory("layouts", game->fileSystem->GetGamePath("gui/layouts").string());
-	rp->setResourceGroupDirectory("fonts", game->fileSystem->GetGamePath("gui/fonts").string());
-	rp->setResourceGroupDirectory("looknfeel", game->fileSystem->GetGamePath("gui/looks").string());
+	rp->setResourceGroupDirectory("imagesets", game->fileSystem->GetGamePath(rootResFolder+"/imagesets").string());
+	rp->setResourceGroupDirectory("schemes", game->fileSystem->GetGamePath(rootResFolder+"/schemes").string());
+	rp->setResourceGroupDirectory("xml_schemas", game->fileSystem->GetGamePath(rootResFolder+"/xml_schemas").string());
+	rp->setResourceGroupDirectory("styles", game->fileSystem->GetGamePath(rootResFolder+"/styles").string());
+	rp->setResourceGroupDirectory("layouts", game->fileSystem->GetGamePath(rootResFolder+"/layouts").string());
+	rp->setResourceGroupDirectory("fonts", game->fileSystem->GetGamePath(rootResFolder+"/fonts").string());
+	rp->setResourceGroupDirectory("looknfeel", game->fileSystem->GetGamePath(rootResFolder+"/looks").string());
 
 	CEGUI::ImageManager::setImagesetDefaultResourceGroup("imagesets");
 	CEGUI::Scheme::setDefaultResourceGroup("schemes");
@@ -490,7 +491,7 @@ void UserInterface::OnChar(char key)
 
 void UserInterface::OnMouseButton(uint16 btn, int mode)
 {
-	CEGUI::MouseButton newBtn = CEGUI::NoButton;
+	CEGUI::MouseButton newBtn = CEGUI::LeftButton;
 	if(btn == Key["MouseLeft"])
 	{
 		newBtn = CEGUI::LeftButton;

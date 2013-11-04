@@ -46,8 +46,8 @@ void Subsystem::Init()
 	{
 		printf("About to load file for subsystem\n");
 		string type = type::Descope(type::Name(this));
-		to_lower(type);
-		LoadFile("settings/"+type+".cfg");
+		type[0] = tolower(type[0]);
+		LoadFile("settings/"+type+".prop");
 	}
 }
 

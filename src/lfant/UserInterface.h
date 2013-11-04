@@ -141,6 +141,8 @@ protected:
 
 	bool resized = false;
 	uvec2 size;
+
+	string rootResFolder = "gui";
 };
 
 }

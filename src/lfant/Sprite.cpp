@@ -35,7 +35,7 @@
 namespace lfant
 {
 
-IMPLEMENT_COMP(Sprite)
+IMPLEMENT_TYPE(Component, Sprite)
 
 Sprite::Sprite()
 {

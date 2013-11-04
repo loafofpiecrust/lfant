@@ -194,10 +194,35 @@ string lexical_cast<string, bool>(const bool& src)
 	return "false";
 }
 
+string cut_zeroes(string orig)
+{
+	uint pos = 0;
+	string str = orig;
+	for(uint i = 0; i < str.size(); ++i)
+	{
+		if(str[str.size()-1-i] != '0')
+		{
+			pos = str.size()-i+1;
+			break;
+		}
+	}
+	if(pos < str.size())
+	{
+		str.erase(str.begin()+pos, str.end());
+	}
+	return str;
+}
+
 template<>
 string lexical_cast<string, float>(const float& src)
 {
-	return to_string(src);
+	return cut_zeroes(to_string(src));
+}
+
+template<>
+string lexical_cast<string, vec2>(const vec2& src)
+{
+	return "("+lexical_cast<string>(src.x)+","+lexical_cast<string>(src.y)+")";
 }
 
 template<>
@@ -387,7 +412,16 @@ template<>
 vec3 lexical_cast<vec3, string>(const string& val)
 {
 	vec3 result(0);
-	deque<string> str = lfant::Split(val, " x:,()");
+	string valstr = val;
+/*	for(uint i = 0; i < valstr.size(); ++i)
+	{
+		if(valstr[i] == -7)
+		{
+			valstr.erase(i, 1);
+		}
+	}*/
+//	Log("First char in vec3 lexcast: '", (int)val[0], "'");
+	deque<string> str = lfant::Split(valstr, " x:,()");
 	Log("Lexcasting vec3, size: ", str.size());
 	result.x = lexical_cast<float>(str[0]);
 	if(str.size() > 1)

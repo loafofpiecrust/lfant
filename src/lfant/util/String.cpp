@@ -37,8 +37,8 @@ deque<string> Split(string str, string dropDelim, string keepDelim)
 		return result;
 	}
 	char_separator<char> sep(dropDelim.c_str(), keepDelim.c_str(), drop_empty_tokens);
-	tokenizer<char_separator<char> > tok(str, sep);
-	for(tokenizer<char_separator<char> >::iterator i = tok.begin(); i != tok.end(); ++i)
+	tokenizer<char_separator<char>> tok(str, sep);
+	for(tokenizer<char_separator<char>>::iterator i = tok.begin(); i != tok.end(); ++i)
 	{
 		result += *i;
 	}

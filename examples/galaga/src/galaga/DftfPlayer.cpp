@@ -11,7 +11,7 @@ using namespace lfant;
 
 namespace dftf {
 
-IMPLEMENT_COMP(dftf::Player)
+IMPLEMENT_TYPE(lfant::Component, dftf::Player)
 
 void Player::Init()
 {

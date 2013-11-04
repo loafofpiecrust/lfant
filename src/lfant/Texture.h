@@ -100,7 +100,7 @@ public:
 	void InitData(byte* data);
 	void Deinit();
 
-	void LoadFile(string path = "", int mode = 0);
+	void LoadFile(string path = "", int mode = -1);
 	virtual void Load(Properties* prop);
 	virtual void Save(Properties* prop) const;
 
@@ -136,10 +136,10 @@ public:
 //	uint32 uniformId = 0;
 
 private:
-	void LoadPNG(int mode);
-	void LoadJPEG(int mode);
-	void LoadBMP(int mode);
-	void LoadDDS(int mode);
+	void LoadPNG(string path);
+	void LoadJPEG(string path);
+	void LoadBMP(string path);
+	void LoadDDS(string path);
 
 	uint32_t id = -1;
 //	vector<byte> data;

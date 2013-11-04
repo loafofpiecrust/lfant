@@ -98,6 +98,8 @@ public:
 	template<typename C>
 	C* AddComponent()
 	{
+		if(GetComponent<C>()) return nullptr;
+
 		C* comp = new C();
 		AddComponent(comp);
 		TriggerEvent("OnSetComponent"+type::Descope(type::Name(comp)), comp);
@@ -106,8 +108,6 @@ public:
 
 	Component* AddComponent(string type);
 
-	void AddComponent(Component* comp);
-
 	/**
 	 *	Removes a component from this Entity
 	 *	@tparam C The type of component to remove.
@@ -115,7 +115,6 @@ public:
 	template<typename C>
 	void RemoveComponent();
 	void RemoveComponent(string type);
-	void RemoveComponent(Component* comp);
 
 	/**
 	 *	Clones an identical instance of this Entity.
@@ -126,11 +125,12 @@ public:
 	template<typename C>
 	C* GetComponent()
 	{
+		string type = type::Name<C>();
 		for(auto& comp : components)
 		{
-			if(C* c = dynamic_cast<C*>(comp.get()))
+			if(type::Name(comp) == type)
 			{
-				return c;
+				return dynamic_cast<C*>(comp.get());
 			}
 		}
 		return nullptr;
@@ -211,7 +211,9 @@ protected:
 
 private:
 
+	void AddComponent(Component* comp);
 	Component* AddComponent(string type, Properties* prop);
+	void RemoveComponent(Component* comp);
 
 	deque< ptr<Entity> > children;
 	deque< ptr<Component> > components;

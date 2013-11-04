@@ -33,7 +33,7 @@
 namespace lfant {
 namespace galaga {
 
-IMPLEMENT_COMP(MouseLook)
+IMPLEMENT_TYPE(lfant::Component, MouseLook)
 
 MouseLook::MouseLook()
 {

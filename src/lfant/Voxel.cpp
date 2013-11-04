@@ -113,7 +113,7 @@ void Voxel::Chunk::EndRender()
 }
 
 // Voxel
-IMPLEMENT_COMP(Voxel)
+IMPLEMENT_TYPE(Component, Voxel)
 
 Voxel::Voxel() :
 	shader(new Shader),

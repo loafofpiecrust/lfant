@@ -125,14 +125,17 @@ void Renderer::Init()
 	Log("Renderer::Init: About to start GLFW");
 
 #if !ANDROID
-	if(!glfwInit())
+	if(game->standAlone)
 	{
-		Log("Renderer::Init: GLFW failed to initialise.");
-		game->Destroy();
+		if(!glfwInit())
+		{
+			Log("Renderer::Init: GLFW failed to initialise.");
+			game->Destroy();
+		}
 	}
 #endif
 
-	if(game->standAlone)
+//	if(game->standAlone)
 	{
 		if(!OpenWindow())
 		{
@@ -144,16 +147,19 @@ void Renderer::Init()
 	}
 
 #if !ANDROID
-	glfwSwapInterval(vsync);
 
-	glfwSetWindowCloseCallback(window, &Renderer::OnCloseWindow);
-	glfwSetWindowSizeCallback(window, &Renderer::OnSetResolution);
+	if(game->standAlone)
+	{
+		glfwSwapInterval(vsync);
+		glfwSetWindowCloseCallback(window, &Renderer::OnCloseWindow);
+		glfwSetWindowSizeCallback(window, &Renderer::OnSetResolution);
+		glfwSetErrorCallback(&Renderer::OnError);
+	}
 
-	glfwSetErrorCallback(&Renderer::OnError);
+#endif
 	
 	glShadeModel(GL_SMOOTH);
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-#endif
 
 	// Background color
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -218,8 +224,11 @@ static bool fboDrawn = false;
 void Renderer::PreUpdate()
 {
 #if !ANDROID
-	glfwSwapBuffers(window);
-	glfwPollEvents();
+	if(game->standAlone)
+	{
+		glfwSwapBuffers(window);
+		glfwPollEvents();
+	}
 #endif
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -262,10 +271,10 @@ void Renderer::Update()
 
 void Renderer::Deinit()
 {
-	frameBuffer->EndRender();
+	frameBuffer->Deinit();
 	Log("Renderer::Deinit(): Touch");
 #if !ANDROID
-	glfwTerminate();
+	if(game->standAlone) glfwTerminate();
 #endif
 }
 
@@ -278,8 +287,8 @@ void Renderer::Deinit()
 bool Renderer::OpenWindow()
 {
 #if !ANDROID
-//	if(game->standAlone)
-//	{
+	if(game->standAlone)
+	{
 	Log("Renderer::OpenWindow: About to set window hints.");
 	glfwWindowHint(GLFW_SAMPLES, fsaa);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, version.major);
@@ -302,7 +311,7 @@ bool Renderer::OpenWindow()
 //	SetWindowTitle(windowTitle);
 	SetWindowPos(windowPos);
 	Log("Renderer::OpenWindow: Window successfully opened.");
-//	}
+	}
 	glewExperimental = true;     // Needed for core profile
 	if (glewInit() != GLEW_OK)
 	{

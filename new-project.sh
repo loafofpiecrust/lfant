@@ -7,6 +7,7 @@ fi
 
 if [[ "$#" != "3" ]]; then
 	echo "Incorrect number of arguments."
+	echo "syntax: ./new-project.sh dir name title"
 	exit
 fi
 
@@ -20,7 +21,7 @@ rm -rf "$projDir/$projName"
 mkdir -p "$projDir"
 cp -r "./project-template" "$projDir/$projName"
 
-projDir=$1/$2
+projDir=$projDir/$projName
 
 mv "$projDir/src/game" "$projDir/src/$projName"
 mv "$projDir/src/$projName/Game.h" "$projDir/src/$projName/$projTitle.h"
@@ -37,5 +38,3 @@ sed -i "s*projectName*$projName*g" "$projDir/src/launcher/main.cpp"
 
 sed -i "s*projectName*$projName*g" "$projDir/android/AndroidManifest.xml"
 sed -i "s*projectTitle*$projTitle*g" "$projDir/android/AndroidManifest.xml"
-
-ln -s $currDir $projDir/bin32/linux

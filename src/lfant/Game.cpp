@@ -80,7 +80,7 @@ Game::~Game()
 void Game::Init()
 {
 	console->Init();
-	LoadFile("settings/game.cfg");
+	LoadFile("settings/game.prop");
 
 	Log("Initing filesystem");
 	fileSystem->Init();
@@ -118,6 +118,8 @@ void Game::Update()
 	physics->Update();
 	input->Update();
 	network->Update();
+	
+	scene->Render();
 	renderer->Update();
 	userInterface->Update();
 }

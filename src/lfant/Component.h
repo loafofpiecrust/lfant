@@ -38,9 +38,6 @@ namespace lfant {
  *	 @{
  */
 
-#define DECLARE_COMP(type) DECLARE_TYPE(Component, type)
-#define IMPLEMENT_COMP(type) IMPLEMENT_TYPE(Component, type)
-
 
 /**	The base class for all Entity Components.
  *		Component is the basis for all things to be attached to

@@ -56,15 +56,19 @@ void Scene::Update()
 			continue;
 		
 		ent->Update();
-		ent->Render();
 	}
-/*	for(auto& ent : entities)
+}
+
+void Scene::Render()
+{
+	Subsystem::Render();
+	for(auto& ent : entities)
 	{
 		if(!ent || !ent->active)
 			continue;
 		
 		ent->Render();
-	}*/
+	}
 }
 
 void Scene::FixedUpdate()
@@ -225,9 +229,6 @@ void Scene::Load(Properties *prop)
 
 void Scene::AddEntity(Entity* ent)
 {
-	ent->active = true;
-	ent->Init();
-
 	if(!ent->parent)
 	{
 		entities.push_back(ent);
@@ -237,6 +238,8 @@ void Scene::AddEntity(Entity* ent)
 	{
 		ent->parent->AddChild(ent);
 	}
+	ent->Init();
+	TriggerEvent("AddEntity", ent);
 	Log("Scene::AddEntity: Finished.");
 }
 
@@ -258,19 +261,9 @@ Entity* Scene::SpawnAndLoad(Properties* prop, string name, Entity* parent)
 	Entity* ent = new Entity;
 	ent->parent = parent;
 	ent->name = name;
-	ent->active = true;
 	ent->Load(prop);
-	ent->Init();
-	
-	if(!parent)
-	{
-		entities.push_back(ent);
-		Log("Scene::SpawnAndLoad: pushed in.");
-	}
-	else
-	{
-		parent->AddChild(ent);
-	}
+	AddEntity(ent);
+
 	return ent;
 }
 
@@ -285,6 +278,11 @@ deque<Entity*> Scene::GetEntities(string tag) const
 		}
 	}
 	return result;
+}
+
+const deque<ptr<Entity>>& Scene::GetEntities() const
+{
+	return entities;
 }
 
 }

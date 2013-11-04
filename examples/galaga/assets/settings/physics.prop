@@ -1,0 +1,6 @@
+// Physics
+physics
+{
+	// Default
+	gravity = (0, 0, 0)
+}

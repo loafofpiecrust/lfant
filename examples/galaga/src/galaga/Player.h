@@ -41,7 +41,7 @@ class Inventory;
  */
 class Player : public lfant::Component
 {
-	DECLARE_COMP(Player)
+	DECLARE_TYPE(lfant::Component, Player)
 public:
 	Player()
 	{

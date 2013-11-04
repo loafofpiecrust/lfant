@@ -30,7 +30,7 @@ namespace lfant {
 
 class PointLight : public Light
 {
-	DECLARE_COMP(PointLight)
+	DECLARE_TYPE(Component, PointLight)
 public:
 	PointLight();
 	~PointLight();

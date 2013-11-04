@@ -41,7 +41,7 @@
 namespace lfant
 {
 
-IMPLEMENT_COMP(Mesh)
+IMPLEMENT_TYPE(Component, Mesh)
 
 Mesh::Mesh()
 {
@@ -92,15 +92,21 @@ void Mesh::SetShape(string preset)
 
 void Mesh::Init()
 {
-	if(material->shader->GetId() == -1 || material->texture->GetId() == -1)
+	if(material->shader->GetId() == -1)
 	{
-		Log("Mesh init rejected");
+		Log("Mesh init rejected (shader)");
+		return;
+	}
+
+	if(material->texture->GetId() == -1)
+	{
+		Log("Mesh init rejected (texture)");
 		return;
 	}
 
 	if(loaded)
 	{
-		Log("Mesh init rejected 2");
+		Log("Mesh init rejected (loaded)");
 		return;
 	}
 
@@ -177,9 +183,21 @@ void Mesh::Deinit()
 
 void Mesh::Render()
 {
-	if(material->shader->GetId() == -1 || material->texture->GetId() == -1 || !loaded)
+	if(material->shader->GetId() == -1)
 	{
-		Log("Mesh render rejected");
+		Log("Mesh render rejected (shader)");
+		return;
+	}
+
+	if(material->texture->GetId() == -1)
+	{
+		Log("Mesh render rejected (texture)");
+		return;
+	}
+
+	if(!loaded)
+	{
+		Log("Mesh render rejected (!loaded)");
 		return;
 	}
 

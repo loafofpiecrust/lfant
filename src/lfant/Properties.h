@@ -62,17 +62,20 @@ public:
 	Properties* GetFirstChild();
 	Properties* GetChild(string type);
 	Properties* GetChildById(string id);
-	deque<Properties*> GetChildren(string type = "");
+
+	const deque<ptr<Properties>>& GetChildren();
+	deque<Properties*> GetChildren(string type);
 
 	qumap<string, string>& GetValues();
 
+	Properties* AddChild(Properties* prop);
 	Properties* AddChild(string type = "", string id = "");
 	Properties* AddChild(istream& stream, string type, string id, bool first = true);
 
 	template<typename T>
 	void Set(string name, const T& value)
 	{
-		values[TrimSpace(name)] = lexical_cast<string>(value);
+		Set(name, lexical_cast<string>(value));
 	}
 
 	void AddValue(string name, string value);
@@ -90,6 +93,7 @@ public:
 
 	void Get(string name, Entity*& ref);
 	void Set(string name, Entity* const& value);
+	void Set(string name, string value);
 
 	template<typename T = string>
 	T Get(string name)
@@ -133,6 +137,7 @@ public:
 	string id = "";
 
 	qumap<string, string> values;
+	deque<ptr<Properties>> children;
 
 protected:
 
@@ -150,7 +155,6 @@ private:
 	Properties* GetTopParent();
 
 	qumap<string, string> enums;
-	deque<ptr<Properties>> children;
 	Properties* parent = nullptr;
 	bool getFirstLine = true;
 };

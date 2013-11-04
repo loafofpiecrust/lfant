@@ -68,7 +68,7 @@ public:
  */
 class ParticleSystem : public Renderable
 {
-	DECLARE_COMP(ParticleSystem)
+	DECLARE_TYPE(Component, ParticleSystem)
 	friend class Renderer;
 	friend class Particle;
 public:

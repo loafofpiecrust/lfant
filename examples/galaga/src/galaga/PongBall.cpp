@@ -12,7 +12,7 @@ using namespace lfant;
 
 namespace pong {
 
-IMPLEMENT_COMP(pong::Ball)
+IMPLEMENT_TYPE(lfant::Component, pong::Ball)
 
 Ball::Ball()
 {

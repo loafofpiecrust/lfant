@@ -38,13 +38,18 @@ public:
 	using parType::operator[];
 	using parType::erase;
 
+	valType& operator[](const uint32_t& idx)
+	{
+		return this->at(idx);
+	}
+
 	T2& operator[](const T1& key)
 	{
-		for(auto& i : *this)
+		for(uint i = 0; i < this->size(); ++i)
 		{
-			if(i.first == key)
+			if(operator[](i).first == key)
 			{
-				return i.second;
+				return operator[](i).second;
 			}
 		}
 	//	valType* v = new valType(key);

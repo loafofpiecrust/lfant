@@ -33,7 +33,7 @@
 namespace lfant {
 namespace galaga {
 
-IMPLEMENT_COMP(Movement)
+IMPLEMENT_TYPE(lfant::Component, Movement)
 
 Movement::Movement()
 {

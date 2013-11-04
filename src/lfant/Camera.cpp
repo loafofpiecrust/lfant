@@ -32,7 +32,7 @@
 
 namespace lfant {
 
-IMPLEMENT_COMP(Camera)
+IMPLEMENT_TYPE(Component, Camera)
 
 Camera::Camera()
 {
@@ -92,7 +92,11 @@ void Camera::Init()
 {
 	Log("Updated projection");
 	UpdateProjection();
-	Log("mainCamera = ", game->scene->mainCamera);
+
+	if(!game->scene->mainCamera)
+	{
+		game->scene->mainCamera = this;
+	}
 }
 
 void Camera::Update()
@@ -127,13 +131,9 @@ void Camera::UpdateProjection()
 	{
 		case Mode::Perspective:
 		{
-			Log("Setting cam projection to perspective");
-			Log(lexical_cast<string>(fov));
-			Log(lexical_cast<string>(aspectRatio));
-			Log(lexical_cast<string>(viewRange));
 			projection = glm::perspective(fov/aperture, aspectRatio, viewRange.min, viewRange.max);
 		//	projection[10] = -projection[10];
-			Log("projection: ", lexical_cast<string>(projection));
+			Log("projection: ", projection);
 			break;
 		}
 		case Mode::Orthographic:

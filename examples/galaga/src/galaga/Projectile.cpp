@@ -30,7 +30,7 @@
 namespace lfant {
 namespace galaga {
 
-IMPLEMENT_COMP(Projectile)
+IMPLEMENT_TYPE(lfant::Component, Projectile)
 
 Projectile::Projectile()
 {

@@ -27,10 +27,13 @@ namespace lfant {
 #define IMPLEMENT_REGISTRY(type) TypeRegistry<type> type::registry __attribute__((init_priority(101)));
 
 #define DECLARE_TYPE(parent, type) \
-	static parent::RegistryEntry<type> _registryEntry;
+	static const parent::RegistryEntry<type> _registryEntry;
+
+#define IMPLEMENT_TYPE_NAME(parent, type, name) \
+	const parent::RegistryEntry<type> type::_registryEntry {#type};
 
 #define IMPLEMENT_TYPE(parent, type) \
-	parent::RegistryEntry<type> type::_registryEntry {#type};
+	IMPLEMENT_TYPE_NAME(parent, type, type)
 
 template<typename T>
 class TypeRegistry

@@ -60,7 +60,7 @@ class Rigidbody : public Component
 {
 	friend class Physics;
 	friend class physics::MotionState;
-	DECLARE_COMP(Rigidbody)
+	DECLARE_TYPE(Component, Rigidbody)
 public:
 
 	// Nested classes

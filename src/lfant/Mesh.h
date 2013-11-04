@@ -118,7 +118,7 @@ public:
 class Mesh : public Renderable
 {
 	friend class Renderer;
-	DECLARE_COMP(Mesh)
+	DECLARE_TYPE(Component, Mesh)
 
 public:
 	Mesh();

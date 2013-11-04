@@ -29,7 +29,7 @@ namespace galaga {
 
 class FollowEntity : public lfant::Component
 {
-	DECLARE_COMP(FollowEntity)
+	DECLARE_TYPE(lfant::Component, FollowEntity)
 public:
 	FollowEntity();
 	~FollowEntity();

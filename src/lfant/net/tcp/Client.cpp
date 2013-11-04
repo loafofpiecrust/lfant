@@ -69,7 +69,7 @@ void Client::Disconnect(string ip)
 /*
 void Client::SendData(Properties *prop, string path)
 {
-	fstream stream("temp/data.cfg");
+	fstream stream("temp/data.prop");
 	prop->SaveStream(stream);
 
 	string line = "";
@@ -82,7 +82,7 @@ void Client::SendData(Properties *prop, string path)
 	SendData(":\\Properties");
 	stream.close();
 
-	remove("temp/data.cfg");
+	remove("temp/data.prop");
 }
 */
 

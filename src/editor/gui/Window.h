@@ -7,9 +7,11 @@
 #include <lfant/ptr.h>
 #include <lfant/util/qumap.h>
 #include <lfant/Entity.h>
+#include <editor/gui/GLCanvas.h>
 
 // External
 #include <wx/frame.h>
+#include <wx/treectrl.h>
 #include <map>
 
 class wxAuiManager;
@@ -20,6 +22,7 @@ class wxPanel;
 class wxBoxSizer;
 class wxGLCanvas;
 class wxGLContext;
+class wxGrid;
 
 namespace lfant {
 namespace editor {
@@ -45,18 +48,21 @@ public:
 	};
 };
 
-class Window : public wxFrame
+class Window : public wxFrame, public lfant::Object
 {
 public:
+
 	Window(string title, Rect rect);
 	virtual ~Window();
 
 	virtual void Init();
+	void Render();
 
 	void OnQuit(wxCommandEvent& event);
 	void OnAbout(wxCommandEvent& event);
 
 	int GetId(string name = "");
+	wxWindow* GetWidget(string name);
 	int AddId(string name);
 
 	wxAuiNotebook* AddPane(string name, string label);
@@ -72,27 +78,46 @@ public:
 	void AddMenuSeparator();
 
 	void StartWidget(wxWindow* widget, int flags = -1);
-	void AddWidget(wxWindow* widget, int flags = -1);
+	void AddWidget(wxWindow* parent, wxWindow* widget, int flags = -1, int proportion = 0);
+	void AddWidget(wxWindow* widget, int flags = -1, int proportion = 0);
 	void EndWidget();
 	wxWindow* GetLastWidget(int back = 1);
 	wxObject* GetLastObject(int back = 1);
 
 protected:
+
+	void FindAddEntityNode(Entity* entity);
+	void AddEntityNode(wxTreeItemId& parent, Entity* entity);
+
+	wxTreeItemId FindEntityInTree(wxTreeItemId parent, Entity* entity, void* vali);
+	void ClearTree(wxTreeItemId id = 0);
+
+	void SetCurrentEntity(wxTreeEvent& evt);
+	void SaveCurrentEntity(wxCommandEvent& evt);
+
+	void AddEntity(wxCommandEvent& evt);
+
 	qumap<string, int> ids;
 	int currId = 1;
-	ptr<wxAuiManager> manager;
-	deque<ptr<wxAuiNotebook>> notebooks;
+	wxAuiManager* manager;
+	deque<wxAuiNotebook*> notebooks;
 
 	deque<wxObject*> widgetStack;
 	deque<wxMenu*> menuStack;
 
-	ptr<wxMenuBar> menuBar;
-	ptr<wxGLCanvas> canvas;
-	ptr<wxGLContext> context;
+	wxMenuBar* menuBar;
+	GLCanvas* canvas;
+	wxTreeCtrl* tree;
+//	ptr<wxGLContext> context;
 
 	Entity* currentEnt = nullptr;
+	Properties* currentProp = nullptr;
+	wxBoxSizer* gridContSizer = nullptr;
+
+	deque<wxGrid*> compGrids;
 
 private:
+//	DECLARE_EVENT_TABLE()
 };
 
 }

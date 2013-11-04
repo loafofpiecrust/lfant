@@ -86,7 +86,7 @@ auto Name(T p1)->typename enable_if<!is_ptr<T>::value && !is_pointer<T>::value, 
 template<typename T>
 auto Name(T& p1)->typename enable_if<is_ptr<T>::value, string>::type
 {
-	return type::Demangle(typeid(*(p1.get())).name());
+	return type::Demangle(typeid(*p1).name());
 }
 
 template<typename T>

@@ -13,8 +13,9 @@ endif()
 
 get_filename_component(ROOT "./" REALPATH)
 
-file(STRINGS "${ROOT}/bin32/${PLATFORM}/lfantdir.txt" LFANT)
-set(CMAKE_MODULE_PATH ${LFANT}/cmake)
+file(STRINGS "${ROOT}/bin/x86/${PLATFORM}/lfantdir.txt" LFANT)
+message(${LFANT})
+set(CMAKE_MODULE_PATH "${LFANT}/cmake")
 
 include(Config)
 
@@ -28,9 +29,21 @@ cmake_policy(SET CMP0015 NEW)
 project(projectName)
 
 # Source Dir
-file(GLOB_RECURSE GAME_SRC
+file(GLOB GAME_SRC
 	"src/${PROJECT_NAME}/*.cpp"
 	)
+
+if(ANDROID)
+file(GLOB PLAT_SRC
+	"src/${PROJECT_NAME}/platform/mobile/*.cpp"
+	)
+else()
+file(GLOB PLAT_SRC
+	"src/${PROJECT_NAME}/platform/desktop/*.cpp"
+	"src/${PROJECT_NAME}/platform/${PLATFORM}/*.cpp"
+	)
+endif()
+list(APPEND GAME_SRC "${PLAT_SRC}")
 
 if(ANDROID)
 file(GLOB LAUNCHER_SRC
@@ -54,13 +67,11 @@ link_directories(
 add_library(${PROJECT_NAME} SHARED ${GAME_SRC})
 target_link_libraries(${PROJECT_NAME}
 	lfant
+	CEGUI
 	)
 
-if(!ANDROID)
+if(NOT ANDROID)
 add_executable(launcher ${LAUNCHER_SRC})
-target_link_libraries(launcher
-	lfant
-	)
 endif()
 
 # Includes
@@ -75,7 +86,7 @@ include_directories(
 	${LFANT}/external/squirrel/include
 	)
 
-if(!ANDROID)
+if(NOT ANDROID)
 target_link_libraries(launcher
 	boost
 	)

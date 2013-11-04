@@ -41,7 +41,7 @@ namespace compute = boost::compute;
 
 namespace lfant {
 
-IMPLEMENT_COMP(ParticleSystem)
+IMPLEMENT_TYPE(Component, ParticleSystem)
 
 ParticleSystem::ParticleSystem() :
 	material(new Material)

@@ -14,7 +14,7 @@ using namespace lfant;
 
 namespace pong {
 
-IMPLEMENT_COMP(pong::Player)
+IMPLEMENT_TYPE(lfant::Component, pong::Player)
 
 Player::Player()
 {

@@ -15,6 +15,7 @@
 #include <lfant/SystemInfo.h>
 #include <lfant/FileSystem.h>
 #include <lfant/Network.h>
+#include <lfant/UserInterface.h>
 
 #include <editor/gui/App.h>
 
@@ -41,7 +42,7 @@ Editor::~Editor()
 
 void Editor::Init()
 {
-//	LoadFile("settings/game.cfg");
+/*	LoadFile("settings/game.cfg");
 
 
 	console->Init();
@@ -64,24 +65,28 @@ void Editor::Init()
 	systemInfo->Init();
 	time->Init();
 	physics->Init();
-//	renderer->Init();
+	renderer->Init();
 	input->Init();
 //	audio->Init();
 	network->Init();
 //	scriptSystem->Init();
+	userInterface->Init();
 	scene->Init();
 
 	/// @todo Init renderer as Editor, eg. without the window opening process
 	///			split 'window' into it's own subsystem?
+	*/
+	Game::Init();
 }
 
 void Editor::Update()
 {
 //	while(!IsExited())
 //	{
-		if(playing)
+	//	if(playing)
 		{
 			time->Update();
+			scene->Update();
 			physics->Update();
 			input->Update();
 		//	userInterface->Update();

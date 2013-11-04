@@ -45,7 +45,7 @@ namespace lfant
  */
 class Sprite : public Mesh
 {
-	DECLARE_COMP(Sprite)
+	DECLARE_TYPE(Component, Sprite)
 	friend class Renderer;
 public:
 

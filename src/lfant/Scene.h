@@ -54,6 +54,7 @@ public:
 
 	virtual void Init();
 	virtual void Update();
+	virtual void Render();
 	virtual void Deinit();
 	virtual void FixedUpdate();
 
@@ -86,6 +87,8 @@ public:
 	 */
 	deque<Entity*> GetEntities(string tag) const;
 
+	const deque<ptr<Entity>>& GetEntities() const;
+
 	deque<Entity*> GetLayer(string layer) const;
 
 	/**
@@ -110,9 +113,6 @@ public:
 	 *
 	 *	@param name Name of new Entity.
 	 *	@param parent Parent entity, defaults to nullptr.
-	 *	@param pos Position, defaults to the origin.
-	 *	@param rot Rotation, defaults to 0 degrees xyz.
-	 *	@param scale Scale, defaults to x1.
 	 *	@return The new entity.
 	 */
 	Entity* Spawn(string name = "Entity", Entity* parent = nullptr);

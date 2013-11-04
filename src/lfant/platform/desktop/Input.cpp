@@ -92,18 +92,27 @@ void Input::Init()
 	Subsystem::Init();
 
 	Log("Input::Init: Begin.");
-	glfwSetKeyCallback(game->renderer->GetWindowHandle(), OnKeyPress);
-	glfwSetCursorPosCallback(game->renderer->GetWindowHandle(), OnMouseMove);
-	glfwSetMouseButtonCallback(game->renderer->GetWindowHandle(), OnMouseButton);
-	glfwSetCharCallback(game->renderer->GetWindowHandle(), OnCharPress);
+	if(game->standAlone)
+	{
+		glfwSetKeyCallback(game->renderer->GetWindowHandle(), OnKeyPress);
+		glfwSetCursorPosCallback(game->renderer->GetWindowHandle(), OnMouseMove);
+		glfwSetMouseButtonCallback(game->renderer->GetWindowHandle(), OnMouseButton);
+		glfwSetCharCallback(game->renderer->GetWindowHandle(), OnCharPress);
+	}
 
 	Log("Input: Initialized");
 }
 
-void Input::OnKeyPress(GLFWwindow* win, int key, int scancode, int action, int mods)
+void Input::OnKeyPress(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-	game->input->TriggerEvent("KeyPress", (uint16_t)key, action);
-	for(auto& axis : game->input->axes)
+	game->input->OnKeyPress(key, scancode, action, mods);
+}
+
+void Input::OnKeyPress(int key, int scancode, int action, int mods)
+{
+//	Log("Key pressed");
+	TriggerEvent("KeyPress", (uint16_t)key, action);
+	for(auto& axis : axes)
 	{
 		if(key == axis.positive || key == axis.positiveAlt)
 		{
@@ -176,36 +185,53 @@ void Input::OnKeyPress(GLFWwindow* win, int key, int scancode, int action, int m
 	}
 }
 
-void Input::OnMouseMove(GLFWwindow* win, double x, double y)
+void Input::OnMouseMove(GLFWwindow* window, double x, double y)
 {
-	game->input->TriggerEvent("MouseMove", (int)x, (int)y);
-	game->input->TriggerEvent("MouseMove", ivec2(x, y));
-	game->input->TriggerEvent("MouseMove", vec2(x, y));
-	if(game->input->lockMouse)
+	game->input->OnMouseMove(vec2(x, y));
+}
+
+void Input::OnMouseMove(vec2 pos)
+{
+	TriggerEvent("MouseMove", (int)pos.x, (int)pos.y);
+	TriggerEvent("MouseMove", (ivec2)pos);
+	TriggerEvent("MouseMove", pos);
+	if(lockMouse)
 	{
-		game->input->SetMousePos(game->renderer->GetResolution() / 2);
+		SetMousePos(game->renderer->GetResolution() / 2);
 	}
 //	game->userInterface->OnMouseMove((float)x, (float)y);
 }
 
-void Input::OnCharPress(GLFWwindow* win, uint32_t key)
+void Input::OnCharPress(uint32_t key)
 {
-	game->input->TriggerEvent("CharPress", (char)key);
+	TriggerEvent("CharPress", (char)key);
 }
 
-void Input::OnMouseButton(GLFWwindow* win, int btn, int action, int mods)
+void Input::OnCharPress(GLFWwindow* win, uint32_t key)
 {
+	game->input->OnCharPress(key);
+}
+
+void Input::OnMouseButton(GLFWwindow* window, int btn, int action, int mods)
+{
+	game->input->OnMouseButton(btn, action, mods);
+}
+
+void Input::OnMouseButton(int btn, int action, int mods)
+{
+	Log("Mouse button at ", lexical_cast<string>(GetMousePos()));
+
 	btn = 400+btn;
-	game->input->TriggerEvent("MouseButton", (uint16_t)btn, action);
+	TriggerEvent("MouseButton", (uint16_t)btn, action);
 	if(action == GLFW_PRESS)
 	{
-		game->input->TriggerEvent("MouseDown", (uint16_t)btn);
+		TriggerEvent("MouseDown", (uint16_t)btn);
 	}
 	else if(action == GLFW_RELEASE)
 	{
-		game->input->TriggerEvent("MouseUp", (uint16_t)btn);
+		TriggerEvent("MouseUp", (uint16_t)btn);
 	}
-	OnKeyPress(win, btn, 0, action, mods);
+	OnKeyPress(btn, 0, action, mods);
 }
 
 void Input::GetJoystickAxes()
@@ -313,19 +339,33 @@ int8_t Input::GetButtonUp(string name) const
 
 ivec2 Input::GetMousePos() const
 {
-	dvec2 result;
-	glfwGetCursorPos(game->renderer->GetWindowHandle(), &result.x, &result.y);
-	return (ivec2)result;
+	if(game->standAlone)
+	{
+		dvec2 result;
+		glfwGetCursorPos(game->renderer->GetWindowHandle(), &result.x, &result.y);
+		return (ivec2)result;
+	}
+	else
+	{
+		return mousePos;
+	}
 }
 
 void Input::SetMousePos(int32 x, int32 y)
 {
-	glfwSetCursorPos(game->renderer->GetWindowHandle(), x, y);
+	if(game->standAlone)
+	{
+		glfwSetCursorPos(game->renderer->GetWindowHandle(), x, y);
+	}
+	else
+	{
+		mousePos = ivec2(x, y);
+	}
 }
 
 void Input::SetMousePos(ivec2 pos)
 {
-	glfwSetCursorPos(game->renderer->GetWindowHandle(), pos.x, pos.y);
+	SetMousePos(pos.x, pos.y);
 }
 
 }
