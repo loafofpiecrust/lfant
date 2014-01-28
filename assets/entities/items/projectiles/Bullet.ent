@@ -1,0 +1,14 @@
+
+entity Bullet
+{
+	lifeTime = 1.5
+	
+	component Rigidbody
+	{
+		mass = 10
+	}
+	component Mesh
+	{
+		file = meshes/suzanne.obj
+	}
+}

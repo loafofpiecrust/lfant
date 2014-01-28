@@ -7,7 +7,7 @@ glm@g-truc.net
 ================================================================================
 The MIT License
 --------------------------------------------------------------------------------
-Copyright (c) 2005 - 2013 G-Truc Creation (www.g-truc.net)
+Copyright (c) 2005 - 2014 G-Truc Creation (www.g-truc.net)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -35,6 +35,86 @@ GLM is a header only library, there is nothing to build, just include it.
 
 More informations in GLM manual:
 http://glm.g-truc.net/glm.pdf
+
+================================================================================
+GLM 0.9.5.1: 2014-01-11
+--------------------------------------------------------------------------------
+- Fixed angle and orientedAngle that sometimes return NaN values (#145)
+- Deprecated degrees for function parameters and display a message
+- Added possible static_cast conversion of GLM types (#72)
+- Fixed error 'inverse' is not a member of 'glm' from glm::unProject (#146)
+- Fixed mismatch between some declarations and definitions
+- Fixed inverse link error when using namespace glm; (#147)
+- Optimized matrix inverse and division code (#149)
+- Added intersectRayPlane function (#153)
+- Fixed outerProduct return type (#155)
+
+================================================================================
+GLM 0.9.5.0: 2013-12-25
+--------------------------------------------------------------------------------
+- Added forward declarations (glm/fwd.hpp) for faster compilations
+- Added per feature headers
+- Minimized GLM internal dependencies
+- Improved Intel Compiler detection
+- Added bitfieldInterleave and _mm_bit_interleave_si128 functions
+- Added GTX_scalar_relational
+- Added GTX_dual_quaternion
+- Added rotation function to GTX_quaternion (#22)
+- Added precision variation of each type
+- Added quaternion comparison functions
+- Fixed GTX_multiple for negative value
+- Removed GTX_ocl_type extension
+- Fixed post increment and decrement operators
+- Fixed perspective with zNear == 0 (#71)
+- Removed l-value swizzle operators
+- Cleaned up compiler detection code for unsupported compilers
+- Replaced C cast by C++ casts
+- Fixed .length() that should return a int and not a size_t
+- Added GLM_FORCE_SIZE_T_LENGTH and glm::length_t
+- Removed unnecessary conversions
+- Optimized packing and unpacking functions
+- Removed the normalization of the up argument of lookAt function (#114)
+- Added low precision specializations of inversesqrt
+- Fixed ldexp and frexp implementations
+- Increased assert coverage
+- Increased static_assert coverage
+- Replaced GLM traits by STL traits when possible
+- Allowed including individual core feature
+- Increased unit tests completness
+- Added creating of a quaternion from two vectors
+- Added C++11 initializer lists
+- Fixed umulExtended and imulExtended implementations for vector types (#76)
+- Fixed CUDA coverage for GTC extensions
+- Added GTX_io extension
+- Improved GLM messages enabled when defining GLM_MESSAGES
+- Hidden matrix _inverse function implementation detail into private section
+
+================================================================================
+GLM 0.9.4.6: 2013-09-20
+--------------------------------------------------------------------------------
+- Fixed detection to select the last known compiler if newer version #106
+- Fixed is_int and is_uint code duplication with GCC and C++11 #107 
+- Fixed test suite build while using Clang in C++11 mode
+- Added c++1y mode support in CMake test suite
+- Removed ms extension mode to CMake when no using Visual C++
+- Added pedantic mode to CMake test suite for Clang and GCC
+- Added use of GCC frontend on Unix for ICC and Visual C++ fronted on Windows
+  for ICC
+- Added compilation errors for unsupported compiler versions
+- Fixed glm::orientation with GLM_FORCE_RADIANS defined #112
+- Fixed const ref issue on assignment operator taking a scalar parameter #116
+- Fixed glm::eulerAngleY implementation #117
+
+================================================================================
+GLM 0.9.4.5: 2013-08-12
+--------------------------------------------------------------------------------
+- Fixed CUDA support
+- Fixed inclusion of intrinsics in "pure" mode #92
+- Fixed language detection on GCC when the C++0x mode isn't enabled #95
+- Fixed issue #97: register is deprecated in C++11
+- Fixed issue #96: CUDA issues
+- Added Windows CE detection #92
+- Added missing value_ptr for quaternions #99
 
 ================================================================================
 GLM 0.9.4.4: 2013-05-29

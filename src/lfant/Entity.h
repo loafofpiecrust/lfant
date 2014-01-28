@@ -36,6 +36,13 @@
 
 namespace lfant {
 
+namespace editor {
+namespace gui
+{
+	class Window;
+}
+}
+
 class Component;
 class Item;
 class Transform;
@@ -63,6 +70,7 @@ bool EntityActive(Entity* ent);
  */
 class Entity : public Object
 {
+	friend class lfant::editor::gui::Window;
 	friend class Scene;
 	friend class Component;
 	friend class Renderer;
@@ -90,15 +98,15 @@ public:
 	template<typename C>
 	C* AddComponent()
 	{
+		if(GetComponent<C>()) return nullptr;
+
 		C* comp = new C();
 		AddComponent(comp);
-		TriggerEvent("OnSetComponent"+type::Unscope(type::Name(comp)), comp);
+		TriggerEvent("OnSetComponent"+type::Descope(type::Name(comp)), comp);
 		return comp;
 	}
 
 	Component* AddComponent(string type);
-
-	void AddComponent(Component* comp);
 
 	/**
 	 *	Removes a component from this Entity
@@ -107,7 +115,6 @@ public:
 	template<typename C>
 	void RemoveComponent();
 	void RemoveComponent(string type);
-	void RemoveComponent(Component* comp);
 
 	/**
 	 *	Clones an identical instance of this Entity.
@@ -118,11 +125,12 @@ public:
 	template<typename C>
 	C* GetComponent()
 	{
+		string type = type::Name<C>();
 		for(auto& comp : components)
 		{
-			if(C* c = dynamic_cast<C*>(comp.get()))
+			if(type::Name(comp) == type)
 			{
-				return c;
+				return dynamic_cast<C*>(comp.get());
 			}
 		}
 		return nullptr;
@@ -150,11 +158,13 @@ public:
 
 	uint32_t GetId() const { return id; }
 
-	string GetLayer();
-	void SetLayer(string layer);
+	uint32_t GetLayer();
+	void SetLayer(uint32_t layer);
 
 	Entity* GetParent();
 	void SetParent(Entity* ent);
+
+	void SetName(string name) { this->name = name; }
 
 	Transform* transform;
 
@@ -173,6 +183,7 @@ protected:
 	virtual void Init();
 	virtual void Update();
 	virtual void FixedUpdate();
+	virtual void Render();
 //	virtual void Deinit();
 
 	void AddChild(Entity* ent);
@@ -202,7 +213,9 @@ protected:
 
 private:
 
+	void AddComponent(Component* comp);
 	Component* AddComponent(string type, Properties* prop);
+	void RemoveComponent(Component* comp);
 
 	deque< ptr<Entity> > children;
 	deque< ptr<Component> > components;
@@ -212,7 +225,7 @@ private:
 	uint32_t id = 0;
 
 	/// The layer of this entity for primarily display filtering
-	string layer = "Main";
+	uint32_t layer = -1;
 
 	Entity* parent = nullptr;
 };

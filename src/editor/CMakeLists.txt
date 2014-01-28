@@ -23,16 +23,16 @@ add_executable(${PROJECT_NAME} ${SRC_FILES})
 
 # Includes Info
 include_directories(
-	"${ROOT}/src"
-	"${ROOT}/external/fmod/api/inc"
-	"${ROOT}/external/glm"
-	"${ROOT}/external/boost"
-	"${ROOT}/external/bullet/src"
-	"${ROOT}/external/raknet/Source"
-	"${ROOT}/external/glew/include"
-	"${ROOT}/external/glfw/include"
-	"${ROOT}/external/rocket/Include"
-	"${ROOT}/external/wxwidgets/include"
+	${ROOT}/src
+	${ROOT}/external/glm
+	${ROOT}/external/boost
+	${ROOT}/external/bullet/src
+	${ROOT}/external/raknet/Source
+	${ROOT}/external/glew/include
+	${ROOT}/external/glfw/include
+	${ROOT}/external/rocket/Include
+	${ROOT}/external/wxwidgets/include
+	${ROOT}/external/squirrel/include
 	)
 
 add_definitions(
@@ -46,8 +46,8 @@ target_link_libraries(${PROJECT_NAME}
 	glfw
 	boost
 	bullet
-	fmod
 	png
 	z
 	wxwidgets
+	squirrel
 	)

@@ -53,7 +53,7 @@ void Transform::Init()
 	}
 }
 
-void Transform::Save(Properties *prop)
+void Transform::Save(Properties *prop) const
 {
 	Component::Save(prop);
 
@@ -98,7 +98,7 @@ void Transform::SetPosition(vec3 pos)
 quat Transform::GetRotationQuat()
 {
 //	vec3 rot = radians(vec3(rotation.x+180, -rotation.y, -(rotation.z+180)));
-	vec3 rot = radians(vec3(rotation.x, -rotation.y, -rotation.z));
+	vec3 rot = vec3(rotation.x, -rotation.y, -rotation.z);
 	return quat(rot);
 //	return quat(radians(rotation));
 }
@@ -119,9 +119,10 @@ vec3 Transform::GetRotation()
 
 void Transform::SetRotation(vec3 rot)
 {
-	rollover(rot.x, 0.0f, 360.0f);
-	rollover(rot.y, 0.0f, 360.0f);
-	rollover(rot.z, 0.0f, 360.0f);
+	float cap = radians(360.0f);
+	rollover(rot.x, 0.0f, cap);
+	rollover(rot.y, 0.0f, cap);
+	rollover(rot.z, 0.0f, cap);
 
 	rotation = rot;
 //	rotationQuat = quat(rotation);
@@ -144,7 +145,7 @@ void Transform::SetScale(vec3 scl)
 
 vec3 Transform::GetWorldPosition()
 {
-	return matrix[3].xyz;
+	return matrix[3].xyz();
 	/*
 	if(owner->GetParent())
 	{
@@ -370,18 +371,18 @@ void Transform::Scale(vec3 scl)
 
 vec3 Transform::GetDirection()
 {
-	return matrix[2].xyz;
+	return matrix[2].xyz();
 //	return matrix[1].xyz;
 }
 
 vec3 Transform::GetRight()
 {
-	return -vec3(matrix[0].xyz);
+	return -vec3(matrix[0].xyz());
 }
 
 vec3 Transform::GetUp()
 {
-	return matrix[1].xyz;
+	return matrix[1].xyz();
 //	return matrix[2].xyz;
 }
 

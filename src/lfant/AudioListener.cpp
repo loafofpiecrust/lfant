@@ -28,6 +28,6 @@
 namespace lfant
 {
 
-//IMPLEMENT_COMP(AudioListener)
+//IMPLEMENT_TYPE(Component, AudioListener)
 
 }

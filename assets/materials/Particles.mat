@@ -1,0 +1,20 @@
+// Diffuse defaulr
+material Diffuse
+{
+	texture Diffuse
+	{
+		file = textures/Default.png
+		mipmap = false
+		filterMode = Bilinear
+		wrapMode = Clamp
+		format = Compressed
+		anisoFilter = 1
+	}
+
+	shader Main
+	{
+		vertex = shaders/particles/Diffuse.vert
+		fragment = shaders/particles/Diffuse.frag
+	//	geometry = shaders/Diffuse.geom
+	}
+}

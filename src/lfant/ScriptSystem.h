@@ -24,10 +24,7 @@
 #include <lfant/Subsystem.h>
 
 // External
-#include <sqrat/sqratClass.h>
-#include <sqrat/sqratVM.h>
-#include <sqrat/sqratTable.h>
-#include <sqrat/sqratScript.h>
+#include <sqrat.h>
 
 namespace lfant
 {

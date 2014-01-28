@@ -33,7 +33,7 @@ namespace galaga {
 
 class Projectile : public lfant::Component
 {
-	DECLARE_COMP(Projectile)
+	DECLARE_TYPE(lfant::Component, Projectile)
 public:
 	Projectile();
 	~Projectile();

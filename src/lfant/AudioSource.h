@@ -42,7 +42,7 @@ namespace lfant
  */
 class AudioSource : public Component
 {
-//	DECLARE_COMP(AudioSource)
+//	DECLARE_TYPE(Component, AudioSource)
 public:
 	AudioSource();
 	virtual ~AudioSource();

@@ -1,6 +1,3 @@
-#ifndef HEADER_F10FF25176ACD9D0
-#define HEADER_F10FF25176ACD9D0
-
 /******************************************************************************
 *
 *	LFANT Source
@@ -37,11 +34,16 @@
 #include <typeinfo>
 #include <forward_list>
 #include <iostream>
-#include <sqrat/sqratObject.h>
-#include <sqrat/sqratFunction.h>
 
 #define SENDER(obj, sig) obj, #sig
 #define RECEIVER(obj, slot) obj, &remove_ref<decltype(*obj)>::type::slot
+
+namespace Sqrat {
+
+class Object;
+class Function;
+
+}
 
 namespace lfant
 {
@@ -123,10 +125,10 @@ class Object
 	class EventScript : public Event
 	{
 	public:
-		Sqrat::Function func;
-		Sqrat::Object obj;
+		Sqrat::Function* func;
+		Sqrat::Object* obj;
 
-		EventScript(string name, Sqrat::Function func, Sqrat::Object obj) :
+		EventScript(string name, Sqrat::Function* func, Sqrat::Object* obj) :
 			Event(name), func(func), obj(obj)
 		{
 		}
@@ -446,6 +448,8 @@ public:
 	 */
 	virtual void Update();
 
+	virtual void Render();
+
 	virtual void FixedUpdate();
 
 	/**
@@ -472,7 +476,7 @@ protected:
 
 private:
 	// For scripts
-	void ConnectScriptEvent(Object* sender, string name, Sqrat::Object receiver, Sqrat::Function func)
+	void ConnectScriptEvent(Object* sender, string name, Sqrat::Object* receiver, Sqrat::Function* func)
 	{
 		erase_all(name, " ");
 		name = type::Name(sender) + "::" + name + "()";
@@ -516,5 +520,3 @@ private:
 /// @}
 
 } /* namespace lfant */
-
-#endif // header guard

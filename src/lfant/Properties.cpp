@@ -77,6 +77,21 @@ void Properties::Set(string name, Entity* const& value)
 	Set(name, value->GetId());
 }
 
+void Properties::Set(string name, string value)
+{
+	values[TrimSpace(name)] = value;
+/*	name = TrimSpace(name);
+	for(auto& val : values)
+	{
+		if(val.first == name)
+		{
+			val.second = value;
+			return;
+		}
+	}
+	values.emplace_back(name, value);*/
+}
+
 void Properties::LoadFile(string path)
 {
 	ifstream stream(game->fileSystem->GetGamePath(path).string());
@@ -457,9 +472,30 @@ deque<Properties*> Properties::GetChildren(string type)
 	return props;
 }
 
+const deque<ptr<Properties>>& Properties::GetChildren()
+{
+	return children;
+}
+
 qumap<string, string>& Properties::GetValues()
 {
 	return values;
+}
+
+Properties* Properties::AddChild(Properties* prop)
+{
+	if(prop->parent)
+	{
+		for(uint i = 0; i < prop->parent->children.size(); ++i)
+		{
+			if(prop->parent->children[i] == prop)
+			{
+				prop->parent->children.erase(prop->parent->children.begin()+i);
+			}
+		}
+	}
+	prop->parent = this;
+	children.push_back(prop);
 }
 
 Properties* Properties::AddChild(string type, string id)
@@ -502,20 +538,18 @@ void Properties::SkipSpace(istream &stream)
 
 string Properties::TrimSpace(string str, bool onlyIndent)
 {
-	deque<string> toks = Split(str, "", " \t");
+//	Log("Trimming space on '"+str+"'");
+	uint pos = 0;
 	string result = "";
-	for(int i = 0; i < toks.size(); ++i)
+	for(uint i = 0; i < str.size(); ++i)
 	{
-		if(toks[i] != " " && toks[i] != "\t")
+		if(str[i] != ' ' && str[i] != '\t')
 		{
-			result.append(toks[i]);
+			result.push_back(str[i]);
 			if(onlyIndent)
 			{
-				for(uint k = i+1; k < toks.size(); ++k)
-				{
-					result.append(toks[k]);
-				}
-				return result;
+				result.append(str.substr(i+1, str.size()-(i+1)));
+				break;
 			}
 		}
 	}
@@ -563,6 +597,80 @@ string Properties::GetIndent()
 		return parent->GetIndent()+"\t";
 	}
 	return "";
+}
+
+Properties* Properties::GetTopParent()
+{
+	Properties* prop = this;
+	while(prop->parent) prop = prop->parent;
+	return prop;
+}
+
+string Properties::ParseValue(string val)
+{
+	string result = "";
+	for(uint i = 0; i < val.size(); ++i)
+	{
+		if(val[i] == '$')
+		{
+			// dollar
+			if(val.size() >= i && val[i+1] == '{')
+			{
+				++i;
+				// this is a reference
+				string ref = "";
+				for(uint k = i+1; k < val.size(); ++k)
+				{
+					if(val[k] == '}')
+					{
+						i = k+1;
+						break;
+					}
+					else
+					{
+						ref.push_back(val[k]);
+					}
+				}
+
+				// actual parsing
+				deque<string> toks = Split(ref, ".");
+				Properties* prop = GetTopParent();
+				for(uint k = 0; k < toks.size(); ++k)
+				{
+					if(k != toks.size()-1)
+					{
+						for(auto& child : prop->children)
+						{
+							if(child->id == toks[k])
+							{
+								prop = child;
+								break;
+							}
+						}
+					}
+					else
+					{
+						for(auto& value : prop->values)
+						{
+							if(value.first == toks[k])
+							{
+								result.append(value.second);
+							}
+						}
+					}
+				}
+			}
+			else
+			{
+				result.push_back(val[i]);
+			}
+		}
+		else
+		{
+			result.push_back(val[i]);
+		}
+	}
+	return result;
 }
 
 

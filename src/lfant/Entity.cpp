@@ -163,6 +163,25 @@ void Entity::Update()
 	}
 }
 
+void Entity::Render()
+{
+	for(auto& comp : components)
+	{
+		if(comp->IsEnabled())
+		{
+			comp->Render();
+		}
+	}
+
+	for(auto& child : children)
+	{
+		if(child->active)
+		{
+			child->Render();
+		}
+	}
+}
+
 void Entity::FixedUpdate()
 {
 	for(auto& comp : components)
@@ -201,12 +220,17 @@ void Entity::RemoveChild(Entity* ent)
 
 void Entity::AddComponent(Component* comp)
 {
+	// @note Needed to call comp->Deinit() here?
+	if(comp->GetOwner())
+	{
+		comp->GetOwner()->RemoveComponent(comp);
+	}
 	components.push_back(comp);
 	comp->owner = this;
 	comp->Init();
 	TriggerEvent("AddComponent", comp);
-	Log("Entity::AddComponent: Calling ", "SetComponent"+type::Unscope(type::Name(comp)));
-	TriggerEvent("OnSetComponent"+type::Unscope(type::Name(comp)), comp);
+	Log("Entity::AddComponent: Calling ", "SetComponent"+type::Descope(type::Name(comp)));
+	TriggerEvent("OnSetComponent"+type::Descope(type::Name(comp)), comp);
 }
 
 void Entity::Deinit()
@@ -247,10 +271,10 @@ void Entity::Destroy()
 
 Component* Entity::GetComponent(string type)
 {
-	string unscoped = type::Unscope(type);
+	string unscoped = type::Descope(type);
 	for(auto& comp : components)
 	{
-		if(type::Name(comp) == type || type::Name(comp) == unscoped || type::Unscope(type::Name(comp)).find(unscoped) != -1)
+		if(type::Name(comp) == type || type::Name(comp) == unscoped || type::Descope(type::Name(comp)).find(unscoped) != -1)
 		{
 			return comp;
 		}
@@ -258,9 +282,9 @@ Component* Entity::GetComponent(string type)
 	return nullptr;
 }
 
-string Entity::GetLayer()
+uint32_t Entity::GetLayer()
 {
-	if(layer == "Main" && parent)
+	if(layer == -1 && parent)
 	{
 		return parent->GetLayer();
 	}
@@ -270,7 +294,7 @@ string Entity::GetLayer()
 	}
 }
 
-void Entity::SetLayer(string layer)
+void Entity::SetLayer(uint32_t layer)
 {
 	this->layer = layer;
 }
@@ -290,7 +314,7 @@ void Entity::RemoveComponent(Component* comp)
 		if(components[i] == comp)
 		{
 			TriggerEvent("RemoveComponent", comp);
-			TriggerEvent("OnSetComponent"+type::Unscope(type::Name(comp)), comp);
+			TriggerEvent("OnSetComponent"+type::Descope(type::Name(comp)), comp);
 			components.erase(components.begin()+i);
 			break;
 		}
@@ -298,19 +322,20 @@ void Entity::RemoveComponent(Component* comp)
 	Log("Removed component");
 }
 
-template<typename T>
+template<typename C>
 void Entity::RemoveComponent()
 {
-	for(uint i = 0; i < components.size(); ++i)
+	uint i = 0;
+	for(auto& comp : components)
 	{
-		Component* comp = components[i];
-		if(type::Name<T>() == type::Name(comp))
+		if(type::Name<C>() == type::Name(comp))
 		{
-			TriggerEvent("RemoveComponent", comp);
+			TriggerEvent("RemoveComponent", comp.get());
 			comp->Destroy();
 			components.erase(components.begin()+i);
-			TriggerEvent("OnSetComponent"+type::Unscope(type::Name<T>()), nullptr);
+			TriggerEvent("OnSetComponent"+type::Descope(type::Name<C>()), nullptr);
 		}
+		++i;
 	}
 }
 
@@ -320,12 +345,12 @@ void Entity::RemoveComponent(string type)
 	{
 		Component* comp = components[i];
 		string t = type::Name(comp);
-		if(t == type || type::Unscope(t) == type)
+		if(t == type || type::Descope(t) == type)
 		{
 			TriggerEvent("RemoveComponent", comp);
 			comp->Destroy();
 			components.erase(components.begin()+i);
-			TriggerEvent("OnSetComponent"+type::Unscope(t), nullptr);
+			TriggerEvent("OnSetComponent"+type::Descope(t), nullptr);
 		}
 	}
 }
@@ -427,6 +452,7 @@ void Entity::Bind()
 
 void Entity::Save(Properties* prop) const
 {
+	Log("Saving entity to ", prop);
 	prop->type = "entity";
 	prop->id = name;
 
@@ -438,7 +464,9 @@ void Entity::Save(Properties* prop) const
 
 	for(auto& comp : components)
 	{
-		comp->Save(prop->AddChild());
+		auto cp = prop->AddChild();
+		Log("Saving comp: ", type::Name(comp), " to ", cp);
+		comp->Save(cp);
 	}
 
 	for(auto& child : children)
@@ -452,7 +480,7 @@ void Entity::Load(Properties* prop)
 
 	prop->GetId(name);
 	prop->Get("id", id);
-	prop->Get("tags", tags);
+//	prop->Get("tags", tags);
 	prop->Get("layer", layer);
 	prop->Get("active", active);
 	prop->Get("lifetime", lifetime);
@@ -467,7 +495,7 @@ void Entity::Load(Properties* prop)
 		Log("Loading component props, '"+comp->type+" "+comp->id+"'.");
 		if(comp->id != "Transform")
 		{
-			if(component = GetComponent(comp->id))
+			if((component = GetComponent(comp->id)))
 			{
 				component->Load(comp);
 			}
@@ -476,11 +504,6 @@ void Entity::Load(Properties* prop)
 				component = AddComponent(comp->id, comp);
 			}
 			Log("Entity::Load: Added component, owner = ", component->owner);
-			if(comp->id == "Camera")
-			{
-				game->scene->mainCamera = dynamic_cast<Camera*>(component);
-				Log("Added Camera component, now mainCamera = ", game->scene->mainCamera);
-			}
 		}
 		else
 		{
@@ -497,13 +520,20 @@ void Entity::Load(Properties* prop)
 		//	component->Load(comp);
 	}
 
-	c = prop->GetChildren("entity");
-	Log("Entity::Load: Children nodes loaded.");
-	Entity* ent = nullptr;
-	for(auto& child : c)
 	{
-		ent = game->scene->SpawnAndLoad(child, child->id, this);
-	//	ent->Load(child);
+		c = prop->GetChildren("entity");
+		Entity* ent = nullptr;
+		for(auto& child : c)
+		{
+			if((ent = GetChild(child->id)))
+			{
+				ent->Load(child);
+			}
+			else
+			{
+				game->scene->SpawnAndLoad(child, child->id, this);
+			}
+		}
 	}
 
 	string file = "";
@@ -513,7 +543,7 @@ void Entity::Load(Properties* prop)
 		Log("Loading entity from file path");
 		ptr<Properties> fp {new Properties};
 		fp->LoadFile(file);
-		string type = type::Unscope(type::Name(this));
+		string type = type::Descope(type::Name(this));
 		to_lower(type);
 		if(Properties* pc = fp->GetChild(type))
 		{
@@ -561,11 +591,6 @@ Component* Entity::AddComponent(string type, Properties* prop)
 			if(prop) result->Load(prop);
 			AddComponent(result);
 		}
-	}
-
-	if(type == "Camera")
-	{
-		game->scene->mainCamera = dynamic_cast<Camera*>(result);
 	}
 
 	return result;

@@ -38,6 +38,8 @@ namespace lfant
  */
 class Subsystem : public Object
 {
+public:
+	virtual void Destroy();
 protected:
 	Subsystem();
 	virtual ~Subsystem();

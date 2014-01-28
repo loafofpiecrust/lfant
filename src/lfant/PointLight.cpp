@@ -38,7 +38,7 @@
 
 namespace lfant {
 
-IMPLEMENT_COMP(PointLight)
+IMPLEMENT_TYPE(Component, PointLight)
 
 PointLight::PointLight()
 {
@@ -103,7 +103,7 @@ void PointLight::Load(Properties* prop)
 	prop->Get("specularIntensity", specularIntensity);
 }
 
-void PointLight::Save(Properties* prop)
+void PointLight::Save(Properties* prop) const
 {
 	Light::Save(prop);
 

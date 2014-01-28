@@ -1,0 +1,31 @@
+
+entity Bullet
+{
+	lifeTime = 7
+	active = true
+
+	component Transform
+	{
+		scale = (0.22,0.70,0.70)
+	}
+	
+	component Rigidbody
+	{
+		mass = 1
+		trigger = true
+	}
+
+	component BoxCollider
+	{
+	}
+
+	component Projectile
+	{
+	}
+
+	component Mesh
+	{
+		file = meshes/plane.obj
+		material = materials/Rocket.mat
+	}
+}

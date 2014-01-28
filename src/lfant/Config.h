@@ -56,7 +56,7 @@
  */
 #define null(type) *((type*)nullptr)
 #define GLM_SWIZZLE 1
-//#define GLM_FORCE_RADIANS 1
+#define GLM_FORCE_RADIANS 1
 #define BOOST_EXCEPTION_DISABLE
 #define __GXX_EXPERIMENTAL_CXX0X__ 1
 #if __GXX_EXPERIMENTAL_CXX0X__

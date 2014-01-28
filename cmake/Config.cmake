@@ -62,13 +62,13 @@ message("Platform: ${PLATFORM}")
 
 set(CMAKE_BUILD_TYPE Release)
 set(BASE_FLAGS "-O3 -Wall -D__STRICT_ANSI__ -fPIC")
-set(CMAKE_C_FLAGS "${BASE_FLAGS} -std=c11")
 if(NOT ANDROID)
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m${ARCH_OPTION}")
+	set(BASE_FLAGS "${BASE_FLAGS} -m${ARCH_OPTION}")
 endif()
 if(NOT WIN32)
 #	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
 endif()
+set(CMAKE_C_FLAGS "${BASE_FLAGS} -std=c11")
 set(CMAKE_CXX_FLAGS "${BASE_FLAGS} -std=gnu++11 -Wno-invalid-offsetof -g -Wno-overloaded-virtual")
 
 # RPathing

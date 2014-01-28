@@ -138,7 +138,7 @@ void UserInterface::Deinit()
 	gameswf::set_render_handler(nullptr);
 }
 
-void UserInterface::Save(Properties *prop)
+void UserInterface::Save(Properties *prop) const
 {
 
 }
@@ -267,7 +267,7 @@ void UserInterface::CreateWindow(Properties* prop, CEGUI::Window* parent)
 {
 	CEGUI::Window* win = windowManager->createWindow(prop->Get<string>("type"), prop->id);
 
-	string type = type::Unscope(type::Name(win));
+	string type = type::Descope(type::Name(win));
 	if(type == "PushButton")
 	{
 		win->subscribeEvent(CEGUI::PushButton::EventClicked, &UserInterface::OnClickButton, this);
@@ -316,6 +316,7 @@ void UserInterface::Load(Properties *prop)
 	prop->Get("font", pfont);
 	prop->Get("cursor", pcursor);
 	prop->Get("file", file);
+	prop->Get("rootFolder", rootResFolder);
 
 	Log("UserInterface, file to load: '"+file+"'.");
 	if(file != "")
@@ -348,7 +349,7 @@ void UserInterface::Load(Properties *prop)
 	}
 }
 
-void UserInterface::Save(Properties* prop)
+void UserInterface::Save(Properties* prop) const
 {
 	Subsystem::Save(prop);
 }
@@ -365,16 +366,16 @@ void UserInterface::Init()
 	renderer->enableExtraStateSettings(true);
 
 	CEGUI::DefaultResourceProvider* rp = static_cast<CEGUI::DefaultResourceProvider*>(system->getResourceProvider());
-	rp->setResourceGroupDirectory("assets", game->fileSystem->GetGamePath("").string());
-	rp->setDefaultResourceGroup("assets");
+	rp->setResourceGroupDirectory("root", game->fileSystem->GetGamePath(rootResFolder).string());
+	rp->setDefaultResourceGroup("root");
 
-	rp->setResourceGroupDirectory("imagesets", game->fileSystem->GetGamePath("gui/imagesets").string());
-	rp->setResourceGroupDirectory("schemes", game->fileSystem->GetGamePath("gui/schemes").string());
-	rp->setResourceGroupDirectory("xml_schemas", game->fileSystem->GetGamePath("gui/xml_schemas").string());
-	rp->setResourceGroupDirectory("styles", game->fileSystem->GetGamePath("gui/styles").string());
-	rp->setResourceGroupDirectory("layouts", game->fileSystem->GetGamePath("gui/layouts").string());
-	rp->setResourceGroupDirectory("fonts", game->fileSystem->GetGamePath("gui/fonts").string());
-	rp->setResourceGroupDirectory("looknfeel", game->fileSystem->GetGamePath("gui/looks").string());
+	rp->setResourceGroupDirectory("imagesets", game->fileSystem->GetGamePath(rootResFolder+"/imagesets").string());
+	rp->setResourceGroupDirectory("schemes", game->fileSystem->GetGamePath(rootResFolder+"/schemes").string());
+	rp->setResourceGroupDirectory("xml_schemas", game->fileSystem->GetGamePath(rootResFolder+"/xml_schemas").string());
+	rp->setResourceGroupDirectory("styles", game->fileSystem->GetGamePath(rootResFolder+"/styles").string());
+	rp->setResourceGroupDirectory("layouts", game->fileSystem->GetGamePath(rootResFolder+"/layouts").string());
+	rp->setResourceGroupDirectory("fonts", game->fileSystem->GetGamePath(rootResFolder+"/fonts").string());
+	rp->setResourceGroupDirectory("looknfeel", game->fileSystem->GetGamePath(rootResFolder+"/looks").string());
 
 	CEGUI::ImageManager::setImagesetDefaultResourceGroup("imagesets");
 	CEGUI::Scheme::setDefaultResourceGroup("schemes");
@@ -386,7 +387,7 @@ void UserInterface::Init()
 	rootWindow = windowManager->createWindow("DefaultWindow", "Root");
 	context->setRootWindow(rootWindow);
 
-	context->getMouseCursor().setInitialMousePosition(vec2_cast<CEGUI::Vector2f>(game->input->GetMousePos()));
+	context->getMouseCursor().setInitialMousePosition(vec2_cast<CEGUI::Vector2f>((vec2)game->input->GetMousePos()));
 
 	ConnectEvent(SENDER(game->input, KeyPress), RECEIVER(this, OnKey));
 	ConnectEvent(SENDER(game->input, CharPress), RECEIVER(this, OnChar));
@@ -416,6 +417,7 @@ void UserInterface::Update()
 	windowManager->cleanDeadPool();
 
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
 }
 
 void UserInterface::Deinit()
@@ -489,7 +491,7 @@ void UserInterface::OnChar(char key)
 
 void UserInterface::OnMouseButton(uint16 btn, int mode)
 {
-	CEGUI::MouseButton newBtn = CEGUI::NoButton;
+	CEGUI::MouseButton newBtn = CEGUI::LeftButton;
 	if(btn == Key["MouseLeft"])
 	{
 		newBtn = CEGUI::LeftButton;
@@ -525,12 +527,12 @@ void UserInterface::OnMouseMove(vec2 pos)
 	//context->getMouseCursor().setPosition(vec2_cast<CEGUI::Vector2f>(vec2(x,y)));
 }
 
-void UserInterface::OnWindowResize(uint width, uint height)
+void UserInterface::OnWindowResize(int32_t width, int32_t height)
 {
 	if(system)
 	{
 		resized = true;
-		size = uvec2(width, height);
+		size = ivec2(width, height);
 		//	rootWindow->setMaxSize(CEGUI::USize(cegui_reldim(1.0f), cegui_reldim( 1.0f)));
 	}
 }
@@ -566,7 +568,7 @@ void UserInterface::Load(Properties *prop)
 {
 }
 
-void UserInterface::Save(Properties* prop)
+void UserInterface::Save(Properties* prop) const
 {
 	Subsystem::Save(prop);
 }

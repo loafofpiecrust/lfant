@@ -7,22 +7,22 @@ file(GLOB SRC_FILES
 	libs/filesystem/src/*.cpp
 	libs/random/src/*.cpp
 #	libs/thread/src/pthread/*.cpp
-	libs/thread/src/tss_null.cpp
-	libs/thread/src/future.cpp
+#	libs/thread/src/tss_null.cpp
+#	libs/thread/src/future.cpp
 	)
 
 if(PLATFORM STREQUAL "linux")
-	file(GLOB SRC_FILES_PLAT
-		libs/thread/src/pthread/*.cpp
-		)
-	set(SRC_FILES ${SRC_FILES} ${SRC_FILES_PLAT})
+#	file(GLOB SRC_FILES_PLAT
+#		libs/thread/src/pthread/*.cpp
+#		)
+#	set(SRC_FILES ${SRC_FILES} ${SRC_FILES_PLAT})
 endif()
 
 if(PLATFORM STREQUAL "windows")
-	file(GLOB SRC_FILES_PLAT
-		libs/thread/src/win32/*.cpp
-		)
-	set(SRC_FILES ${SRC_FILES} ${SRC_FILES_PLAT})
+#	file(GLOB SRC_FILES_PLAT
+#		libs/thread/src/win32/*.cpp
+#		)
+#	set(SRC_FILES ${SRC_FILES} ${SRC_FILES_PLAT})
 endif()
 
 if(EXISTS "${PROJECT_SOURCE_DIR}/boost/.svn/")

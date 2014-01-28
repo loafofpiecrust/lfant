@@ -60,21 +60,6 @@ using namespace boost::algorithm;
 typedef uint8_t byte;
 typedef unsigned int uint; // Generally used in 'for' loops
 
-// Int primitives, ridding suffix '_t', cuz I don't like it
-typedef int8_t int8;
-typedef uint8_t uint8;
-typedef int16_t int16;
-typedef uint16_t uint16;
-typedef int32_t int32;
-typedef uint32_t uint32;
-typedef int64_t int64;
-typedef uint64_t uint64;
-
-typedef tvec2<int32_t> ivec2;
-typedef tvec3<int32_t> ivec3;
-typedef tvec2<uint32_t> uvec2;
-typedef tvec3<uint32_t> uvec3;
-
 /// Unsigned char 4-component vector
-typedef tvec3<unsigned char> rgb;
-typedef tvec4<unsigned char> rgba;
+typedef u8vec3 rgb;
+typedef u8vec4 rgba;

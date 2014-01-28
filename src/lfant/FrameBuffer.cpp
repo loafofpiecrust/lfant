@@ -133,7 +133,9 @@ void FrameBuffer::Init()
 
 void FrameBuffer::Deinit()
 {
-	EndRender();
+	posBuffer.Destroy();
+	shader->Destroy();
+
 	for(auto& tex : textures)
 	{
 		tex->Destroy();
@@ -159,6 +161,7 @@ void FrameBuffer::AddDepthTexture(string name, Texture::Format form1, Texture::F
 		depthTexture = new Texture;
 	}
 	depthTexName = name;
+	hasDepth = true;
 }
 
 void FrameBuffer::GetTextures(Shader* sh) const
@@ -282,6 +285,7 @@ void FrameBuffer::BeginRender()
 	shader->AddUniform("focalDepth");
 	shader->AddUniform("focalLength");
 	shader->AddUniform("fstop");
+	shader->AddUniform("focus");
 	shader->AddUniform("textureSize");
 
 	posBuffer.push_back(vec2(-1, -1));
@@ -310,11 +314,15 @@ void FrameBuffer::Render()
 	
 //	shader->SetUniform("cameraPosition", game->scene->mainCamera->owner->transform->GetWorldPosition());
 //	shader->SetUniform("cameraDof", vec2(game->scene->mainCamera->dof - game->scene->mainCamera->dofWidth, game->scene->mainCamera->dof + game->scene->mainCamera->dofWidth));
-	shader->SetUniform("focalDepth", game->scene->mainCamera->focalDepth);
-	shader->SetUniform("focalLength", game->scene->mainCamera->focalLength);
-	shader->SetUniform("fstop", game->scene->mainCamera->fstop);
+	if(game->scene->mainCamera)
+	{
+		shader->SetUniform("focalDepth", game->scene->mainCamera->focalDepth);
+		shader->SetUniform("focalLength", game->scene->mainCamera->focalLength);
+		shader->SetUniform("fstop", game->scene->mainCamera->aperture);
+		shader->SetUniform("focus", game->scene->mainCamera->focus);
+		shader->SetUniform("cameraRange", vec2_cast<vec2>(game->scene->mainCamera->GetViewRange()));
+	}
 	shader->SetUniform("textureSize", (vec2)game->renderer->GetResolution());
-	shader->SetUniform("cameraRange", vec2_cast<vec2>(game->scene->mainCamera->GetViewRange()));
 
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, posBuffer);
@@ -335,8 +343,6 @@ void FrameBuffer::Render()
 
 void FrameBuffer::EndRender()
 {
-	posBuffer.Destroy();
-	shader->Destroy();
 }
 
 }

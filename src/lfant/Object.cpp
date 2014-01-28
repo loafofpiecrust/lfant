@@ -27,6 +27,8 @@
 #include <lfant/ScriptSystem.h>
 
 // External
+#include <sqrat/sqratObject.h>
+#include <sqrat/sqratFunction.h>
 
 namespace lfant
 {
@@ -62,6 +64,10 @@ void Object::Update()
 	}
 }
 
+void Object::Render()
+{
+}
+
 void Object::FixedUpdate()
 {
 	
@@ -70,16 +76,7 @@ void Object::FixedUpdate()
 void Object::Destroy()
 {
 	Deinit();
-	/*
-	for(auto& evt : events)
-	{
-		delete evt;
-	}
-	*/
-}
-
-void Object::Deinit()
-{
+	
 	for(auto& s : senders)
 	{
 		for(uint i = 0; i < s->events.size(); ++i)
@@ -91,6 +88,13 @@ void Object::Deinit()
 			}
 		}
 	}
+
+	// @todo Keep?
+//	delete this;
+}
+
+void Object::Deinit()
+{
 }
 
 void Object::LoadFile(string path)
@@ -98,7 +102,7 @@ void Object::LoadFile(string path)
 //	Log(type::Name(this), " loading file '", path, "'.");
 	Properties prop;
 	prop.LoadFile(path);
-//	string type = type::Unscope(type::Name(this));
+//	string type = type::Descope(type::Name(this));
 //	to_lower(type);
 	Log("Checking for first child");
 	if(Properties* pc = prop.GetFirstChild())
@@ -106,6 +110,7 @@ void Object::LoadFile(string path)
 		Log("Loading first child");
 		Load(pc);
 	}
+	Log("Done loading file");
 }
 
 void Object::Load(Properties *prop)
@@ -121,7 +126,7 @@ void Object::SaveFile(string path) const
 
 void Object::Save(Properties *prop) const
 {
-	string type = type::Unscope(type::Name(this));
+	string type = type::Descope(type::Name(this));
 	to_lower(type);
 	prop->type = type;
 }

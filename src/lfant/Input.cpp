@@ -125,8 +125,7 @@ void Input::Update()
 void Input::Load(Properties* prop)
 {
 	Subsystem::Load(prop);
-//	Properties root("settings/input.cfg");
-//	Properties* prop = root.GetChild("input");
+	
 	Log("Loading input props...");
 	deque<Properties*> binds = prop->GetChildren("axis");
 	Axis axis("");

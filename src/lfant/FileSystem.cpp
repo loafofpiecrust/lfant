@@ -34,7 +34,7 @@ namespace lfant
 {
 
 #if LINUX || ANDROID
-string GetProgramDir()
+string GetProgramDirRaw()
 {
 	char tmp[128];
 	uint len = readlink("/proc/self/exe", tmp, sizeof(tmp)-1);
@@ -43,14 +43,19 @@ string GetProgramDir()
 		tmp[len] = '\0';
 	}
 	string result = tmp;
-	if(uint pos = result.find("/launcher"))
+	uint pos = -1;
+	if((pos = result.find("/launcher")) != -1)
+	{
+		result.erase(result.begin()+pos, result.end());
+	}
+	else if((pos = result.find("/editor")) != -1)
 	{
 		result.erase(result.begin()+pos, result.end());
 	}
 	return result;
 }
 #elif WINDOWS
-string GetProgramDir()
+string GetProgramDirRaw()
 {
 	HMODULE hmod = GetModuleHandle(0);
 	char file[128];
@@ -65,12 +70,18 @@ string GetProgramDir()
 #endif
 
 FileSystem::FileSystem() :
-	gameFolder(GetProgramDir()+"/../../..")
+	programFolder(GetProgramDirRaw()),
+	gameFolder(programFolder+"/../../..")
 {
 }
 
 FileSystem::~FileSystem()
 {
+}
+
+string FileSystem::GetProgramDir()
+{
+	return programFolder;
 }
 
 void FileSystem::Init()

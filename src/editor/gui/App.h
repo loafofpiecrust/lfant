@@ -4,6 +4,7 @@
 
 // Internal
 #include <lfant/ptr.h>
+#include <editor/gui/Window.h>
 
 // External
 #include <wx/app.h>
@@ -12,8 +13,6 @@ namespace lfant {
 namespace editor {
 namespace gui {
 
-class Window;
-
 class App : public wxApp
 {
 public:
@@ -21,13 +20,19 @@ public:
 	virtual ~App();
 
 	virtual bool OnInit();
-	virtual int MainLoop();
+//	virtual int MainLoop();
+
+	void ActivateRenderLoop(bool on);
+	void OnIdle(wxIdleEvent& evt);
 
 protected:
-	ptr<Window> window;
+	Window* window = nullptr;
+	bool render_loop_on = false;
 
 private:
 };
+
+DECLARE_APP(lfant::editor::gui::App)
 
 }
 }

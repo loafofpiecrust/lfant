@@ -88,7 +88,7 @@ void Renderer::Load(Properties* prop)
 	Log("OpenGL Version loaded: ", lexical_cast<string>(version));
 }
 
-void Renderer::Save(Properties *prop)
+void Renderer::Save(Properties *prop) const
 {
 	Subsystem::Save(prop);
 
@@ -125,14 +125,17 @@ void Renderer::Init()
 	Log("Renderer::Init: About to start GLFW");
 
 #if !ANDROID
-	if(!glfwInit())
+	if(game->standAlone)
 	{
-		Log("Renderer::Init: GLFW failed to initialise.");
-		game->Destroy();
+		if(!glfwInit())
+		{
+			Log("Renderer::Init: GLFW failed to initialise.");
+			game->Destroy();
+		}
 	}
 #endif
 
-	if(game->standAlone)
+//	if(game->standAlone)
 	{
 		if(!OpenWindow())
 		{
@@ -144,16 +147,19 @@ void Renderer::Init()
 	}
 
 #if !ANDROID
-	glfwSwapInterval(vsync);
 
-	glfwSetWindowCloseCallback(window, &Renderer::OnCloseWindow);
-	glfwSetWindowSizeCallback(window, &Renderer::OnSetResolution);
+	if(game->standAlone)
+	{
+		glfwSwapInterval(vsync);
+		glfwSetWindowCloseCallback(window, &Renderer::OnCloseWindow);
+		glfwSetWindowSizeCallback(window, &Renderer::OnSetResolution);
+		glfwSetErrorCallback(&Renderer::OnError);
+	}
 
-	glfwSetErrorCallback(&Renderer::OnError);
+#endif
 	
 	glShadeModel(GL_SMOOTH);
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-#endif
 
 	// Background color
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -192,8 +198,8 @@ void Renderer::Init()
 //	frameBuffer->AddTexture("specularTex", Texture::Format::RGBA, Texture::Format::RGBA);
 	frameBuffer->AddDepthTexture("depthTex");
 
-	frameBuffer->SetRect({0,0,resolution.x,resolution.y});
-	frameBuffer->hasDepth = true;
+	frameBuffer->SetRect({0,0,(uint32_t)resolution.x,(uint32_t)resolution.y});
+//	frameBuffer->hasDepth = true;
 	frameBuffer->Init();
 	frameBuffer->Bind();
 	frameBuffer->BeginRender();
@@ -218,8 +224,11 @@ static bool fboDrawn = false;
 void Renderer::PreUpdate()
 {
 #if !ANDROID
-	glfwSwapBuffers(window);
-	glfwPollEvents();
+	if(game->standAlone)
+	{
+		glfwSwapBuffers(window);
+		glfwPollEvents();
+	}
 #endif
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -262,10 +271,10 @@ void Renderer::Update()
 
 void Renderer::Deinit()
 {
-	frameBuffer->EndRender();
+	frameBuffer->Deinit();
 	Log("Renderer::Deinit(): Touch");
 #if !ANDROID
-	glfwTerminate();
+	if(game->standAlone) glfwTerminate();
 #endif
 }
 
@@ -278,12 +287,12 @@ void Renderer::Deinit()
 bool Renderer::OpenWindow()
 {
 #if !ANDROID
-//	if(game->standAlone)
-//	{
+	if(game->standAlone)
+	{
 	Log("Renderer::OpenWindow: About to set window hints.");
 	glfwWindowHint(GLFW_SAMPLES, fsaa);
-//	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, version.major);
-//	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, version.minor);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, version.major);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, version.minor);
 //	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_RESIZABLE, windowResizable);
 
@@ -302,7 +311,7 @@ bool Renderer::OpenWindow()
 //	SetWindowTitle(windowTitle);
 	SetWindowPos(windowPos);
 	Log("Renderer::OpenWindow: Window successfully opened.");
-//	}
+	}
 	glewExperimental = true;     // Needed for core profile
 	if (glewInit() != GLEW_OK)
 	{
@@ -335,7 +344,7 @@ void Renderer::OnSetResolution(GLFWwindow* win, int x, int y)
 	game->renderer->frameBuffer->Render();
 //	frameBuffer->ResizeViewport();
 	*/
-	game->renderer->TriggerEvent("SetResolution", (uint32)x, (uint32)y);
+	game->renderer->TriggerEvent("SetResolution", x, y);
 }
 
 /*******************************************************************************

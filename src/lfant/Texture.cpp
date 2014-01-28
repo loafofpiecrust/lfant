@@ -59,16 +59,16 @@ Texture::Texture() :
 {
 }
 
-void Texture::Load(Properties *prop)
+void Texture::Load(Properties* prop)
 {
 	prop->Get("file", path);
 	Log("Tex path: '"+path+"'.");
 	prop->Get("anisoLevel", anisoLevel);
 
-	LoadFile(path);
+	LoadFile();
 }
 
-void Texture::Save(Properties *prop)
+void Texture::Save(Properties* prop) const
 {
 	Object::Save(prop);
 
@@ -132,7 +132,7 @@ void Texture::Deinit()
 	glDeleteTextures(1, &id);
 }
 
-void Texture::SetIndex(uint32 idx)
+void Texture::SetIndex(uint32_t idx)
 {
 	index = idx;
 }
@@ -156,13 +156,13 @@ void Texture::LoadFile(string path, int mode)
 		path = this->path;
 	}
 
-	if(mode != 0)
+	if(mode != -1)
 	{
 		this->mode = mode;
 	}
 
-	this->path = game->fileSystem->GetGamePath(path).string();
-
+	path = game->fileSystem->GetGamePath(path).string();
+ 
 	for(auto& tex : textures)
 	{
 		if(!tex)
@@ -179,11 +179,11 @@ void Texture::LoadFile(string path, int mode)
 //	data.clear();
 //	data.resize(0);
 //	cimg_library::CImg<byte> img(this->path.c_str());
-	LoadPNG(this->mode);
+	LoadPNG(path);
 	textures.push_back(this);
 }
 
-void Texture::LoadPNG(int mode)
+void Texture::LoadPNG(string path)
 {
 	vector<byte> data;
 	uint error = lodepng::decode(data, size.x, size.y, path);
@@ -196,11 +196,11 @@ void Texture::LoadPNG(int mode)
 	Log("Texture::LoadPNG: Image size: (", size.x, ", ", size.y, ").");
 }
 
-void Texture::LoadJPEG(int mode)
+void Texture::LoadJPEG(string path)
 {
 }
 
-void Texture::LoadBMP(int mode)
+void Texture::LoadBMP(string path)
 {
 	vector<byte> data;
 	byte header[54];
@@ -259,7 +259,7 @@ void Texture::LoadBMP(int mode)
 #define FOURCC_DXT3 0x33545844 // Equivalent to "DXT3" in ASCII
 #define FOURCC_DXT5 0x35545844 // Equivalent to "DXT5" in ASCII
 
-void Texture::LoadDDS(int mode)
+void Texture::LoadDDS(string path)
 {
 	unsigned char header[124];
 

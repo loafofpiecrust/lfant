@@ -25,6 +25,8 @@
 #include <boost/any.hpp>
 #include <iostream>
 #include <fstream>
+#include <boost/type_traits/is_fundamental.hpp>
+#include <boost/type_traits.hpp>
 
 // Internal
 
@@ -116,25 +118,35 @@ public:
 	void Input(string line);
 
 	template<typename T = string>
-	void Print(T msg)
+	void Print(const T& msg)
 	{
-		logFile.open(logName, ios_base::app);
-		// Print to console window
-		cout << msg << "\n";
-		// Append message to file
-		logFile << msg << "\n";
-		logFile.close();
+		LinePrint(msg);
+		LinePrint("\n");
 	}
 
 	template<typename T = string>
-	void LinePrint(T msg)
+	auto LinePrint(T msg)->typename enable_if<boost::is_fundamental<T>::value || boost::is_pointer<T>::value || boost::is_same<string, T>::value, void>::type
 	{
-		logFile.open(logName, ios_base::app);
+	//	logFile.open(logName, ios_base::app);
+	//	string strMsg = lexical_cast<string>(msg);
 		// Print to console window
 		cout << msg;
 		// Append message to file
 		logFile << msg;
-		logFile.close();
+
+	//	logFile.close();
+	}
+
+	template<typename T = string>
+	auto LinePrint(T msg)->typename enable_if<!boost::is_fundamental<T>::value && !boost::is_pointer<T>::value && !is_ptr<T>::value && !boost::is_same<string, T>::value, void>::type
+	{
+		LinePrint(lexical_cast<string>(msg));
+	}
+
+	template<typename T>
+	auto LinePrint(const T& msg)->typename enable_if<is_ptr<T>::value, void>::type
+	{
+		LinePrint(msg.get());
 	}
 
 	void RegisterCommand(CommandDefault::funcTypeRaw func, string name, string help = "");

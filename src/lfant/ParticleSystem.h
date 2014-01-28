@@ -41,8 +41,9 @@ namespace lfant
  *	 @{
  */
 
-struct Particle
+class Particle
 {
+public:
 	vec4 pos;
 	vec4 color;
 	vec4 vel;
@@ -67,7 +68,7 @@ struct Particle
  */
 class ParticleSystem : public Renderable
 {
-	DECLARE_COMP(ParticleSystem)
+	DECLARE_TYPE(Component, ParticleSystem)
 	friend class Renderer;
 	friend class Particle;
 public:

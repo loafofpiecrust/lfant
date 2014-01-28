@@ -42,13 +42,18 @@ Subsystem::~Subsystem()
 void Subsystem::Init()
 {
 	Object::Init();
-	if(type::Name(this) != type::Name<Scene>())
+	if(type::Name(this) != "lfant::Scene")
 	{
 		printf("About to load file for subsystem\n");
-		string type = type::Unscope(type::Name(this));
-		to_lower(type);
-		LoadFile("settings/"+type+".cfg");
+		string type = type::Descope(type::Name(this));
+		type[0] = tolower(type[0]);
+		LoadFile("settings/"+type+".prop");
 	}
+}
+
+void Subsystem::Destroy()
+{
+	Object::Destroy();
 }
 
 }

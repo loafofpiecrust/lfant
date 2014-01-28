@@ -33,7 +33,7 @@
 namespace lfant {
 namespace galaga {
 
-IMPLEMENT_COMP(MouseLook)
+IMPLEMENT_TYPE(lfant::Component, MouseLook)
 
 MouseLook::MouseLook()
 {
@@ -70,15 +70,15 @@ void MouseLook::Look(vec3 rot)
 {
 	if(owner->GetParent())
 	{
-		owner->GetParent()->transform->Rotate(vec3(0,0,rot.z) * lookSpeed * game->time->deltaTime);
-		owner->transform->Rotate(vec3(rot.x,rot.y,0) * lookSpeed * game->time->deltaTime);
+		owner->GetParent()->transform->Rotate(radians(vec3(0,0,rot.z) * lookSpeed * game->time->deltaTime));
+		owner->transform->Rotate(radians(vec3(rot.x,rot.y,0) * lookSpeed * game->time->deltaTime));
 
 	//	Log("Parent rot: ", lexical_cast<string>(owner->GetParent()->transform->GetWorldRotation()));
 	//	Log("Camera rot: ", lexical_cast<string>(owner->transform->GetWorldRotation()));
 	}
 	else
 	{
-		owner->transform->Rotate(rot * lookSpeed * game->time->deltaTime);
+		owner->transform->Rotate(radians(rot * lookSpeed * game->time->deltaTime));
 	}
 
 }

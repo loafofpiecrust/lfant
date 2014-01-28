@@ -37,16 +37,12 @@ namespace lfant
  *	@{
  */
 
-/**	This class handles a Camera Component for the Owner Entity.
- *		This is a Component to allow easy use of Cameras for Players,
- *		and the ability to add/remove a Camera without having to create
- *		and destroy the Entity. It could be an Entity, and allowed to be
- *		a child of the one in need of it, but then I wouldn't be taking
- *		advantage of having a Component-based Entity system.
+/**
+ *	
  */
 class Camera : public Component
 {
-	DECLARE_COMP(Camera)
+	DECLARE_TYPE(Component, Camera)
 	friend class Renderer;
 public:
 	Camera();
@@ -96,7 +92,7 @@ public:
 
 	vec3 lastPos;
 
-	Rect viewport;
+	Rect viewport = {0.0f, 0.0f, 1.0f, 1.0f};
 
 	enum class Mode : short
 	{
@@ -104,10 +100,13 @@ public:
 		Orthographic = 1
 	};
 	Mode mode = Mode::Perspective;
-	
+
+	// Include film size for DoF and part of FoV?	
+//	float filmSize = 35.0f;
 	float focalLength = 35.0f;
 	float focalDepth = 6.6f;
-	float fstop = 1.0f;
+	float aperture = 4.0f;
+	float focus = 0.9f;
 
 protected:
 
@@ -118,7 +117,7 @@ protected:
 	mat4 view = mat4(1);
 
 	/// Field of view, eg. 40.0f
-	float fov = 50.0f;
+	float fov = 66.0f;
 
 	/// Aspect ratio, eg. 16.0f/9.0f
 	float aspectRatio = 16.0f / 9.0f;
@@ -127,7 +126,6 @@ protected:
 	Range<float> viewRange = { 0.01f, 1000.0f };
 
 	// Real Camera settings
-	float aperture = 1.8f;
 
 	float shutterSpeed = 0.003f;
 

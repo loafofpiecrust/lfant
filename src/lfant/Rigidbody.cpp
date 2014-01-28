@@ -34,7 +34,7 @@
 
 namespace lfant {
 
-IMPLEMENT_COMP(Rigidbody)
+IMPLEMENT_TYPE(Component, Rigidbody)
 
 Rigidbody::Rigidbody()
 {
@@ -45,7 +45,7 @@ Rigidbody::~Rigidbody()
 {
 }
 
-void Rigidbody::Save(Properties* prop)
+void Rigidbody::Save(Properties* prop) const
 {
 	Component::Save(prop);
 
@@ -131,7 +131,7 @@ void Rigidbody::Init()
 
 	body->getWorldTransform().setOrigin(vec3_cast<btVector3>(owner->transform->GetPosition()));
 	body->forceActivationState(DISABLE_DEACTIVATION);
-//	body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
+	body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
 	Log("Rigidbody is trigger? ", IsTrigger());
 	SetTrigger(IsTrigger());
 }
@@ -203,7 +203,7 @@ void Rigidbody::OnSetRot( vec3 rot )
 *
 *******************************************************************************/
 
-float Rigidbody::GetMass()
+float Rigidbody::GetMass() const
 {
 	return mass;
 }
@@ -239,12 +239,12 @@ void Rigidbody::RemoveConstraint(uint16 idx)
 //	game->physics->RemoveConstraint( GetConstraint( idx ) );
 }
 
-float Rigidbody::GetSpeed()
+float Rigidbody::GetSpeed() const
 {
 	return length(GetVelocity());
 }
 
-vec3 Rigidbody::GetVelocity()
+vec3 Rigidbody::GetVelocity() const
 {
 	return vec3_cast<vec3>(body->getLinearVelocity());
 }
@@ -319,7 +319,7 @@ void Rigidbody::SetTrigger(bool is)
 	}
 }
 
-bool Rigidbody::IsTrigger()
+bool Rigidbody::IsTrigger() const
 {
 	return isTrigger;
 }

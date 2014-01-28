@@ -59,7 +59,7 @@ public:
 	virtual void Destroy();
 
 	virtual void Load(Properties *prop);
-	virtual void Save(Properties* prop);
+	virtual void Save(Properties* prop) const;
 //	void LoadFile(string file = "");
 	virtual void LoadFile(string file);
 	void LoadFile(string vert, string frag, string geom = "", string comp = "");

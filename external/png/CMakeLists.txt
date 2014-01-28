@@ -4,6 +4,10 @@ file(GLOB SRC_FILES
 	*.c
 	)
 
+list(REMOVE_ITEM SRC_FILES
+	${PROJECT_SOURCE_DIR}/pngtest.c
+)
+
 file(GLOB HEADER_FILES
 	*.h
 	)

@@ -30,7 +30,7 @@
 namespace lfant
 {
 
-void Collider::Save(Properties* prop)
+void Collider::Save(Properties* prop) const
 {
 	Component::Save(prop);
 

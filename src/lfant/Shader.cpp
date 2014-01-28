@@ -33,7 +33,7 @@ void Shader::Load(Properties *prop)
 	LoadFile(vertex, fragment, geometry);
 }
 
-void Shader::Save(Properties *prop)
+void Shader::Save(Properties *prop) const
 {
 	prop->Set("vertex", vertex);
 	prop->Set("fragment", fragment);
@@ -47,7 +47,7 @@ void Shader::LoadFile(string file)
 		return;
 	}
 
-	Log("Shader::LoadFile: Touch.");
+	Log("Shader::LoadFile: Touch '"+file+"'.");
 	string ext = Extension(file);
 	if(ext == "vert")
 	{
@@ -83,6 +83,7 @@ void Shader::LoadFile(string vert, string frag, string geom, string comp)
 
 void Shader::Compile()
 {
+	Log("Shader::Compile: Touch.");
 	if(vertex == "" || fragment == "")
 	{
 		Log("Shader link failed: missing vertex or fragment stage.");
@@ -105,12 +106,12 @@ void Shader::Compile()
 
 	if(vertex != "")
 	{
-		vert = Compile(GL_VERTEX_SHADER, game->fileSystem->GetGamePath(vertex).string());
+		vert = Compile(GL_VERTEX_SHADER, vertex);
 		glAttachShader(id, vert);
 	}
 	if(fragment != "")
 	{
-		frag = Compile(GL_FRAGMENT_SHADER, game->fileSystem->GetGamePath(fragment).string());
+		frag = Compile(GL_FRAGMENT_SHADER, fragment);
 		glAttachShader(id, frag);
 	}
 #if !LFANT_GLES
@@ -118,12 +119,12 @@ void Shader::Compile()
 	uint32 comp = -1;
 	if(geometry != "")
 	{
-		geom = Compile(GL_GEOMETRY_SHADER, game->fileSystem->GetGamePath(geometry).string());
+		geom = Compile(GL_GEOMETRY_SHADER, geometry);
 		glAttachShader(id, geom);
 	}
 	if(compute != "")
 	{
-		comp = Compile(GL_COMPUTE_SHADER, game->fileSystem->GetGamePath(compute).string());
+		comp = Compile(GL_COMPUTE_SHADER, compute);
 		glAttachShader(id, comp);
 	}
 #endif
@@ -179,7 +180,7 @@ uint32 Shader::GetId()
 
 uint32 Shader::Compile(uint32 type, const string &path)
 {
-	ifstream stream(path);
+	ifstream stream(game->fileSystem->GetGamePath(path).string());
 	string line = "";
 	string source = "";
 
@@ -193,7 +194,8 @@ uint32 Shader::Compile(uint32 type, const string &path)
 			str = Split(line, "\t <>\"");
 			if(str[0] == "#include")
 			{
-				ifstream stream2(game->fileSystem->GetGamePath(str[1]));
+				Log("including in shader '"+str[1]+"'.");
+				ifstream stream2(game->fileSystem->GetGamePath(str[1]).string());
 				string line = "";
 				while(stream2.good())
 				{

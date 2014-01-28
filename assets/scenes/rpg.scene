@@ -1,0 +1,31 @@
+scene rpg
+{
+	system Physics
+	{
+		gravity = (0,0,-9.81)
+	}
+
+	entity Player
+	{
+		component Transform
+		{
+		}
+
+		// General
+		component Rigidbody
+		{
+			mass = 45
+		}
+
+		component BoxCollider
+		{
+			size = (1,1,0.1)
+		}
+
+		// Player
+		component Movement
+		{
+			
+		}
+	}
+}

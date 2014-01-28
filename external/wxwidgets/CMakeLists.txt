@@ -53,7 +53,7 @@ list(REMOVE_ITEM SRC_FILES
 	"${PROJECT_SOURCE_DIR}/src/gtk/dcscreen.cpp"
 #	"${PROJECT_SOURCE_DIR}/src/unix/utilsunx.cpp"
 	"${PROJECT_SOURCE_DIR}/src/unix/snglinst.cpp"
-	${PROJECT_SOURCE_DIR}/src/unix/evtloopunix.cpp
+#	${PROJECT_SOURCE_DIR}/src/unix/evtloopunix.cpp
 	"${PROJECT_SOURCE_DIR}/src/generic/statline.cpp"
 	"${PROJECT_SOURCE_DIR}/src/generic/notebook.cpp"
 	"${PROJECT_SOURCE_DIR}/src/generic/fontpickerg.cpp"

@@ -41,10 +41,11 @@
 namespace lfant
 {
 
-IMPLEMENT_COMP(Mesh)
+IMPLEMENT_TYPE(Component, Mesh)
 
 Mesh::Mesh()
 {
+	initBeforeLoad = false;
 }
 
 Mesh::~Mesh()
@@ -55,7 +56,8 @@ void Mesh::Load(Properties *prop)
 {
 	Component::Load(prop);
 
-	prop->Get("file", file);
+	string f = "";
+	prop->Get("file", f);
 
 	if(Properties* pmat = prop->GetChild("material"))
 	{
@@ -69,7 +71,7 @@ void Mesh::Load(Properties *prop)
 		if(mat != "") material->LoadFile(mat);
 	}
 
-	LoadFile(file);
+	LoadFile(f);
 }
 
 void Mesh::Save(Properties *prop) const
@@ -90,24 +92,22 @@ void Mesh::SetShape(string preset)
 
 void Mesh::Init()
 {
-	Renderable::Init();
-}
+	if(material->shader->GetId() == -1)
+	{
+		Log("Mesh init rejected (shader)");
+		return;
+	}
 
-void Mesh::Update()
-{
-	Renderable::Update();
-}
+	if(material->texture->GetId() == -1)
+	{
+		Log("Mesh init rejected (texture)");
+		return;
+	}
 
-void Mesh::Deinit()
-{
-	Renderable::Deinit();
-}
-
-void Mesh::BeginRender()
-{
 	if(loaded)
 	{
-		EndRender();
+		Log("Mesh init rejected (loaded)");
+		return;
 	}
 
 	FrameBuffer* fbo = FrameBuffer::GetCurrent();
@@ -117,19 +117,19 @@ void Mesh::BeginRender()
 		fbo->Unbind();
 	}
 
-	if(material->shader->GetId() == -1)
+/*	if(material->shader->GetId() == -1)
 	{
 		Log("Loading default shader.");
 		material->shader->LoadFile("shaders/simple/Diffuse.vert", "shaders/simple/Diffuse.frag");
-	}
+	}*/
 
-//	if(material->texture->GetId() == -1)
+/*	if(material->texture->GetId() == -1)
 	{
-//		Log("Manually loading texture.");
-//		material->texture->LoadFile();
-	}
+		Log("Manually loading texture.");
+		material->texture->LoadFile();
+	}*/
 
-	if(material->shader->GetId() != -1)
+//	if(material->shader->GetId() != -1)
 	{
 		Log("Adding uniforms..");
 		material->shader->AddUniform("M");
@@ -152,8 +152,6 @@ void Mesh::BeginRender()
 	normalBuffer.Create(GL_ARRAY_BUFFER);
 	indexBuffer.Create(GL_ELEMENT_ARRAY_BUFFER);
 	*/
-
-	loaded = true;
 	
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -163,12 +161,43 @@ void Mesh::BeginRender()
 		Log("Rebinding fbo after mesh init.");
 		fbo->Bind();
 	}
+
+	Renderable::Init();
+}
+
+void Mesh::Update()
+{
+	Renderable::Update();
+}
+
+void Mesh::Deinit()
+{
+	vertexBuffer.Destroy();
+	uvBuffer.Destroy();
+	normalBuffer.Destroy();
+	indexBuffer.Destroy();
+	material->texture->Destroy();
+
+	Renderable::Deinit();
 }
 
 void Mesh::Render()
 {
-	if(!material->shader->GetId() /*|| !material->texture->GetId()*/)
+	if(material->shader->GetId() == -1)
 	{
+		Log("Mesh render rejected (shader)");
+		return;
+	}
+
+	if(material->texture->GetId() == -1)
+	{
+		Log("Mesh render rejected (texture)");
+		return;
+	}
+
+	if(!loaded)
+	{
+		Log("Mesh render rejected (!loaded)");
 		return;
 	}
 
@@ -231,16 +260,6 @@ void Mesh::Render()
 	glUseProgram(0);
 }
 
-void Mesh::EndRender()
-{
-	vertexBuffer.Destroy();
-	uvBuffer.Destroy();
-	normalBuffer.Destroy();
-	indexBuffer.Destroy();
-	material->texture->Destroy();
-	loaded = false;
-}
-
 uint32 Mesh::CreateBuffer(void* data, uint32 size, int target, int mode)
 {
 	if(mode == 0)
@@ -258,10 +277,17 @@ void Mesh::LoadFile(string path)
 {
 	if(!material->loaded)
 	{
-		material->LoadFile("materials/Diffuse.mat");
+		material->LoadFile("materials/Diffuse.prop");
 	}
 	
+	if(this->file == path)
+	{
+		Log("Mesh LoadFile rejected");
+		return;
+	}
+
 	Log("Loading mesh file '"+path+"'.");
+	this->file = path;
 	path = game->fileSystem->GetGamePath(path).string();
 
 	const aiScene* scene = aiImportFile(path.c_str(), aiProcessPreset_TargetRealtime_MaxQuality);
@@ -272,7 +298,7 @@ void Mesh::LoadFile(string path)
 		vertexBuffer.data.reserve(vertexBuffer.size()+mesh->mNumVertices);
 		uvBuffer.data.reserve(uvBuffer.size()+mesh->mNumVertices);
 		normalBuffer.data.reserve(normalBuffer.size()+mesh->mNumVertices);
-		indexBuffer.data.reserve(indexBuffer.size()+mesh->mNumFaces*3);
+	//	indexBuffer.data.reserve(indexBuffer.size()+mesh->mNumFaces*3);
 
 		for(uint k = 0; k < mesh->mNumVertices; ++k)
 		{
@@ -292,9 +318,12 @@ void Mesh::LoadFile(string path)
 		}
 	}
 	aiReleaseImport(scene);
-//	scene->mMeshes[0]->
 
-	BeginRender();
+	if(loaded)
+	{
+		Deinit();
+	}
+	Init();
 }
 
 /// @fixme Something is horribly wrong.

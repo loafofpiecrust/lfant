@@ -27,6 +27,7 @@
 #include <lfant/Time.h>
 #include <lfant/Physics.h>
 #include <lfant/Network.h>
+#include <lfant/Renderer.h>
 
 // External
 
@@ -51,15 +52,22 @@ void Scene::Update()
 	Subsystem::Update();
 	for(auto& ent : entities)
 	{
-		if(!ent)
-		{
+		if(!ent || !ent->active)
 			continue;
-		}
 		
-		if(ent->active)
-		{
-			ent->Update();
-		}
+		ent->Update();
+	}
+}
+
+void Scene::Render()
+{
+	Subsystem::Render();
+	for(auto& ent : entities)
+	{
+		if(!ent || !ent->active)
+			continue;
+		
+		ent->Render();
 	}
 }
 
@@ -67,15 +75,10 @@ void Scene::FixedUpdate()
 {
 	for(auto& ent : entities)
 	{
-		if(!ent)
-		{
+		if(!ent || !ent->active)
 			continue;
-		}
 
-		if(ent->active)
-		{
-			ent->FixedUpdate();
-		}
+		ent->FixedUpdate();
 	}
 }
 
@@ -207,6 +210,10 @@ void Scene::Load(Properties *prop)
 		{
 			game->network->Load(i);
 		}
+	/*	else if(i->id == "Renderer")
+		{
+			game->renderer->Load(i);
+		}*/
 	}
 
 	Entity* ent = nullptr;
@@ -222,9 +229,6 @@ void Scene::Load(Properties *prop)
 
 void Scene::AddEntity(Entity* ent)
 {
-	ent->active = true;
-	ent->Init();
-
 	if(!ent->parent)
 	{
 		entities.push_back(ent);
@@ -234,6 +238,8 @@ void Scene::AddEntity(Entity* ent)
 	{
 		ent->parent->AddChild(ent);
 	}
+	ent->Init();
+	TriggerEvent("AddEntity", ent);
 	Log("Scene::AddEntity: Finished.");
 }
 
@@ -255,19 +261,9 @@ Entity* Scene::SpawnAndLoad(Properties* prop, string name, Entity* parent)
 	Entity* ent = new Entity;
 	ent->parent = parent;
 	ent->name = name;
-	ent->active = true;
 	ent->Load(prop);
-	ent->Init();
-	
-	if(!parent)
-	{
-		entities.push_back(ent);
-		Log("Scene::SpawnAndLoad: pushed in.");
-	}
-	else
-	{
-		parent->AddChild(ent);
-	}
+	AddEntity(ent);
+
 	return ent;
 }
 
@@ -282,6 +278,11 @@ deque<Entity*> Scene::GetEntities(string tag) const
 		}
 	}
 	return result;
+}
+
+const deque<ptr<Entity>>& Scene::GetEntities() const
+{
+	return entities;
 }
 
 }

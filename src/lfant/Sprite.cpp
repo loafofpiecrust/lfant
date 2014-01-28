@@ -32,10 +32,9 @@
 #include <lfant/Transform.h>
 #include <lfant/Console.h>
 
-namespace lfant
-{
+namespace lfant {
 
-IMPLEMENT_COMP(Sprite)
+IMPLEMENT_TYPE(Component, Sprite)
 
 Sprite::Sprite()
 {
@@ -45,7 +44,7 @@ Sprite::~Sprite()
 {
 }
 
-void Sprite::BeginRender()
+void Sprite::Init()
 {
 
 	vertexBuffer.push_back(vec3(0, 0, 0));
@@ -62,13 +61,13 @@ void Sprite::BeginRender()
 	indexBuffer.push_back(1);
 	indexBuffer.push_back(2);
 	indexBuffer.push_back(3);
-	
+
 	currentFrame.x = 0;
 	currentFrame.y = 0;
 	currentFrame.width = 50;
 	currentFrame.height = 50;
 
-	Mesh::BeginRender();
+	Mesh::Init();
 }
 
 void Sprite::Render()
@@ -92,7 +91,7 @@ void Sprite::Render()
 	material->texture->Bind();
 	glUniform1i(material->shader->GetUniform("textureSampler"), 0);
 
-	
+
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
@@ -100,11 +99,11 @@ void Sprite::Render()
 	glEnableVertexAttribArray(1);
 	glBindBuffer(GL_ARRAY_BUFFER, uvBuffer);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
-	
+
 	glEnableVertexAttribArray(2);
 	glBindBuffer(GL_ARRAY_BUFFER, normalBuffer.id);
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-	
+
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
 	glDrawElements(GL_QUADS, indexBuffer.size(), GL_UNSIGNED_INT, (void*)0);
@@ -236,14 +235,14 @@ void Sprite::Load(Properties *props)
 	}
 }
 
-void Sprite::EndRender()
+void Sprite::Deinit()
 {
 	vertexBuffer.Destroy();
 	uvBuffer.Destroy();
 	indexBuffer.Destroy();
 	material->texture->Destroy();
 
-	Renderable::EndRender();
+	Renderable::Deinit();
 }
 
 void Sprite::PlayAnim(string name, Animation::Mode mode, bool reverse)

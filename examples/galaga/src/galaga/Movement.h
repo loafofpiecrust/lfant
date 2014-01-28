@@ -41,7 +41,7 @@ namespace galaga {
  */
 class Movement : public lfant::Component
 {
-	DECLARE_COMP(Movement)
+	DECLARE_TYPE(lfant::Component, Movement)
 public:
 	Movement();
 	~Movement();

@@ -39,7 +39,7 @@ namespace galaga {
  */
 class MouseLook : public lfant::Component
 {
-	DECLARE_COMP(MouseLook)
+	DECLARE_TYPE(lfant::Component, MouseLook)
 public:
 	MouseLook();
 	~MouseLook();

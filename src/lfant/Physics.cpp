@@ -43,7 +43,7 @@ Physics::~Physics()
 {
 }
 
-void Physics::Save(Properties* prop)
+void Physics::Save(Properties* prop) const
 {
 	Subsystem::Save(prop);
 
@@ -155,7 +155,8 @@ void Physics::Update()
 
 void Physics::Deinit()
 {
-	world.reset();
+	Subsystem::Deinit();
+//	world.reset();
 }
 
 /*******************************************************************************
@@ -164,7 +165,7 @@ void Physics::Deinit()
 *
 *******************************************************************************/
 
-vec3 Physics::GetGravity()
+vec3 Physics::GetGravity() const
 {
 	return vec3_cast<vec3>(world->getGravity());
 }
@@ -245,12 +246,16 @@ bool Physics::OnCollide(string func, btManifoldPoint& cp, const btCollisionObjec
 
 	Log("Collision called, OnCollide", func, ", on entity ", body1->owner->name);
 
-	Collision* col = new Collision;
-	col->other = body0;
-	col->contacts.push_back(ContactPoint(vec3_cast<vec3>(cp.getPositionWorldOnA()), vec3_cast<vec3>(cp.m_normalWorldOnB)));
+	Collision col;
+	col.contacts.push_back(ContactPoint(vec3_cast<vec3>(cp.getPositionWorldOnA()), vec3_cast<vec3>(cp.m_normalWorldOnB)));
 
-	body1->TriggerEvent("Collide"+func, col);
-	body1->owner->TriggerEvent("Collide"+func, body1, col);
+	col.first = body1;
+	col.second = body0;
+	body1->TriggerEvent("Collide"+func, &col);
+
+	col.first = body0;
+	col.second = body1;
+	body0->TriggerEvent("Collide"+func, &col);
 
 	return true;
 }
@@ -258,17 +263,20 @@ bool Physics::OnCollide(string func, btManifoldPoint& cp, const btCollisionObjec
 bool Physics::OnCollideEnter(btManifoldPoint& cp, const btCollisionObjectWrapper* colObj0, int partId0, int index0,
 							 const btCollisionObjectWrapper* colObj1, int partId1, int index1)
 {
+	Log("Collision enter");
 	return OnCollide("Enter", cp, colObj0, partId0, index0, colObj1, partId1, index1);
 }
 
 bool Physics::OnCollideStay(btManifoldPoint& cp, void* body0, void* body1)
 {
+	Log("Collision stay");
 	//	return OnCollide( "Stay", cp, colObj0, partId0, index0, colObj1, partId1, index1 );
 	return false;
 }
 
 bool Physics::OnCollideExit(void* userPersistentData)
 {
+	Log("Collision exit");
 	//	return OnCollide( "Exit", cp, colObj0, partId0, index0, colObj1, partId1, index1 );
 	return false;
 }

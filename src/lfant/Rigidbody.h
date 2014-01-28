@@ -60,7 +60,7 @@ class Rigidbody : public Component
 {
 	friend class Physics;
 	friend class physics::MotionState;
-	DECLARE_COMP(Rigidbody)
+	DECLARE_TYPE(Component, Rigidbody)
 public:
 
 	// Nested classes
@@ -84,7 +84,7 @@ public:
 	virtual ~Rigidbody();
 
 	virtual void Load(Properties* prop);
-	virtual void Save(Properties* prop);
+	virtual void Save(Properties* prop) const;
 
 	// Methods
 	btTypedConstraint* GetConstraint(uint16_t idx);
@@ -101,7 +101,7 @@ public:
 	/**
 	 *	Returns the (current) mass of this Rigidbody.
 	 */
-	float GetMass();
+	float GetMass() const;
 
 	/**
 	 *	Sets the mass of this Rigidbody.
@@ -112,7 +112,7 @@ public:
 	 *	Returns this Rigidbody's density.
 	 *	\return mass / volume
 	 */
-	float GetDensity();
+	float GetDensity() const;
 
 	/**
 	 *	Sets the mass to (density * volume)
@@ -122,7 +122,7 @@ public:
 	/**
 	 *	Returns the object's current velocity.
 	 */
-	vec3 GetVelocity();
+	vec3 GetVelocity() const;
 
 	/**
 	 *	Sets the velocity of this object directly.
@@ -132,7 +132,7 @@ public:
 	/**
 	 *	Returns the average of the three components of this object's velocity.
 	 */
-	float GetSpeed();
+	float GetSpeed() const;
 
 	float GetFriction() const;
 	void SetFriction(float f);
@@ -141,7 +141,7 @@ public:
 	float GetMaxSpeed() { return maxSpeed; }
 
 	void SetTrigger(bool is);
-	bool IsTrigger();
+	bool IsTrigger() const;
 
 	// Variables
 	Mode mode;

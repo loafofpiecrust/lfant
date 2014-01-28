@@ -1,0 +1,30 @@
+
+entity Rifle
+{
+	component Transform
+	{
+		position = (0,0,0.4)
+		scale = (0.4,0.4,0.4)
+	}
+
+	component Item
+	{
+		mass = 8
+		equippedPosition = (-1,0,1)
+		initialPosition = (0,0,0)
+	}
+
+	component Weapon
+	{
+		bulletSpeed = 1
+		reloadTime = 2
+		fireRate = 2
+		automatic = true
+		projectilefile = entities/items/projectiles/Laser.ent
+	}
+
+	component Mesh
+	{
+		file = meshes/suzanne.obj
+	}
+}

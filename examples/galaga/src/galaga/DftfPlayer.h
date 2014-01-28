@@ -10,7 +10,7 @@ namespace dftf {
 
 class Player : public lfant::Component
 {
-	DECLARE_COMP(dftf::Player)
+	DECLARE_TYPE(lfant::Component, dftf::Player)
 public:
 	virtual void Init();
 	virtual void Update();

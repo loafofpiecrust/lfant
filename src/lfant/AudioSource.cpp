@@ -31,7 +31,7 @@
 namespace lfant
 {
 
-//IMPLEMENT_COMP(AudioSource)
+//IMPLEMENT_TYPE(Component, AudioSource)
 
 AudioSource::AudioSource()
 {

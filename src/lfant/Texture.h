@@ -100,9 +100,9 @@ public:
 	void InitData(byte* data);
 	void Deinit();
 
-	void LoadFile(string path = "", int mode = 0);
+	void LoadFile(string path = "", int mode = -1);
 	virtual void Load(Properties* prop);
-	void Save(Properties *prop);
+	virtual void Save(Properties* prop) const;
 
 	uint32 GetId();
 	uint32 GetMode();
@@ -115,33 +115,33 @@ public:
 	static Texture* GetCurrent();
 
 	uint32 GetIndex();
-	void SetIndex(uint32 idx);
+	void SetIndex(uint32_t idx);
 
 	void SetFormat(Format input = Format::RGBA, Format output = Format::RGBA);
 
 	string path = "";
 	WrapMode wrapMode = WrapMode::Repeat;
 	FilterMode filterMode = FilterMode::Bilinear;
-	uint8 anisoLevel = 1;
+	uint8_t anisoLevel = 1;
 //	Format format = Format::Compressed;
 	Format internalFormat = Format::RGBA;
 	Format format = Format::RGBA;
 	DataType dataType = DataType::Byte;
 	uvec2 size = uvec2(0);
 	vec2 tiling = vec2(1);
-	uint32 index = 0;
+	uint32_t index = 0;
 	byte msaa = 0;
-	uint32 mode;
+	uint32_t mode;
 	ScaleFilter scaleFilter = ScaleFilter::Nearest;
 //	uint32 uniformId = 0;
 
 private:
-	void LoadPNG(int mode);
-	void LoadJPEG(int mode);
-	void LoadBMP(int mode);
-	void LoadDDS(int mode);
+	void LoadPNG(string path);
+	void LoadJPEG(string path);
+	void LoadBMP(string path);
+	void LoadDDS(string path);
 
-	uint32 id = -1;
+	uint32_t id = -1;
 //	vector<byte> data;
 
 	static deque<Texture*> textures;

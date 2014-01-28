@@ -28,7 +28,7 @@ namespace lfant {
 
 class Voxel : public Component
 {
-	DECLARE_COMP(Voxel)
+	DECLARE_TYPE(Component, Voxel)
 public:
 
 	class Block

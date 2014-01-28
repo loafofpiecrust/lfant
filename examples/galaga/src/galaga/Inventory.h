@@ -41,7 +41,7 @@ class Inventory;
 class Item : public lfant::Component
 {
 	friend class Inventory;
-	DECLARE_COMP(Item)
+	DECLARE_TYPE(lfant::Component, Item)
 public:
 	Item();
 	virtual ~Item();
@@ -80,7 +80,7 @@ private:
 class Inventory : public lfant::Component
 {
 	friend class Item;
-	DECLARE_COMP(Inventory)
+	DECLARE_TYPE(lfant::Component, Inventory)
 public:
 	Inventory();
 	~Inventory();

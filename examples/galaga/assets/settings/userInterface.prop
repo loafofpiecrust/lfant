@@ -1,0 +1,5 @@
+// UserInterface settings
+userinterface
+{
+	file = gui/hud.gui
+}

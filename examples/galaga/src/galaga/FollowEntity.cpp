@@ -31,7 +31,7 @@
 namespace lfant {
 namespace galaga {
 
-IMPLEMENT_COMP(FollowEntity)
+IMPLEMENT_TYPE(lfant::Component, FollowEntity)
 
 FollowEntity::FollowEntity()
 {

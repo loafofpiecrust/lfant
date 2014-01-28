@@ -1,0 +1,19 @@
+// Sprite default
+material Sprite
+{
+	texture
+	{
+		file = textures/Default.png
+		mipmap = false
+		filterMode = Bilinear
+		wrapMode = Clamp
+		format = Compressed
+		anisoFilter = 1
+	}
+
+	shader Main
+	{
+		vertex = shaders/sprite/Diffuse.vert
+		fragment = shaders/sprite/Diffuse.frag
+	}
+}

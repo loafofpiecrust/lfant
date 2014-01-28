@@ -1,0 +1,70 @@
+
+entity Player
+{
+	layer = Entities
+	tags = {Player,MainCamera}
+
+	component Transform
+	{
+	//	scale = (1.5, 1.5, 1.5)
+	}
+
+	component Player
+	{
+	}
+
+	component Movement
+	{
+		movementSpeed = 15
+		jumpHeight = 4
+	}
+
+	component BoxCollider
+	{
+		size = (1,1,1)
+	}
+
+	component Rigidbody
+	{
+		mass = 45
+		maxSpeed = 20
+	}
+
+	entity Main
+	{
+		component Camera
+		{
+			mode = 0
+			fov = 45
+		}
+		component MouseLook
+		{
+			enabled = false
+			lookSpeed = 85
+		}
+
+		entity BackPack
+		{
+			component Transform
+			{
+			//	rotation = (0,180,0)
+			}
+
+			component Inventory
+			{
+				equippedItem = 0
+			}
+			
+			entity Rifle
+			{
+				file = entities/items/weapons/Rifle.ent
+			}
+			
+		/*	entity HPPack
+			{
+				file = entities/items/HealthPack.ent
+			}*/
+		}
+	}
+
+}

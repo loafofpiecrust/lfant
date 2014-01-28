@@ -80,7 +80,8 @@ struct ContactPoint
 
 struct Collision
 {
-	Rigidbody* other = nullptr;
+	Rigidbody* first = nullptr;
+	Rigidbody* second = nullptr;
 	deque<ContactPoint> contacts;
 };
 
@@ -103,7 +104,7 @@ public:
 	Physics();
 	virtual ~Physics();
 
-	virtual void Save(Properties* prop);
+	virtual void Save(Properties* prop) const;
 	virtual void Load(Properties* prop);
 
 	virtual void Init();
@@ -117,7 +118,7 @@ public:
 	void AddRigidbody(Rigidbody* ent);
 	void RemoveRigidbody(Rigidbody* ent, bool destroy = false);
 
-	vec3 GetGravity();
+	vec3 GetGravity() const;
 	void SetGravity(vec3 grav);
 
 	/**

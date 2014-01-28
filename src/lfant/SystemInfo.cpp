@@ -37,6 +37,11 @@ SystemInfo::~SystemInfo()
 {
 }
 
+void SystemInfo::Destroy()
+{
+	Subsystem::Destroy();
+}
+
 #if WINDOWS
 
 void SystemInfo::Init()
