@@ -22,6 +22,7 @@
 
 // Internal
 #include <lfant/util/String.h>
+#include <lfant/FileSystem.h>
 
 // External
 #include <lfant/util/lexical_cast.h>
@@ -44,7 +45,7 @@ void Console::Init()
 {
 	Subsystem::Init();
 
-	logFile.open(logName);
+	logFile.open(game->fileSystem->GetProgramDir()+"/"+logName);
 
 	// Default commands
 	RegisterCommand(&Console::CmdExit, "quit", "Quit the game");

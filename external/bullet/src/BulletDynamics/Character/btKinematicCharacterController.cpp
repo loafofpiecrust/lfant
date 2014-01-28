@@ -411,7 +411,9 @@ void btKinematicCharacterController::stepForwardAndStrafe ( btCollisionWorld* co
 	//		break;
 
 	}
+	
 }
+
 
 void btKinematicCharacterController::stepDown ( btCollisionWorld* collisionWorld, btScalar dt)
 {

@@ -102,7 +102,7 @@ public:
 	virtual void OnChar(char key);
 	virtual void OnMouseButton(uint16 btn, int mode);
 	virtual void OnMouseMove(vec2 pos);
-	virtual void OnWindowResize(uint width, uint height);
+	virtual void OnWindowResize(int32_t width, int32_t height);
 
 
 //	Movie* LoadMovie(string name, string path);
@@ -140,7 +140,7 @@ protected:
 	*/
 
 	bool resized = false;
-	uvec2 size;
+	ivec2 size;
 
 	string rootResFolder = "gui";
 };

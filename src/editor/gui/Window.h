@@ -89,11 +89,13 @@ protected:
 	void FindAddEntityNode(Entity* entity);
 	void AddEntityNode(wxTreeItemId& parent, Entity* entity);
 
+	wxTreeItemId FindEntityInTree(Entity* entity);
 	wxTreeItemId FindEntityInTree(wxTreeItemId parent, Entity* entity, void* vali);
 	void ClearTree(wxTreeItemId id = 0);
 
 	void SetCurrentEntity(wxTreeEvent& evt);
 	void SaveCurrentEntity(wxCommandEvent& evt);
+	void SetEntityValue(wxCommandEvent& evt);
 
 	void AddEntity(wxCommandEvent& evt);
 

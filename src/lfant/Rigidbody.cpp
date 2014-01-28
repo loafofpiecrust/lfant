@@ -131,7 +131,7 @@ void Rigidbody::Init()
 
 	body->getWorldTransform().setOrigin(vec3_cast<btVector3>(owner->transform->GetPosition()));
 	body->forceActivationState(DISABLE_DEACTIVATION);
-//	body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
+	body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
 	Log("Rigidbody is trigger? ", IsTrigger());
 	SetTrigger(IsTrigger());
 }

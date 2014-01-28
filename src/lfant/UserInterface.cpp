@@ -387,7 +387,7 @@ void UserInterface::Init()
 	rootWindow = windowManager->createWindow("DefaultWindow", "Root");
 	context->setRootWindow(rootWindow);
 
-	context->getMouseCursor().setInitialMousePosition(vec2_cast<CEGUI::Vector2f>(game->input->GetMousePos()));
+	context->getMouseCursor().setInitialMousePosition(vec2_cast<CEGUI::Vector2f>((vec2)game->input->GetMousePos()));
 
 	ConnectEvent(SENDER(game->input, KeyPress), RECEIVER(this, OnKey));
 	ConnectEvent(SENDER(game->input, CharPress), RECEIVER(this, OnChar));
@@ -527,12 +527,12 @@ void UserInterface::OnMouseMove(vec2 pos)
 	//context->getMouseCursor().setPosition(vec2_cast<CEGUI::Vector2f>(vec2(x,y)));
 }
 
-void UserInterface::OnWindowResize(uint width, uint height)
+void UserInterface::OnWindowResize(int32_t width, int32_t height)
 {
 	if(system)
 	{
 		resized = true;
-		size = uvec2(width, height);
+		size = ivec2(width, height);
 		//	rootWindow->setMaxSize(CEGUI::USize(cegui_reldim(1.0f), cegui_reldim( 1.0f)));
 	}
 }

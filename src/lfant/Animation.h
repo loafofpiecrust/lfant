@@ -33,26 +33,30 @@ public:
 
 	class Clip
 	{
+	public:
+		Clip(string name, uint16_t start, uint16_t end, uint16_t fps) :
+			start(start), end(end), fps(fps)
+		{
+		}
+
 		string name = "";
-		float length = 0.0f;
-		Range<uint16_t> frames {0,1};
+		uint16_t start = 1;
+		uint16_t end = 2;
+		uint16_t fps = 15;
 	};
 
-	Animation();
-	~Animation();
+	virtual void Save(Properties* prop) const;
+	virtual void Load(Properties* prop);
 
-	void Save(Properties* prop);
-	void Load(Properties* prop);
+	virtual void Play(string anim = "") = 0;
+	virtual void Stop(string anim = "") = 0;
 
-	void Init();
-
-	void Play(string anim = "");
-	void Stop(string anim = "");
+	virtual void AddClip(string name, uint16_t start, uint16_t end, uint16_t fps);
 
 	Clip* GetClip(string name);
 
 protected:
-	bool playAutomatically = false;
+	string currentClip = "";
 	deque<Clip> clips;
 
 private:

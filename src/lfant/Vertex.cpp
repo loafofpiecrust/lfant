@@ -44,7 +44,7 @@ void Vertex::Add(const vec4& value)
 
 void Vertex::Add(const rgba& value)
 {
-	elements.push_back({value.x, value.y, value.z, value.w});
+	elements.push_back({(float)value.x, (float)value.y, (float)value.z, (float)value.w});
 }
 
 const vector<Vertex::Element>& Vertex::Get()

@@ -198,7 +198,7 @@ void Renderer::Init()
 //	frameBuffer->AddTexture("specularTex", Texture::Format::RGBA, Texture::Format::RGBA);
 	frameBuffer->AddDepthTexture("depthTex");
 
-	frameBuffer->SetRect({0,0,resolution.x,resolution.y});
+	frameBuffer->SetRect({0,0,(uint32_t)resolution.x,(uint32_t)resolution.y});
 //	frameBuffer->hasDepth = true;
 	frameBuffer->Init();
 	frameBuffer->Bind();
@@ -344,7 +344,7 @@ void Renderer::OnSetResolution(GLFWwindow* win, int x, int y)
 	game->renderer->frameBuffer->Render();
 //	frameBuffer->ResizeViewport();
 	*/
-	game->renderer->TriggerEvent("SetResolution", (uint32)x, (uint32)y);
+	game->renderer->TriggerEvent("SetResolution", x, y);
 }
 
 /*******************************************************************************

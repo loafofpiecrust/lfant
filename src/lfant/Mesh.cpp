@@ -277,7 +277,7 @@ void Mesh::LoadFile(string path)
 {
 	if(!material->loaded)
 	{
-		material->LoadFile("materials/Diffuse.mat");
+		material->LoadFile("materials/Diffuse.prop");
 	}
 	
 	if(this->file == path)

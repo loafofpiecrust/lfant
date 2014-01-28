@@ -29,7 +29,7 @@ bool App::OnInit()
 //	Log("Called OnInit, ", this);
 	game = new Editor;
 	game->standAlone = false;
-	window = new Window("lfant", Rect(100, 50, 450, 340));
+	window = new Window("lfant", Rect(100, 50, 1280, 720));
 	window->Show(true);
 	window->Init();
 	SetTopWindow(window);

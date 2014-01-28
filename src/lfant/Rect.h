@@ -42,7 +42,7 @@ class TRect
 {
 public:
 //	typedef float T;
-	typedef tvec2<T> vec_t;
+	typedef tvec2<T, mediump> vec_t;
 
 	TRect() :
 		x(0), y(0), width(0), height(0)

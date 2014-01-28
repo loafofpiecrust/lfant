@@ -158,11 +158,13 @@ public:
 
 	uint32_t GetId() const { return id; }
 
-	string GetLayer();
-	void SetLayer(string layer);
+	uint32_t GetLayer();
+	void SetLayer(uint32_t layer);
 
 	Entity* GetParent();
 	void SetParent(Entity* ent);
+
+	void SetName(string name) { this->name = name; }
 
 	Transform* transform;
 
@@ -223,7 +225,7 @@ private:
 	uint32_t id = 0;
 
 	/// The layer of this entity for primarily display filtering
-	string layer = "Main";
+	uint32_t layer = -1;
 
 	Entity* parent = nullptr;
 };

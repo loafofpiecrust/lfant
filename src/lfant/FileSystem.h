@@ -54,9 +54,12 @@ public:
 
 	deque<path> GetGameFiles(string dir) const;
 
+	string GetProgramDir();
+
 protected:
 
 public:
+	string programFolder = "./";
 	string gameFolder = "../..";
 	string userFolder;
 };

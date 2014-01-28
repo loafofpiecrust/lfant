@@ -127,14 +127,14 @@ public:
 	template<typename T = string>
 	auto LinePrint(T msg)->typename enable_if<boost::is_fundamental<T>::value || boost::is_pointer<T>::value || boost::is_same<string, T>::value, void>::type
 	{
-		logFile.open(logName, ios_base::app);
+	//	logFile.open(logName, ios_base::app);
 	//	string strMsg = lexical_cast<string>(msg);
 		// Print to console window
 		cout << msg;
 		// Append message to file
 		logFile << msg;
 
-		logFile.close();
+	//	logFile.close();
 	}
 
 	template<typename T = string>

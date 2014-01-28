@@ -81,6 +81,8 @@ public:
 	 */
 	void Enable(bool enable = true);
 
+	void SetOwner(Entity* ent);
+	Entity* GetOwner() { return owner; }
 
 	/// The owner of this Component.
 	Entity* owner = nullptr;
@@ -114,27 +116,25 @@ protected:
 	}
 
 	template<typename T>
-	void RequireComponent(T*& val)
+	void ConnectComponent(T*& val, bool required = false)
 	{
-		ConnectEvent(owner, "OnSetComponent"+RemoveScoping(Type(*val)), val);
-		if(T* t = owner->GetComponent<T>())
+		ConnectEvent(owner, "SetComponent"+type::Descope(type::Name(val)), (Component**)&val);
+		val = owner->GetComponent<T>();
+		if(!val && required)
 		{
-			val = t;
-			return;
+			val = owner->AddComponent<T>();
 		}
-		val = owner->AddComponent<T>();
 	}
 
 	template<typename T>
-	void RequireComponent(string type, T*& val)
+	void ConnectComponent(string type, T*& val, bool required = false)
 	{
-		ConnectEvent(owner, "OnSetComponent"+type, val);
-		if(Component* comp = owner->GetComponent(type))
+		ConnectEvent(owner, "SetComponent"+type, (Component**)&val);
+		val = dynamic_cast<T*>(owner->GetComponent(type));
+		if(!val && required)
 		{
-			val = dynamic_cast<T*>(comp);
-			return;
+			val = dynamic_cast<T*>(owner->AddComponent(type));
 		}
-		val = dynamic_cast<T*>(owner->AddComponent(type));
 	}
 
 private:

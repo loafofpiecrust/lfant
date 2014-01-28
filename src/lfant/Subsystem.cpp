@@ -51,4 +51,9 @@ void Subsystem::Init()
 	}
 }
 
+void Subsystem::Destroy()
+{
+	Object::Destroy();
+}
+
 }

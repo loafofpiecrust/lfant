@@ -80,7 +80,8 @@ struct ContactPoint
 
 struct Collision
 {
-	Rigidbody* other = nullptr;
+	Rigidbody* first = nullptr;
+	Rigidbody* second = nullptr;
 	deque<ContactPoint> contacts;
 };
 

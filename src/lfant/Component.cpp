@@ -127,6 +127,11 @@ void Component::TriggerEvent(string name)
 *		\area General
 *******************************************************************************/
 
+void Component::SetOwner(Entity* ent)
+{
+	ent->AddComponent(this);
+}
+
 void Component::Enable(bool enable)
 {
 	enabled = enable;

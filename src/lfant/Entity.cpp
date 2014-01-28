@@ -220,6 +220,11 @@ void Entity::RemoveChild(Entity* ent)
 
 void Entity::AddComponent(Component* comp)
 {
+	// @note Needed to call comp->Deinit() here?
+	if(comp->GetOwner())
+	{
+		comp->GetOwner()->RemoveComponent(comp);
+	}
 	components.push_back(comp);
 	comp->owner = this;
 	comp->Init();
@@ -277,9 +282,9 @@ Component* Entity::GetComponent(string type)
 	return nullptr;
 }
 
-string Entity::GetLayer()
+uint32_t Entity::GetLayer()
 {
-	if(layer == "Main" && parent)
+	if(layer == -1 && parent)
 	{
 		return parent->GetLayer();
 	}
@@ -289,7 +294,7 @@ string Entity::GetLayer()
 	}
 }
 
-void Entity::SetLayer(string layer)
+void Entity::SetLayer(uint32_t layer)
 {
 	this->layer = layer;
 }

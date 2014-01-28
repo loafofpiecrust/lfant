@@ -10,6 +10,7 @@
 #include <lfant/Scene.h>
 #include <editor/gui/GLCanvas.h>
 #include <editor/gui/ValueGrid.h>
+#include <editor/gui/DirTree.h>
 
 // External
 #include <wx/wx.h>
@@ -21,6 +22,7 @@
 #include <wx/treectrl.h>
 #include <wx/treebase.h>
 #include <wx/event.h>
+#include <wx/dirctrl.h>
 
 namespace lfant {
 namespace editor {
@@ -48,6 +50,7 @@ void Window::Init()
 //	Connect(GetId("File.About"), wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&Window::OnAbout);
 
 	SetMinSize(wxSize(50, 50));
+	SetMinClientSize(wxSize(50, 50));
 
 	// Basic Setup
 
@@ -141,6 +144,7 @@ void Window::Init()
 	//	Log("Starting panel.");
 		StartPanel("panel1", "Inspector");
 		{
+			GetLastWidget()->SetSize(50, 0);
 		//	Log("Starting box sizer.");
 			StartBoxSizer(Orient::Vertical);
 			{
@@ -169,8 +173,6 @@ void Window::Init()
 		//	StartBoxSizer(Orient::Vertical);
 			{
 		//		AddWidget(new wxButton(GetLastWidget(), GetId("Entity.SaveButton"), "Save"));
-
-
 				gridContSizer = StartBoxSizer(Orient::Vertical);
 				EndWidget();
 			}
@@ -179,6 +181,33 @@ void Window::Init()
 		EndWidget();
 	}
 	EndWidget();
+
+
+	StartAuiNotebook("notebook3", "ProjectFiles", wxBOTTOM);
+	{
+	//	Log("Starting panel.");
+	//	StartPanel("panel2", "Viewport");
+		auto win = new wxScrolledWindow(GetLastWidget(), GetId("ProjectContainer"));
+		StartWidget(win);
+		{
+			win->SetName("pagi");
+		//	Log("Starting box sizer.");
+		//	StartBoxSizer(Orient::Vertical);
+			{
+		//		AddWidget(new wxButton(GetLastWidget(), GetId("Entity.SaveButton"), "Save"));
+				gridContSizer = StartBoxSizer(Orient::Vertical);
+				{
+					auto dirTree = new DirTree(GetLastWidget(), GetId("ProjectTree"), "/home/taylorsnead/piecrust/lfant/assets");
+					AddWidget(dirTree, wxEXPAND, 1);
+				}
+				EndWidget();
+			}
+		//	EndWidget();
+		}
+		EndWidget();
+	}
+	EndWidget();
+
 	manager->Update();
 	Layout();
 //	}
@@ -220,6 +249,12 @@ void Window::FindAddEntityNode(Entity* entity)
 			AddEntityNode(item, entity);
 		}
 	}
+}
+
+wxTreeItemId Window::FindEntityInTree(Entity* entity)
+{
+	void* vali = 0;
+	return FindEntityInTree(tree->GetRootItem(), entity, vali);
 }
 
 wxTreeItemId Window::FindEntityInTree(wxTreeItemId parent, Entity* entity, void* vali)
@@ -296,6 +331,21 @@ wxWindow* Window::GetWidget(string name)
 	return wxWindow::FindWindowById(GetId(name));
 }
 
+void Window::SetEntityValue(wxCommandEvent& evt)
+{
+//	Log("SetEntityValue: Touch.");
+	wxTextCtrl* win = (wxTextCtrl*)evt.GetEventObject();
+	if(win == GetWidget("Entity.name"))
+	{
+		currentEnt->SetName(win->GetLineText(0));
+		tree->SetItemText(FindEntityInTree(currentEnt), currentEnt->name);
+	}
+	else
+	{
+		currentProp->Set(win->GetName(), (string)win->GetLineText(0));
+	}
+}
+
 void Window::SetCurrentEntity(wxTreeEvent& evt)
 {
 	Log("Window::SetCurrentEntity: Touch.");
@@ -311,9 +361,27 @@ void Window::SetCurrentEntity(wxTreeEvent& evt)
 
 	compGrids.clear();
 
-	auto saveBtn = new wxButton(gridContSizer->GetContainingWindow(), GetId("Entity.SaveButton"), "Save");
-	AddWidget((wxWindow*)gridContSizer, saveBtn);
-	/*GetWidget("Entity.SaveButton")->*/saveBtn->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &Window::SaveCurrentEntity, this, saveBtn->GetId());
+	auto win = gridContSizer->GetContainingWindow();
+
+	auto saveBtn = new wxButton(win, GetId("Entity.SaveButton"), "Save");
+	gridContSizer->Add(saveBtn, 0, wxALL|wxEXPAND, 5);/*AddWidget((wxWindow*)gridContSizer, saveBtn);*/
+	saveBtn->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &Window::SaveCurrentEntity, this, saveBtn->GetId());
+
+	auto field = new wxTextCtrl(win, GetId("Entity.name"), "name", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER, wxDefaultValidator, "name");
+//	nameField->SetExtraStyle(wxTE_PROCESS_ENTER);
+	gridContSizer->Add(field, 0, wxALL|wxEXPAND, 5);
+	field->Bind(wxEVT_COMMAND_TEXT_ENTER, &Window::SetEntityValue, this, field->GetId());
+
+	for(uint i = 0; i < currentProp->values.size(); ++i)
+	{
+		string name = currentProp->values[i].first;
+		string value = currentProp->values[i].second;
+
+		auto field = new wxTextCtrl(win, GetId("Entity."+name), name, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER, wxDefaultValidator, name);
+	//	nameField->SetExtraStyle(wxTE_PROCESS_ENTER);
+		gridContSizer->Add(field, 0, wxALL|wxEXPAND, 5);
+		field->Bind(wxEVT_COMMAND_TEXT_ENTER, &Window::SetEntityValue, this, field->GetId());
+	}
 
 	for(uint i = 0; i < currentEnt->components.size(); ++i)
 	{

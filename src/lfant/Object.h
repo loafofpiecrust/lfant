@@ -1,6 +1,3 @@
-#ifndef HEADER_F10FF25176ACD9D0
-#define HEADER_F10FF25176ACD9D0
-
 /******************************************************************************
 *
 *	LFANT Source
@@ -523,5 +520,3 @@ private:
 /// @}
 
 } /* namespace lfant */
-
-#endif // header guard

@@ -54,7 +54,7 @@ public:
 	struct Monitor
 	{
 		string name;
-		tvec2<uint16_t> resolution;
+		u16vec2 resolution;
 	};
 
 	struct Processor
@@ -67,6 +67,7 @@ public:
 	virtual ~SystemInfo();
 
 	virtual void Init();
+	virtual void Destroy();
 
 	string computerName;
 	float memory;

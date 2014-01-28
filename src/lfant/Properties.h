@@ -92,6 +92,7 @@ public:
 	}
 
 	void Get(string name, Entity*& ref);
+
 	void Set(string name, Entity* const& value);
 	void Set(string name, string value);
 
