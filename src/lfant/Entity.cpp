@@ -205,6 +205,11 @@ void Entity::AddChild(Entity* ent)
 	children.push_back(ent);
 }
 
+Entity* Entity::SpawnChild()
+{
+	return game->scene->Spawn(this);
+}
+
 void Entity::RemoveChild(Entity* ent)
 {
 	//	children.remove(ptr<Entity>(ent));
@@ -269,12 +274,17 @@ void Entity::Destroy()
 	}
 }
 
-Component* Entity::GetComponent(string type)
+Component* Entity::GetComponent(string name)
 {
-	string unscoped = type::Descope(type);
 	for(auto& comp : components)
 	{
-		if(type::Name(comp) == type || type::Name(comp) == unscoped || type::Descope(type::Name(comp)).find(unscoped) != -1)
+		string type = type::Name(comp);
+		if(type::Descope(type, "lfant") == name || type::Descope(type) == name || type == name)
+		{
+			return comp;
+		}
+		auto reg = Component::registry.Get(name);
+		if(reg && reg->Inherits(type))
 		{
 			return comp;
 		}
@@ -487,7 +497,21 @@ void Entity::Load(Properties* prop)
 
 	Log("Entity::Load: Loaded basic properties.");
 
-	deque<Properties*> c = prop->GetChildren("component");
+	deque<Properties*> c = prop->GetChildren("entity");
+	Entity* ent = nullptr;
+	for(auto& child : c)
+	{
+		if((ent = GetChild(child->id)))
+		{
+			ent->Load(child);
+		}
+		else
+		{
+			game->scene->SpawnAndLoad(child, this, child->id);
+		}
+	}
+
+	c = prop->GetChildren("component");
 	Log("Entity::Load: Component nodes loaded.");
 	Component* component = nullptr;
 	for(auto& comp : c)
@@ -495,6 +519,7 @@ void Entity::Load(Properties* prop)
 		Log("Loading component props, '"+comp->type+" "+comp->id+"'.");
 		if(comp->id != "Transform")
 		{
+			Log("Entity::Load: Component type '"+comp->id+"'");
 			if((component = GetComponent(comp->id)))
 			{
 				component->Load(comp);
@@ -503,7 +528,7 @@ void Entity::Load(Properties* prop)
 			{
 				component = AddComponent(comp->id, comp);
 			}
-			Log("Entity::Load: Added component, owner = ", component->owner);
+			Log("Entity::Load: Added component, ", component);
 		}
 		else
 		{
@@ -518,22 +543,6 @@ void Entity::Load(Properties* prop)
 			}
 		}
 		//	component->Load(comp);
-	}
-
-	{
-		c = prop->GetChildren("entity");
-		Entity* ent = nullptr;
-		for(auto& child : c)
-		{
-			if((ent = GetChild(child->id)))
-			{
-				ent->Load(child);
-			}
-			else
-			{
-				game->scene->SpawnAndLoad(child, child->id, this);
-			}
-		}
 	}
 
 	string file = "";
@@ -569,7 +578,10 @@ Component *Entity::AddComponent(string type)
 Component* Entity::AddComponent(string type, Properties* prop)
 {
 	printf("Adding comp via string of type\n");
-	auto val = Component::registry.Get(type);
+	auto reg = Component::registry.Get(type);
+	if(!reg) return nullptr;
+
+	auto val = reg->func;
 	Component* result = nullptr;
 	if(val == nullptr)
 	{

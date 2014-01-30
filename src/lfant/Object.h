@@ -65,71 +65,146 @@ namespace lfant
  */
 class Object
 {
-	class Event
+	class EventBase
 	{
 	public:
-		string name;
-		Object* obj = nullptr;
+		string name = "";
+		Object* sender = nullptr;
 
-		Event()
+		virtual void Clear() {}
+
+		EventBase()
 		{
 		}
 
-		Event(string name, Object* obj = nullptr) :
-			name(name), obj(obj)
+		EventBase(string name, Object* sender = nullptr) :
+			name(name), sender(sender)
 		{
 		}
 
-		virtual ~Event()
+		virtual ~EventBase()
 		{
 		}
 	};
 
-	class Event0 : public Event
+/*	class Event0 : public Event
 	{
 	public:
 		typedef boost::function<void()> funcType;
-		funcType func;
+		deque<funcType> func;
 
-		Event0(string name, funcType func, Object* obj) :
-			Event(name, obj), func(func)
+		Event0(string name, Object* sender) :
+			Event(name, sender)
 		{
+		}
+	};*/
+
+	class Event0 : public EventBase
+	{
+		typedef boost::function<void()> funcType;
+		deque<funcType> functions;
+
+		Event0(string name, Object* sender) :
+			EventBase(name, sender)
+		{
+		}
+
+		virtual ~Event0() {}
+
+		void Register(funcType func)
+		{
+			functions.push_back(func);
+		}
+
+		bool IsRegistered(funcType func)
+		{
+			for(funcType f : functions)
+			{
+//				if(f == func)
+				{
+	//				return true;
+				}
+			}
+		}
+
+		void Clear()
+		{
+			functions.clear();
+		}
+
+		void Trigger()
+		{
+			for(auto& func : functions)
+			{
+				func();
+			}
 		}
 	};
 
-	template<typename P1, typename ... P>
-	class EventP : public Event
+	template<typename ... P>
+	class Event : public EventBase
 	{
 	public:
-		typedef boost::function<void(P1, P...)> funcType;
-		funcType func;
+		typedef boost::function<void(P...)> funcType;
+		deque<funcType> functions;
 
-		EventP(string name, funcType func, Object* obj) :
-			Event(name, obj), func(func)
+		Event(string name, Object* sender) :
+			EventBase(name, sender)
 		{
+		}
+
+		virtual ~Event() {}
+
+		void Register(funcType func)
+		{
+			functions.push_back(func);
+		}
+
+		bool IsRegistered(funcType func)
+		{
+			for(auto& f : functions)
+			{
+				if(f == func)
+				{
+					return true;
+				}
+			}
+		}
+
+		void Clear()
+		{
+			functions.clear();
+		}
+
+		void Trigger(P... args)
+		{
+			for(auto& func : functions)
+			{
+				func(args...);
+			}
 		}
 	};
 
 	template<typename T>
-	class EventVar : public Event
+	class EventVar : public EventBase
 	{
 	public:
 		T* var;
 
 		EventVar(string name, T* var) :
-			Event(name), var(var)
+			EventBase(name), var(var)
 		{
 		}
 	};
 
-	class EventScript : public Event
+	class EventScript : public EventBase
 	{
 	public:
 		Sqrat::Function* func;
 		Sqrat::Object* obj;
 
 		EventScript(string name, Sqrat::Function* func, Sqrat::Object* obj) :
-			Event(name), func(func), obj(obj)
+			EventBase(name), func(func), obj(obj)
 		{
 		}
 	};
@@ -176,103 +251,89 @@ public:
 
 	static void Bind() __attribute__((constructor));
 
+	template<typename C>
+	static void RegisterEventFunc(Event<>* evt, C* receiver, void (C::*func)())
+	{
+		evt->Register(boost::bind(func, receiver));
+	}
+
+	template<typename C, typename P1>
+	static void RegisterEventFunc(Event<P1>* evt, C* receiver, void (C::*func)(P1))
+	{
+		evt->Register(boost::bind(func, receiver, _1));
+	}
+
+	template<typename C, typename P1, typename P2>
+	static void RegisterEventFunc(Event<P1,P2>* evt, C* receiver, void (C::*func)(P1,P2))
+	{
+		evt->Register(boost::bind(func, receiver, _1, _2));
+	}
+
+	template<typename C, typename P1, typename P2, typename P3>
+	static void RegisterEventFunc(Event<P1,P2,P3>* evt, C* receiver, void (C::*func)(P1,P2,P3))
+	{
+		evt->Register(boost::bind(func, receiver, _1, _2, _3));
+	}
+
+	template<typename C, typename P1, typename P2, typename P3, typename P4>
+	static void RegisterEventFunc(Event<P1,P2,P3,P4>* evt, C* receiver, void (C::*func)(P1,P2,P3,P4))
+	{
+		evt->Register(boost::bind(func, receiver, _1, _2, _3, _4));
+	}
+
 	template<typename R>
 	static void ConnectEvent(Object* sender, string name, R* receiver, void (R::*func)(), bool dis = false)
 	{
 		erase_all(name, " ");
 		name = type::Name(sender) + "::" + name + "()";
-		for(auto& event : sender->events)
+		for(auto& evt : Object::events)
 		{
-			if(event->name == name && event->obj == receiver)
+			if(evt->name == name && evt->sender == sender)
 			{
-				delete event;
-				event = new Event0(name, boost::bind(func, receiver), receiver);
-				receiver->AddSender(sender);
+				Event<>* evtp = dynamic_cast<Event<>*>(evt.get());
+				RegisterEventFunc<R>(evtp, receiver, func);
 				return;
 			}
 		}
 		if(!dis)
 		{
-			sender->events.push_back(new Event0(name, boost::bind(func, receiver), receiver));
-			receiver->AddSender(sender);
+			Event<>* evt = new Event<>(name, sender);
+			Object::events.push_back(evt);
+			RegisterEventFunc<R>(new Event<>(name, sender), receiver, func);
 		}
 	}
 
-	template<typename R, typename P1>
-	static void ConnectEvent(Object* sender, string name, R* receiver, void (R::* func)(P1), bool dis = false)
+	template<typename R, typename P1, typename... P>
+	static void ConnectEvent(Object* sender, string name, R* receiver, void (R::*func)(P1, P...), bool dis = false)
 	{
 		erase_all(name, " ");
-		name = type::Name(sender) + "::" + name + "(" + type::Name<P1>() + ")";
-		for(auto& event : sender->events)
+		name = type::Name<Object*>(sender) + "::" + name + "(" + type::Name<P1, P...>() + ")";
+		for(auto& evt : Object::events)
 		{
-			if(event->name == name && event->obj == receiver)
+			if(evt->name == name && evt->sender == sender)
 			{
-				delete event;
-				event = new EventP<P1>(name, boost::bind(func, receiver, _1), receiver);
-				receiver->AddSender(sender);
+				Event<P1, P...>* evtp = dynamic_cast<Event<P1, P...>*>(evt.get());
+				RegisterEventFunc<R, P1, P...>(evtp, receiver, func);
 				return;
 			}
 		}
 		if(!dis)
 		{
-			sender->events.push_back(new EventP<P1>(name, boost::bind(func, receiver, _1), receiver));
-			receiver->AddSender(sender);
+			Event<P1, P...>* evt = new Event<P1, P...>(name, sender);
+			Object::events.push_back(evt);
+			RegisterEventFunc<R, P1, P...>(evt, receiver, func);
 		}
 	}
 
-	template<typename R, typename P1, typename P2>
-	static void ConnectEvent(Object* sender, string name, R* receiver, void (R::* func)(P1, P2), bool dis = false)
+	template<typename C>
+	static void ClearEvent(string name)
 	{
-		erase_all(name, " ");
-		name = type::Name(sender) + "::" + name + "(" + type::Name<P1, P2>() + ")";
-		for(auto& event : sender->events)
+		name = type::Name<C>() + "::" + name;
+		for(auto& evt : events)
 		{
-			if(event->name == name && event->obj == receiver)
+			if(evt->name == name)
 			{
-				delete event;
-				event = new EventP<P1, P2>(name, boost::bind(func, receiver, _1, _2), receiver);
-				receiver->AddSender(sender);
-				return;
-			}
-		}
-		if(!dis)
-		{
-			sender->events.push_back(new EventP<P1, P2>(name, boost::bind(func, receiver, _1, _2), receiver));
-			receiver->AddSender(sender);
-		}
-	}
-
-	template<typename R, typename P1, typename P2, typename P3>
-	static void ConnectEvent(Object* sender, string name, R* receiver, void (R::* func)(P1, P2, P3), bool dis = false)
-	{
-		erase_all(name, " ");
-		name = type::Name(sender) + "::" + name + "(" + type::Name<P1, P2, P3>() + ")";
-		for(auto& event : sender->events)
-		{
-			if(event->name == name && event->obj == receiver)
-			{
-				delete event;
-				event = new EventP<P1, P2, P3>(name, boost::bind(func, receiver, _1, _2, _3), receiver);
-				receiver->AddSender(sender);
-				return;
-			}
-		}
-		if(!dis)
-		{
-			sender->events.push_back(new EventP<P1, P2, P3>(name, boost::bind(func, receiver, _1, _2, _3), receiver));
-			receiver->AddSender(sender);
-		}
-	}
-
-	void ClearEvent(string name)
-	{
-		name = type::Name(this) + "::" + name;
-		for(uint i = 0; i < events.size(); ++i)
-		{
-			if(events[i]->name == name)
-			{
-				delete events[i];
-				events.erase(events.begin()+i);
+				evt->Clear();
 			}
 		}
 	}
@@ -283,11 +344,11 @@ public:
 		erase_all(name, " ");
 		name = type::Name(sender) + "::" + name + "(" + type::Name<T>() + ")";
 		EventVar<T>* con = nullptr;
-		for(auto& event : sender->events)
+		for(auto& evt : Object::events)
 		{
-			if(event->name == name)
+			if(evt->name == name)
 			{
-				con = dynamic_cast<EventVar<T>*>(event);
+				con = dynamic_cast<EventVar<T>*>(evt.get());
 				if(con)
 				{
 					con->var = var;
@@ -296,89 +357,110 @@ public:
 			}
 		}
 		con = new EventVar<T>(name, var);
-		sender->events.push_back(con);
+		Object::events.push_back(con);
 	}
 
-	virtual void TriggerEvent(string name)
+	void TriggerEvent(string name)
 	{
 		erase_all(name, " ");
 		name = type::Name(this) + "::" + name + "()";
-		for(auto& event : events)
+		for(auto& evt : Object::events)
 		{
-			if(event->name == name)
+			if(evt->sender == this && evt->name == name)
 			{
-				Event0* con = dynamic_cast<Event0*>(event);
-				if(con)
-				{
-					con->func();
-				}
+				Event<>* con = dynamic_cast<Event<>*>(evt.get());
+				con->Trigger();
+				return;
 			}
 		}
+
 	}
 
 	template<typename P1>
 	void TriggerEvent(string name, P1 arg)
 	{
 		erase_all(name, " ");
-		string name2 = type::Name(this) + "::" + name + "(" + type::Name<P1>() + ")";
-		for(auto& event : events)
+		name = type::Name(this) + "::" + name + "(" + type::Name<P1>() + ")";
+		for(auto& evt : Object::events)
 		{
-			if(event->name == name2)
+			if(evt->sender == this && evt->name == name)
 			{
-				EventP<P1>* con = dynamic_cast<EventP<P1>*>(event);
+				Event<P1>* con = dynamic_cast<Event<P1>*>(evt.get());
 				if(con)
 				{
-					con->func(arg);
-				//	continue;
+					con->Trigger(arg);
 				}
-				EventVar<P1>* conv = dynamic_cast<EventVar<P1>*>(event);
-				if(conv)
+				else
 				{
-					*conv->var = arg;
-				//	continue;
+					EventVar<P1>* conv = dynamic_cast<EventVar<P1>*>(evt.get());
+					if(conv)
+					{
+						*conv->var = arg;
+					}
 				}
+				return;
 			}
 		}
-		TriggerEvent(name);
 	}
 
-	template<typename P1, typename P2>
-	void TriggerEvent(string name, P1 arg, P2 arg2)
+
+	template<typename P1, typename... P>
+	void TriggerEvent(string name, P1 arg1, P... args)
 	{
 		erase_all(name, " ");
-		string name2 = type::Name(this) + "::" + name + "(" + type::Name<P1, P2>() + ")";
-		for(auto& event : events)
+		name = type::Name(this) + "::" + name + "(" + type::Name<P1, P...>() + ")";
+		for(auto& evt : Object::events)
 		{
-			if(event->name == name2)
+			if(evt->sender == this && evt->name == name)
 			{
-				auto con = dynamic_cast<EventP<P1, P2>*>(event);
+				Event<P1, P...>* con = dynamic_cast<Event<P1, P...>*>(evt.get());
 				if(con)
 				{
-					con->func(arg, arg2);
+					con->Trigger(arg1, args...);
 				}
+				return;
 			}
 		}
-		TriggerEvent(name, arg);
+	}
+/*
+	template<typename P1, typename PL>
+	virtual void TriggerEvent(string name, P1 arg1, PL argLast)
+	{
+		erase_all(name, " ");
+		name = type::Name(this) + "::" + name + "(" + type::Name<P1, PL>() + ")";
+		for(auto& evt : Object::events)
+		{
+			if(evt->sender == this && evt->name == name)
+			{
+				Event<P1, PL>* con = dynamic_cast<Event<P1, PL>*>(evt);
+				if(con)
+				{
+					con->Trigger(arg1, argLast);
+				}
+				return;
+			}
+		}
 	}
 
-	template<typename P1, typename P2, typename P3>
-	void TriggerEvent(string name, P1 arg, P2 arg2, P3 arg3)
+	template<typename P1, typename PL, typename... P>
+	virtual void TriggerEvent(string name, P1 arg1, P... args, PL argLast)
 	{
 		erase_all(name, " ");
-		string name2 = type::Name(this) + "::" + name + "(" + type::Name<P1, P2, P3>() + ")";
-		for(auto& event : events)
+		name = type::Name(this) + "::" + name + "(" + type::Name<P1, P...>() + ")";
+		for(auto& evt : Object::events)
 		{
-			if(event->name == name2)
+			if(evt->sender == this && evt->name == name)
 			{
-				auto con = dynamic_cast<EventP<P1, P2, P3>*>(event);
+				Event<P1, P...>* con = dynamic_cast<Event<P1, P...>*>(evt);
 				if(con)
 				{
-					con->func(arg, arg2, arg3);
+					con->Trigger(arg1, args..., argLast);
 				}
+				return;
 			}
 		}
-		TriggerEvent(name, arg, arg2);
 	}
+*/
 
 	bool EventConnected(string name)
 	{
@@ -485,7 +567,7 @@ private:
 		{
 			if(event->name == name)
 			{
-				con = dynamic_cast<EventScript*>(event);
+				con = dynamic_cast<EventScript*>(event.get());
 				if(con)
 				{
 					con->func = func;
@@ -498,20 +580,7 @@ private:
 		sender->events.push_back(con);
 	}
 
-	void AddSender(Object* sender)
-	{
-		for(auto& s : senders)
-		{
-			if(s == sender)
-			{
-				return;
-			}
-		}
-		senders.push_back(sender);
-	}
-
-	deque<Event*> events;
-	deque<Object*> senders;
+	static deque<ptr<EventBase>> events;
 	deque<Timer*> timers;
 
 };

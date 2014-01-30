@@ -118,7 +118,7 @@ protected:
 	template<typename T>
 	void ConnectComponent(T*& val, bool required = false)
 	{
-		ConnectEvent(owner, "SetComponent"+type::Descope(type::Name(val)), (Component**)&val);
+		ConnectEvent(owner, "SetComponent"+type::Descope(type::Name<T>()), (Component**)&val);
 		val = owner->GetComponent<T>();
 		if(!val && required)
 		{

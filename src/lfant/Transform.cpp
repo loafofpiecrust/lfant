@@ -98,7 +98,7 @@ void Transform::SetPosition(vec3 pos)
 quat Transform::GetRotationQuat()
 {
 //	vec3 rot = radians(vec3(rotation.x+180, -rotation.y, -(rotation.z+180)));
-	vec3 rot = vec3(rotation.x, -rotation.y, -rotation.z);
+	vec3 rot = vec3(rotation.x, rotation.y, -(rotation.z+180));
 	return quat(rot);
 //	return quat(radians(rotation));
 }
@@ -263,7 +263,7 @@ void Transform::SetMatrix()
 		matrix = mat4(0);
 		return;
 	}
-	
+
 //	vec3 pos = vec3(-position.x, position.y, position.z);
 	vec3 pos = GetPosition();
 	quat rot = GetRotationQuat();
@@ -276,17 +276,17 @@ void Transform::SetMatrix()
 	}
 	else
 	{
-		matrix = mat4();
+		matrix = mat4(1);
 	//	matrix = glm::rotate(matrix, -90.0f, vec3(1,0,0));
 	}
 
 //	matrix = glm::translate(mat4(), pos) * mat4_cast(rot) * glm::scale(mat4(), scl);
-	
+
 	if(pos != vec3(0))
 	{
 		matrix = glm::translate(matrix, pos);
 	}
-	
+
 //	if(rot != vec3(0))
 	{
 	//	matrix = glm::rotate(matrix, rot.y, vec3(0,1,0));
@@ -294,12 +294,16 @@ void Transform::SetMatrix()
 	//	matrix = glm::rotate(matrix, rot.x, vec3(1,0,0));
 		matrix *= mat4_cast(rot);
 	}
-	
-	if(scl != vec3(1))
+
+//	if(scl != vec3(1))
 	{
 		matrix = glm::scale(matrix, scl);
 	}
-	
+
+//	mat4 copy = matrix;
+//	matrix[2] = copy[1];
+//	matrix[1] = copy[2];
+
 /*	if(owner->parent)
 	{
 		matrix = owner->parent->transform->GetMatrix() * matrix;
@@ -311,6 +315,9 @@ const mat4& Transform::GetMatrix()
 {
 //	mat4 matrix = this->matrix;
 //	matrix[3].x = -matrix[3].x;
+//	mat4 copy = matrix;
+//	copy[2] = matrix[1].xyzw();
+//	copy[1] = matrix[2].xyzw();
 	return matrix;
 }
 
@@ -319,21 +326,21 @@ void Transform::SetDirection()
 /*
 	vec3 rot = radians(GetWorldRotation());
 
-//	rot.y = -rot.y;	
+//	rot.y = -rot.y;
 //	rot.x = -rot.x;
-	
+
 	direction = vec3(
 		cos(rot.x) * sin(rot.y),
 		sin(rot.x),
 		cos(rot.x) * cos(rot.y)
 		);
 //	direction.x = -direction.x;
-	
+
 	right = vec3(
 		sin(rot.y - pi / 2.0f),
 		0,
 		cos(rot.y - pi / 2.0f)
-		);	
+		);
 */
 //	mat4 matrix = GetWorldMatrix();
 //	right = vec3(matrix[0].xyz);
@@ -377,7 +384,7 @@ vec3 Transform::GetDirection()
 
 vec3 Transform::GetRight()
 {
-	return -vec3(matrix[0].xyz());
+	return /*-*/vec3(matrix[0].xyz());
 }
 
 vec3 Transform::GetUp()

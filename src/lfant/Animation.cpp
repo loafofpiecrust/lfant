@@ -3,23 +3,30 @@
 
 namespace lfant {
 
-Animation::Animation()
+void Animation::Clip::Save(Properties* prop) const
 {
+	prop->type = "Clip";
+	prop->id = name;
+	prop->Set("start", start);
+	prop->Set("end", end);
+	prop->Set("frameRate", frameRate);
 }
 
-Animation::~Animation()
+void Animation::Clip::Load(Properties* prop)
 {
+	name = prop->id;
+	prop->Get("start", start);
+	prop->Get("end", end);
+	prop->Get("frameRate", frameRate);
 }
 
 void Animation::Save(Properties* prop) const
 {
 	Component::Save(prop);
 
-	for(Clip& clip : clips)
+	for(auto& clip : clips)
 	{
-		Properties* child = prop->AddChild("Clip", clip.name);
-		child->Set("start", start);
-		child->Set("end", end);
+		clip->Save(prop->AddChild("Clip"));
 	}
 }
 
@@ -28,24 +35,21 @@ void Animation::Load(Properties* prop)
 	for(Properties*& child : prop->GetChildren("Clip"))
 	{
 		Clip* clip = new Clip();
-		clip->name = child->id;
-		child->Get("start", clip->start);
-		child->Get("end", clip->end);
-
-		clips.push_back(*clip);
+		clip->Load(child);
+		clips.push_back(clip);
 	}
 }
 
-void Animation::AddClip(string name, uint16_t start, uint16_t end, uint16_t fps)
+void Animation::AddClip(Clip* clip)
 {
-	clips.push_back(Clip(name, start, end, fps));
+	clips.push_back(clip);
 }
 
 Animation::Clip* Animation::GetClip(string name)
 {
 	for(auto& clip : clips)
 	{
-		if(clip.name == name)
+		if(clip->name == name)
 		{
 			return clip;
 		}

@@ -34,30 +34,50 @@ public:
 	class Clip
 	{
 	public:
-		Clip(string name, uint16_t start, uint16_t end, uint16_t fps) :
-			start(start), end(end), fps(fps)
+		enum class Mode : byte
+		{
+			Loop = 0,
+			Bounce,
+			Once,
+			Default = Loop
+		};
+
+		Clip()
 		{
 		}
+
+		Clip(string name, uint16_t start, uint16_t end, uint16_t fps) :
+			start(start), end(end), frameRate(fps)
+		{
+		}
+
+		virtual void Save(Properties* prop) const;
+		virtual void Load(Properties* prop);
 
 		string name = "";
 		uint16_t start = 1;
 		uint16_t end = 2;
-		uint16_t fps = 15;
+		uint16_t frameRate = 15;
+		Mode mode = Mode::Default;
 	};
 
 	virtual void Save(Properties* prop) const;
 	virtual void Load(Properties* prop);
 
-	virtual void Play(string anim = "") = 0;
-	virtual void Stop(string anim = "") = 0;
+	virtual void SetCurrent(string name) {}
 
-	virtual void AddClip(string name, uint16_t start, uint16_t end, uint16_t fps);
+	virtual void Play() = 0;
+	virtual void Pause() = 0;
+	virtual void Stop() = 0;
+
+	virtual void AddClip(Clip* clip);
 
 	Clip* GetClip(string name);
 
 protected:
+	float currentTime = 0.0f;
 	string currentClip = "";
-	deque<Clip> clips;
+	deque<Clip*> clips;
 
 private:
 };

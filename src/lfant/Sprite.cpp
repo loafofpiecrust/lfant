@@ -62,11 +62,6 @@ void Sprite::Init()
 	indexBuffer.push_back(2);
 	indexBuffer.push_back(3);
 
-	currentFrame.x = 0;
-	currentFrame.y = 0;
-	currentFrame.width = 50;
-	currentFrame.height = 50;
-
 	Mesh::Init();
 }
 
@@ -122,90 +117,6 @@ void Sprite::Render()
 
 void Sprite::Update()
 {
-	if(playingAnim)
-	{
-		if(currentAnim)
-		{
-			float x = 1.0f / currentAnim->columns;
-			float y = 1.0f / currentAnim->rows;
-			uvBuffer[0] = vec2(currentFrame.x + x, currentFrame.y);
-			uvBuffer[1] = vec2(currentFrame.x, currentFrame.y);
-			uvBuffer[2] = vec2(currentFrame.x, currentFrame.y + y);
-			uvBuffer[3] = vec2(currentFrame.x, currentFrame.y + y);
-			uvBuffer[4] = vec2(currentFrame.x + x, currentFrame.y + y);
-			uvBuffer[5] = vec2(currentFrame.x + x, currentFrame.y);
-
-			currentTime += game->time->deltaTime;
-			if(currentTime >= currentAnim->frameRate)
-			{
-				currentTime = 0.0f;
-				Animation::Mode mode = animMode;
-				if(mode == Animation::Mode::Default)
-				{
-					if(currAnimMode == Animation::Mode::Default)
-					{
-						mode = currentAnim->mode;
-					}
-					else
-					{
-						mode = currAnimMode;
-					}
-				}
-				if(!playingReverseAnim)
-				{
-					if(currentFrame.x + x < 1.0f)
-					{
-						currentFrame.x += x;
-					}
-					else if(currentFrame.y + y < 1.0f)
-					{
-						currentFrame.y += y;
-						currentFrame.x = 0.0f;
-					}
-					else
-					{
-						if(mode == Animation::Mode::Once)
-						{
-							playingAnim = false;
-						}
-						else if(mode == Animation::Mode::Bounce)
-						{
-							playingReverseAnim = true;
-						}
-
-						currentFrame.x = 0.0f;
-						currentFrame.y = 0.0f;
-					}
-				}
-				else
-				{
-					if(currentFrame.x - x >= 0.0f)
-					{
-						currentFrame.x -= x;
-					}
-					else if(currentFrame.y - y >= 0.0f)
-					{
-						currentFrame.y -= y;
-						currentFrame.x = 1.0f - x;
-					}
-					else
-					{
-						if(mode == Animation::Mode::Once)
-						{
-							playingAnim = false;
-						}
-						else if(mode == Animation::Mode::Bounce)
-						{
-							playingReverseAnim = false;
-						}
-
-						currentFrame.x = 1.0f - x;
-						currentFrame.y = 1.0f - y;
-					}
-				}
-			}
-		}
-	}
 	Renderable::Update();
 }
 
@@ -245,34 +156,9 @@ void Sprite::Deinit()
 	Renderable::Deinit();
 }
 
-void Sprite::PlayAnim(string name, Animation::Mode mode, bool reverse)
+void Sprite::SetUV(uint32_t idx, vec2 value)
 {
-	if(Animation* anim = &GetAnim(name))
-	{
-		currentAnim = anim;
-		playingAnim = true;
-		if(reverse)
-		{
-			playingReverseAnim = true;
-		}
-		currAnimMode = mode;
-	}
-}
-
-Sprite::Animation& Sprite::GetAnim(string name)
-{
-	for(auto& anim : animations)
-	{
-		if(anim.name == name)
-		{
-			return anim;
-		}
-	}
-}
-
-void Sprite::PauseAnim()
-{
-
+	uvBuffer[idx] = value;
 }
 
 }

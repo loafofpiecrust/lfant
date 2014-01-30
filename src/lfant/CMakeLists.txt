@@ -12,11 +12,12 @@ link_directories(
 	)
 
 # Source Info
-file(GLOB SRC_FILES 
+file(GLOB SRC_FILES
 	*.cpp
 	)
 
 file(GLOB_RECURSE SRC_FILES_REC
+	*.h
 	net/*.cpp
 	util/*.cpp
 	physics/*.cpp

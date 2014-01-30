@@ -47,10 +47,19 @@ target_link_libraries(${PROJECT_NAME}
 endif()
 
 if(PLATFORM STREQUAL "windows")
+set_target_properties(${PROJECT_NAME}
+	PROPERTIES CMAKE_IMPORT_LIBRARY_SUFFIX " "
+	CMAKE_LINK_LIBRARY_SUFFIX a
+	)
+
 target_link_libraries(${PROJECT_NAME}
 	opengl32
 	glu32
 	)
+#add_definitions(
+#	-lopengl32
+#	-lglu32
+#	)
 endif()
 
 if(ANDROID)

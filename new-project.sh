@@ -19,7 +19,7 @@ currDir=$(pwd)
 # Copy over the template
 rm -rf "$projDir/$projName"
 mkdir -p "$projDir"
-cp -r "./project-template" "$projDir/$projName"
+cp -r "$currDir/project-template" "$projDir/$projName"
 
 projDir=$projDir/$projName
 

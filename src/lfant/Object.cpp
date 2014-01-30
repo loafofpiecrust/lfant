@@ -33,6 +33,8 @@
 namespace lfant
 {
 
+deque<ptr<Object::EventBase>> Object::events;
+
 Object::Object()
 {
 }
@@ -70,22 +72,19 @@ void Object::Render()
 
 void Object::FixedUpdate()
 {
-	
+
 }
 
 void Object::Destroy()
 {
 	Deinit();
-	
-	for(auto& s : senders)
+
+	for(uint i = 0; i < Object::events.size(); ++i)
 	{
-		for(uint i = 0; i < s->events.size(); ++i)
+		if(events[i]->sender == this)
 		{
-			if(s->events[i]->obj == this)
-			{
-				delete s->events[i];
-				s->events.erase(s->events.begin()+i);
-			}
+		//	delete events[i];
+			events.erase(events.begin()+i);
 		}
 	}
 

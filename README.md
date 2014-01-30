@@ -1,19 +1,17 @@
 lfant
 =========
-A cross-platform, OpenGL game engine that uses an Entity-Component model, fairly similar Unity3D, where 
-Entities have a list of Components that they can access at any given time. These components "add" 
+A cross-platform, OpenGL game engine that uses an Entity-Component model, fairly similar Unity3D, where
+Entities have a list of Components that they can access at any given time. These components "add"
 functionality to the owner Entity. Examples of Components are Rigidbody, Inventory,
 MeshRenderer, ParticleSystem, etc. This allows the easy manipulation of what Entities can do at runtime. All external libraries not included in a default install of each OS are included.
 
-Latest unstable development: https://github.com/babybluesedan/lfant
-
-Latest mostly-stable development: https://github.com/lazyfox-studios/lfant
+Latest development: https://github.com/loafofpiecrust/lfant
 
 Building
 ============
 Binaries here are not always up-to-date with the code, so it is suggested to build them.
-lfant uses primarily CMake for building. Some IDEs support the use of a CMakeLists.txt file directly 
-as a project. 
+lfant uses primarily CMake for building. Some IDEs support the use of a CMakeLists.txt file directly
+as a project.
 To compile using the CMake CLI, first install it. On Linux distributions using aptitude for package
 management (eg. Ubuntu):
 ```bash
@@ -25,7 +23,7 @@ We use the LLVM/Clang compiler, but it builds perfectly fine with the latest GCC
 most/all Linux distros by default, but Windows users will need to install MinGW (I suggest TDM-GCC).
 On Mac OSX, XCode comes with both GCC and Clang.
 
-Then, create a folder to build to. This directory's location is irrelevant, but I suggest 'lfant/build'. 
+Then, create a folder to build to. This directory's location is irrelevant, but I suggest 'lfant/build'.
 Open a terminal in your build directory, and do this (substituting '~/lfant' with your directory):
 ```bash
 mkdir ~/lfant/build

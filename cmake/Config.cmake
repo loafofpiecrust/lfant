@@ -3,6 +3,7 @@ message("Config file called")
 
 set(ARCH "x64")
 set(ARCH "x64" CACHE STRING "Architecture to build for. (x86/x64)")
+set(MINGW "C:\\MinGW\\x86_64-mingw32" CACHE STRING "Mingw folder")
 
 #set(ANDROID_NDK_PATH "" CACHE STRING "Root path of your android ndk")
 set(ANDROID_TOOLCHAIN "" CACHE STRING "Toolchain name to use for android building")
@@ -18,6 +19,8 @@ endif()
 if(ARCH STREQUAL "arm")
 	set(ARCH_OPTION "cpu=arm7")
 endif()
+
+message("Arch: m${ARCH_OPTION}")
 
 set(PLATFORM "")
 if(UNIX)

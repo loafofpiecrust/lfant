@@ -28,7 +28,7 @@
 namespace lfant
 {
 
-IMPLEMENT_TYPE(Component, BoxCollider)
+IMPLEMENT_SUBTYPE(Component, BoxCollider, Collider)
 
 void BoxCollider::Init()
 {

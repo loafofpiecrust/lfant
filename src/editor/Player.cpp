@@ -54,9 +54,9 @@ void Player::Update()
 	{
 		TriggerEvent("Look", vec3(-value, 0, 0));
 	}
-	if (game->input->GetButtonDown("ShowLoc"))
+	if((value = game->input->GetAxis("ZRotation")) != 0.0f)
 	{
-		Log("Player position: ", owner->transform->GetPosition());
+		TriggerEvent("Look", vec3(0, -value, 0));
 	}
 
 	if(game->input->GetButtonDown("ShowFPS"))
@@ -71,9 +71,9 @@ void Player::Update()
 	}
 	if (game->input->GetButtonDown("ShowRot"))
 	{
-		Log("Player rotation: ", owner->transform->GetRotation());
-		Log("Camera rotation: ", game->scene->mainCamera->owner->transform->GetRotation());
+		Log("Camera rotation: ", game->scene->mainCamera->owner->transform->GetWorldRotation());
 		Log("Camera direction: ", game->scene->mainCamera->owner->transform->GetDirection());
+		Log("Camera matrix: ", game->scene->mainCamera->owner->transform->GetMatrix());
 	}
 }
 

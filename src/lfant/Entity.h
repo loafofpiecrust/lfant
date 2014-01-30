@@ -136,7 +136,7 @@ public:
 		return nullptr;
 	}
 
-	Component* GetComponent(string type);
+	Component* GetComponent(string name);
 
 	template<typename C>
 	deque<C*> GetComponents()
@@ -153,6 +153,24 @@ public:
 	}
 
 	Entity* GetChild(string name, bool recursive = false);
+
+	template<typename C>
+	deque<C*> GetChildrenWithComponent(bool recursive = false)
+	{
+		C* temp = nullptr;
+		deque<C*> result;
+		for(auto& child : children)
+		{
+			temp = child->GetComponent<C>();
+			if(temp)
+			{
+				result.push_back(temp);
+			}
+		}
+		return result;
+	}
+
+	Entity* SpawnChild();
 
 	bool HasTag(string tag);
 

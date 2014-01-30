@@ -115,8 +115,8 @@ public:
 	 *	@param parent Parent entity, defaults to nullptr.
 	 *	@return The new entity.
 	 */
-	Entity* Spawn(string name = "Entity", Entity* parent = nullptr);
-	Entity* SpawnAndLoad(Properties* prop, string name = "Entity", Entity* parent = nullptr);
+	Entity* Spawn(Entity* parent = nullptr, string name = "Entity");
+	Entity* SpawnAndLoad(Properties* prop, Entity* parent = nullptr, string name = "Entity");
 
 	Camera* mainCamera = nullptr;
 	string name = "Scene";

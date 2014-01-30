@@ -47,6 +47,7 @@ class Sprite : public Mesh
 {
 	DECLARE_TYPE(Component, Sprite)
 	friend class Renderer;
+	friend class SpriteAnimation;
 public:
 
 	/**
@@ -87,20 +88,13 @@ public:
 
 	virtual void Load(Properties *props);
 
-	void PlayAnim(string name, Animation::Mode mode = Animation::Mode::Default, bool reverse = false);
-	void PlayLastAnim();
-	void PauseAnim();
-	void ResumeAnim();
-	void StopAnim();
-
-	void AddAnim(Animation& anim);
-	void RemoveAnim(string name);
-	Animation& GetAnim(string name);
-
 	/// The sprite animations to be used.
 	deque<Animation> animations;
 
 protected:
+
+	void SetUV(uint32_t idx, vec2 value);
+
 	/// The currently playing animation.
 	Animation* currentAnim = nullptr;
 

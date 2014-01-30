@@ -9,18 +9,59 @@
 
 namespace lfant {
 
-#define DECLARE_REGISTRY(type) \
+template<typename T>
+class RegistryEntryBase
+{
+public:
+	typedef T*(*funcType)();
+
+	bool Inherits(string super, bool recursive = true)
+	{
+		if(!parent) return false;
+
+		if(!recursive)
+		{
+			return super == parent->name || super == parent->typeName;
+		}
+		else
+		{
+			RegistryEntryBase* superInst = parent;
+			while(superInst)
+			{
+				if(super == superInst->name || super == superInst->typeName)
+				{
+					return true;
+				}
+				else
+				{
+					superInst = superInst->parent;
+				}
+			}
+		}
+		return false;
+	}
+
+	string typeName = "";
+	string name = "";
+	RegistryEntryBase* parent = nullptr;
+	funcType func;
+};
+
+#define DECLARE_REGISTRY(regType) \
 	public:\
-	static TypeRegistry<type> registry; \
+	static TypeRegistry<regType> registry; \
 	template<typename C> \
-	class RegistryEntry \
+	class RegistryEntry : public RegistryEntryBase<regType> \
 	{ \
 	public:\
-		RegistryEntry(string name) { \
-			type::registry.Register<C>(name); \
+		RegistryEntry(string name, string parent = "") { \
+			if(parent != "") this->parent = regType::registry.Get(parent); \
+			this->typeName = type::Name<C>(); \
+			this->name = name; \
+			regType::registry.Register<C>(this); \
 		} \
 	};\
-	type* New(string name) {\
+	regType* New(string name) {\
 		return registry.New(name);\
 	}
 
@@ -29,18 +70,19 @@ namespace lfant {
 #define DECLARE_TYPE(parent, type) \
 	static const parent::RegistryEntry<type> _registryEntry;
 
-#define IMPLEMENT_TYPE_NAME(parent, type, name) \
+#define IMPLEMENT_TYPE(parent, type) \
 	const parent::RegistryEntry<type> type::_registryEntry {#type};
 
-#define IMPLEMENT_TYPE(parent, type) \
-	IMPLEMENT_TYPE_NAME(parent, type, type)
+#define IMPLEMENT_SUBTYPE(parent, type, super) \
+	const parent::RegistryEntry<type> type::_registryEntry {#type, #super};
 
 template<typename T>
 class TypeRegistry
 {
 public:
-
 	typedef T*(*funcType)();
+	typedef RegistryEntryBase<T> entryType;
+
 	template<typename C>
 	static T* Create()
 	{
@@ -48,25 +90,34 @@ public:
 	}
 
 	template<typename C>
-	void Register(string name)
+	void Register(entryType* inst)
 	{
-		data[name] = &TypeRegistry<T>::Create<C>;
+		if(Get(inst->name))
+		{
+			// do something?
+		}
+		data.push_back(inst);
+		inst->func = &TypeRegistry<T>::Create<C>;
 	}
 
-	template<typename C>
-	void Add(string name)
+	entryType* Get(string name)
 	{
-		this->Register<C>(name);
-	}
-
-	funcType Get(string name)
-	{
-		return data[name];
+		to_lower(name);
+		for(auto& entry : data)
+		{
+			string entryName = entry->name; to_lower(entryName);
+			string entryType = entry->typeName; to_lower(entryType);
+			if(name == entryName || name == entryType)
+			{
+				return entry;
+			}
+		}
+		return nullptr;
 	}
 
 	T* New(string name)
 	{
-		funcType f = data[name];
+		funcType f = Get(name)->func;
 		if(f)
 		{
 			return f();
@@ -75,7 +126,7 @@ public:
 	}
 
 protected:
-	qumap<string, funcType> data;
+	deque<RegistryEntryBase<T>*> data;
 };
 
 }

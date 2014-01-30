@@ -54,7 +54,7 @@ void Scene::Update()
 	{
 		if(!ent || !ent->active)
 			continue;
-		
+
 		ent->Update();
 	}
 }
@@ -66,7 +66,7 @@ void Scene::Render()
 	{
 		if(!ent || !ent->active)
 			continue;
-		
+
 		ent->Render();
 	}
 }
@@ -220,7 +220,7 @@ void Scene::Load(Properties *prop)
 	for(auto& i : prop->GetChildren("entity"))
 	{
 		Log("About to spawn");
-		ent = Spawn(i->id);
+		ent = Spawn(nullptr, i->id);
 		Log("Spawned the entity!");
 		ent->Load(i);
 	}
@@ -243,7 +243,7 @@ void Scene::AddEntity(Entity* ent)
 	Log("Scene::AddEntity: Finished.");
 }
 
-Entity* Scene::Spawn(string name, Entity* parent)
+Entity* Scene::Spawn(Entity* parent, string name)
 {
 	Entity* ent = new Entity;
 	Log("Scene::Spawn: Allocated Entity pointer.");
@@ -256,7 +256,7 @@ Entity* Scene::Spawn(string name, Entity* parent)
 	return ent;
 }
 
-Entity* Scene::SpawnAndLoad(Properties* prop, string name, Entity* parent)
+Entity* Scene::SpawnAndLoad(Properties* prop, Entity* parent, string name)
 {
 	Entity* ent = new Entity;
 	ent->parent = parent;

@@ -220,7 +220,7 @@ void Window::Init()
 
 void Window::AddEntity(wxCommandEvent& evt)
 {
-	game->scene->Spawn("Entity", currentEnt);
+	game->scene->Spawn(currentEnt, "Entity");
 }
 
 void Window::AddEntityNode(wxTreeItemId& parent, Entity* entity)
@@ -521,7 +521,7 @@ void Window::AddWidget(wxWindow* widget, int flags, int proportion)
 		}
 		sizer->Add(widget, proportion, f, 5);
 	}
-	
+
 	if(wxAuiNotebook* nt = dynamic_cast<wxAuiNotebook*>(GetLastObject()))
 	{
 		nt->AddPage(widget, widget->GetName());
@@ -539,7 +539,7 @@ void Window::AddWidget(wxWindow* parent, wxWindow* widget, int flags, int propor
 		}
 		sizer->Add(widget, proportion, f, 5);
 	}
-	
+
 	if(wxAuiNotebook* nt = dynamic_cast<wxAuiNotebook*>(parent))
 	{
 		nt->AddPage(widget, widget->GetName());
