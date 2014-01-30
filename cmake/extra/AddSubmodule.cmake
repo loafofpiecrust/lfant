@@ -1,0 +1,69 @@
+if(__ADD_SUBMODULE_CMAKE__)
+  return()
+endif()
+set(__ADD_SUBMODULE_CMAKE__ TRUE)
+
+
+include(CMakeParseArguments)
+find_package(Git)
+
+function(add_submodule SUBMODULE_NAME SUBMODULE_URL SUBMODULE_FOLDER)
+  if(NOT GIT_FOUND)
+    message(WARNING "Git not found, ignoring submodule ${SUBMODULE_NAME}")
+    return()
+  endif()
+
+  set(GTULU_PROGRAM_ARGS_FLAGS )
+  set(GTULU_PROGRAM_ARGS_ONE_VALUE   TAG BRANCH)
+  set(GTULU_PROGRAM_ARGS_MULTI_VALUE INCLUDE_DIRS)
+  cmake_parse_arguments(SUBMODULE "${GTULU_PROGRAM_ARGS_FLAGS}" "${GTULU_PROGRAM_ARGS_ONE_VALUE}" "${GTULU_PROGRAM_ARGS_MULTI_VALUE}" ${ARGN} )
+
+  if(NOT IS_ABSOLUTE ${SUBMODULE_FOLDER})
+    set(SUBMODULE_FOLDER_FULL ${CMAKE_CURRENT_SOURCE_DIR}/${SUBMODULE_FOLDER})
+  else()
+    set(SUBMODULE_FOLDER_FULL ${SUBMODULE_FOLDER})
+  endif()
+
+  if(SUBMODULE_BRANCH)
+    set(SUBMODULE_GITREF ${SUBMODULE_BRANCH})
+  elseif(SUBMODULE_TAG)
+    set(SUBMODULE_GITREF ${SUBMODULE_TAG})
+  endif()
+
+  if(${SUBMODULE_NAME}_SOURCE_DIR AND NOT "${SUBMODULE_FOLDER_FULL}" STREQUAL "${${SUBMODULE_NAME}_SOURCE_DIR}")
+    message(STATUS "submodule ${SUBMODULE_NAME} already in ${${SUBMODULE_NAME}_SOURCE_DIR}")
+
+    if(SUBMODULE_GITREF AND NOT "${SUBMODULE_GITREF}" STREQUAL "${${SUBMODULE_NAME}_GITREF}")
+      message(FATAL_ERROR "Submodule ${SUBMODULE_NAME} was registered with a different branch or tag, multiple versions are not currently supported")
+    endif()
+    return()
+  endif()
+
+  if(NOT EXISTS ${SUBMODULE_FOLDER})
+    execute_process(COMMAND git submodule add ${SUBMODULE_URL} ${SUBMODULE_FOLDER} WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} OUTPUT_QUIET ERROR_QUIET)
+  endif()
+
+  message(STATUS "using ${SUBMODULE_NAME} submodule in ${SUBMODULE_FOLDER}...")
+  execute_process(COMMAND git submodule update --init ${SUBMODULE_FOLDER} WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} OUTPUT_QUIET ERROR_QUIET)
+
+  if(SUBMODULE_GITREF)
+    message(STATUS "updating ${SUBMODULE_NAME} submodule to ref ${SUBMODULE_GITREF}...")
+    execute_process(COMMAND git checkout ${SUBMODULE_GITREF} WORKING_DIRECTORY ${SUBMODULE_FOLDER_FULL} OUTPUT_QUIET ERROR_QUIET)
+  endif()
+
+
+  if(EXISTS ${SUBMODULE_FOLDER_FULL}/CMakeLists.txt)
+    add_subdirectory(${SUBMODULE_FOLDER} EXCLUDE_FROM_ALL)
+  endif()
+
+  foreach(SUBMODULE_INCLUDE_DIR ${SUBMODULE_INCLUDE_DIRS})
+    if(NOT IS_ABSOLUTE ${SUBMODULE_INCLUDE_DIR})
+      set(SUBMODULE_INCLUDE_DIR ${SUBMODULE_FOLDER_FULL}/${SUBMODULE_INCLUDE_DIR})
+    endif()
+
+    include_directories(${SUBMODULE_INCLUDE_DIR})
+  endforeach()
+
+  set(${SUBMODULE_NAME}_SOURCE_DIR ${SUBMODULE_FOLDER_FULL} CACHE "${SUBMODULE_NAME} source folder" "${SUBMODULE_NAME} source folder")
+  set(${SUBMODULE_NAME}_GITREF     ${SUBMODULE_GITREF}      CACHE "${SUBMODULE_NAME} git ref" "${SUBMODULE_NAME} git ref")
+endfunction(add_submodule)
