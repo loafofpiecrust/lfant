@@ -5,16 +5,12 @@ get_filename_component(ROOT "./" REALPATH)
 set(LFANT "${ROOT}")
 set(CMAKE_MODULE_PATH "${ROOT}/cmake")
 
-if(WIN32 AND COMPILER STREQUAL "clang")
-	set(CMAKE_TOOLCHAIN_FILE ${ROOT}/cmake/extra/toolchain/x86_64-windows-mingw-clang.cmake)
+if(WIN32)
+include(extra/Platform/Windows-Clang-C)
+#set(CMAKE_TOOLCHAIN_FILE extra/toolchain/x86_64-windows-mingw-clang)
+include(CMakeExtraBootstrap)
 endif()
 
-if(WIN32 AND COMPILER STREQUAL "clang")
-#	include(extra/Platform/Windows-Clang-C)
-#	set(CMAKE_SYSTEM_NAME Windows-Clang)
-endif()
-
-#include(CMakeExtraBootstrap)
 include(Config)
 
 if(PLATFORM STREQUAL "android")

@@ -283,8 +283,8 @@ Component* Entity::GetComponent(string name)
 		{
 			return comp;
 		}
-		auto reg = Component::registry.Get(type);
-		if(reg && reg->Inherits(name))
+		auto reg = typeRegistry.Get("Component", name);
+		if(reg && reg->Inherits(type))
 		{
 			return comp;
 		}
@@ -462,10 +462,6 @@ void Entity::Bind()
 
 void Entity::Save(Properties* prop) const
 {
-	if(!prop) return;
-
-	Object::Save(prop);
-
 	Log("Saving entity to ", prop);
 	prop->type = "entity";
 	prop->id = name;
@@ -583,11 +579,7 @@ Component* Entity::AddComponent(string type, Properties* prop)
 {
 	printf("Adding comp via string of type\n");
 	auto reg = Component::registry.Get(type);
-	if(!reg)
-	{
-		Log("Tried adding component that doesn't exist. Failed.");
-		return nullptr;
-	}
+	if(!reg) return nullptr;
 
 	auto val = reg->func;
 	Component* result = nullptr;
@@ -600,7 +592,7 @@ Component* Entity::AddComponent(string type, Properties* prop)
 	{
 		Log("Adding component");
 		result = (*val)();
-	//	result->owner = this;
+		result->owner = this;
 		if(result->initBeforeLoad)
 		{
 			AddComponent(result);
