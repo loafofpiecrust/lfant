@@ -131,9 +131,9 @@ void Rigidbody::Init()
 
 	body->getWorldTransform().setOrigin(vec3_cast<btVector3>(owner->transform->GetPosition()));
 	body->forceActivationState(DISABLE_DEACTIVATION);
-	body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
+//	body->setCollisionFlags(body->getCollisionFlags() /*| btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK*/);
 	Log("Rigidbody is trigger? ", IsTrigger());
-	SetTrigger(IsTrigger());
+	if(IsTrigger()) SetTrigger(true);
 }
 
 void Rigidbody::Update()
@@ -184,17 +184,17 @@ void Rigidbody::OnSetPos( vec3 pos )
 	body->getWorldTransform().setOrigin(vec3_cast<btVector3>(pos));
 }
 
-void Rigidbody::OnSetRot( vec3 rot )
+void Rigidbody::OnSetRot( quat rot )
 {/*
-//	Log("Setting rot");
 	btQuaternion q = quat_cast<btQuaternion>(quat(radians(rot)));
 	if(q == body->getWorldTransform().getRotation())
 	{
 		return;
 	}
 	body->getWorldTransform().setRotation(q);*/
-	rot = radians(rot);
-	body->getWorldTransform().setRotation(quat_cast<btQuaternion>(quat(rot)));
+//	Log("Setting rot");
+//	rot = radians(rot);
+	body->getWorldTransform().setRotation(quat_cast<btQuaternion>(rot));
 }
 
 /*******************************************************************************

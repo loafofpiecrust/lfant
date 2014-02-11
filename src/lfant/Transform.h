@@ -61,6 +61,7 @@ public:
 
 	void Translate(vec3 pos);
 	void Rotate(vec3 rot);
+	void Rotate(vec3 axis, float value);
 	void Scale(vec3 scl);
 
 	void SetDirection();
@@ -87,6 +88,7 @@ protected:
 
 	Transform* parent = nullptr;
 	bool updateMatrix = false;
+	u8vec3 rotOrder {2,0,1};
 
 
 private:

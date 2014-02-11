@@ -32,6 +32,25 @@ input
 		positive = M
 		negative = N
 	}
+
+	// Object Rotational axes
+	axis VRotation2
+	{
+		positive = i
+		negative = k
+	}
+	
+	axis HRotation2
+	{
+		positive = l
+		negative = j
+	}
+
+	axis ZRotation2
+	{
+		positive = o
+		negative = u
+	}
 	
 	// Misc Logging axes
 	axis ShowRot

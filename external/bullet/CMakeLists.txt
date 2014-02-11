@@ -36,3 +36,9 @@ add_library(${PROJECT_NAME} SHARED ${SRC_FILES} ${HEADER_FILES})
 include_directories(
 	"src"
 )
+
+if(PLATFORM STREQUAL "windows")
+target_link_libraries(${PROJECT_NAME}
+	stdc++
+)
+endif()

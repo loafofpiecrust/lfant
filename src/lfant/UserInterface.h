@@ -109,18 +109,18 @@ public:
 //	Movie* GetMovie(string name);
 
 #if !LFANT_GLES
-	
+
 	bool OnClickButton(const CEGUI::EventArgs &evt);
 	bool OnCloseWindow(const CEGUI::EventArgs &evt);
 
 	CEGUI::Window* rootWindow;
 
 protected:
-	
+
 	CEGUI::OpenGL3Renderer* renderer;
 	CEGUI::WindowManager* windowManager;
 	deque<CEGUI::Window*> windows;
-	CEGUI::System* system;
+	CEGUI::System* system = nullptr;
 	CEGUI::GUIContext* context;
 #endif
 

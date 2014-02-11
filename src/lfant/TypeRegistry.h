@@ -92,9 +92,14 @@ public:
 	template<typename C>
 	void Register(entryType* inst)
 	{
-		if(Get(inst->name))
+		for(uint i = 0; i < data.size(); ++i)
 		{
-			// do something?
+			if(data[i]->name == inst->name)
+			{
+				data[i] = inst;
+				inst->func = &TypeRegistry<T>::Create<C>;
+				return;
+			}
 		}
 		data.push_back(inst);
 		inst->func = &TypeRegistry<T>::Create<C>;
@@ -126,7 +131,7 @@ public:
 	}
 
 protected:
-	deque<RegistryEntryBase<T>*> data;
+	deque<entryType*> data;
 };
 
 }

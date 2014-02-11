@@ -10,6 +10,8 @@
 #include <lfant/Input.h>
 #include <lfant/util/lexical_cast.h>
 
+#include <editor/gui/Window.h>
+
 // external
 #include <wx/dcclient.h>
 
@@ -27,6 +29,8 @@ int shizargs[] = {
 GLCanvas::GLCanvas(wxFrame* parent, int id) :
 	wxGLCanvas(parent, id, shizargs, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE, "GLCanvas")
 {
+	window = (gui::Window*)parent;
+
 	context = new wxGLContext(this);
 	Connect(id, wxEVT_PAINT, (wxObjectEventFunction)&GLCanvas::OnPaint);
 	Connect(id, wxEVT_SIZE, (wxObjectEventFunction)&GLCanvas::OnResize);
@@ -81,7 +85,7 @@ void GLCanvas::Render(wxDC& dc)
 
 	game->scene->Render();
 	game->renderer->Update();
-	game->userInterface->Update();
+//	game->userInterface->Update();
 	SwapBuffers();
 	game->renderer->PreUpdate();
 

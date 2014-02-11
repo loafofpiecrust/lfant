@@ -1,15 +1,20 @@
 
 
 get_filename_component(ROOT "./" REALPATH)
+
 set(LFANT "${ROOT}")
 set(CMAKE_MODULE_PATH "${ROOT}/cmake")
 
-if(WIN32)
-include(extra/Platform/Windows-Clang-C)
-#set(CMAKE_TOOLCHAIN_FILE extra/toolchain/x86_64-windows-mingw-clang)
+if(WIN32 AND COMPILER STREQUAL "clang")
+	set(CMAKE_TOOLCHAIN_FILE ${ROOT}/cmake/extra/toolchain/x86_64-windows-mingw-clang.cmake)
 endif()
 
-include(CMakeExtraBootstrap)
+if(WIN32 AND COMPILER STREQUAL "clang")
+#	include(extra/Platform/Windows-Clang-C)
+#	set(CMAKE_SYSTEM_NAME Windows-Clang)
+endif()
+
+#include(CMakeExtraBootstrap)
 include(Config)
 
 if(PLATFORM STREQUAL "android")
@@ -17,33 +22,49 @@ if(PLATFORM STREQUAL "android")
 #	set(CMAKE_C_COMPILER "gcc")
 #	set(CMAKE_CXX_COMPILER "g++")
 else()
-#	if(UNIX)
+	if(UNIX)
 	set(CMAKE_C_COMPILER "clang")
 	set(CMAKE_CXX_COMPILER "clang++")
-#	endif()
+	endif()
 endif()
 
-if(PLATFORM STREQUAL "windows")
+cmake_minimum_required(VERSION 2.8)
+project(lfroot)
 
-#include(extra/toolchain/i686-windows-mingw-clang)
+if(PLATFORM STREQUAL "windows" AND CMAKE_C_COMPILER STREQUAL "clang")
 
-#if(CMAKE_C_COMPILER STREQUAL "clang")
 	message("Windows clang")
 
-	find_path(STDLIB_PATH libstdc++.a)
-	set(HACK_FLAGS "-L${MINGW}/lib -L${STDLIB_PATH} -lstdc++")
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${HACK_FLAGS}")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${HACK_FLAGS}")
+	find_library(MINGW_ARCH_DIR libglu32.a)
+	get_filename_component(MINGW_ARCH_DIR "${MINGW_ARCH_DIR}" PATH)
+	set(MINGW_ARCH_DIR "${MINGW_ARCH_DIR}/..")
 
-	include_directories("${MINGW}/include")
+	get_filename_component(MINGW_ROOT "${MINGW_ARCH_DIR}/.." REALPATH)
 
-#endif()
+	file(GLOB MINGW_VER_DIR "${MINGW_ROOT}/lib/gcc/*/*/libgcc.a")
+	get_filename_component(MINGW_VER_DIR "${MINGW_VER_DIR}" PATH)
+
+	message("root dir: ${MINGW_ROOT}, ver_dir: ${MINGW_VER_DIR}")
+
+	link_directories(
+		${MINGW_ARCH_DIR}/lib
+		${MINGW_ARCH_DIR}/lib32
+		${MINGW_VER_DIR}
+	)
+
+	include_directories(
+		${MINGW_ARCH_DIR}/include
+		${MINGW_ARCH_DIR}/include/c++
+	)
+
 endif()
 
 message("C++ flags: '${CMAKE_CXX_FLAGS}'")
 
-cmake_minimum_required(VERSION 2.8)
-project(lfroot)
+if(COMPILER STREQUAL "clang")
+	SET(CMAKE_STATIC_LIBRARY_PREFIX "lib")
+	SET(CMAKE_STATIC_LIBRARY_SUFFIX ".a")
+endif()
 
 option(BUILD_EXAMPLES "Should the examples be built?" ON)
 

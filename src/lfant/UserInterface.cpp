@@ -358,10 +358,13 @@ void UserInterface::Init()
 {
 	//	Subsystem::Init();
 
-	renderer = &CEGUI::OpenGL3Renderer::bootstrapSystem();
-	windowManager = CEGUI::WindowManager::getSingletonPtr();
-	system = CEGUI::System::getSingletonPtr();
-	context = &system->getDefaultGUIContext();
+	if(!system)
+	{
+		renderer = &CEGUI::OpenGL3Renderer::bootstrapSystem();
+		windowManager = CEGUI::WindowManager::getSingletonPtr();
+		system = CEGUI::System::getSingletonPtr();
+		context = &system->getDefaultGUIContext();
+	}
 
 	renderer->enableExtraStateSettings(true);
 
@@ -384,7 +387,10 @@ void UserInterface::Init()
 	CEGUI::WindowManager::setDefaultResourceGroup("layouts");
 	CEGUI::WidgetLookManager::setDefaultResourceGroup("looknfeel");
 
-	rootWindow = windowManager->createWindow("DefaultWindow", "Root");
+	if(!rootWindow)
+	{
+		rootWindow = windowManager->createWindow("DefaultWindow", "Root");
+	}
 	context->setRootWindow(rootWindow);
 
 	context->getMouseCursor().setInitialMousePosition(vec2_cast<CEGUI::Vector2f>((vec2)game->input->GetMousePos()));

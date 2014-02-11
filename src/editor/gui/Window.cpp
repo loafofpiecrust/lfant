@@ -8,11 +8,17 @@
 #include <lfant/Component.h>
 #include <lfant/Entity.h>
 #include <lfant/Scene.h>
+#include <lfant/Game.h>
+#include <lfant/FileSystem.h>
+
 #include <editor/gui/GLCanvas.h>
 #include <editor/gui/ValueGrid.h>
 #include <editor/gui/DirTree.h>
+#include <editor/gui/Inspector.h>
+#include <editor/gui/EntityTree.h>
 
 // External
+#include <string.h>
 #include <wx/wx.h>
 #include <wx/aui/aui.h>
 #include <wx/glcanvas.h>
@@ -23,6 +29,10 @@
 #include <wx/treebase.h>
 #include <wx/event.h>
 #include <wx/dirctrl.h>
+#include <wx/dirdlg.h>
+
+#include <boost/extension/shared_library.hpp>
+#include <boost/filesystem.hpp>
 
 namespace lfant {
 namespace editor {
@@ -31,6 +41,9 @@ namespace gui {
 //BEGIN_EVENT_TABLE(Window, wxFrame)
 //	EVT_BUTTON(Window::SaveCurrentEntity)
 //END_EVENT_TABLE()
+
+int Window::currId = 1;
+qumap<string, int> Window::ids;
 
 Window::Window(string title, Rect rect) :
 	wxFrame(0, -1, wxString(title), wxPoint(rect.x, rect.y), wxSize(rect.width, rect.height))
@@ -57,26 +70,36 @@ void Window::Init()
 	CreateStatusBar();
 	SetStatusText("Welcome to lfant!~");
 
-	menuBar = new wxMenuBar;
-	SetMenuBar(menuBar);
-	StartMenu("&File");
+	if(menuBar) menuBar->DestroyChildren();
+	else
 	{
-		AddMenuItem("File.NewProject", "New Project");
-		AddMenuItem("File.LoadProject", "Load Project...");
-		AddMenuItem("File.SaveProject", "Save Project");
+		menuBar = new wxMenuBar;
+		SetMenuBar(menuBar);
+		StartMenu("&File");
+		{
+			AddMenuItem("File.NewProject", "New Project");
+			AddMenuItem("File.LoadProject", "Load Project...", (wxObjectEventFunction)&Window::OnLoadProject);
+			AddMenuItem("File.SaveProject", "Save Project");
 
-		AddMenuSeparator();
+			AddMenuSeparator();
 
-		AddMenuItem("File.NewScene", "&New Scene");
-		AddMenuItem("File.LoadScene", "Load Scene...");
-		AddMenuItem("File.SaveScene", "&Save Scene");
+			AddMenuItem("File.NewScene", "&New Scene");
+			AddMenuItem("File.LoadScene", "Load Scene...");
+			AddMenuItem("File.SaveScene", "&Save Scene", (wxObjectEventFunction)&Window::SaveScene);
 
-		AddMenuSeparator();
+			AddMenuSeparator();
 
-		AddMenuItem("File.About", "About", (wxObjectEventFunction)&Window::OnAbout);
-		AddMenuItem("File.Quit", "E&xit", (wxObjectEventFunction)&Window::OnQuit);
+			AddMenuItem("File.About", "About", (wxObjectEventFunction)&Window::OnAbout);
+			AddMenuItem("File.Quit", "E&xit", (wxObjectEventFunction)&Window::OnQuit);
+		}
+		EndMenu();
+
+		if(!game)
+		{
+			Layout();
+			return;
+		}
 	}
-	EndMenu();
 
 	StartMenu("Edit");
 	{
@@ -96,6 +119,13 @@ void Window::Init()
 		AddMenuItem("Scene.AddEnt", "Add Entity");
 
 		wxFrame::Bind(wxEVT_COMMAND_MENU_SELECTED, &Window::AddEntity, this, GetId("Scene.AddEnt"));
+	}
+	EndMenu();
+
+	StartMenu("Entity");
+	{
+		AddMenuItem("Entity.Refresh", "Refresh", (wxObjectEventFunction)&Window::RefreshEntity);
+		AddMenuItem("Entity.AddComp", "Add Component", (wxObjectEventFunction)&Window::AddEntityComponent);
 	}
 	EndMenu();
 
@@ -142,7 +172,7 @@ void Window::Init()
 	StartAuiNotebook("notebook1", "", wxLEFT);
 	{
 	//	Log("Starting panel.");
-		StartPanel("panel1", "Inspector");
+		StartPanel("panel1", "EntityTreePanel");
 		{
 			GetLastWidget()->SetSize(50, 0);
 		//	Log("Starting box sizer.");
@@ -150,10 +180,10 @@ void Window::Init()
 			{
 			//	Log("Adding button.");
 			//	AddWidget(new wxButton(GetLastWidget(), GetId("btn1"), "Click Me!"));
-				tree = new wxTreeCtrl(GetLastWidget(), GetId("SceneTree"));
+				tree = new EntityTree(GetLastWidget(), GetId("SceneTree"));
 				AddWidget(tree, wxEXPAND, 1);
-
-				auto root = tree->AddRoot("scene");
+				tree->Init();
+			//	auto root = tree->AddRoot("scene");
 			}
 			EndWidget();
 		}
@@ -163,20 +193,16 @@ void Window::Init()
 
 	StartAuiNotebook("notebook2", "EntityStuff", wxRIGHT);
 	{
-	//	Log("Starting panel.");
-	//	StartPanel("panel2", "Viewport");
-		auto win = new wxScrolledWindow(GetLastWidget(), GetId("GridContainer"));
-		StartWidget(win);
+		StartPanel("panel2", "Entsstufs");
 		{
-			win->SetName("pagi");
-		//	Log("Starting box sizer.");
-		//	StartBoxSizer(Orient::Vertical);
+			GetLastWidget()->SetSize(50, 0);
+			StartBoxSizer(Orient::Vertical);
 			{
-		//		AddWidget(new wxButton(GetLastWidget(), GetId("Entity.SaveButton"), "Save"));
-				gridContSizer = StartBoxSizer(Orient::Vertical);
-				EndWidget();
+				inspector = new Inspector(tree, GetLastWidget(), GetId("Inspectorzz"));
+				AddWidget(inspector, wxEXPAND, 1);
+				inspector->Init();
 			}
-		//	EndWidget();
+			EndWidget();
 		}
 		EndWidget();
 	}
@@ -195,7 +221,7 @@ void Window::Init()
 		//	StartBoxSizer(Orient::Vertical);
 			{
 		//		AddWidget(new wxButton(GetLastWidget(), GetId("Entity.SaveButton"), "Save"));
-				gridContSizer = StartBoxSizer(Orient::Vertical);
+				StartBoxSizer(Orient::Vertical);
 				{
 					auto dirTree = new DirTree(GetLastWidget(), GetId("ProjectTree"), "/home/taylorsnead/piecrust/lfant/assets");
 					AddWidget(dirTree, wxEXPAND, 1);
@@ -214,76 +240,32 @@ void Window::Init()
 //	EndWidget();
 //	Log("Window created.");
 
-	Object::ConnectEvent(SENDER(game->scene, AddEntity), RECEIVER(this, FindAddEntityNode));
-	tree->Bind(wxEVT_COMMAND_TREE_ITEM_RIGHT_CLICK, &Window::SetCurrentEntity, this, tree->GetId());
+//	tree->Bind(wxEVT_COMMAND_TREE_ITEM_RIGHT_CLICK, &Window::SetCurrentEntity, this, tree->GetId());
+}
+
+void Window::Deinit()
+{
+	DestroyChildren();
 }
 
 void Window::AddEntity(wxCommandEvent& evt)
 {
-	game->scene->Spawn(currentEnt, "Entity");
+	game->scene->Spawn(inspector->GetEntity(), "Entity");
 }
 
-void Window::AddEntityNode(wxTreeItemId& parent, Entity* entity)
+string Window::ConvertString(const wxString& str)
 {
-	auto id = tree->AppendItem(parent, entity->name, -1, -1, (wxTreeItemData*)entity);
-	tree->SetItemHasChildren(id, true);
-	for(auto& child : entity->children)
+	string result = "";
+	for(uint i = 0; i < str.size(); ++i)
 	{
-		AddEntityNode(id, child);
+		result.push_back((char)str[i].GetValue());
 	}
-}
-
-void Window::FindAddEntityNode(Entity* entity)
-{
-	wxTreeItemId id = tree->GetRootItem();
-	if(!entity->parent)
-	{
-		AddEntityNode(id, entity);
-	}
-	else
-	{
-		void* vali = 0;
-		auto item = FindEntityInTree(id, entity->parent, vali);
-		if(item.IsOk())
-		{
-			AddEntityNode(item, entity);
-		}
-	}
-}
-
-wxTreeItemId Window::FindEntityInTree(Entity* entity)
-{
-	void* vali = 0;
-	return FindEntityInTree(tree->GetRootItem(), entity, vali);
-}
-
-wxTreeItemId Window::FindEntityInTree(wxTreeItemId parent, Entity* entity, void* vali)
-{
-	auto item = tree->GetFirstChild(parent, vali);
-	uint childCount = tree->GetChildrenCount(parent, false);
-	for(uint i = 0; i < childCount; ++i)
-	{
-		if(!item.IsOk()) break;
-
-		if((Entity*)tree->GetItemData(item) == entity)
-		{
-			return item;
-		}
-
-		void* vali2 = 0;
-		wxTreeItemId temp = FindEntityInTree(item, entity, vali2);
-		if(temp != item)
-		{
-			return temp;
-		}
-
-		item = tree->GetNextChild(parent, vali);
-	}
-	return parent;
+	return result;
 }
 
 void Window::ClearTree(wxTreeItemId id)
 {
+	if(!tree) return;
 	if(!id) id = tree->GetRootItem();
 
 	tree->SetItemData(id, nullptr);
@@ -303,148 +285,14 @@ void Window::ClearTree(wxTreeItemId id)
 	}
 }
 
-void Window::SaveCurrentEntity(wxCommandEvent& evt)
-{
-//	Log("Window::SaveCurrentEntity: Touch.");
-	if(!currentProp) { Log("Window::Save: invalid props"); return; }
-
-	Log("Window::Save: Touch.");
-	Log("Window::Save: prop ", currentProp);
-//	wxSizerItemList& sizerItems = gridContSizer->GetChildren();
-	for(uint i = 0; i < compGrids.size(); ++i)
-	{
-		auto grid = compGrids[i];
-		grid->ForceRefresh();
-
-		Log("Window::Save: prop child ", i, ": ", currentProp->children[i].get());
-		for(uint k = 0; k < grid->GetNumberRows(); ++k)
-		{
-			Log("Setting value '"+grid->GetCellValue(k, 0).ToStdString()+"' to '"+grid->GetCellValue(k, 1).ToStdString()+"'.");
-			currentProp->children[i]->Set(grid->GetCellValue(k, 0).ToStdString(), grid->GetCellValue(k, 1).ToStdString());
-		}
-	}
-	currentEnt->Load(currentProp);
-}
-
 wxWindow* Window::GetWidget(string name)
 {
 	return wxWindow::FindWindowById(GetId(name));
 }
 
-void Window::SetEntityValue(wxCommandEvent& evt)
-{
-//	Log("SetEntityValue: Touch.");
-	wxTextCtrl* win = (wxTextCtrl*)evt.GetEventObject();
-	if(win == GetWidget("Entity.name"))
-	{
-		currentEnt->SetName(win->GetLineText(0));
-		tree->SetItemText(FindEntityInTree(currentEnt), currentEnt->name);
-	}
-	else
-	{
-		currentProp->Set(win->GetName(), (string)win->GetLineText(0));
-	}
-}
-
-void Window::SetCurrentEntity(wxTreeEvent& evt)
-{
-	Log("Window::SetCurrentEntity: Touch.");
-
-	currentEnt = (Entity*)tree->GetItemData(evt.GetItem());
-	gridContSizer->Clear(true);
-	wxSizerItemList& sizerItems = gridContSizer->GetChildren();
-//	currentProp->children.clear();
-	if(currentProp) delete currentProp;
-	currentProp = new Properties();
-	Log("Change entity, new props: ", currentProp, "; vals: ", &(currentProp->values));
-	currentEnt->Save(currentProp);
-
-	compGrids.clear();
-
-	auto win = gridContSizer->GetContainingWindow();
-
-	auto saveBtn = new wxButton(win, GetId("Entity.SaveButton"), "Save");
-	gridContSizer->Add(saveBtn, 0, wxALL|wxEXPAND, 5);/*AddWidget((wxWindow*)gridContSizer, saveBtn);*/
-	saveBtn->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &Window::SaveCurrentEntity, this, saveBtn->GetId());
-
-	auto field = new wxTextCtrl(win, GetId("Entity.name"), "name", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER, wxDefaultValidator, "name");
-//	nameField->SetExtraStyle(wxTE_PROCESS_ENTER);
-	gridContSizer->Add(field, 0, wxALL|wxEXPAND, 5);
-	field->Bind(wxEVT_COMMAND_TEXT_ENTER, &Window::SetEntityValue, this, field->GetId());
-
-	for(uint i = 0; i < currentProp->values.size(); ++i)
-	{
-		string name = currentProp->values[i].first;
-		string value = currentProp->values[i].second;
-
-		auto field = new wxTextCtrl(win, GetId("Entity."+name), name, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER, wxDefaultValidator, name);
-	//	nameField->SetExtraStyle(wxTE_PROCESS_ENTER);
-		gridContSizer->Add(field, 0, wxALL|wxEXPAND, 5);
-		field->Bind(wxEVT_COMMAND_TEXT_ENTER, &Window::SetEntityValue, this, field->GetId());
-	}
-
-	for(uint i = 0; i < currentEnt->components.size(); ++i)
-	{
-	//	Log("Window::SetCurrentEntity: In the loop");
-		Component* comp = currentEnt->components[i];
-	//	wxSizerItem* item = nullptr;
-	//	if(i < sizerItems.size()) item = sizerItems[i];
-
-	//	Properties* prop = new Properties;
-	//	comp->Save(prop);
-	//	currentProp->AddChild(prop);
-		Properties* prop = currentProp->children[i];
-
-		string compName = type::Descope(type::Name(comp), "lfant");
-		auto coll = new wxCollapsiblePane(gridContSizer->GetContainingWindow(), GetId("Entity."+compName+".Pane"), compName);
-		gridContSizer->Add(coll, 0, wxALL|wxEXPAND, 5);
-
-		auto collSizer = new wxBoxSizer(wxVERTICAL);
-		auto grid = new ValueGrid(coll->GetPane(), GetId("Entity."+compName+".ValueGrid"));
-		collSizer->Add(grid, 1, wxALL|wxGROW|wxEXPAND, 2);
-		coll->GetPane()->SetSizer(collSizer);
-		collSizer->SetSizeHints(coll->GetPane());
-
-		grid->CreateGrid(prop->values.size(), 2);
-		for(uint i = 0; i < prop->values.size(); ++i)
-		{
-			grid->SetCellValue(i, 0, prop->values[i].first);
-			grid->SetReadOnly(i, 0);
-			grid->SetCellValue(i, 1, prop->values[i].second);
-		}
-		grid->EnableEditing(true);
-		grid->EnableGridLines(true);
-		grid->EnableDragColSize(false);
-		grid->EnableDragRowSize(false);
-		grid->HideColLabels();
-		grid->HideRowLabels();
-		grid->SetMargins( 0, 0 );
-		grid->SetDefaultCellAlignment( wxALIGN_LEFT, wxALIGN_TOP );
-		grid->AutoSizeRows();
-
-		Log("Grid ", i, " has default editor '", type::Name(grid->GetDefaultEditor()));
-
-		compGrids.push_back(grid);
-
-	/*	if(item)
-		{
-			gridContSizer->Replace(item->GetWindow(), grid);
-			item->GetWindow()->Destroy();
-		}
-		else*/
-		{
-		}
-	//	AddWidget((wxWindow*)gridContSizer, grid, wxEXPAND);
-	}
-	gridContSizer->Layout();
-//	gridContSizer->Fit(wxWindow::FindWindowById(GetId("GridContainer")));
-//	gridContSizer->GetContainingWindow()->Update();
-//	Layout();
-}
-
 void Window::Render()
 {
-	canvas->Paint();
+	if(canvas) canvas->Paint();
 }
 
 void Window::OnQuit(wxCommandEvent& event)
@@ -462,6 +310,75 @@ void Window::OnAbout(wxCommandEvent& event)
 //	game->renderer->Init();
 //	game->renderer->Update();
 //	canvas->SwapBuffers();
+}
+
+void Window::AddEntityComponent(wxCommandEvent& evt)
+{
+	wxTextEntryDialog dialog(nullptr, "Add Component");
+	if(dialog.ShowModal() == wxID_CANCEL) return;
+
+	string compType = ConvertString(dialog.GetValue());
+
+	if(inspector->GetEntity())
+		inspector->GetEntity()->AddComponent(compType);
+}
+
+void Window::RefreshEntity(wxCommandEvent& evt)
+{
+	inspector->tree = tree;
+	inspector->Refresh();
+}
+
+void Window::OnLoadProject(wxCommandEvent& event)
+{
+	wxFileDialog dialog(nullptr, "Choose project dir", "", "", "Shared Library (*.so)|*.so", wxFD_OPEN /*| wxFD_CHANGE_DIR*/ | wxFD_FILE_MUST_EXIST);
+
+	if(dialog.ShowModal() == wxID_CANCEL)
+	{
+		return;
+	}
+//	wxTextEntryDialog dialog(nullptr, "Project Path");
+//	wxString str = wxGetTextFromUser("Project Path");
+	wxString str = dialog.GetPath();
+	string projectPath = "";
+	for(int i = 0; i < str.size(); ++i)
+	{
+	//	cout << "char " << i << ": " << (char)str.at(i).GetValue() << "\n";
+		projectPath.push_back((char)str.at(i).GetValue());
+	}
+
+//	cout << "Trying to load path:" << dialog.GetPath() << ", dir:" << dialog.GetDirectory() << ", file:" << dialog.GetFilename() << "\n";
+	cout << "Trying to load: '" << projectPath << "'\n";
+
+	boost::extensions::shared_library lib(projectPath);
+	if(!lib.open())
+	{
+		cout << "Failed to load " << projectPath << ": '" << dlerror() << "\n";
+		return;
+	}
+	boost::function<void()> func = lib.get<void>("ResetInstance");
+	if(func)
+	{
+		cout << "Loading game...\n";
+		func();
+		game->standAlone = false;
+
+		boost::filesystem::path p(projectPath);
+		game->fileSystem->gameFolder = p.remove_filename().string()+"/../../..";
+		game->fileSystem->programFolder = p.remove_filename().string();
+
+		Deinit();
+		Init();
+	}
+	else
+	{
+		cout << "Couldn't launch game: " << dlerror() << "\n";
+	}
+}
+
+void Window::SaveScene(wxCommandEvent& event)
+{
+	game->scene->SaveFile(game->scene->currentFile);
 }
 
 int Window::GetId(string name)
@@ -506,7 +423,7 @@ wxAuiNotebook* Window::GetPane(string name)
 
 void Window::StartWidget(wxWindow* widget, int flags)
 {
-	AddWidget(widget, flags);
+	AddWidget(widget, flags, 1);
 	widgetStack.push_back(widget);
 }
 
@@ -634,12 +551,12 @@ wxBoxSizer* Window::StartBoxSizer(int orient)
 
 	if(wxSizer* sizerp = dynamic_cast<wxSizer*>(GetLastObject()))
 	{
-		sizerp->Add(sizer, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+		sizerp->Add(sizer, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxGROW, 5);
 	}
 	else
 	{
 		GetLastWidget()->SetSizer(sizer);
-		sizer->Fit(GetLastWidget());
+	//	sizer->Fit(GetLastWidget());
 		sizer->SetSizeHints(GetLastWidget());
 	}
 	widgetStack.push_back(sizer);

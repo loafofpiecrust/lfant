@@ -15,7 +15,7 @@
 namespace lfant {
 namespace editor {
 
-IMPLEMENT_TYPE(Component, Player)
+IMPLEMENT_TYPE(Component, editor::Player)
 
 void Player::Load(Properties* prop)
 {
@@ -36,6 +36,8 @@ void Player::Update()
 {
 	Component::Update();
 
+	Transform* cam = game->scene->mainCamera->GetOwner()->transform;
+
 	float value = 0.0f;
 	if((value = game->input->GetAxis("Horizontal")) != 0.0f)
 	{
@@ -48,21 +50,22 @@ void Player::Update()
 
 	if((value = game->input->GetAxis("HRotation")) != 0.0f)
 	{
-		TriggerEvent("Look", vec3(0, 0, value));
+		TriggerEvent("Look", vec3(0,0,1), value);
 	}
 	if((value = game->input->GetAxis("VRotation")) != 0.0f)
 	{
-		TriggerEvent("Look", vec3(-value, 0, 0));
+		TriggerEvent("Look", vec3(1,0,0), -value);
 	}
 	if((value = game->input->GetAxis("ZRotation")) != 0.0f)
 	{
-		TriggerEvent("Look", vec3(0, -value, 0));
+		TriggerEvent("Look", vec3(0,1,0), -value);
 	}
 
 	if(game->input->GetButtonDown("ShowFPS"))
 	{
 		Log("deltaTime: ", game->time->deltaTime);
 		Log("Game FPS: ", game->time->frameRate);
+		Log("Object events: ", Object::GetEventCount());
 	}
 
 	if (game->input->GetButtonDown("ShowLoc"))

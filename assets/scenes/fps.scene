@@ -90,6 +90,10 @@ scene scene
 			material = materials/Diffuse.mat
 		}
 
+		component Rotatable
+		{
+		}
+
 	/*	component BoxCollider
 		{
 		}

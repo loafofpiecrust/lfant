@@ -11,8 +11,9 @@
 
 namespace lfant {
 namespace editor {
-namespace gui
-{
+namespace gui {
+
+class Window;
 
 class GLCanvas : public wxGLCanvas
 {
@@ -36,6 +37,7 @@ protected:
 	void OnKey(wxKeyEvent& evt, int action);
 
 	ptr<wxGLContext> context = nullptr;
+	gui::Window* window = nullptr;
 	bool inited = false;
 private:
 };

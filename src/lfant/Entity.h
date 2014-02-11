@@ -33,13 +33,15 @@
 #include <lfant/Game.h>
 #include <lfant/ptr.h>
 #include <lfant/Properties.h>
+//#include <lfant/Component.h>
 
 namespace lfant {
 
 namespace editor {
 namespace gui
 {
-	class Window;
+	class Inspector;
+	class EntityTree;
 }
 }
 
@@ -70,7 +72,9 @@ bool EntityActive(Entity* ent);
  */
 class Entity : public Object
 {
-	friend class lfant::editor::gui::Window;
+	friend class lfant::editor::gui::Inspector;
+	friend class lfant::editor::gui::EntityTree;
+
 	friend class Scene;
 	friend class Component;
 	friend class Renderer;
@@ -125,12 +129,16 @@ public:
 	template<typename C>
 	C* GetComponent()
 	{
-		string type = type::Name<C>();
+	//	string type = type::Name<C>();
+		C* result = nullptr;
 		for(auto& comp : components)
 		{
-			if(type::Name(comp) == type)
+			result = dynamic_cast<C*>(comp.get());
+		//	if(type::Name(comp) == type || Component::registry)
+			if(result)
 			{
-				return dynamic_cast<C*>(comp.get());
+			//	return dynamic_cast<C*>(comp.get());
+				return result;
 			}
 		}
 		return nullptr;

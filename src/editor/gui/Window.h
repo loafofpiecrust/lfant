@@ -25,8 +25,14 @@ class wxGLContext;
 class wxGrid;
 
 namespace lfant {
+
+class Game;
+
 namespace editor {
 namespace gui {
+
+class Inspector;
+class EntityTree;
 
 class MenuIds
 {
@@ -50,18 +56,23 @@ public:
 
 class Window : public wxFrame, public lfant::Object
 {
+	friend class Inspector;
 public:
 
 	Window(string title, Rect rect);
 	virtual ~Window();
 
 	virtual void Init();
+	virtual void Deinit();
 	void Render();
 
 	void OnQuit(wxCommandEvent& event);
 	void OnAbout(wxCommandEvent& event);
+	void OnLoadProject(wxCommandEvent& event);
 
-	int GetId(string name = "");
+	void SaveScene(wxCommandEvent& event);
+
+	static int GetId(string name = "");
 	wxWindow* GetWidget(string name);
 	int AddId(string name);
 
@@ -93,30 +104,29 @@ protected:
 	wxTreeItemId FindEntityInTree(wxTreeItemId parent, Entity* entity, void* vali);
 	void ClearTree(wxTreeItemId id = 0);
 
-	void SetCurrentEntity(wxTreeEvent& evt);
-	void SaveCurrentEntity(wxCommandEvent& evt);
-	void SetEntityValue(wxCommandEvent& evt);
+	void AddEntityComponent(wxCommandEvent& evt);
+	void RefreshEntity(wxCommandEvent& evt);
 
 	void AddEntity(wxCommandEvent& evt);
 
-	qumap<string, int> ids;
-	int currId = 1;
-	wxAuiManager* manager;
+	static string ConvertString(const wxString& str);
+
+	void AddPropToGrid(wxWindow* parent, Properties* prop);
+
+	static qumap<string, int> ids;
+	static int currId;
+	wxAuiManager* manager = nullptr;
 	deque<wxAuiNotebook*> notebooks;
 
 	deque<wxObject*> widgetStack;
 	deque<wxMenu*> menuStack;
 
-	wxMenuBar* menuBar;
-	GLCanvas* canvas;
-	wxTreeCtrl* tree;
-//	ptr<wxGLContext> context;
+	wxMenuBar* menuBar = nullptr;
+	GLCanvas* canvas = nullptr;
 
-	Entity* currentEnt = nullptr;
-	Properties* currentProp = nullptr;
-	wxBoxSizer* gridContSizer = nullptr;
+	EntityTree* tree = nullptr;
+	Inspector* inspector = nullptr;
 
-	deque<wxGrid*> compGrids;
 
 private:
 //	DECLARE_EVENT_TABLE()

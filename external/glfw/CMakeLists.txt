@@ -27,6 +27,10 @@ if(PLATFORM STREQUAL "windows")
 		src/win32_*.c
 		)
 	list(APPEND SRC_FILES ${SRC_FILES_PLAT})
+	
+	add_definitions(
+		-DWIN32
+	)
 endif()
 
 if(PLATFORM STREQUAL "macosx")

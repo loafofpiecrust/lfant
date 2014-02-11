@@ -12,7 +12,7 @@ namespace editor {
 
 class Player : public Component
 {
-	DECLARE_TYPE(Component, Player)
+	DECLARE_TYPE(Component, editor::Player)
 public:
 
 	virtual void Load(Properties* prop);

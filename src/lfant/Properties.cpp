@@ -354,7 +354,7 @@ void Properties::LoadStream(istream& stream)
 		else
 		{
 			stream.seekg(-1, ios_base::cur);
-			
+
 		}
 
 		if((line[0] == '}' || stream.get() == '}'))
@@ -518,6 +518,11 @@ Properties* Properties::AddChild(istream& stream, string type, string id, bool f
 	c->LoadStream(stream);
 	children.push_back(c);
 	return c;
+}
+
+void Properties::Clear()
+{
+
 }
 
 void Properties::SkipSpace(istream &stream)

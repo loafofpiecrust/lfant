@@ -117,6 +117,8 @@ void Mesh::Init()
 		fbo->Unbind();
 	}
 
+	Log("Mesh init proceeding");
+
 /*	if(material->shader->GetId() == -1)
 	{
 		Log("Loading default shader.");
@@ -152,7 +154,7 @@ void Mesh::Init()
 	normalBuffer.Create(GL_ARRAY_BUFFER);
 	indexBuffer.Create(GL_ELEMENT_ARRAY_BUFFER);
 	*/
-	
+
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -185,19 +187,19 @@ void Mesh::Render()
 {
 	if(material->shader->GetId() == -1)
 	{
-		Log("Mesh render rejected (shader)");
+	//	Log("Mesh render rejected (shader)");
 		return;
 	}
 
 	if(material->texture->GetId() == -1)
 	{
-		Log("Mesh render rejected (texture)");
+	//	Log("Mesh render rejected (texture)");
 		return;
 	}
 
 	if(!loaded)
 	{
-		Log("Mesh render rejected (!loaded)");
+	//	Log("Mesh render rejected (!loaded)");
 		return;
 	}
 
@@ -275,15 +277,15 @@ uint32 Mesh::CreateBuffer(void* data, uint32 size, int target, int mode)
 
 void Mesh::LoadFile(string path)
 {
+	if(this->file == path && loaded)
+	{
+		Log("Mesh LoadFile rejected (the Mesh has already loaded this file)");
+		return;
+	}
+
 	if(!material->loaded)
 	{
 		material->LoadFile("materials/Diffuse.prop");
-	}
-	
-	if(this->file == path)
-	{
-		Log("Mesh LoadFile rejected");
-		return;
 	}
 
 	Log("Loading mesh file '"+path+"'.");
@@ -334,7 +336,7 @@ void Mesh::IndexVBO()
 	bool found = false;
 
 	Log("INDEXING VBO.");
-	
+
 	for(uint i = 0; i < vertexBuffer.size(); ++i)
 	{
 		for(uint k = 0; k < indexBuffer.size(); ++k)
@@ -355,7 +357,7 @@ void Mesh::IndexVBO()
 			indexBuffer.push_back(i);
 		}
 	}
-	
+
 	/*
 	for(uint i = 0; i < vertexBuffer.size(); ++i)
 	{

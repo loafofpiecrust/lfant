@@ -105,6 +105,8 @@ public:
 	 */
 	virtual void Load(Properties* prop);
 
+	virtual void LoadFile(string path);
+
 	void Clear();
 
 	/**
@@ -120,6 +122,7 @@ public:
 
 	Camera* mainCamera = nullptr;
 	string name = "Scene";
+	string currentFile = "";
 
 protected:
 

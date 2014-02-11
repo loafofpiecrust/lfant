@@ -28,6 +28,8 @@ public:
 	virtual void Update();
 	virtual void Deinit();
 
+	void LoadProject(string dir);
+
 
 protected:
 	ptr<gui::App> app;

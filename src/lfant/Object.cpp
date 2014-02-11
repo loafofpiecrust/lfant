@@ -43,6 +43,11 @@ Object::~Object()
 {
 }
 
+uint32_t Object::GetEventCount()
+{
+	return Object::events.size();
+}
+
 void Object::Init()
 {
 	Bind();
@@ -148,6 +153,85 @@ void Object::Bind()
 	inst.Func("LoadFile", &Object::LoadFile);
 	inst.Func("SaveFile", &Object::SaveFile);
 	*/
+}
+
+void Object::ConnectScriptEvent(Object* sender, string name, Sqrat::Object* receiver, Sqrat::Function* func)
+{
+	erase_all(name, " ");
+	name = type::Name(sender) + "::" + name + "()";
+	EventScript* con = nullptr;
+	for(auto& event : sender->events)
+	{
+		if(event->name == name)
+		{
+			con = dynamic_cast<EventScript*>(event.get());
+			if(con)
+			{
+				con->func = func;
+				con->obj = receiver;
+				return;
+			}
+		}
+	}
+	con = new EventScript(name, func, receiver);
+	sender->events.push_back(con);
+}
+
+bool Object::EventConnected(string name)
+{
+	erase_all(name, " ");
+	name = type::Name(this) + "::" + name;
+	for(auto& event : events)
+	{
+		if(event->name == name)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+void Object::SetTimer(string name, float time)
+{
+	erase_all(name, " ");
+//	name = type::Name(this) + "::" + name + "()";
+	for(auto& t : timers)
+	{
+		if(t->name == name)
+		{
+			t->time = time;
+			return;
+		}
+	}
+	timers.push_back(new Timer(name, time));
+}
+
+void Object::CancelTimer(string name)
+{
+	erase_all(name, " ");
+//	name = type::Name(this) + "::" + name + "()";
+	for(uint i = 0; i < timers.size(); ++i)
+	{
+		if(timers[i]->name == name)
+		{
+			timers.erase(timers.begin()+i);
+			return;
+		}
+	}
+}
+
+float* Object::GetTimer(string name)
+{
+	erase_all(name, " ");
+//	name = type::Name(this) + "::" + name + "()";
+	for(auto& t : timers)
+	{
+		if(t->name == name)
+		{
+			return &t->time;
+		}
+	}
+	return nullptr;
 }
 
 }

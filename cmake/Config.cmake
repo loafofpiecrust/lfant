@@ -3,7 +3,7 @@ message("Config file called")
 
 set(ARCH "x64")
 set(ARCH "x64" CACHE STRING "Architecture to build for. (x86/x64)")
-set(MINGW "C:\\MinGW\\x86_64-mingw32" CACHE STRING "Mingw folder")
+set(COMPILER "gcc" CACHE STRING "Compiler to use")
 
 #set(ANDROID_NDK_PATH "" CACHE STRING "Root path of your android ndk")
 set(ANDROID_TOOLCHAIN "" CACHE STRING "Toolchain name to use for android building")
@@ -76,8 +76,7 @@ set(CMAKE_CXX_FLAGS "${BASE_FLAGS} -std=gnu++11 -Wno-invalid-offsetof -g -Wno-ov
 
 # RPathing
 set(CMAKE_SKIP_BUILD_RPATH TRUE)
-set(CMAKE_SHARED_LINKER_FLAGS "-Wl,-rpath,'$ORIGIN' -Wl,-rpath,'$ORIGIN/lib' -Wl,-rpath-link,. -Wl,--no-undefined")
-#set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--no-undefined")
+set(CMAKE_SHARED_LINKER_FLAGS "-m${ARCH_OPTION} -Wl,-rpath,'$ORIGIN' -Wl,-rpath,'$ORIGIN/lib' -Wl,-rpath-link,. -Wl,--no-undefined")
 if(UNIX)
 	set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-z,origin -g")
 endif()

@@ -4,7 +4,7 @@ renderer Rend
 	// Window props
 	windowResizable = false
 	windowTitle = Galaga by lazyfox
-	windowPos = 40 x 40
+	windowPos = 600 x 40
 
 	// General
 	version = 4.2

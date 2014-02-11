@@ -12,7 +12,7 @@ namespace editor {
 
 class MouseLook : public Component
 {
-	DECLARE_TYPE(Component, MouseLook)
+	DECLARE_TYPE(Component, editor::MouseLook)
 public:
 	virtual void Load(Properties* prop);
 	virtual void Save(Properties* prop);
@@ -20,7 +20,7 @@ public:
 	virtual void Init();
 
 	void OnSetMousePos(ivec2 pos);
-	void Look(vec3 rot);
+	void Look(vec3 axis, float value);
 
 protected:
 	float lookSpeed = 0.01f;

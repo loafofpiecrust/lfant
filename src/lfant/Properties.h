@@ -72,6 +72,8 @@ public:
 	Properties* AddChild(string type = "", string id = "");
 	Properties* AddChild(istream& stream, string type, string id, bool first = true);
 
+	void Clear();
+
 	template<typename T>
 	void Set(string name, const T& value)
 	{

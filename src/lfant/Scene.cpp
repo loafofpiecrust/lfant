@@ -45,6 +45,11 @@ Scene::~Scene()
 void Scene::Init()
 {
 	Subsystem::Init();
+	if(game->defaultScene != "")
+	{
+		Log("About to load '"+game->defaultScene+"' as default.");
+		LoadFile(game->defaultScene);
+	}
 }
 
 void Scene::Update()
@@ -85,17 +90,16 @@ void Scene::FixedUpdate()
 void Scene::Deinit()
 {
 	Subsystem::Deinit();
+	Clear();
+}
+
+void Scene::Clear()
+{
 	for(auto& ent : entities)
 	{
 		Log("Scene::Destroy: Destroying ", ent->name);
 		ent->Deinit();
 	}
-//	entities.clear();
-}
-
-void Scene::Clear()
-{
-	Deinit();
 	entities.clear();
 }
 
@@ -225,6 +229,12 @@ void Scene::Load(Properties *prop)
 		ent->Load(i);
 	}
 	Log("Loading scene took ", game->time->GetTime() - t, " seconds");
+}
+
+void Scene::LoadFile(string path)
+{
+	Subsystem::LoadFile(path);
+	currentFile = path;
 }
 
 void Scene::AddEntity(Entity* ent)

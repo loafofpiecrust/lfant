@@ -162,7 +162,7 @@ protected:
 
 	// Slots
 	void OnSetPos(vec3 pos);
-	void OnSetRot(vec3 rot);
+	void OnSetRot(quat rot);
 	void OnSetScale(vec3 scale);
 	void OnSetMesh(Mesh* mesh);
 	void OnSetCollider(Collider* collider);

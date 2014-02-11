@@ -14,7 +14,7 @@
 namespace lfant {
 namespace editor {
 
-IMPLEMENT_TYPE(Component, Movement)
+IMPLEMENT_TYPE(Component, editor::Movement)
 
 void Movement::Load(Properties* prop)
 {

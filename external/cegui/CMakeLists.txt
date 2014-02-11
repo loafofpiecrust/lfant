@@ -111,12 +111,14 @@ include_directories(
 	
 add_definitions(
 	-DCEGUI_STATIC
+	-DGLM_FORCE_RADIANS
 	)
 
 target_link_libraries(${PROJECT_NAME}
 	glew
 	freetype
 	m
+	supc++
 	)
 
 if(PLATFORM STREQUAL "linux")

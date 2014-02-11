@@ -99,11 +99,8 @@ void Game::Init()
 //	audio->Init();
 	network->Init();
 	scriptSystem->Init();
-	userInterface->Init();
+	if(standAlone) userInterface->Init();
 	scene->Init();
-
-	Log("About to load '"+defaultScene+"' as default.");
-	if(defaultScene != "") scene->LoadFile(defaultScene);
 
 	Log("Window callback set.");
 
@@ -112,16 +109,20 @@ void Game::Init()
 
 void Game::Update()
 {
-	renderer->PreUpdate();
+	if(standAlone) renderer->PreUpdate();
+
 	time->Update();
 	scene->Update();
 	physics->Update();
 	input->Update();
 	network->Update();
-	
-	scene->Render();
-	renderer->Update();
-	userInterface->Update();
+
+	if(standAlone)
+	{
+		scene->Render();
+		renderer->Update();
+		userInterface->Update();
+	}
 }
 
 

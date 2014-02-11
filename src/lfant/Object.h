@@ -125,6 +125,7 @@ class Object
 	//				return true;
 				}
 			}
+			return false;
 		}
 
 		void Clear()
@@ -285,7 +286,7 @@ public:
 	static void ConnectEvent(Object* sender, string name, R* receiver, void (R::*func)(), bool dis = false)
 	{
 		erase_all(name, " ");
-		name = type::Name(sender) + "::" + name + "()";
+		name = name + "()";
 		for(auto& evt : Object::events)
 		{
 			if(evt->name == name && evt->sender == sender)
@@ -307,7 +308,7 @@ public:
 	static void ConnectEvent(Object* sender, string name, R* receiver, void (R::*func)(P1, P...), bool dis = false)
 	{
 		erase_all(name, " ");
-		name = type::Name<Object*>(sender) + "::" + name + "(" + type::Name<P1, P...>() + ")";
+		name = name + "(" + type::Name<P1, P...>() + ")";
 		for(auto& evt : Object::events)
 		{
 			if(evt->name == name && evt->sender == sender)
@@ -328,7 +329,6 @@ public:
 	template<typename C>
 	static void ClearEvent(string name)
 	{
-		name = type::Name<C>() + "::" + name;
 		for(auto& evt : events)
 		{
 			if(evt->name == name)
@@ -342,7 +342,7 @@ public:
 	static void ConnectEvent(Object* sender, string name, T* var)
 	{
 		erase_all(name, " ");
-		name = type::Name(sender) + "::" + name + "(" + type::Name<T>() + ")";
+		name = name + "(" + type::Name<T>() + ")";
 		EventVar<T>* con = nullptr;
 		for(auto& evt : Object::events)
 		{
@@ -363,7 +363,7 @@ public:
 	void TriggerEvent(string name)
 	{
 		erase_all(name, " ");
-		name = type::Name(this) + "::" + name + "()";
+		name = name + "()";
 		for(auto& evt : Object::events)
 		{
 			if(evt->sender == this && evt->name == name)
@@ -380,7 +380,7 @@ public:
 	void TriggerEvent(string name, P1 arg)
 	{
 		erase_all(name, " ");
-		name = type::Name(this) + "::" + name + "(" + type::Name<P1>() + ")";
+		name = name + "(" + type::Name<P1>() + ")";
 		for(auto& evt : Object::events)
 		{
 			if(evt->sender == this && evt->name == name)
@@ -408,7 +408,7 @@ public:
 	void TriggerEvent(string name, P1 arg1, P... args)
 	{
 		erase_all(name, " ");
-		name = type::Name(this) + "::" + name + "(" + type::Name<P1, P...>() + ")";
+		name = name + "(" + type::Name<P1, P...>() + ")";
 		for(auto& evt : Object::events)
 		{
 			if(evt->sender == this && evt->name == name)
@@ -462,62 +462,11 @@ public:
 	}
 */
 
-	bool EventConnected(string name)
-	{
-		erase_all(name, " ");
-		name = type::Name(this) + "::" + name;
-		for(auto& event : events)
-		{
-			if(event->name == name)
-			{
-				return true;
-			}
-		}
-		return false;
-	}
+	bool EventConnected(string name);
 
-	void SetTimer(string name, float time)
-	{
-		erase_all(name, " ");
-	//	name = type::Name(this) + "::" + name + "()";
-		for(auto& t : timers)
-		{
-			if(t->name == name)
-			{
-				t->time = time;
-				return;
-			}
-		}
-		timers.push_back(new Timer(name, time));
-	}
-
-	void CancelTimer(string name)
-	{
-		erase_all(name, " ");
-	//	name = type::Name(this) + "::" + name + "()";
-		for(uint i = 0; i < timers.size(); ++i)
-		{
-			if(timers[i]->name == name)
-			{
-				timers.erase(timers.begin()+i);
-				return;
-			}
-		}
-	}
-
-	float* GetTimer(string name)
-	{
-		erase_all(name, " ");
-	//	name = type::Name(this) + "::" + name + "()";
-		for(auto& t : timers)
-		{
-			if(t->name == name)
-			{
-				return &t->time;
-			}
-		}
-		return nullptr;
-	}
+	void SetTimer(string name, float time);
+	void CancelTimer(string name);
+	float* GetTimer(string name);
 
 	/**
 	 *	Called when the object is initialised. Used instead of
@@ -554,31 +503,13 @@ protected:
 	 */
 	virtual void Deinit();
 
+	static uint32_t GetEventCount();
+
 	bool initBeforeLoad = false;
 
 private:
 	// For scripts
-	void ConnectScriptEvent(Object* sender, string name, Sqrat::Object* receiver, Sqrat::Function* func)
-	{
-		erase_all(name, " ");
-		name = type::Name(sender) + "::" + name + "()";
-		EventScript* con = nullptr;
-		for(auto& event : sender->events)
-		{
-			if(event->name == name)
-			{
-				con = dynamic_cast<EventScript*>(event.get());
-				if(con)
-				{
-					con->func = func;
-					con->obj = receiver;
-					return;
-				}
-			}
-		}
-		con = new EventScript(name, func, receiver);
-		sender->events.push_back(con);
-	}
+	void ConnectScriptEvent(Object* sender, string name, Sqrat::Object* receiver, Sqrat::Function* func);
 
 	static deque<ptr<EventBase>> events;
 	deque<Timer*> timers;

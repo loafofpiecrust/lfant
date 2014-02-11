@@ -13,7 +13,7 @@
 namespace lfant {
 namespace editor {
 
-IMPLEMENT_TYPE(Component, MouseLook)
+IMPLEMENT_TYPE(Component, editor::MouseLook)
 
 void MouseLook::Save(Properties* prop)
 {
@@ -37,19 +37,19 @@ void MouseLook::Init()
 	ConnectEvent(SENDER(owner, Look), RECEIVER(this, Look));
 }
 
-void MouseLook::Look(vec3 rot)
+void MouseLook::Look(vec3 axis, float value)
 {
-	if(owner->GetParent())
+/*	if(owner->GetParent())
 	{
-		owner->GetParent()->transform->Rotate(radians(vec3(0,0,rot.z) * lookSpeed * game->time->deltaTime));
-		owner->transform->Rotate(radians(vec3(rot.x,rot.y,0) * lookSpeed * game->time->deltaTime));
+		owner->transform->Rotate(vec3(0,0,rot.z) * lookSpeed * game->time->deltaTime);
+		owner->transform->Rotate(vec3(rot.x,rot.y,0) * lookSpeed * game->time->deltaTime);
 
 	//	Log("Parent rot: ", lexical_cast<string>(owner->GetParent()->transform->GetWorldRotation()));
 	//	Log("Camera rot: ", lexical_cast<string>(owner->transform->GetWorldRotation()));
 	}
-	else
+	else*/
 	{
-		owner->transform->Rotate(radians(rot * lookSpeed * game->time->deltaTime));
+		owner->transform->Rotate(axis, value * lookSpeed * game->time->deltaTime);
 	}
 
 }
@@ -58,7 +58,9 @@ void MouseLook::OnSetMousePos(ivec2 pos)
 {
 	ivec2 mousePos = pos-lastMouse;
 	ivec2 screenCenter = game->renderer->GetResolution()/2;
-	Look(vec3(mousePos.y, -mousePos.x, 0));
+	Look({1,0,0}, mousePos.y);
+	Look({0,0,1}, -mousePos.x);
+//	Look(vec3(mousePos.y, -mousePos.x, 0));
 //	if(pos.x )
 #if !ANDROID
 	game->input->SetMousePos(screenCenter);

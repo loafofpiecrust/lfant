@@ -58,7 +58,7 @@ void Editor::Init()
 //	app->OnInit();
 //	app->OnRun();
 //	app->OnExit();
-	
+
 	Log("Loading other stuff.");
 
 	fileSystem->Init();
@@ -102,6 +102,17 @@ void Editor::Update()
 void Editor::Deinit()
 {
 	Game::Deinit();
+}
+
+void Editor::LoadProject(string dir)
+{
+	Deinit();
+	fileSystem->gameFolder = dir;
+	fileSystem->programFolder = dir+"/bin/x64/linux";
+
+	LoadFile("settings/game.prop");
+	fileSystem->Init();
+	scene->Init();
 }
 
 }

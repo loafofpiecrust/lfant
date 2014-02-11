@@ -97,18 +97,18 @@ void Transform::SetPosition(vec3 pos)
 
 quat Transform::GetRotationQuat()
 {
-//	vec3 rot = radians(vec3(rotation.x+180, -rotation.y, -(rotation.z+180)));
-	vec3 rot = vec3(rotation.x, rotation.y, -(rotation.z+180));
-	return quat(rot);
-//	return quat(radians(rotation));
+//	vec3 rot = vec3(rotation.x, rotation.y, -(rotation.z));
+//	return quat(rot); // radians
+//	return quat(radians(rot)); // degrees
+	return rotationQuat;
 }
 
 void Transform::SetRotationQuat(quat rot)
 {
-//	rotationQuat = rot;
-//	rotation = degrees(eulerAngles(rot));
-//	TriggerEvent("SetRotation", rotation);
-	SetRotation(eulerAngles(rot));
+//	SetRotation(eulerAngles(rot)); // radians
+//	SetRotation(degrees(eulerAngles(rot))); // degrees
+	rotationQuat = rot;
+	rotation = degrees(eulerAngles(rot));
 	TriggerEvent("OnSetRotation", rot);
 }
 
@@ -119,16 +119,18 @@ vec3 Transform::GetRotation()
 
 void Transform::SetRotation(vec3 rot)
 {
-	float cap = radians(360.0f);
+//	float cap = radians(360.0f); // radians
+	float cap = 360.0f; // degrees
 	rollover(rot.x, 0.0f, cap);
 	rollover(rot.y, 0.0f, cap);
 	rollover(rot.z, 0.0f, cap);
 
 	rotation = rot;
-//	rotationQuat = quat(rotation);
+	rotationQuat = quat(radians(rotation));
 //	Log("Setting rotation to ", lexical_cast<string>(rotation));
 
 	TriggerEvent("OnSetRotation", rot);
+	TriggerEvent("OnSetRotation", rotationQuat);
 //	TriggerEvent("SetRotation", rotationQuat);
 }
 
@@ -187,7 +189,7 @@ void Transform::SetWorldRotationQuat(quat rot)
 {
 	if(owner->GetParent())
 	{
-		SetRotation(eulerAngles(rot) - owner->GetParent()->transform->GetWorldRotation());
+		SetRotation(degrees(eulerAngles(rot)) - owner->GetParent()->transform->GetWorldRotation());
 	}
 	else
 	{
@@ -267,7 +269,7 @@ void Transform::SetMatrix()
 //	vec3 pos = vec3(-position.x, position.y, position.z);
 	vec3 pos = GetPosition();
 	quat rot = GetRotationQuat();
-//	vec3 rot = vec3(rotation.x, -rotation.y, -rotation.z);
+//	vec3 rot = radians(GetRotation());
 //	matrix = mat4(1);
 
 	if(owner->GetParent())
@@ -289,9 +291,9 @@ void Transform::SetMatrix()
 
 //	if(rot != vec3(0))
 	{
-	//	matrix = glm::rotate(matrix, rot.y, vec3(0,1,0));
-	//	matrix = glm::rotate(matrix, rot.z, vec3(0,0,1));
-	//	matrix = glm::rotate(matrix, rot.x, vec3(1,0,0));
+	/*	matrix = glm::rotate(matrix, rot.y, vec3(0,1,0));
+		matrix = glm::rotate(matrix, rot.z, vec3(0,0,1));
+		matrix = glm::rotate(matrix, rot.x, vec3(1,0,0));*/
 		matrix *= mat4_cast(rot);
 	}
 
@@ -359,15 +361,26 @@ void Transform::Translate(vec3 pos)
 	SetPosition(GetPosition() + pos);
 }
 
+/// @todo Switch fully to quaternions
 void Transform::Rotate(vec3 rot)
 {
-	SetRotation(GetRotation() + rot);
+//	SetRotation(GetRotation() + rot);
+
+	Rotate({1,0,0}, rot.x);
+	Rotate({0,1,0}, rot.y);
+	Rotate({0,0,1}, rot.z);
 
 	//rotationQuat = quat(rotation);
 	//_rotationQuat = rotate( _rotationQuat, rot.x, xdir );
 	//_rotationQuat = rotate( _rotationQuat, rot.y, ydir );
 	//_rotationQuat = rotate( _rotationQuat, rot.z, zdir );
 //	TriggerEvent("SetRotation", rotation);
+}
+
+void Transform::Rotate(vec3 axis, float value)
+{
+	rotationQuat = glm::rotate(rotationQuat, radians(value), axis);
+	rotation = eulerAngles(rotationQuat);
 }
 
 void Transform::Scale(vec3 scl)
@@ -384,7 +397,7 @@ vec3 Transform::GetDirection()
 
 vec3 Transform::GetRight()
 {
-	return /*-*/vec3(matrix[0].xyz());
+	return -vec3(matrix[0].xyz());
 }
 
 vec3 Transform::GetUp()
