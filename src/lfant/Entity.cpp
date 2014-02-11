@@ -283,7 +283,7 @@ Component* Entity::GetComponent(string name)
 		{
 			return comp;
 		}
-		auto reg = Component::registry.Get(name);
+		auto reg = typeRegistry.Get("Component", name);
 		if(reg && reg->Inherits(type))
 		{
 			return comp;
@@ -578,7 +578,7 @@ Component *Entity::AddComponent(string type)
 Component* Entity::AddComponent(string type, Properties* prop)
 {
 	printf("Adding comp via string of type\n");
-	auto reg = Component::registry.Get(type);
+	auto reg = typeRegistry.Get("Component", type);
 	if(!reg) return nullptr;
 
 	auto val = reg->func;

@@ -7,9 +7,9 @@ set(CMAKE_MODULE_PATH "${ROOT}/cmake")
 if(WIN32)
 include(extra/Platform/Windows-Clang-C)
 #set(CMAKE_TOOLCHAIN_FILE extra/toolchain/x86_64-windows-mingw-clang)
+include(CMakeExtraBootstrap)
 endif()
 
-include(CMakeExtraBootstrap)
 include(Config)
 
 if(PLATFORM STREQUAL "android")

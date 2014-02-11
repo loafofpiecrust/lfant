@@ -9,11 +9,10 @@
 
 namespace lfant {
 
-template<typename T>
 class RegistryEntryBase
 {
 public:
-	typedef T*(*funcType)();
+	typedef Object*(*funcType)();
 
 	bool Inherits(string super, bool recursive = true)
 	{
@@ -40,30 +39,31 @@ public:
 		}
 		return false;
 	}
-
-	string typeName = "";
-	string name = "";
+	
+	string typeName;
 	RegistryEntryBase* parent = nullptr;
 	funcType func;
+};
+
+template<typename C>
+class RegistryEntry : public RegistryEntryBase 
+{ 
+public:
+	RegistryEntry(string base, string name, string parent = "") { 
+		if(parent != "") this->parent = registry.Get(parent); 
+		this->typeName = type::Name<C>();
+		regType::registry.Register<C>(base, name, this); 
+	} 
+	regType* New(string name) {
+		return registry.New(name);
+	}
 };
 
 #define DECLARE_REGISTRY(regType) \
 	public:\
 	static TypeRegistry<regType> registry; \
 	template<typename C> \
-	class RegistryEntry : public RegistryEntryBase<regType> \
-	{ \
-	public:\
-		RegistryEntry(string name, string parent = "") { \
-			if(parent != "") this->parent = regType::registry.Get(parent); \
-			this->typeName = type::Name<C>(); \
-			this->name = name; \
-			regType::registry.Register<C>(this); \
-		} \
-	};\
-	regType* New(string name) {\
-		return registry.New(name);\
-	}
+	
 
 #define IMPLEMENT_REGISTRY(type) TypeRegistry<type> type::registry __attribute__((init_priority(101)));
 
@@ -71,39 +71,37 @@ public:
 	static const parent::RegistryEntry<type> _registryEntry;
 
 #define IMPLEMENT_TYPE(parent, type) \
-	const parent::RegistryEntry<type> type::_registryEntry {#type};
+	const RegistryEntry<type> type::_registryEntry {#parent, #type};
 
 #define IMPLEMENT_SUBTYPE(parent, type, super) \
-	const parent::RegistryEntry<type> type::_registryEntry {#type, #super};
+	const RegistryEntry<type> type::_registryEntry {#parent, #type, #super};
 
-template<typename T>
 class TypeRegistry
 {
 public:
-	typedef T*(*funcType)();
-	typedef RegistryEntryBase<T> entryType;
+	typedef Object*(*funcType)();
+	typedef RegistryEntryBase entryType;
 
 	template<typename C>
-	static T* Create()
+	static C* Create()
 	{
 		return new C();
 	}
 
 	template<typename C>
-	void Register(entryType* inst)
+	void Register(string base, string name, entryType* inst)
 	{
-		if(Get(inst->name))
+		if(Get(base, name))
 		{
 			// do something?
 		}
-		data.push_back(inst);
-		inst->func = &TypeRegistry<T>::Create<C>;
+		data[{base, name}] = inst;
+		inst->func = &TypeRegistry::Create<C>;
 	}
 
-	entryType* Get(string name)
+	entryType* Get(string base, string name)
 	{
-		to_lower(name);
-		for(auto& entry : data)
+	/*	for(auto& entry : data)
 		{
 			string entryName = entry->name; to_lower(entryName);
 			string entryType = entry->typeName; to_lower(entryType);
@@ -111,13 +109,13 @@ public:
 			{
 				return entry;
 			}
-		}
-		return nullptr;
+		}*/
+		return data[{base, name}];
 	}
 
-	T* New(string name)
+	Object* New(string base, string name)
 	{
-		funcType f = Get(name)->func;
+		funcType f = Get(base, name)->func;
 		if(f)
 		{
 			return f();
@@ -126,7 +124,9 @@ public:
 	}
 
 protected:
-	deque<RegistryEntryBase<T>*> data;
+	unordered_map<pair<string, string>, RegistryEntryBase<T>*> data;
 };
+
+TypeRegistry typeRegistry;
 
 }

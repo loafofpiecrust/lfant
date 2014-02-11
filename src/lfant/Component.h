@@ -61,6 +61,7 @@ public:
 
 //	virtual Component& operator=(const Component& other);
 
+	/// @todo Remove or fix Clone()
 	virtual Component* Clone(Entity* owner) const;
 	void Clone(Component* comp, Entity* owner) const;
 
@@ -68,7 +69,8 @@ public:
 	virtual void Save(Properties* prop) const;
 
 	virtual void Destroy() final;
-
+	
+	/// @todo Rename Bind() to something clearer
 	static void Bind() __attribute__((constructor));
 
 	/**
@@ -101,6 +103,7 @@ protected:
 
 	virtual void TriggerEvent(string name) final;
 
+	// @todo Centralize these special TriggerEvent() overloads
 	template<typename... P>
 	void TriggerEvent(string name, P... args)
 	{
@@ -138,9 +141,6 @@ protected:
 	}
 
 private:
-
-//	static TypeRegistry<Component> registry;
-
 	/// Whether this component should Update or not.
 	bool enabled = true;
 };

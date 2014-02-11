@@ -2,7 +2,7 @@ project(wxwidgets)
 
 # Source Dir
 file(GLOB SRC_FILES
-	"src/aui/*.cpp"
+	src/aui/*.cpp
 	"src/common/*.cpp"
 	"src/common/extended.c"
 	"src/generic/*.cpp"
