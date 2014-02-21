@@ -62,7 +62,7 @@ void EntityTree::AppendItem(Entity* entity)
 
 wxTreeItemId EntityTree::GetItem(string name)
 {
-	return GetItem(game->scene->GetEntity(name));
+	return GetItem(game->scene->GetRoot()->GetChild(name, true));
 }
 
 wxTreeItemId EntityTree::GetItem(Entity *ent)

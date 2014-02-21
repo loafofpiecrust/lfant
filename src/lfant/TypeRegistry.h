@@ -4,102 +4,104 @@
 
 // internal
 #include <lfant/util/qumap.h>
+#include <lfant/TypeInfo.h>
 
 // external
+#include <unordered_map>
 
 namespace lfant {
 
-class RegistryEntryBase
-{
-public:
-	typedef Object*(*funcType)();
-
-	bool Inherits(string super, bool recursive = true)
-	{
-		if(!parent) return false;
-
-		if(!recursive)
-		{
-			return super == parent->name || super == parent->typeName;
-		}
-		else
-		{
-			RegistryEntryBase* superInst = parent;
-			while(superInst)
-			{
-				if(super == superInst->name || super == superInst->typeName)
-				{
-					return true;
-				}
-				else
-				{
-					superInst = superInst->parent;
-				}
-			}
-		}
-		return false;
-	}
-	
-	string typeName;
-	RegistryEntryBase* parent = nullptr;
-	funcType func;
-};
-
-template<typename C>
-class RegistryEntry : public RegistryEntryBase 
-{ 
-public:
-	RegistryEntry(string base, string name, string parent = "") { 
-		if(parent != "") this->parent = registry.Get(parent); 
-		this->typeName = type::Name<C>();
-		regType::registry.Register<C>(base, name, this); 
-	} 
-	regType* New(string name) {
-		return registry.New(name);
-	}
-};
 
 #define DECLARE_REGISTRY(regType) \
-	public:\
-	static TypeRegistry<regType> registry; \
-	template<typename C> \
-	
+public:\
+	static lfant::TypeRegistry<regType> typeRegistry;\
+public:\
+	static regType* NewFromString(string type) {\
+		return typeRegistry.New(type);\
+	}
 
-#define IMPLEMENT_REGISTRY(type) TypeRegistry<type> type::registry __attribute__((init_priority(101)));
-
-#define DECLARE_TYPE(parent, type) \
-	static const parent::RegistryEntry<type> _registryEntry;
+#define IMPLEMENT_REGISTRY(type) lfant::TypeRegistry<type> type::typeRegistry __attribute__((init_priority(101)));
 
 #define IMPLEMENT_TYPE(parent, type) \
-	const RegistryEntry<type> type::_registryEntry {#parent, #type};
+	static const lfant::TypeRegistry<parent>::Entry<type> type_registryEntry_ {parent::typeRegistry, #type};
 
 #define IMPLEMENT_SUBTYPE(parent, type, super) \
-	const RegistryEntry<type> type::_registryEntry {#parent, #type, #super};
+	static const lfant::TypeRegistry<parent>::Entry<type> type_registryEntry_ {parent::typeRegistry, #type, #super};
 
+template<typename BaseT>
 class TypeRegistry
 {
 public:
-	typedef Object*(*funcType)();
-	typedef RegistryEntryBase entryType;
+	typedef BaseT*(*funcType)();
+
+	class EntryBase
+	{
+	public:
+		typedef BaseT*(*funcType)();
+
+		bool Inherits(string super, bool recursive = true)
+		{
+			/// @todo Redo this?
+			if(!parent) return false;
+
+		/*	if(super == parent->name || super == parent->typeName)
+			{
+				return true;
+			}
+			else if(recursive)
+			{
+				return parent->Inherits(super, true);
+			}*/
+			return false;
+		}
+
+		string typeName;
+		EntryBase* parent = nullptr;
+		funcType func;
+
+	protected:
+
+		void SetFunc(funcType f)
+		{
+			func = f;
+		}
+	};
 
 	template<typename C>
-	static C* Create()
+	class Entry : public TypeRegistry<BaseT>::EntryBase
 	{
-		return new C();
-	}
+	public:
+		Entry(TypeRegistry<BaseT>& registry, string name, string parent = "")
+		{
+			if(parent != "") this->parent = registry.Get(parent);
+			this->typeName = type::Name<C>();
+			this->SetFunc((funcType)&Entry<C>::New);
+			registry.Register<C>(name, this);
+		}
+
+		static C* New()
+		{
+			return new C();
+		}
+	};
+
+	typedef EntryBase entryType;
 
 	template<typename C>
-	void Register(string base, string name, entryType* inst)
+	void Register(string name, entryType* inst)
 	{
-		if(Get(base, name))
+		entryType*& ref = data[name];
+		if(ref)
 		{
 			// do something?
 		}
-		data[{base, name}] = inst;
-		inst->func = &TypeRegistry::Create<C>;
+		else
+		{
+			ref = inst;
+		}
 	}
 
-	entryType* Get(string base, string name)
+	entryType* Get(string name)
 	{
 	/*	for(auto& entry : data)
 		{
@@ -110,12 +112,12 @@ public:
 				return entry;
 			}
 		}*/
-		return data[{base, name}];
+		return data[name];
 	}
 
-	Object* New(string base, string name)
+	BaseT* New(string name)
 	{
-		funcType f = Get(base, name)->func;
+		funcType f = Get(name)->func;
 		if(f)
 		{
 			return f();
@@ -124,9 +126,10 @@ public:
 	}
 
 protected:
-	unordered_map<pair<string, string>, RegistryEntryBase<T>*> data;
+	std::unordered_map<string, entryType*> data;
 };
 
-TypeRegistry typeRegistry;
+
+
 
 }

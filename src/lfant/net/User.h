@@ -19,7 +19,7 @@ namespace net {
 class User : public Object
 {
 	DECLARE_REGISTRY(net::User)
-	
+
 public:
 	virtual ~User();
 
@@ -53,8 +53,8 @@ protected:
 	virtual void OnGetData(string data, net::Connection* con);
 
 	bool started = false;
-	shared_ptr<asio::io_service> io {new asio::io_service};
-	deque<ptr<net::Connection>> connections;
+	std::shared_ptr<asio::io_service> io {new asio::io_service};
+	std::deque<ptr<net::Connection>> connections;
 
 private:
 };

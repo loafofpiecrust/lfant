@@ -1,22 +1,12 @@
-/******************************************************************************
-*
-*	LFANT Source
-*	Copyright (C) 2012-2013 by LazyFox Studios
+/*
+*	Copyright (C) 2013-2014, by loafofpiecrust
 *	Created: 2013-01-15 by Taylor Snead
 *
 *	Licensed under the Apache License, Version 2.0 (the "License");
 *	you may not use this file except in compliance with the License.
-*	You may obtain a copy of the License at
-*
-*	http://www.apache.org/licenses/LICENSE-2.0
-*
-*	Unless required by applicable law or agreed to in writing, software
-*	distributed under the License is distributed on an "AS IS" BASIS,
-*	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-*	See the License for the specific language governing permissions and
-*	limitations under the License.
-*
-******************************************************************************/
+*	You may obtain a copy of the License in the accompanying LICENSE file or at
+*		http://www.apache.org/licenses/LICENSE-2.0
+*/
 #include <lfant/Texture.h>
 
 // External
@@ -31,6 +21,8 @@
 #include <lfant/Console.h>
 #include <lfant/Thread.h>
 
+using namespace std;
+
 namespace lfant
 {
 
@@ -39,19 +31,19 @@ Texture* Texture::current;
 
 unsigned int unitFromIndex(unsigned int index)
 {
-    switch(index)
-    {
-        case 1: return GL_TEXTURE1;
-        case 2: return GL_TEXTURE2;
-        case 3: return GL_TEXTURE3;
-        case 4: return GL_TEXTURE4;
-        case 5: return GL_TEXTURE5;
-        case 6: return GL_TEXTURE6;
-        case 7: return GL_TEXTURE7;
-        case 8: return GL_TEXTURE8;
-        case 9: return GL_TEXTURE9;
-        default: return GL_TEXTURE0;
-    }
+	switch(index)
+	{
+		case 1: return GL_TEXTURE1;
+		case 2: return GL_TEXTURE2;
+		case 3: return GL_TEXTURE3;
+		case 4: return GL_TEXTURE4;
+		case 5: return GL_TEXTURE5;
+		case 6: return GL_TEXTURE6;
+		case 7: return GL_TEXTURE7;
+		case 8: return GL_TEXTURE8;
+		case 9: return GL_TEXTURE9;
+		default: return GL_TEXTURE0;
+	}
 }
 
 Texture::Texture() :
@@ -99,15 +91,18 @@ void Texture::SetFormat(Texture::Format input, Texture::Format output)
 
 void Texture::InitData(byte* data)
 {
+	Log("Texture::InitData(): {");
 	if(id == -1)
 	{
 		glGenTextures(1, &id);
 		Log("Generating tex id, ", id);
 	}
 	Bind();
-	
+
+	Log("glTexImage2D");
 	glTexImage2D(mode, 0, (uint)internalFormat, size.x, size.y, 0, (uint)format, (uint)dataType, data);
 
+	Log("glTexParameteri");
 	glTexParameteri(mode, GL_TEXTURE_MAG_FILTER, (uint)scaleFilter);
 	glTexParameteri(mode, GL_TEXTURE_MIN_FILTER, (uint)scaleFilter);
 
@@ -118,6 +113,7 @@ void Texture::InitData(byte* data)
 	}
 
 	Unbind();
+	Log("}");
 }
 
 void Texture::Deinit()
@@ -162,7 +158,7 @@ void Texture::LoadFile(string path, int mode)
 	}
 
 	path = game->fileSystem->GetGamePath(path).string();
- 
+
 	for(auto& tex : textures)
 	{
 		if(!tex)

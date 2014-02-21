@@ -1,22 +1,11 @@
-/******************************************************************************
-*
-*	LFANT Source
-*	Copyright (C) 2012-2013 by LazyFox Studios
-*	Created: 2012-07-17 by Taylor Snead
+/*
+*	Copyright (C) 2013-2014, by loafofpiecrust
 *
 *	Licensed under the Apache License, Version 2.0 (the "License");
 *	you may not use this file except in compliance with the License.
-*	You may obtain a copy of the License at
-*
-*	http://www.apache.org/licenses/LICENSE-2.0
-*
-*	Unless required by applicable law or agreed to in writing, software
-*	distributed under the License is distributed on an "AS IS" BASIS,
-*	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-*	See the License for the specific language governing permissions and
-*	limitations under the License.
-*
-******************************************************************************/
+*	You may obtain a copy of the License in the accompanying LICENSE file or at
+*		http://www.apache.org/licenses/LICENSE-2.0
+*/
 #pragma once
 #include <lfant/stdafx.h>
 
@@ -104,7 +93,7 @@ public:
 	void AddLight(Light* light);
 	void RemoveLight(Light* light);
 
-	void IndexArray(vector<vec3>& arr, vector<uint32_t>& idx);
+	void IndexArray(std::vector<vec3>& arr, std::vector<uint32_t>& idx);
 
 	void SetResolution(ivec2 res);
 	ivec2 GetResolution();
@@ -145,11 +134,11 @@ protected:
 	bool hideMouse = false;
 	bool windowResizable = false;
 
-	deque< ptr<Shader> > shaders;
+	std::deque<ptr<Shader>> shaders;
 
 	GLFWwindow* window;
 
-	deque<Light*> lights;
+	std::deque<Light*> lights;
 
 public:
 

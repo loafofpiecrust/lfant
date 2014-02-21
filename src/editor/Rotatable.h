@@ -11,7 +11,6 @@ namespace editor {
 
 class Rotatable : public Component
 {
-	DECLARE_TYPE(Component, editor::Rotatable)
 public:
 	Rotatable();
 

@@ -114,7 +114,7 @@ void Input::OnKeyPress(int key, int scancode, int action, int mods)
 	TriggerEvent("KeyPress", (uint16_t)key, action);
 	for(auto& axis : axes)
 	{
-		if(key == axis.positive || key == axis.positiveAlt)
+		if(key == axis.positive)
 		{
 			if(action == GLFW_PRESS)
 			{
@@ -149,7 +149,7 @@ void Input::OnKeyPress(int key, int scancode, int action, int mods)
 				}
 			}
 		}
-		else if(key == axis.negative || key == axis.negativeAlt)
+		else if(key == axis.negative)
 		{
 			if(action == GLFW_PRESS)
 			{
@@ -263,78 +263,64 @@ void Input::GetJoystickAxes()
 }
 
 
-void Input::AddAxis(string name, string positive, string negative, string altpos, string altneg, float sens, float dead, bool snap, byte joyNum)
+void Input::AddAxis(Axis axis)
 {
-	axes.push_back(Axis(name, Key[positive], Key[negative], Key[altpos], Key[altneg], sens, dead, snap, joyNum));
+	axes.push_back(axis);
 }
 
-float Input::GetAxis(string name) const
+Input::Axis* Input::GetAxis(string name) const
 {
 	for(auto& axis : axes)
 	{
 		if(axis.name == name)
 		{
-			/*
-			if (abs(axis.value) <= axis.dead)
-			{
-				return 0.0f;
-			}
-			*/
-			return axis.value;
+			return const_cast<Input::Axis*>(&axis);
 		}
 	}
-	return 0.0f;
+	return nullptr;
 }
 
 int8_t Input::GetButton(string name) const
 {
-	for(auto axis : axes)
+	Axis* axis = GetAxis(name);
+	if(!axis) return 0;
+
+	if(axis->value > axis->dead && axis->posHeld)
 	{
-		if(axis.name == name)
-		{
-			if(axis.value > axis.dead && axis.posHeld)
-			{
-				return 1;
-			}
-			if(axis.value < -axis.dead && axis.negHeld)
-			{
-				return -1;
-			}
-			return 0;
-		}
+		return 1;
 	}
-	return 0;
+	else if(axis->value < -axis->dead && axis->negHeld)
+	{
+		return -1;
+	}
+	else
+	{
+		return 0;
+	}
 }
 
 int8_t Input::GetButtonDown(string name) const
 {
-	for(auto& axis : axes)
+	Axis* axis = GetAxis(name);
+
+	if(!axis->down) return false;
+
+	if(axis->posHeld)
 	{
-		if(axis.name == name && axis.down != 0)
-		{
-			if(axis.posHeld)
-			{
-				return axis.down;
-			}
-			else if(axis.negHeld)
-			{
-				return -axis.down;
-			}
-		}
+		return axis->down;
 	}
-	return false;
+	else if(axis->negHeld)
+	{
+		return -axis->down;
+	}
 }
 
 int8_t Input::GetButtonUp(string name) const
 {
-	for(auto axis : axes)
-	{
-		if(axis.name == name)
-		{
-			return axis.up;
-		}
-	}
-	return false;
+	Axis* axis = GetAxis(name);
+	if(!axis) return 0;
+
+	return axis->up;
 }
 
 ivec2 Input::GetMousePos() const

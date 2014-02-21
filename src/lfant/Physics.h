@@ -1,22 +1,11 @@
-/******************************************************************************
-*
-*	LFANT Source
-*	Copyright (C) 2012-2013 by LazyFox Studios
-*	Created: 2012-07-29 by Taylor Snead
+/*
+*	Copyright (C) 2013-2014, by loafofpiecrust
 *
 *	Licensed under the Apache License, Version 2.0 (the "License");
 *	you may not use this file except in compliance with the License.
-*	You may obtain a copy of the License at
-*
+*	You may obtain a copy of the License in the accompanying LICENSE file or at
 *		http://www.apache.org/licenses/LICENSE-2.0
-*
-*	Unless required by applicable law or agreed to in writing, software
-*	distributed under the License is distributed on an "AS IS" BASIS,
-*	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-*	See the License for the specific language governing permissions and
-*	limitations under the License.
-*
-******************************************************************************/
+*/
 #pragma once
 
 // Internal
@@ -82,7 +71,7 @@ struct Collision
 {
 	Rigidbody* first = nullptr;
 	Rigidbody* second = nullptr;
-	deque<ContactPoint> contacts;
+	std::deque<ContactPoint> contacts;
 };
 
 /**
@@ -154,7 +143,7 @@ public:
 	 *	@param direction The direction to cast the ray.
 	 *	@param distance The distance to cast the ray. Defaults to infinity as 0.0f.
 	 */
-	deque<RaycastHit> RaycastAll(vec3 origin, vec3 direction, float distance = 0.0f);
+	std::deque<RaycastHit> RaycastAll(vec3 origin, vec3 direction, float distance = 0.0f);
 
 protected:
 	virtual void ApplyGravity()
@@ -180,10 +169,10 @@ private:
 	ptr<btConstraintSolver> solver;
 	ptr<btDefaultCollisionConfiguration> collisionConfig;
 
-	deque<Rigidbody*> bodies;
+	std::deque<Rigidbody*> bodies;
 //	ptr<physics::DebugRenderer> debugRenderer;
 
-	deque<GravPoint> gravityPoints;
+	std::deque<GravPoint> gravityPoints;
 //	vec3 initGravity = vec3(0, -9.81, 0);
 };
 

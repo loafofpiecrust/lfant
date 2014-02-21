@@ -33,6 +33,7 @@ include_directories(
 	${ROOT}/external/rocket/Include
 	${ROOT}/external/wxwidgets/include
 	${ROOT}/external/squirrel/include
+	${ROOT}/external/cajun
 	)
 
 add_definitions(

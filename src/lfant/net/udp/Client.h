@@ -20,7 +20,6 @@ namespace udp {
  */
 class Client : public net::User
 {
-	DECLARE_TYPE(net::User, net::udp::Client)
 public:
 	Client();
 	Client(asio::io_service& io);

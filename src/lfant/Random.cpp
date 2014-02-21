@@ -1,7 +1,5 @@
-/******************************************************************************
-*
-*	LFANT Source
-*	Copyright (C) 2012-2013 by LazyFox Studios
+/*
+*	Copyright (C) 2013-2014, by loafofpiecrust
 *	Created: 2012-08-04 by Taylor Snead
 *
 *	Licensed under the Apache License, Version 2.0 (the "License");
@@ -60,9 +58,9 @@ float Range(float min, float max)
 	return d(randfast);
 }
 
-rgba Range(rgba min, rgba max)
+u8vec4 Range(u8vec4 min, u8vec4 max)
 {
-	rgba result;
+	u8vec4 result;
 	result.r = Range(min.r, max.r);
 	result.g = Range(min.g, max.g);
 	result.b = Range(min.b, max.b);

@@ -22,7 +22,7 @@ public:
 	void Render();
 
 protected:
-	vector<btVector3> points;
+	std::vector<btVector3> points;
 
 	ptr<Material> material;
 	uint32_t pointBuffer = 0;

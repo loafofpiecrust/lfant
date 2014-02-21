@@ -1,29 +1,18 @@
-/******************************************************************************
-*
-*	LFANT Source
-*	Copyright (C) 2012-2013 by LazyFox Studios
-*	Created: 2012-07-23 by Taylor Snead
+/*
+*	Copyright (C) 2013-2014, by loafofpiecrust
 *
 *	Licensed under the Apache License, Version 2.0 (the "License");
 *	you may not use this file except in compliance with the License.
-*	You may obtain a copy of the License at
-*
+*	You may obtain a copy of the License in the accompanying LICENSE file or at
 *		http://www.apache.org/licenses/LICENSE-2.0
-*
-*	Unless required by applicable law or agreed to in writing, software
-*	distributed under the License is distributed on an "AS IS" BASIS,
-*	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-*	See the License for the specific language governing permissions and
-*	limitations under the License.
-*
-******************************************************************************/
+*/
 #pragma once
 #include <lfant/stdafx.h>
 
 // External
+#include <glm/mat4x4.hpp>
 
 // Internal
-
 #include <lfant/Component.h>
 #include <lfant/Range.h>
 #include <lfant/Rect.h>
@@ -38,11 +27,10 @@ namespace lfant
  */
 
 /**
- *	
+ *
  */
 class Camera : public Component
 {
-	DECLARE_TYPE(Component, Camera)
 	friend class Renderer;
 public:
 	Camera();
@@ -101,7 +89,7 @@ public:
 	};
 	Mode mode = Mode::Perspective;
 
-	// Include film size for DoF and part of FoV?	
+	// Include film size for DoF and part of FoV?
 //	float filmSize = 35.0f;
 	float focalLength = 35.0f;
 	float focalDepth = 6.6f;

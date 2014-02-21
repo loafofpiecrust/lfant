@@ -23,9 +23,9 @@
 
 // Internal
 #include <lfant/Console.h>
+#include <lfant/Audio.h>
 
 // External
-//#include <bass.h>
 #include <AL/al.h>
 #include <AL/alc.h>
 
@@ -49,17 +49,15 @@ void Audio::Init()
 	device = alcOpenDevice(0);
 	if(!device)
 	{
-		// failed to create
+	// failed to create
 	}
 
 	context = alcCreateContext(device, 0);
 	alcMakeContextCurrent(context);
 	if(!context)
 	{
-		// failed to create
+	// failed to create
 	}
-
-	
 }
 
 void Audio::Update()

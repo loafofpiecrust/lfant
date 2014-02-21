@@ -1,22 +1,11 @@
-/******************************************************************************
-*
-*	LFANT Source
-*	Copyright (C) 2012-2013 by LazyFox Studios
-*	Created: 2012-08-27 by Taylor Snead
+/*
+*	Copyright (C) 2013-2014, by loafofpiecrust
 *
 *	Licensed under the Apache License, Version 2.0 (the "License");
 *	you may not use this file except in compliance with the License.
-*	You may obtain a copy of the License at
-*
-*	http://www.apache.org/licenses/LICENSE-2.0
-*
-*	Unless required by applicable law or agreed to in writing, software
-*	distributed under the License is distributed on an "AS IS" BASIS,
-*	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-*	See the License for the specific language governing permissions and
-*	limitations under the License.
-*
-******************************************************************************/
+*	You may obtain a copy of the License in the accompanying LICENSE file or at
+*		http://www.apache.org/licenses/LICENSE-2.0
+*/
 #pragma once
 
 #include <lfant/stdafx.h>
@@ -28,10 +17,10 @@
 #include <boost/type_traits/is_fundamental.hpp>
 #include <boost/type_traits.hpp>
 
+
 // Internal
 
 #include <lfant/Subsystem.h>
-
 #include <lfant/Game.h>
 
 namespace lfant
@@ -82,8 +71,8 @@ public:
 
 	struct CommandDefault : public Command
 	{
-		typedef void (Console::* funcTypeRaw)(deque<string>);
-		typedef boost::function<void (deque<string>)> funcType;
+		typedef void (Console::* funcTypeRaw)(std::deque<string>);
+		typedef boost::function<void (std::deque<string>)> funcType;
 		funcType func;
 
 		CommandDefault(funcType func, string name, string help) :
@@ -125,12 +114,12 @@ public:
 	}
 
 	template<typename T = string>
-	auto LinePrint(T msg)->typename enable_if<boost::is_fundamental<T>::value || boost::is_pointer<T>::value || boost::is_same<string, T>::value, void>::type
+	auto LinePrint(T msg)->typename std::enable_if<boost::is_fundamental<T>::value || boost::is_pointer<T>::value || boost::is_same<string, T>::value, void>::type
 	{
 	//	logFile.open(logName, ios_base::app);
 	//	string strMsg = lexical_cast<string>(msg);
 		// Print to console window
-		cout << msg;
+		std::cout << msg;
 		// Append message to file
 		logFile << msg;
 
@@ -138,13 +127,13 @@ public:
 	}
 
 	template<typename T = string>
-	auto LinePrint(T msg)->typename enable_if<!boost::is_fundamental<T>::value && !boost::is_pointer<T>::value && !is_ptr<T>::value && !boost::is_same<string, T>::value, void>::type
+	auto LinePrint(T msg)->typename std::enable_if<!boost::is_fundamental<T>::value && !boost::is_pointer<T>::value && !is_ptr<T>::value && !boost::is_same<string, T>::value, void>::type
 	{
 		LinePrint(lexical_cast<string>(msg));
 	}
 
 	template<typename T>
-	auto LinePrint(const T& msg)->typename enable_if<is_ptr<T>::value, void>::type
+	auto LinePrint(const T& msg)->typename std::enable_if<is_ptr<T>::value, void>::type
 	{
 		LinePrint(msg.get());
 	}
@@ -154,7 +143,7 @@ public:
 
 	void RegisterVar(string name, float val, string help = "", bool readOnly = false);
 
-	bool CallCommand(string name, deque<string> args);
+	bool CallCommand(string name, std::deque<string> args);
 	bool CallCommand(string name);
 
 	Command* GetCommand(string name);
@@ -174,17 +163,17 @@ public:
 	void SetValue(string name, float value);
 
 	void CmdExit();
-	void CmdGetVar(deque<string> args);
-	void CmdSetVar(deque<string> args);
-	void CmdHelp(deque<string> args);
+	void CmdGetVar(std::deque<string> args);
+	void CmdSetVar(std::deque<string> args);
+	void CmdHelp(std::deque<string> args);
 
 protected:
 
 private:
-	deque<Command*> commands;
+	std::deque<Command*> commands;
 
 	string logName = "lfant.log";
-	ofstream logFile;
+	std::ofstream logFile;
 };
 
 template<typename T = const char*>
@@ -197,7 +186,7 @@ template<typename T, typename P, typename ... A>
 void Log(T msg, P msg2, A ... args)
 {
 	game->console->LinePrint(msg);
-	Log(msg2, args ...);
+	Log(msg2, args...);
 }
 
 /// @}

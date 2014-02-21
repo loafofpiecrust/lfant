@@ -10,17 +10,19 @@ file(GLOB SRC_FILES
 	"src/propgrid/*.cpp"
 #	"src/regex/*.c"
 	"src/ribbon/*.cpp"
+#	src/xml/*.cpp
 #	"src/richtext/*.cpp"
 #	"src/stc/*.cpp"
 #	"src/univ/*.cpp"
-#	"src/xml/*.cpp"
+#	src/unix/utilsx11.cpp
 	)
 
 if(PLATFORM STREQUAL "linux")
 	file(GLOB SRC_FILES_PLAT
 		"src/gtk/*.cpp"
-		"src/gtk/treeentry_gtk.c"
 		"src/unix/*.cpp"
+		"src/gtk/treeentry_gtk.c"
+	#	src/gtk/eggtrayicon.c
 		)
 	set(SRC_FILES ${SRC_FILES} ${SRC_FILES_PLAT})
 	#list(REMOVE_ITEM SRC_FILES
@@ -44,6 +46,8 @@ list(REMOVE_ITEM SRC_FILES
 	"${PROJECT_SOURCE_DIR}/src/common/fontmgrcmn.cpp"
 	"${PROJECT_SOURCE_DIR}/src/common/webview.cpp"
 	"${PROJECT_SOURCE_DIR}/src/common/dummy.cpp"
+	"${PROJECT_SOURCE_DIR}/src/common/regex.cpp"
+#	"${PROJECT_SOURCE_DIR}/src/common/debugrpt.cpp"
 #	"${PROJECT_SOURCE_DIR}/src/common/init.cpp"
 	"${PROJECT_SOURCE_DIR}/src/generic/regiong.cpp"
 	"${PROJECT_SOURCE_DIR}/src/gtk/webview_webkit.cpp"
@@ -53,6 +57,7 @@ list(REMOVE_ITEM SRC_FILES
 	"${PROJECT_SOURCE_DIR}/src/gtk/dcscreen.cpp"
 #	"${PROJECT_SOURCE_DIR}/src/unix/utilsunx.cpp"
 	"${PROJECT_SOURCE_DIR}/src/unix/snglinst.cpp"
+	"${PROJECT_SOURCE_DIR}/src/unix/net.cpp"
 #	${PROJECT_SOURCE_DIR}/src/unix/evtloopunix.cpp
 	"${PROJECT_SOURCE_DIR}/src/generic/statline.cpp"
 	"${PROJECT_SOURCE_DIR}/src/generic/notebook.cpp"
@@ -62,6 +67,7 @@ list(REMOVE_ITEM SRC_FILES
 	"${PROJECT_SOURCE_DIR}/src/generic/clrpickerg.cpp"
 	"${PROJECT_SOURCE_DIR}/src/generic/collpaneg.cpp"
 	"${PROJECT_SOURCE_DIR}/src/generic/timer.cpp"
+	"${PROJECT_SOURCE_DIR}/src/generic/dbgrptg.cpp"
 	)
 
 file(GLOB HEADER_FILES
@@ -79,8 +85,8 @@ link_directories(
 add_library(${PROJECT_NAME} SHARED ${SRC_FILES} ${HEADER_FILES})
 
 add_definitions(
-	-DwxUSE_GUI
-	-DwxUSE_BASE=1
+#	-DwxUSE_GUI
+#	-DwxUSE_BASE=1
 	-D__WX__
 #	-D__WXGTK__
 	-DSCI_LEXER
@@ -90,20 +96,38 @@ add_definitions(
 	-DPIC
 	-DWX_PRECOMP
 	-D_FILE_OFFSET_BITS=64
+	-DWX_NO_REGEX_ADVANCED
 	)
 
 include_directories(
-	"include"
-	"${ROOT}/external/jpeg"
-	"${ROOT}/external/png"
-	"${ROOT}/external/zlib"
+	include
+	src/tiff/libtiff
+	src/regex
+	${ROOT}/external/jpeg
+	${ROOT}/external/png
+	${ROOT}/external/zlib
+#	lib/wx/include/gtk2-unicode-3.0
 	)
 
 #set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -lXext -lX11")
 
+
+target_link_libraries(${PROJECT_NAME}
+	tiff
+	z
+	png
+	jpeg
+	glew
+)
+
 if(PLATFORM STREQUAL "linux")
 	include_directories(
-		"/usr/include/gtk-3.0"
+		/usr/include/gtk-3.0
+		/usr/include/gtk-3.0/unix-print
+		/usr/lib/x86_64-linux-gnu/gtk-3.0/include
+	#	/usr/include/gtk-2.0
+	#	/usr/lib/x86_64-linux-gnu/gtk-2.0/include
+	#	/usr/include/gtk-unix-print-3.0
 		"/usr/include/glib-2.0"
 		"/usr/lib/x86_64-linux-gnu/glib-2.0/include"
 		"/usr/include/pango-1.0"
@@ -117,20 +141,19 @@ if(PLATFORM STREQUAL "linux")
 		gtk-3
 	#	gtk-x11-2.0
 		gdk-3
+	#	gdk-x11-2.0
 		gdk_pixbuf-2.0
 		cairo
 		GL
 		GLU
 		X11
 		Xext
+		Xxf86vm
 		glib-2.0
 		pango-1.0
 		pangocairo-1.0
 		gobject-2.0
-		z
-		png
-		jpeg
-		glew
 		dl
+		SM
 		)
 endif()

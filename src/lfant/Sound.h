@@ -6,17 +6,19 @@
 #include <lfant/ptr.h>
 
 // external
+#include <vector>
 #include <fstream>
 
 namespace lfant {
 
 class AudioSource;
+class File;
 
 class Sound
 {
 	friend class AudioSource;
 public:
-	Sound(AudioSource* src, string name);
+	Sound(AudioSource* src, const std::shared_ptr<File>& file);
 	~Sound();
 
 	class Resource
@@ -36,7 +38,7 @@ public:
 		Stream(uint32_t& source, string path);
 
 		uint32_t bufferCount = 3;
-		vector<uint32_t> buffers;
+		std::vector<uint32_t> buffers;
 		uint16_t channelCount = 0;
 		uint32_t frequency = 0;
 		int32_t format = 0;
@@ -48,7 +50,7 @@ public:
 		void Seek(float time);
 
 	protected:
-		ifstream stream;
+		std::ifstream stream;
 		uint8_t* temp = (uint8_t*)malloc(4096);
 
 		uint32_t& source;

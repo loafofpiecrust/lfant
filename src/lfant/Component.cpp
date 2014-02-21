@@ -1,22 +1,12 @@
-/******************************************************************************
-*
-*	LFANT Source
-*	Copyright (C) 2012-2013 by LazyFox Studios
+/*
+*	Copyright (C) 2013-2014, by loafofpiecrust
 *	Created: 2012-07-20 by Taylor Snead
 *
 *	Licensed under the Apache License, Version 2.0 (the "License");
 *	you may not use this file except in compliance with the License.
-*	You may obtain a copy of the License at
-*
-*	http://www.apache.org/licenses/LICENSE-2.0
-*
-*	Unless required by applicable law or agreed to in writing, software
-*	distributed under the License is distributed on an "AS IS" BASIS,
-*	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-*	See the License for the specific language governing permissions and
-*	limitations under the License.
-*
-******************************************************************************/
+*	You may obtain a copy of the License in the accompanying LICENSE file or at
+*		http://www.apache.org/licenses/LICENSE-2.0
+*/
 
 
 #include <lfant/Component.h>
@@ -63,7 +53,8 @@ void Component::Clone(Component* comp, Entity* owner) const
 
 Component* Component::Clone(Entity* owner) const
 {
-	Component* comp = owner->AddComponent(type::Descope(type::Name(this), "lfant"));
+	Component* comp = Component::NewFromString(type::Descope(type::Name(this), "lfant"));
+	owner->AddComponent(comp);
 }
 
 void Component::Load(Properties* prop)
@@ -73,9 +64,13 @@ void Component::Load(Properties* prop)
 
 void Component::Save(Properties *prop) const
 {
-	prop->type = "component";
-	prop->id = type::Descope(type::Name(this));
+	/// @todo Implement Properties::SetName()
+//	prop->SetName("component");
+	prop->Set("type", type::Descope(type::Name(this)));
 	prop->Set("enabled", enabled);
+	
+	prop->LoadFile("suckit");
+	
 }
 
 void Component::Init()

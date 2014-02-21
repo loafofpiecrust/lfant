@@ -7,8 +7,11 @@
 #include <lfant/Console.h>
 
 // External
+#include <glm/gtx/quaternion.hpp>
 #include <boost/lexical_cast.hpp>
 #include <string>
+
+using namespace std;
 
 namespace lfant
 {
@@ -216,7 +219,13 @@ string cut_zeroes(string orig)
 template<>
 string lexical_cast<string, float>(const float& src)
 {
-	return cut_zeroes(to_string(src));
+	return cut_zeroes(std::to_string(src));
+}
+
+template<>
+string lexical_cast<string, double>(const double& src)
+{
+	return cut_zeroes(std::to_string(src));
 }
 
 template<>
@@ -253,7 +262,7 @@ string lexical_cast<string, vec4>(const vec4& src)
 }
 
 template<>
-string lexical_cast<string, rgba>(const rgba& src)
+string lexical_cast<string, u8vec4>(const u8vec4& src)
 {
 	return "("+lexical_cast<string>(src.r)+","+lexical_cast<string>(src.g)+","+
 			lexical_cast<string>(src.b)+","+lexical_cast<string>(src.a)+")";
@@ -305,7 +314,7 @@ string lexical_cast<string, Range<Range<float> > >(const Range<Range<float> >& s
 }
 
 template<>
-string lexical_cast<string, Range<rgba> >(const Range<rgba>& src)
+string lexical_cast<string, Range<u8vec4> >(const Range<u8vec4>& src)
 {
 	return "("+lexical_cast<string>(src.min)+")-("+lexical_cast<string>(src.max)+")";
 }
@@ -352,7 +361,7 @@ template<>
 ivec2 lexical_cast<ivec2, string>(const string& val)
 {
 	ivec2 result(0);
-	deque<string> str = lfant::Split(val, " x:,()");
+	std::deque<string> str = lfant::Split(val, " x:,()");
 	result.x = lexical_cast<int>(str[0]);
 	if(str.size() > 1)
 	{
@@ -365,7 +374,7 @@ template<>
 vec2 lexical_cast<vec2, string>(const string& val)
 {
 	vec2 result(0);
-	deque<string> str = lfant::Split(val, " x:,()");
+	std::deque<string> str = lfant::Split(val, " x:,()");
 	result.x = lexical_cast<float>(str[0]);
 	if(str.size() > 1)
 	{
@@ -378,7 +387,7 @@ template<>
 ivec3 lexical_cast<ivec3, string>(const string& val)
 {
 	ivec3 result(0);
-	deque<string> str = lfant::Split(val, " x:,()");
+	std::deque<string> str = lfant::Split(val, " x:,()");
 	result.x = lexical_cast<int>(str[0]);
 	if(str.size() > 1)
 	{
@@ -395,7 +404,7 @@ template<>
 bvec3 lexical_cast<bvec3, string>(const string& val)
 {
 	bvec3 result(0);
-	deque<string> str = lfant::Split(val, " x:,()");
+	std::deque<string> str = lfant::Split(val, " x:,()");
 	result.x = lexical_cast<bool>(str[0]);
 	if(str.size() > 1)
 	{
@@ -421,7 +430,7 @@ vec3 lexical_cast<vec3, string>(const string& val)
 		}
 	}*/
 //	Log("First char in vec3 lexcast: '", (int)val[0], "'");
-	deque<string> str = lfant::Split(valstr, " x:,()");
+	std::deque<string> str = lfant::Split(valstr, " x:,()");
 	Log("Lexcasting vec3, size: ", str.size());
 	result.x = lexical_cast<float>(str[0]);
 	if(str.size() > 1)
@@ -442,10 +451,10 @@ vec3 lexical_cast<vec3, string>(const string& val)
 }
 
 template<>
-rgba lexical_cast<rgba, string>(const string& src)
+u8vec4 lexical_cast<u8vec4, string>(const string& src)
 {
-	rgba result(0);
-	deque<string> str = lfant::Split(src, " x,()");
+	u8vec4 result(0);
+	std::deque<string> str = lfant::Split(src, " x,()");
 	result.r = lexical_cast<byte>(str[0]);
 	if(str.size() > 1)
 	{
@@ -461,7 +470,6 @@ rgba lexical_cast<rgba, string>(const string& src)
 	}
 	return result;
 }
-
 
 template<>
 vec4 lexical_cast<vec4, string>(const string& src)
@@ -621,7 +629,7 @@ vector<string> lexical_cast<vector<string>, string>(const string& src)
 template<>
 deque<string> lexical_cast<deque<string>, string>(const string& src)
 {
-	deque<string> toks = Split(src, "\n{}", ", \t");
+	deque<string> toks = Split(src, "\n{}[]", ", \t");
 	deque<string> result;
 	bool indent = false;
 	for(uint i = 0; i < toks.size(); ++i)

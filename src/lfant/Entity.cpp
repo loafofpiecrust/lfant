@@ -1,22 +1,12 @@
-/******************************************************************************
-*
-*	LFANT Source
-*	Copyright (C) 2012-2013 by LazyFox Studios
+/*
+*	Copyright (C) 2013-2014, by loafofpiecrust
 *	Created: 2012-07-17 by Taylor Snead
 *
 *	Licensed under the Apache License, Version 2.0 (the "License");
 *	you may not use this file except in compliance with the License.
-*	You may obtain a copy of the License at
-*
-*	http://www.apache.org/licenses/LICENSE-2.0
-*
-*	Unless required by applicable law or agreed to in writing, software
-*	distributed under the License is distributed on an "AS IS" BASIS,
-*	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-*	See the License for the specific language governing permissions and
-*	limitations under the License.
-*
-******************************************************************************/
+*	You may obtain a copy of the License in the accompanying LICENSE file or at
+*		http://www.apache.org/licenses/LICENSE-2.0
+*/
 
 #include <lfant/Entity.h>
 
@@ -80,7 +70,7 @@ void Entity::Clone(Entity* ent, string name, Entity* parent) const
 
 	ent->name = name;
 	ent->parent = parent;
-	game->scene->AddEntity(ent);
+	game->scene->GetRoot()->AddChild(ent);
 
 	for(auto& c : components)
 	{
@@ -109,7 +99,7 @@ void Entity::Init()
 
 //	if(!transform)
 //	{
-	//	transform = AddComponent<Transform>();
+	//	transform = AddComponent(new Transform);
 //	}
 
 	if(lifetime <= 0.0f)
@@ -130,7 +120,7 @@ void Entity::Update()
 	{
 		useLifeTime = true;
 	}
-	if(useLifeTime == true)
+	if(useLifeTime)
 	{
 		lifetime -= game->time->deltaTime;
 		if(lifetime <= 0.0f)
@@ -205,22 +195,31 @@ void Entity::AddChild(Entity* ent)
 	children.push_back(ent);
 }
 
-Entity* Entity::SpawnChild()
+Entity* Entity::AddChild()
 {
-	return game->scene->Spawn(this);
+	Entity* ent = new Entity;
+	AddChild(ent);
+	return ent;
 }
 
 void Entity::RemoveChild(Entity* ent)
+{
+	RemoveChild(ent, true);
+}
+
+void Entity::RemoveChild(Entity* ent, bool destroy)
 {
 	//	children.remove(ptr<Entity>(ent));
 	for(uint i = 0; i < children.size(); ++i)
 	{
 		if(children[i] == ent)
 		{
+			if(!destroy) children[i] = nullptr;
 			children.erase(children.begin()+i);
 			return;
 		}
 	}
+
 }
 
 void Entity::AddComponent(Component* comp)
@@ -262,16 +261,8 @@ void Entity::Destroy()
 	Object::Destroy();
 	Log("Entity::Destroy: super called.");
 
-	if(!parent)
-	{
-		Log("Entity::Destroy: Removing from scene.");
-		game->scene->RemoveEntity(this);
-	}
-	else
-	{
-		Log("Entity::Destroy: Removing from parent.");
-		parent->RemoveChild(this);
-	}
+	Log("Entity::Destroy: Removing from parent.");
+	parent->RemoveChild(this);
 }
 
 Component* Entity::GetComponent(string name)
@@ -283,7 +274,7 @@ Component* Entity::GetComponent(string name)
 		{
 			return comp;
 		}
-		auto reg = typeRegistry.Get("Component", name);
+		auto reg = Component::typeRegistry.Get(name);
 		if(reg && reg->Inherits(type))
 		{
 			return comp;
@@ -292,7 +283,7 @@ Component* Entity::GetComponent(string name)
 	return nullptr;
 }
 
-uint32_t Entity::GetLayer()
+uint32_t Entity::GetLayer() const
 {
 	if(layer == -1 && parent)
 	{
@@ -365,26 +356,99 @@ void Entity::RemoveComponent(string type)
 	}
 }
 
-Entity* Entity::GetParent()
+Entity* Entity::GetParent() const
 {
 	return parent;
 }
 
-void Entity::SetParent(Entity* ent)
+Entity* Entity::GetParent(uint height) const
 {
-	if(parent)
+	Entity* result = GetParent();
+	while(height > 1)
 	{
-		parent->RemoveChild(ent);
+		if(result)
+		{
+			result = result->GetParent();
+			height--;
+		}
+		else
+		{
+			break;
+		}
+	}
+	return result;
+}
+
+string Entity::GetName() const
+{
+	return name;
+}
+
+void Entity::Rename(string name)
+{
+	this->name = name;
+	/// @todo do other stuff here?
+//	TriggerEvent("Rename", name);
+}
+
+void Entity::Reparent(Entity* ent)
+{
+	GetParent()->RemoveChild(this, false);
+	if(ent)
+		ent->AddChild(this);
+	else
+		game->scene->GetRoot()->AddChild(this);
+}
+
+Entity* Entity::GetChild(uint idx)
+{
+	if(children.size() > idx)
+	{
+		return children[idx];
 	}
 	else
 	{
-		game->scene->RemoveEntity(this, false);
+		return nullptr;
 	}
-	ent->AddChild(this);
 }
 
 Entity* Entity::GetChild(string name, bool recursive)
 {
+	if(name.find("/") != -1)
+	{
+		// We're given a path to the entity
+		std::deque<string> toks = Split(name, "", "/");
+		Entity* result = nullptr;
+		for(uint i = 0; i < toks.size(); ++i)
+		{
+			if(toks[i] == "/")
+			{
+				if(!result)
+				{
+					++i;
+					result = GetChild(toks[i], false);
+				}
+				continue;
+			}
+			else if(toks[i] == "..")
+			{
+				if(result) result = result->GetParent();
+			}
+			else if(toks[i] == ".")
+			{
+				continue;
+			}
+			else
+			{
+				if(result)
+				{
+					result = result->GetChild(toks[i], false);
+				}
+			}
+		}
+		return result;
+	}
+
 	Entity* ent = nullptr;
 	for(auto& child : children)
 	{
@@ -463,8 +527,9 @@ void Entity::Bind()
 void Entity::Save(Properties* prop) const
 {
 	Log("Saving entity to ", prop);
-	prop->type = "entity";
-	prop->id = name;
+//	prop->type = "entity";
+//	prop->id = name;
+	prop->Set("name", name);
 
 	prop->Set("id", id);
 	prop->Set("tags", tags);
@@ -474,21 +539,20 @@ void Entity::Save(Properties* prop) const
 
 	for(auto& comp : components)
 	{
-		auto cp = prop->AddChild();
+		auto cp = prop->AddChild("");
 		Log("Saving comp: ", type::Name(comp), " to ", cp);
 		comp->Save(cp);
 	}
 
 	for(auto& child : children)
 	{
-		child->Save(prop->AddChild());
+		child->Save(prop->AddChild(""));
 	}
 }
 
 void Entity::Load(Properties* prop)
 {
-
-	prop->GetId(name);
+	prop->Get("name", name);
 	prop->Get("id", id);
 //	prop->Get("tags", tags);
 	prop->Get("layer", layer);
@@ -497,54 +561,6 @@ void Entity::Load(Properties* prop)
 
 	Log("Entity::Load: Loaded basic properties.");
 
-	deque<Properties*> c = prop->GetChildren("entity");
-	Entity* ent = nullptr;
-	for(auto& child : c)
-	{
-		if((ent = GetChild(child->id)))
-		{
-			ent->Load(child);
-		}
-		else
-		{
-			game->scene->SpawnAndLoad(child, this, child->id);
-		}
-	}
-
-	c = prop->GetChildren("component");
-	Log("Entity::Load: Component nodes loaded.");
-	Component* component = nullptr;
-	for(auto& comp : c)
-	{
-		Log("Loading component props, '"+comp->type+" "+comp->id+"'.");
-		if(comp->id != "Transform")
-		{
-			Log("Entity::Load: Component type '"+comp->id+"'");
-			if((component = GetComponent(comp->id)))
-			{
-				component->Load(comp);
-			}
-			else
-			{
-				component = AddComponent(comp->id, comp);
-			}
-			Log("Entity::Load: Added component, ", component);
-		}
-		else
-		{
-			if(transform)
-			{
-				component = transform;
-				component->Load(comp);
-			}
-			else
-			{
-				component = AddComponent("Transform", comp);
-			}
-		}
-		//	component->Load(comp);
-	}
-
 	string file = "";
 	prop->Get("file", file);
 	if(file != "")
@@ -552,13 +568,60 @@ void Entity::Load(Properties* prop)
 		Log("Loading entity from file path");
 		ptr<Properties> fp {new Properties};
 		fp->LoadFile(file);
-		string type = type::Descope(type::Name(this));
-		to_lower(type);
-		if(Properties* pc = fp->GetChild(type))
+		if(Properties* pc = fp->GetFirstChild())
 		{
 			Load(pc, true);
 		}
 	}
+
+//	Properties* c = prop->GetChild("children");
+	Entity* ent = nullptr;
+	Component* component = nullptr;
+	for(auto& child : prop->children)
+	{
+		if(child->type == "entity")
+		{
+			if((ent = GetChild(child->Get("name"))))
+			{
+				ent->Load(child);
+			}
+			else
+			{
+				AddChild()->Load(child);
+			}
+		}
+		else if(child->type == "component")
+		{
+			if(child->name != "Transform")
+			{
+				Log("Entity::Load: Component type '"+child->name+"'");
+				if((component = GetComponent(child->name)))
+				{
+					component->Load(child);
+				}
+				else
+				{
+					component = AddComponent(child->name);
+					component->Load(child);
+				}
+				Log("Entity::Load: Added component, ", component);
+			}
+			else
+			{
+				if(transform)
+				{
+					component = transform;
+					component->Load(child);
+				}
+				else
+				{
+					component = AddComponent("Transform");
+					component->Load(child);
+				}
+			}
+		}
+	}
+
 }
 
 void Entity::Load(Properties* prop, bool init)
@@ -572,39 +635,11 @@ void Entity::Load(Properties* prop, bool init)
 
 Component *Entity::AddComponent(string type)
 {
-	return AddComponent(type, nullptr);
-}
-
-Component* Entity::AddComponent(string type, Properties* prop)
-{
-	printf("Adding comp via string of type\n");
-	auto reg = Component::registry.Get(type);
-	if(!reg) return nullptr;
-
-	auto val = reg->func;
-	Component* result = nullptr;
-	if(val == nullptr)
+	Component* result = Component::NewFromString(type);
+	if(result)
 	{
-		Log("No function for this component type.");
-		return nullptr;
+		AddComponent(result);
 	}
-	else
-	{
-		Log("Adding component");
-		result = (*val)();
-		result->owner = this;
-		if(result->initBeforeLoad)
-		{
-			AddComponent(result);
-			if(prop) result->Load(prop);
-		}
-		else
-		{
-			if(prop) result->Load(prop);
-			AddComponent(result);
-		}
-	}
-
 	return result;
 }
 

@@ -13,7 +13,6 @@ namespace editor {
 
 class Movement : public Component
 {
-	DECLARE_TYPE(Component, editor::Movement)
 public:
 
 	virtual void Load(Properties* prop);

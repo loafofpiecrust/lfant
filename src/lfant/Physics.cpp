@@ -1,22 +1,12 @@
-/******************************************************************************
-*
-*	LFANT Source
-*	Copyright (C) 2012-2013 by LazyFox Studios
+/*
+*	Copyright (C) 2013-2014, by loafofpiecrust
 *	Created: 2012-07-29 by Taylor Snead
 *
 *	Licensed under the Apache License, Version 2.0 (the "License");
 *	you may not use this file except in compliance with the License.
-*	You may obtain a copy of the License at
-*
-*	http://www.apache.org/licenses/LICENSE-2.0
-*
-*	Unless required by applicable law or agreed to in writing, software
-*	distributed under the License is distributed on an "AS IS" BASIS,
-*	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-*	See the License for the specific language governing permissions and
-*	limitations under the License.
-*
-******************************************************************************/
+*	You may obtain a copy of the License in the accompanying LICENSE file or at
+*		http://www.apache.org/licenses/LICENSE-2.0
+*/
 
 #include <lfant/Physics.h>
 
@@ -51,8 +41,9 @@ void Physics::Save(Properties* prop) const
 
 	for(auto& gpt : gravityPoints)
 	{
-		Properties* pgpt = prop->AddChild("gravityPoint");
-		pgpt->id = gpt.name;
+//		Properties* pgpt = prop->AddChild("gravityPoint");
+		Properties* pgpt = new Properties(prop, "GravityPoint");
+		pgpt->Set("name", gpt.name);
 		pgpt->Set("force", gpt.force);
 	}
 }
@@ -65,11 +56,16 @@ void Physics::Load(Properties* prop)
 	prop->Get("gravity", grav);
 	SetGravity(grav);
 
-	for(auto& pgpt : prop->GetChildren("gravityPoint"))
+	Properties* gravPts = prop->GetChild("gravityPoints");
+	if(gravPts)
 	{
-		GravPoint* gpt = new GravPoint;
-		gpt->name = pgpt->id;
-		pgpt->Get("force", gpt->force); 
+		for(auto& pgpt : gravPts->children)
+		{
+			GravPoint* gpt = new GravPoint;
+			pgpt->Get("name", gpt->name);
+			pgpt->Get("force", gpt->force);
+			gravityPoints.push_back(*gpt);
+		}
 	}
 }
 
@@ -172,6 +168,7 @@ vec3 Physics::GetGravity() const
 
 void Physics::SetGravity(vec3 grav)
 {
+	Log("Physics::SetGravity(", grav, ")");
 	world->setGravity(vec3_cast<btVector3>(grav));
 }
 
@@ -244,7 +241,7 @@ bool Physics::OnCollide(string func, btManifoldPoint& cp, const btCollisionObjec
 		}
 	}
 
-	Log("Collision called, OnCollide", func, ", on entity ", body1->owner->name);
+	Log("Collision called, OnCollide", func, ", on entity ", body1->owner->GetName());
 
 	Collision col;
 	col.contacts.push_back(ContactPoint(vec3_cast<vec3>(cp.getPositionWorldOnA()), vec3_cast<vec3>(cp.m_normalWorldOnB)));

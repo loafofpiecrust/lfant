@@ -1,22 +1,12 @@
-/******************************************************************************
-*
-*	LFANT Source
-*	Copyright (C) 2012-2013 by LazyFox Studios
+/*
+*	Copyright (C) 2013-2014, by loafofpiecrust
 *	Created: 2012-10-27 by Taylor Snead
 *
 *	Licensed under the Apache License, Version 2.0 (the "License");
 *	you may not use this file except in compliance with the License.
-*	You may obtain a copy of the License at
-*
-*	http://www.apache.org/licenses/LICENSE-2.0
-*
-*	Unless required by applicable law or agreed to in writing, software
-*	distributed under the License is distributed on an "AS IS" BASIS,
-*	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-*	See the License for the specific language governing permissions and
-*	limitations under the License.
-*
-******************************************************************************/
+*	You may obtain a copy of the License in the accompanying LICENSE file or at
+*		http://www.apache.org/licenses/LICENSE-2.0
+*/
 #include <lfant/util/String.h>
 
 // External
@@ -27,6 +17,8 @@
 
 namespace lfant
 {
+
+using std::deque;
 
 deque<string> Split(string str, string dropDelim, string keepDelim)
 {
@@ -40,7 +32,7 @@ deque<string> Split(string str, string dropDelim, string keepDelim)
 	tokenizer<char_separator<char>> tok(str, sep);
 	for(tokenizer<char_separator<char>>::iterator i = tok.begin(); i != tok.end(); ++i)
 	{
-		result += *i;
+		result.push_back(*i);
 	}
 	return result;
 }
@@ -136,10 +128,10 @@ deque<string> SplitParens(string str, string dropDelim, string keepDelim)
 
 string Extension(string path)
 {
-	deque<string> tokens = Split(path, ".", "");
+	std::deque<string> tokens = Split(path, ".", "");
 	if(tokens.size() > 1)
 	{
-		to_lower(tokens[tokens.size()-1]);
+		boost::algorithm::to_lower(tokens[tokens.size()-1]);
 		return tokens[tokens.size()-1];
 	}
 	else
@@ -150,7 +142,7 @@ string Extension(string path)
 
 string Replace(string str, string find, string replace)
 {
-	size_t start_pos = str.find(find);
+	std::size_t start_pos = str.find(find);
 	if(start_pos == string::npos)
 	{
 		return str;

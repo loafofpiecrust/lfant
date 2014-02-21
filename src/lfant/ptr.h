@@ -3,7 +3,7 @@
 #include <lfant/stdafx.h>
 
 // External
-#include <boost/utility/enable_if.hpp>
+//#include <boost/utility/enable_if.hpp>
 #include <boost/type_traits.hpp>
 
 // Internal
@@ -28,12 +28,12 @@ public:
 	{
 	}
 
-	ptr(const ptr<T>& x) = delete;
-
 	ptr(ptr<T>&& x) :
 		value(x.release())
 	{
 	}
+
+	ptr(const ptr<T>& x) = delete;
 
 	~ptr()
 	{

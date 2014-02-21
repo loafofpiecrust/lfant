@@ -1,17 +1,19 @@
 project(external)
 
-#set(LIBRARY_OUTPUT_PATH "${ROOT}/bin${ARCH}/${PLATFORM}")
 
-# Subdirs
-#add_subdirectory(boost)
+add_subdirectory(boost)
 add_subdirectory(bullet)
 add_subdirectory(assimp)
 add_subdirectory(squirrel)
 add_subdirectory(zlib)
 add_subdirectory(png)
 add_subdirectory(jpeg)
-#add_subdirectory(openal)
-#add_subdirectory(wxwidgets)
+add_subdirectory(tiff)
+add_subdirectory(volymerna)
+
+if(EDITOR)
+add_subdirectory(wxwidgets)
+endif()
 
 if(NOT ANDROID)
 add_subdirectory(glew)

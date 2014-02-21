@@ -1,7 +1,5 @@
-/******************************************************************************
-*
-*	LFANT Source
-*	Copyright (C) 2012-2013 by LazyFox Studios
+/*
+*	Copyright (C) 2013-2014, by loafofpiecrust
 *	Created: 2013-03-16 by Taylor Snead
 *
 *	Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,8 +29,10 @@
 
 // External
 
-namespace lfant
-{
+namespace lfant {
+
+using namespace std;
+using namespace boost::algorithm;
 
 Properties::Properties()
 {
@@ -43,14 +43,27 @@ Properties::Properties(string path)
 	LoadFile(path);
 }
 
-Properties::Properties(istream &stream, string type, string id, Properties *parent, bool first) :
-	type(type), id(id), parent(parent), getFirstLine(first)
+Properties::Properties(Properties* parent, string type, string name) :
+	parent(parent),
+	type(type),
+	name(name)
 {
-	LoadStream(stream);
+	parent->AddChild(this);
 }
 
 Properties::~Properties()
 {
+}
+
+
+Properties::Iterator Properties::begin()
+{
+	return Iterator(this, 0);
+}
+
+Properties::Iterator Properties::end()
+{
+	return Iterator(this, children.size());
 }
 
 void Properties::Get(string name, Entity*& ref)
@@ -63,12 +76,12 @@ void Properties::Get(string name, Entity*& ref)
 		Get(name, entname);
 		if(entname != "")
 		{
-			ref = game->scene->GetEntity(entname);
+			ref = game->scene->GetRoot()->GetChild(entname, true);
 		}
 	}
 	else
 	{
-		ref = game->scene->GetEntityById(id);
+	//	ref = game->scene->GetRoot()->GetChildbyId(id);
 	}
 }
 
@@ -77,309 +90,181 @@ void Properties::Set(string name, Entity* const& value)
 	Set(name, value->GetId());
 }
 
-void Properties::Set(string name, string value)
-{
-	values[TrimSpace(name)] = value;
-/*	name = TrimSpace(name);
-	for(auto& val : values)
-	{
-		if(val.first == name)
-		{
-			val.second = value;
-			return;
-		}
-	}
-	values.emplace_back(name, value);*/
-}
-
 void Properties::LoadFile(string path)
 {
 	ifstream stream(game->fileSystem->GetGamePath(path).string());
 	LoadStream(stream);
 }
 
-void Properties::LoadStream(istream& stream)
+bool IsWhitespace(char c)
 {
-	string line = "";
-	string extline = "";
-	uint pos;
-	uint pos2;
-	deque<string> stack;
-	deque<string> toks;
-	string name = "";
+	return c == ' ' || c == '\t';
+}
+
+bool IsOperator(char c)
+{
+	return c == '=' || c == ':';
+}
+
+void SkipWhitespace(istream& stream, char& c)
+{
+	while(IsWhitespace(c))
+	{
+		c = stream.get();
+	}
+//	return c;
+}
+
+string ReadUntil(istream& stream, char& curr, string toks, bool lined)
+{
 	string value = "";
-	char c;
-	bool firstLine = true;
-
-//	Set("type", type);
-//	Set("name", id);
-//	if(getFirstLine && stream.good())
-//		getline(stream, line);
-
+//	char curr = stream.get();
+//	curr = stream.get();
 	while(stream.good())
 	{
-	//	if((firstLine && getFirstLine) || !firstLine)
+		for(auto& t : toks)
 		{
-			getline(stream, line);
-		//	firstLine = false;
+			if(curr == t) return value;
 		}
 
-		pos = line.find("\\");
-		while( pos != -1)
+		if(lined && curr == '\n')
 		{
-			getline(stream, extline);
-			line.erase(pos);
-			line.append(extline);
-			pos = line.find("\\");
+			curr = stream.get();
+			SkipWhitespace(stream, curr);
 		}
 
-		line = TrimSpace(line, true);
+		value.push_back(curr);
+		curr = stream.get();
+	}
+	return value;
+}
 
-		pos = line.find("//");
-		if(pos != -1)
-		{
-			Log("Comment found.");
-			line.erase(line.begin()+pos, line.end());
-		}
+void Properties::LoadStream(istream& stream)
+{
+	char curr = '\0';
+	Properties* obj = this;
 
-		if(line.find("/*") != -1)
+	string token = ""; // current token
+	string stype = "";
+	string sname = "";
+	string value = "";
+	while(stream.good())
+	{
+		curr = stream.get();
+		if(curr == '/')
 		{
-			while(true)
+			curr = stream.get();
+			if(curr == '/')
 			{
-				if(line.find("*/") != string::npos)
+				while(curr != '\n')
 				{
-					break;
+					curr = stream.get();
 				}
-				getline(stream, line);
 			}
-		}
-
-		if(line == "")
-		{
-			continue;
-		}
-
-		if(line[0] == '=')
-		{
-		//	Log("Incorrect '='.");
-		}
-
-		if(line[0] == '#')
-		{
-			// Preprocessor magictastics!
-		//	Log("Doing some preprocessor stuff...");
-		//	Preprocess(string(&line[1]));
-			continue;
-		}
-		/*
-		if(line[0] == '}')
-		{
-			continue;
-		}
-		*/
-		// Add to value
-		pos = line.find("+=");
-		if(pos != -1)
-		{
-			for(int i = 0; i < pos; ++i)
+			else if(curr == '*')
 			{
-				name.push_back(line[i]);
-			}
-			for(int i = pos+2; i < line.size(); ++i)
-			{
-				value.push_back(line[i]);
-			}
-		//	name = ;
-		//	to_lower(name);
-			value = TrimSpace(value, true);
-			AddValue(TrimSpace(name), value);
-			name = "";
-			value = "";
-			continue;
-		}
-
-		// Subtract from value
-		pos = line.find("-=");
-		if(pos != -1)
-		{
-			for(int i = 0; i < pos; ++i)
-			{
-				name.push_back(line[i]);
-			}
-			for(int i = pos+2; i < line.size(); ++i)
-			{
-				value.push_back(line[i]);
-			}
-		//	to_lower(name);
-			value = TrimSpace(value, true);
-			SubtractValue(name, value);
-			name = "";
-			value = "";
-			continue;
-		}
-
-		// Set value
-		pos = line.find("=");
-		pos2 = line.find("{");
-		if(pos != -1)
-		{
-			if(pos2 != -1)
-			{
-				// We have an array on our hands
-				for(int i = 0; i < pos; ++i)
+				while(stream.good())
 				{
-					name.push_back(line[i]);
-				}
-				for(int i = pos2; i < line.size(); ++i)
-				{
-					value.push_back(line[i]);
-				}
-
-				uint pos3 = value.find("}");
-				if(pos3 == -1)
-				{
-					while((c = stream.get()) != '}')
+					curr = stream.get();
+					if(curr == '*')
 					{
-						if(c == '\n' || c == '\t')
-							continue;
-						value.push_back(c);
+						curr = stream.get();
+						if(curr == '/')
+						{
+							break;
+						}
 					}
 				}
-
-			//	to_lower(name);
-				Set(name, TrimSpace(value, true));
-				name = "";
-				value = "";
-
-				continue;
 			}
-
-			for(int i = 0; i < pos; ++i)
+			else
 			{
-				name.push_back(line[i]);
+				stream.unget();
 			}
-			for(int i = pos+1; i < line.size(); ++i)
-			{
-				value.push_back(line[i]);
-			}
-		//	to_lower(name);
-		//	Log("\tSetting, '"+TrimSpace(name)+"' = '"+TrimSpace(value, true)+"'.");
-			Set(name, TrimSpace(value, true));
-			name = "";
-			value = "";
-			continue;
 		}
-
-		// Function call
-		// @todo Needed?
-
-		// Namespacing
-		toks = Split(line, " ", "{}");
-		if(toks[0] != "{" && toks[0] != "}")
+		if(IsWhitespace(curr) || curr == '\n' || IsOperator(curr))
 		{
-		//	Log("Setting name.");
-			name = toks[0];
-			to_lower(name);
-		}
-		if(toks.size() > 1 && toks[1] != "{")
-		{
-		//	Log("Setting value");
-			value = toks[1];
-			if(toks.size() > 2 && toks[2] == "{")
+			// process token
+			if(!token.empty())
 			{
-			//	Log("Namespace brace same line");
-				if(toks.size() > 3 && toks[toks.size()-1] == "}")
+				if(token == "{")
 				{
-				//	Log("One line class");
-					if(toks.size() > 4)
+					to_lower(stype);
+					obj = new Properties(obj, stype, sname);
+					stype.clear();
+					sname.clear();
+				}
+				else if(token == "}")
+				{
+					if(obj->parent) obj = obj->parent;
+				}
+				else if(stype.empty())
+				{
+					stype = token;
+				}
+				else if(sname.empty())
+				{
+					sname = token;
+				}
+
+				// clear token
+				token.clear();
+
+			}
+			if(IsOperator(curr))
+			{
+			//	oper = curr;
+				value.clear();
+
+				bool lined = false;
+				curr = stream.get();
+				while(stream.good())
+				{
+					if(curr == '{')
+						lined = true;
+					else if(curr == '}')
+						lined = false;
+
+					if(!lined && (curr == ';' || curr == '\n'))
 					{
-						AddChild(stream, name, value, false);
-					}
-					else
-					{
-						Properties* c = new Properties;
-						c->type = name;
-						c->id = value;
-						c->parent = this;
-						children.push_back(c);
+						break;
 					}
 
-				//	children.push_back(new Properties(stream, name, value, this, false));
-					continue;
+					value.push_back(curr);
+					curr = stream.get();
 				}
-				else
-				{
-					children.push_back(new Properties(stream, name, value, this));
-				//	continue;
-				}
-			}
-		}
-	//	if(toks.size() > 1 && toks[toks.size()-1] == "{")
-		{
-		//	Log("Namespace begins same line");
-		//	children.push_back(new Properties(stream, name, value, this));
-		}
-		/*
-		for(int i = 1; i < toks.size(); ++i)
-		{
-			if(toks[i] == "{")
-			{
-				// Begin namespace
-				// @todo Fix this for the ending '}'
-			//	to_lower(name);
-			//	children.push_back(new Properties(stream, name, value, this));
+				TrimSpace(value, false);
+				obj->Set(stype, value);
 
-				if(toks[i+1] == "}")
-				{
-					// Empty namespace, next line
-					break;
-					continue;
-				}
+				stype.clear();
+				value.clear();
+				sname.clear();
 			}
-			else if(toks[i] == "}")
-			{
-				// End namespace?
-				// @todo maybe do namespace queue?
-				break;
-				continue;
-			}
-		}
-		*/
-		// Brace on new line?
-		if(line[0] == '{' || stream.get() == '{')
-		{
-			to_lower(name);
-			children.push_back(new Properties(stream, name, value, this));
 		}
 		else
 		{
-			stream.seekg(-1, ios_base::cur);
-
-		}
-
-		if((line[0] == '}' || stream.get() == '}'))
-		{
-		//	Log("First char is finishing brace");
-			// Ends a namespace
-			return;
-		}
-		else
-		{
-			stream.seekg(-1, ios_base::cur);
+			token.push_back(curr);
 		}
 	}
+	return;
 }
 
 void Properties::SaveStream(ostream &stream)
 {
 //	stream << "// Scene file generated by lfant.\n";
-	stream << GetIndent() << type << " " << id << "\n";
+	string ind = GetIndent();
+	if(ind.size() > 0) ind.erase(ind.begin());
 
-	stream << GetIndent() << "{\n";
+	if(parent)
+	{
+		stream << ind << type;
+		if(!name.empty())
+			stream << " "+name+"\n";
+		stream << ind << "{\n";
+	}
 
 	for(auto& i : values)
 	{
-		stream << GetIndent()+"\t" << i.first << " = " << i.second << "\n";
+		stream << ind+"\t" << i.first << " = " << i.second << "\n";
 	}
 
 	for(auto& child : children)
@@ -387,40 +272,8 @@ void Properties::SaveStream(ostream &stream)
 		child->SaveStream(stream);
 	}
 
-	stream << GetIndent() << "}\n";
-}
-
-void Properties::AddValue(string name, string value)
-{
-	name = TrimSpace(name);
-	string valname = Get<string>(name);
-//	value = Expand(value);
-	if(valname == "")
-	{
-		Get(name, valname);
-	}
-	Set(name, valname+value);
-//	values[name].append(value);
-	Log(name, " += ", value);
-}
-
-void Properties::SubtractValue(string name, string value)
-{
-	name = TrimSpace(name);
-	string val = Get<string>(name);
-//	value = Expand(value);
-//	values[name] = Replace(values[name], value, "");
-	Set(name, Replace(val, value, ""));
-	Log(name, " -= ", value);
-}
-
-
-void Properties::SaveFile(string path)
-{
-	path = game->fileSystem->GetGamePath(path).string();
-	Log("Saving properties to '"+path+"'.");
-	ofstream stream(path);
-	SaveStream(stream);
+	if(parent)
+		stream << ind << "}\n";
 }
 
 Properties* Properties::GetFirstChild()
@@ -429,7 +282,17 @@ Properties* Properties::GetFirstChild()
 	{
 		return children[0];
 	}
-	return nullptr;
+	else
+	{
+		return nullptr;
+	}
+}
+
+void Properties::SaveFile(string path)
+{
+	ofstream out {game->fileSystem->GetGamePath(path).string()};
+	SaveStream(out);
+	out.close();
 }
 
 Properties* Properties::GetChild(string type)
@@ -446,40 +309,16 @@ Properties* Properties::GetChild(string type)
 	return nullptr;
 }
 
-Properties* Properties::GetChildById(string id)
+Properties* Properties::GetChild(uint idx)
 {
-	for(auto& child : children)
+	if(children.size() > idx)
 	{
-		if(child->id == id)
-		{
-			return child;
-		}
+		return children[idx];
 	}
-	return nullptr;
-}
-
-deque<Properties*> Properties::GetChildren(string type)
-{
-	to_lower(type);
-	deque<Properties*> props;
-	for(auto& child : children)
+	else
 	{
-		if(child->type == type)
-		{
-			props.push_back(child);
-		}
+		return nullptr;
 	}
-	return props;
-}
-
-const deque<ptr<Properties>>& Properties::GetChildren()
-{
-	return children;
-}
-
-qumap<string, string>& Properties::GetValues()
-{
-	return values;
 }
 
 Properties* Properties::AddChild(Properties* prop)
@@ -496,28 +335,22 @@ Properties* Properties::AddChild(Properties* prop)
 	}
 	prop->parent = this;
 	children.push_back(prop);
+	return prop;
 }
 
-Properties* Properties::AddChild(string type, string id)
+Properties* Properties::AddChild(string name)
 {
-	Properties* result = new Properties;
-	result->parent = this;
-	result->type = type;
-	result->id = id;
-	children.push_back(result);
-	return result;
+	return new Properties(this, name);
 }
 
-Properties* Properties::AddChild(istream& stream, string type, string id, bool first)
+bool Properties::IsType(string type)
 {
-	Properties* c = new Properties();
-	c->type = type;
-	c->id = id;
-	c->parent = this;
-	c->getFirstLine = first;
-	c->LoadStream(stream);
-	children.push_back(c);
-	return c;
+	return this->type == type;
+}
+
+bool Properties::IsNamed(string name)
+{
+	return this->name == name;
 }
 
 void Properties::Clear()
@@ -541,57 +374,39 @@ void Properties::SkipSpace(istream &stream)
 	}
 }
 
-string Properties::TrimSpace(string str, bool onlyIndent)
+/// @todo Switch to new string instead of erasing?
+void Properties::TrimSpace(string& str, bool onlyIndent)
 {
-//	Log("Trimming space on '"+str+"'");
-	uint pos = 0;
-	string result = "";
+	uint end = 0;
 	for(uint i = 0; i < str.size(); ++i)
 	{
-		if(str[i] != ' ' && str[i] != '\t')
+		if(!(IsWhitespace(str[i]) /*|| str[i] == '\n'*/))
 		{
-			result.push_back(str[i]);
-			if(onlyIndent)
+			end = i;
+			break;
+		}
+	}
+	if(end != 0) str.erase(str.begin(), str.begin()+(end));
+
+	if(onlyIndent) return;
+
+	end = 0;
+	if(str.size() > 0)
+	{
+		for(uint i = str.size()-1; i > 0; --i)
+		{
+			if(!(IsWhitespace(str[i])))
 			{
-				result.append(str.substr(i+1, str.size()-(i+1)));
+				end = i;
 				break;
 			}
 		}
+		str.erase(str.begin()+end+1, str.end());
 	}
-
-	return result;
 }
 
 string Properties::Expand(string value)
 {
-	/*
-	deque<string> tokens = Split(value, "", "\"' \t");
-	string result = "";
-	bool quoted = false;
-	for(uint i = 0; i < tokens.size(); ++i)
-	{
-		if(tokens[i] == "\"" || tokens[i] == "'")
-		{
-			quoted = !quoted;
-		}
-		else
-		{
-			if(quoted)
-			{
-				result.append(tokens[i]);
-			}
-			else
-			{
-				if(tokens[i] == " " || tokens[i] == "\t")
-				{
-					continue;
-				}
-				result.append(tokens[i]);
-			}
-		}
-	}
-	return result;
-	*/
 	return value;
 }
 
@@ -601,7 +416,10 @@ string Properties::GetIndent()
 	{
 		return parent->GetIndent()+"\t";
 	}
-	return "";
+	else
+	{
+		return "";
+	}
 }
 
 Properties* Properties::GetTopParent()
@@ -611,72 +429,30 @@ Properties* Properties::GetTopParent()
 	return prop;
 }
 
-string Properties::ParseValue(string val)
+string Properties::GetString(string name)
 {
-	string result = "";
-	for(uint i = 0; i < val.size(); ++i)
-	{
-		if(val[i] == '$')
-		{
-			// dollar
-			if(val.size() >= i && val[i+1] == '{')
-			{
-				++i;
-				// this is a reference
-				string ref = "";
-				for(uint k = i+1; k < val.size(); ++k)
-				{
-					if(val[k] == '}')
-					{
-						i = k+1;
-						break;
-					}
-					else
-					{
-						ref.push_back(val[k]);
-					}
-				}
-
-				// actual parsing
-				deque<string> toks = Split(ref, ".");
-				Properties* prop = GetTopParent();
-				for(uint k = 0; k < toks.size(); ++k)
-				{
-					if(k != toks.size()-1)
-					{
-						for(auto& child : prop->children)
-						{
-							if(child->id == toks[k])
-							{
-								prop = child;
-								break;
-							}
-						}
-					}
-					else
-					{
-						for(auto& value : prop->values)
-						{
-							if(value.first == toks[k])
-							{
-								result.append(value.second);
-							}
-						}
-					}
-				}
-			}
-			else
-			{
-				result.push_back(val[i]);
-			}
-		}
-		else
-		{
-			result.push_back(val[i]);
-		}
-	}
-	return result;
+	return values[name];
 }
 
+void Properties::SetString(string name, string value)
+{
+	values[name] = value;
+}
+
+Properties* Properties::Iterator::operator*()
+{
+	return prop->GetChild(pos);
+}
+
+bool Properties::Iterator::operator!=(const Properties::Iterator& other) const
+{
+	return pos != other.pos;
+}
+
+const Properties::Iterator& Properties::Iterator::operator++()
+{
+	++pos;
+	return *this;
+}
 
 }

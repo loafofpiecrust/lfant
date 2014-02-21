@@ -1,26 +1,17 @@
-/******************************************************************************
-*
-*	LFANT Source
-*	Copyright (C) 2012-2013 by LazyFox Studios
+/*
+*	Copyright (C) 2013-2014, by loafofpiecrust
 *	Created: 2012-07-26 by Taylor Snead
 *
 *	Licensed under the Apache License, Version 2.0 (the "License");
 *	you may not use this file except in compliance with the License.
-*	You may obtain a copy of the License at
-*
-*	http://www.apache.org/licenses/LICENSE-2.0
-*
-*	Unless required by applicable law or agreed to in writing, software
-*	distributed under the License is distributed on an "AS IS" BASIS,
-*	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-*	See the License for the specific language governing permissions and
-*	limitations under the License.
-*
-******************************************************************************/
+*	You may obtain a copy of the License in the accompanying LICENSE file or at
+*		http://www.apache.org/licenses/LICENSE-2.0
+*/
 #pragma once
 #include <lfant/stdafx.h>
 
 // External
+#include <vector>
 
 // Internal
 
@@ -59,18 +50,18 @@ struct Vertex
 class Vertex
 {
 public:
-	typedef vector<float> Element;
+	typedef std::vector<float> Element;
 
 	void Add(const float& value);
 	void Add(const vec2& value);
 	void Add(const vec3& value);
 	void Add(const vec4& value);
-	void Add(const rgba& value);
+	void Add(const u8vec4& value);
 
-	const vector<Element>& Get();
+	const std::vector<Element>& Get();
 
 protected:
-	vector<Element> elements;
+	std::vector<Element> elements;
 };
 
 /** @} */

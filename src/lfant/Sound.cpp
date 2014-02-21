@@ -11,7 +11,7 @@
 #include <AL/alc.h>
 
 namespace lfant {
-
+/*
 Sound::Sound(AudioSource* src, string name) :
 	source(src),
 	name(name)
@@ -25,7 +25,7 @@ Sound::~Sound()
 	alSourcei(id, AL_BUFFER, 0);
 	alDeleteSources(1, &id);
 }
-
+*/
 void Sound::LoadBuffer(string path)
 {
 	path = game->fileSystem->GetGamePath(path).string();
@@ -95,7 +95,7 @@ void Sound::SetPosition(vec3 pos)
 
 Sound::Stream::Stream(uint32_t& source, string path) :
 	source(source),
-	stream(path, ios::in|ios::binary)
+	stream(path, std::ios::in|std::ios::binary)
 {
 }
 
@@ -105,7 +105,7 @@ void Sound::Stream::Init()
 	alGenBuffers(buffers.size(), &buffers[0]);
 
 	uint8_t data[8];
-	stream.seekg(12, ios::cur);
+	stream.seekg(12, std::ios::cur);
 
 	stream.read((char*)data, 8);
 	if(data[0] != 'f' || data[1] != 'm' || data[2] != 't')
@@ -129,7 +129,7 @@ void Sound::Stream::Init()
 	stream.read((char*)&frequency, sizeof(frequency));
 
 	// skip block size and bytes/sec
-	stream.seekg(6, ios::cur);
+	stream.seekg(6, std::ios::cur);
 
 	// bit depth?
 	int32_t bits = 0;

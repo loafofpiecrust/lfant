@@ -1,7 +1,5 @@
-/******************************************************************************
-*
-*	LFANT Source
-*	Copyright (C) 2012-2013 by LazyFox Studios
+/*
+*	Copyright (C) 2013-2014, by loafofpiecrust
 *	Created: 2012-10-28 by Taylor Snead
 *
 *	Licensed under the Apache License, Version 2.0 (the "License");
@@ -33,7 +31,7 @@
 namespace lfant
 {
 
-deque<ptr<Object::EventBase>> Object::events;
+std::deque<ptr<Object::EventBase>> Object::events;
 
 Object::Object()
 {
@@ -58,16 +56,16 @@ void Object::Update()
 	for(uint i = 0; i < timers.size(); ++i)
 	{
 	//	Log("Timer '", timers[i]->name, "' updated at ", timers[i]->time);
-		if(timers[i]->time <= 0.0f)
+		if(timers[i].time <= 0.0f)
 		{
-			string name = timers[i]->name;
+			string name = timers[i].name;
 			timers.erase(timers.begin()+i);
 			--i;
 		//	Log("Timer triggered");
 			TriggerEvent(name);
 			continue;
 		}
-		timers[i]->time -= game->time->deltaTime;
+		timers[i].time -= game->time->deltaTime;
 	}
 }
 
@@ -88,7 +86,7 @@ void Object::Destroy()
 	{
 		if(events[i]->sender == this)
 		{
-		//	delete events[i];
+			events[i].reset();
 			events.erase(events.begin()+i);
 		}
 	}
@@ -103,9 +101,10 @@ void Object::Deinit()
 
 void Object::LoadFile(string path)
 {
-//	Log(type::Name(this), " loading file '", path, "'.");
+	Log(type::Name(this), " loading file '", path, "'.");
 	Properties prop;
 	prop.LoadFile(path);
+
 //	string type = type::Descope(type::Name(this));
 //	to_lower(type);
 	Log("Checking for first child");
@@ -130,9 +129,9 @@ void Object::SaveFile(string path) const
 
 void Object::Save(Properties *prop) const
 {
-	string type = type::Descope(type::Name(this));
+/*	string type = type::Descope(type::Name(this));
 	to_lower(type);
-	prop->type = type;
+	prop->SetName(type);*/
 }
 
 void Object::Bind()
@@ -157,7 +156,7 @@ void Object::Bind()
 
 void Object::ConnectScriptEvent(Object* sender, string name, Sqrat::Object* receiver, Sqrat::Function* func)
 {
-	erase_all(name, " ");
+	boost::algorithm::erase_all(name, " ");
 	name = type::Name(sender) + "::" + name + "()";
 	EventScript* con = nullptr;
 	for(auto& event : sender->events)
@@ -179,7 +178,7 @@ void Object::ConnectScriptEvent(Object* sender, string name, Sqrat::Object* rece
 
 bool Object::EventConnected(string name)
 {
-	erase_all(name, " ");
+//	erase_all(name, " ");
 	name = type::Name(this) + "::" + name;
 	for(auto& event : events)
 	{
@@ -193,26 +192,26 @@ bool Object::EventConnected(string name)
 
 void Object::SetTimer(string name, float time)
 {
-	erase_all(name, " ");
+//	erase_all(name, " ");
 //	name = type::Name(this) + "::" + name + "()";
 	for(auto& t : timers)
 	{
-		if(t->name == name)
+		if(t.name == name)
 		{
-			t->time = time;
+			t.time = time;
 			return;
 		}
 	}
-	timers.push_back(new Timer(name, time));
+	timers.emplace_back(name, time);
 }
 
 void Object::CancelTimer(string name)
 {
-	erase_all(name, " ");
+//	erase_all(name, " ");
 //	name = type::Name(this) + "::" + name + "()";
 	for(uint i = 0; i < timers.size(); ++i)
 	{
-		if(timers[i]->name == name)
+		if(timers[i].name == name)
 		{
 			timers.erase(timers.begin()+i);
 			return;
@@ -222,13 +221,13 @@ void Object::CancelTimer(string name)
 
 float* Object::GetTimer(string name)
 {
-	erase_all(name, " ");
+//	erase_all(name, " ");
 //	name = type::Name(this) + "::" + name + "()";
 	for(auto& t : timers)
 	{
-		if(t->name == name)
+		if(t.name == name)
 		{
-			return &t->time;
+			return &(t.time);
 		}
 	}
 	return nullptr;

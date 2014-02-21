@@ -13,7 +13,6 @@ namespace lfant {
 
 class SphereCollider : public Collider
 {
-	DECLARE_TYPE(Component, SphereCollider)
 public:
 	virtual void Init();
 

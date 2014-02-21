@@ -1,22 +1,11 @@
-/******************************************************************************
-*
-*	LFANT Source
-*	Copyright (C) 2012-2013 by LazyFox Studios
-*	Created: 2012-07-17 by Taylor Snead
+/*
+*	Copyright (C) 2013-2014, by loafofpiecrust
 *
 *	Licensed under the Apache License, Version 2.0 (the "License");
 *	you may not use this file except in compliance with the License.
-*	You may obtain a copy of the License at
-*
-*	http://www.apache.org/licenses/LICENSE-2.0
-*
-*	Unless required by applicable law or agreed to in writing, software
-*	distributed under the License is distributed on an "AS IS" BASIS,
-*	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-*	See the License for the specific language governing permissions and
-*	limitations under the License.
-*
-******************************************************************************/
+*	You may obtain a copy of the License in the accompanying LICENSE file or at
+*		http://www.apache.org/licenses/LICENSE-2.0
+*/
 #pragma once
 
 #include <lfant/stdafx.h>
@@ -70,7 +59,7 @@ bool EntityActive(Entity* ent);
  *	@todo
  *		Organize...
  */
-class Entity : public Object
+class Entity final : public Object
 {
 	friend class lfant::editor::gui::Inspector;
 	friend class lfant::editor::gui::EntityTree;
@@ -80,7 +69,6 @@ class Entity : public Object
 	friend class Renderer;
 
 public:
-	Entity();
 	Entity(const Entity& ent);
 	virtual ~Entity();
 
@@ -95,6 +83,9 @@ public:
 
 	static void Bind() __attribute__((constructor));
 
+	Entity* AddChild();
+	void RemoveChild(Entity* ent);
+
 	/**
 	 *	Adds a new component by instancing the given type.
 	 *	@tparam C The class of component to add.
@@ -102,12 +93,18 @@ public:
 	template<typename C>
 	C* AddComponent()
 	{
-		if(GetComponent<C>()) return nullptr;
-
-		C* comp = new C();
-		AddComponent(comp);
-		TriggerEvent("OnSetComponent"+type::Descope(type::Name(comp)), comp);
-		return comp;
+		C* comp = GetComponent<C>();
+		if(comp)
+		{
+			return comp;
+		}
+		else
+		{
+			comp = new C();
+			AddComponent(comp);
+			TriggerEvent("OnSetComponent"+type::Descope(type::Name(comp)), comp);
+			return comp;
+		}
 	}
 
 	Component* AddComponent(string type);
@@ -147,26 +144,27 @@ public:
 	Component* GetComponent(string name);
 
 	template<typename C>
-	deque<C*> GetComponents()
+	std::deque<C*> GetComponents()
 	{
-		deque<C*> comps;
+		std::deque<C*> comps;
 		for(auto& comp : components)
 		{
 			if(type::Name(comp) == type::Name<C>())
 			{
-				comps += dynamic_cast<C*>(comp.get());
+				comps.push_back(dynamic_cast<C*>(comp.get()));
 			}
 		}
 		return comps;
 	}
 
 	Entity* GetChild(string name, bool recursive = false);
+	Entity* GetChild(uint idx);
 
 	template<typename C>
-	deque<C*> GetChildrenWithComponent(bool recursive = false)
+	std::deque<C*> GetChildrenWithComponent(bool recursive = false)
 	{
 		C* temp = nullptr;
-		deque<C*> result;
+		std::deque<C*> result;
 		for(auto& child : children)
 		{
 			temp = child->GetComponent<C>();
@@ -178,43 +176,45 @@ public:
 		return result;
 	}
 
-	Entity* SpawnChild();
+//	Entity* SpawnChild();
 
 	bool HasTag(string tag);
 
 	uint32_t GetId() const { return id; }
 
-	uint32_t GetLayer();
+	uint32_t GetLayer() const;
 	void SetLayer(uint32_t layer);
 
-	Entity* GetParent();
-	void SetParent(Entity* ent);
+	Entity* GetParent() const;
+	Entity* GetParent(uint height) const;
+	void Reparent(Entity* ent);
 
-	void SetName(string name) { this->name = name; }
+	string GetName() const;
+	void Rename(string name);
 
 	Transform* transform;
 
-	/// Whether to update this Entity or not.
 	bool active = true;
-
-	string name = "Entity";
-
-	/// The identifying tags used for grouping.
-	deque<string> tags;
-
 	float lifetime = 0.0f;
+	std::deque<string> tags;
+	
+	std::deque<ptr<Entity>> children;
 
-protected:
+private:
+	Entity();
 
 	virtual void Init();
 	virtual void Update();
 	virtual void FixedUpdate();
 	virtual void Render();
-//	virtual void Deinit();
+	virtual void Deinit();
 
+	/// @todo Make public?
 	void AddChild(Entity* ent);
-	void RemoveChild(Entity* ent);
-	void Deinit();
+	void RemoveChild(Entity* ent, bool destroy);
+
+	void AddComponent(Component* comp);
+	void RemoveComponent(Component* comp);
 
 	template<typename... P>
 	void TriggerEventWithChildren(string name, P... args)
@@ -237,15 +237,10 @@ protected:
 		}
 	}
 
-private:
 
-	void AddComponent(Component* comp);
-	Component* AddComponent(string type, Properties* prop);
-	void RemoveComponent(Component* comp);
+	std::deque<ptr<Component>> components;
 
-	deque< ptr<Entity> > children;
-	deque< ptr<Component> > components;
-	bool useLifeTime = false;
+	string name = "Entity";
 
 	/// Scene-unique identifier.
 	uint32_t id = 0;
@@ -254,6 +249,8 @@ private:
 	uint32_t layer = -1;
 
 	Entity* parent = nullptr;
+
+	bool useLifeTime = false;
 };
 
 /** @} */

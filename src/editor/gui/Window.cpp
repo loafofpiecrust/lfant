@@ -34,6 +34,9 @@
 #include <boost/extension/shared_library.hpp>
 #include <boost/filesystem.hpp>
 
+
+using std::cout;
+
 namespace lfant {
 namespace editor {
 namespace gui {
@@ -250,7 +253,7 @@ void Window::Deinit()
 
 void Window::AddEntity(wxCommandEvent& evt)
 {
-	game->scene->Spawn(inspector->GetEntity(), "Entity");
+	inspector->GetEntity()->AddChild();
 }
 
 string Window::ConvertString(const wxString& str)
@@ -331,7 +334,8 @@ void Window::RefreshEntity(wxCommandEvent& evt)
 
 void Window::OnLoadProject(wxCommandEvent& event)
 {
-	wxFileDialog dialog(nullptr, "Choose project dir", "", "", "Shared Library (*.so)|*.so", wxFD_OPEN /*| wxFD_CHANGE_DIR*/ | wxFD_FILE_MUST_EXIST);
+	cout << "Opening dialog\n";
+	wxFileDialog dialog(nullptr, "Choose project dir", "", "", "Executable (*)|*", wxFD_OPEN /*| wxFD_CHANGE_DIR*/ | wxFD_FILE_MUST_EXIST);
 
 	if(dialog.ShowModal() == wxID_CANCEL)
 	{
@@ -535,7 +539,8 @@ void Window::AddMenuItem(string name, string label, wxObjectEventFunction evt)
 {
 	if(evt)
 	{
-		Connect(GetId(name), wxEVT_COMMAND_MENU_SELECTED, evt);
+	//	Connect(GetId(name), wxEVT_COMMAND_MENU_SELECTED, evt);
+		menuStack[menuStack.size()-1]->Bind(wxEVT_COMMAND_MENU_SELECTED, evt, this, GetId(name));
 	}
 	menuStack[menuStack.size()-1]->Append(GetId(name), label);
 }

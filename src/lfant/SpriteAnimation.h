@@ -13,7 +13,6 @@ class Sprite;
 
 class SpriteAnimation : public Animation
 {
-	DECLARE_TYPE(Component, SpriteAnimation)
 
 	class Clip : public Animation::Clip
 	{

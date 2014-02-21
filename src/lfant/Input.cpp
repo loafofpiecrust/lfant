@@ -1,37 +1,28 @@
-/******************************************************************************
-*
-*	LFANT Source
-*	Copyright (C) 2012-2013 by LazyFox Studios
+/*
+*	Copyright (C) 2013-2014, by loafofpiecrust
 *	Created: 2012-07-16 by Taylor Snead
 *
 *	Licensed under the Apache License, Version 2.0 (the "License");
 *	you may not use this file except in compliance with the License.
-*	You may obtain a copy of the License at
-*
-*	http://www.apache.org/licenses/LICENSE-2.0
-*
-*	Unless required by applicable law or agreed to in writing, software
-*	distributed under the License is distributed on an "AS IS" BASIS,
-*	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-*	See the License for the specific language governing permissions and
-*	limitations under the License.
-*
-******************************************************************************/
+*	You may obtain a copy of the License in the accompanying LICENSE file or at
+*		http://www.apache.org/licenses/LICENSE-2.0
+*/
 
 #include <lfant/Input.h>
 
-// External
-#include <iostream>
-//#include <GLFW/glfw3.h>
-
 // Internal
-
 #include <lfant/Game.h>
 #include <lfant/Time.h>
 #include <lfant/Renderer.h>
 #include <lfant/Properties.h>
 #include <lfant/Console.h>
 #include <lfant/UserInterface.h>
+
+// External
+#include <iostream>
+
+
+using namespace boost::algorithm;
 
 namespace lfant
 {
@@ -125,26 +116,32 @@ void Input::Update()
 void Input::Load(Properties* prop)
 {
 	Subsystem::Load(prop);
-	
+
 	Log("Loading input props...");
-	deque<Properties*> binds = prop->GetChildren("axis");
+//	deque<Properties*> binds = prop->GetChildren("axis");
+//	Properties* binds = prop->GetChild("axes");
 	Axis axis("");
-	for(auto& i : binds)
+	for(auto& b : prop->children)
 	{
-		axis.name = i->id;
+		if(!b->IsType("axis")) continue;
+
+		axis.name = b->name;
 		if(axis.name == "") continue;
 
-		axis.positive = Key[i->Get<string>("positive")];
-		axis.negative = Key[i->Get<string>("negative")];
-		axis.positiveAlt = Key[i->Get<string>("positiveAlt")];
-		axis.positiveAlt = Key[i->Get<string>("negativeAlt")];
+		Log("Adding axis '"+axis.name+"'");
+
+		axis.positive = Key[b->Get("positive")];
+		axis.negative = Key[b->Get("negative")];
+	//	axis.positiveAlt = Key[i->Get<string>("positiveAlt")];
+	//	axis.positiveAlt = Key[i->Get<string>("negativeAlt")];
+
+	//	axis.sensitivity = .asFloat();
+		b->Get("sensitivity", axis.sensitivity);
+		b->Get("dead", axis.dead);
+		b->Get("snap", axis.snap);
+		b->Get("joyNum", axis.joyNum);
 
 		axes.push_back(axis);
-
-		i->Get("sensitivity", axis.sensitivity);
-		i->Get("dead", axis.dead);
-		i->Get("snap", axis.snap);
-		i->Get("joyNum", axis.joyNum);
 	}
 }
 

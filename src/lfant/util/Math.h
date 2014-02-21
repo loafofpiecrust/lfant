@@ -1,7 +1,5 @@
-/******************************************************************************
-*
-*	LFANT Source
-*	Copyright (C) 2012-2013 by LazyFox Studios
+/*
+*	Copyright (C) 2013-2014, by loafofpiecrust
 *	Created: 2012-11-04 by Taylor Snead
 *
 *	Licensed under the Apache License, Version 2.0 (the "License");

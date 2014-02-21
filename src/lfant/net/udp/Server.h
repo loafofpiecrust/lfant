@@ -14,7 +14,6 @@ namespace udp {
 
 class Server : public net::User
 {
-	DECLARE_TYPE(net::User, net::udp::Server)
 public:
 	Server();
 	virtual ~Server();

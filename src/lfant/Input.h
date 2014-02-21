@@ -1,22 +1,11 @@
-/******************************************************************************
-*
-*	LFANT Source
-*	Copyright (C) 2012-2013 by LazyFox Studios
-*	Created: 2012-07-16 by Taylor Snead
+/*
+*	Copyright (C) 2013-2014, by loafofpiecrust
 *
 *	Licensed under the Apache License, Version 2.0 (the "License");
 *	you may not use this file except in compliance with the License.
-*	You may obtain a copy of the License at
-*
-*	http://www.apache.org/licenses/LICENSE-2.0
-*
-*	Unless required by applicable law or agreed to in writing, software
-*	distributed under the License is distributed on an "AS IS" BASIS,
-*	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-*	See the License for the specific language governing permissions and
-*	limitations under the License.
-*
-******************************************************************************/
+*	You may obtain a copy of the License in the accompanying LICENSE file or at
+*		http://www.apache.org/licenses/LICENSE-2.0
+*/
 #pragma once
 #include <lfant/stdafx.h>
 
@@ -148,13 +137,13 @@ class Input : public Subsystem
 {
 	friend class Game;
 
-	struct Axis
+	class Axis
 	{
+		friend class Input;
+	public:
 		string name = "NewAxis";
-		uint16_t positive;
-		uint16_t negative;
-		uint16_t positiveAlt;
-		uint16_t negativeAlt;
+		uint16_t positive = '\0';
+		uint16_t negative = '\0';
 		float sensitivity = 3.0f;
 		float dead = 0.001f;
 		bool snap = true;
@@ -163,34 +152,40 @@ class Input : public Subsystem
 		/// Number of the controller to use. 0 means all.
 		byte joyNum = 0;
 
-		float value = 0.0f;
-		bool posHeld = false;
-		bool negHeld = false;
-		bool down = false;
-		bool up = false;
+
+		float GetValue() const
+		{
+			return value;
+		}
 
 		Axis(string name) :
 			name(name)
 		{
 		}
 
-		Axis(string name, uint16_t positive, uint16_t negative = '\n', float sensitivity = 3.0f, float dead = 0.001f, bool snap =
-				 true, byte joyNum = 0) :
-			name(name), positive(positive), negative(negative), sensitivity(sensitivity), dead(dead), snap(snap), joyNum(
-				joyNum)
+		Axis(string name, uint16_t positive, uint16_t negative) :
+			name(name), positive(positive), negative(negative)
 		{
 		}
 
-		Axis(string name, uint16_t positive, uint16_t negative = '\n', uint16_t altpos = '\n', uint16_t altneg = '\n',
-			 float sensitivity = 3.0f, float dead = 0.001f, bool snap = true, byte joyNum = 0) :
-			name(name), positive(positive), negative(negative), positiveAlt(altpos), negativeAlt(altneg), sensitivity(
-				sensitivity), dead(dead), snap(snap), joyNum(joyNum)
+		Axis(string name, uint16_t positive, uint16_t negative, float sens, float dead, bool snap) :
+			name(name), positive(positive), negative(negative),
+			sensitivity(sens), dead(dead), snap(snap)
 		{
 		}
 
 		~Axis()
 		{
 		}
+
+	private:
+
+		float value = 0.0f;
+
+		bool posHeld = false;
+		bool negHeld = false;
+		bool down = false;
+		bool up = false;
 	};
 
 	struct Joystick
@@ -219,10 +214,12 @@ public:
 	void OnMouseMove(vec2 pos);
 	void OnMouseButton(int btn, int action, int mods);
 
-	void AddAxis(string name, string positive = "null", string negative = "null", string altpos = "null", string altneg = "null", float sens = 3.0f, float dead = 0.001f, bool snap = true, byte joyNum = 0);
+	/// example:
+	/// AddAxis({"Forward", 'w', 's'});
+	void AddAxis(Axis axis);
 
 	// Axes
-	float GetAxis(string name) const;
+	Axis* GetAxis(string name) const;
 
 	// Buttons: Positive side of the given axis
 	int8_t GetButton(string name) const;
@@ -241,14 +238,14 @@ public:
 
 	void GetJoystickAxes();
 
-	bool lockMouse;
-	float mouseSpeed;
+	bool lockMouse = false;
+	float mouseSpeed = 1.0f;
 
 protected:
-	deque<Axis> axes;
-	deque<Joystick> joysticks;
+	std::deque<Axis> axes;
+	std::deque<Joystick> joysticks;
 #if ANDROID
-	deque<Touch> touches;
+	std::deque<Touch> touches;
 #endif
 
 	/// The string of input this frame.

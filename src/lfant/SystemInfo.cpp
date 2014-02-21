@@ -213,7 +213,7 @@ void SystemInfo::Init()
 	}
 	pclose(cmd);
 
-	deque<string> result_spl = Split(string(result), " \n");
+	std::deque<string> result_spl = Split(string(result), " \n");
 	OS = result_spl[result_spl.size() - 1] + " " + result_spl[2];
 	computerName = result_spl[1];
 
@@ -297,7 +297,7 @@ void SystemInfo::Init()
 
 void SystemInfo::Init()
 {
-	
+
 }
 
 #endif

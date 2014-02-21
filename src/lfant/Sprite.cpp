@@ -1,22 +1,12 @@
-/******************************************************************************
-*
-*	LFANT Source
-*	Copyright (C) 2012-2013 by LazyFox Studios
+/*
+*	Copyright (C) 2013-2014, by loafofpiecrust
 *	Created: 2012-07-28 by Taylor Snead
 *
 *	Licensed under the Apache License, Version 2.0 (the "License");
 *	you may not use this file except in compliance with the License.
-*	You may obtain a copy of the License at
-*
-*	http://www.apache.org/licenses/LICENSE-2.0
-*
-*	Unless required by applicable law or agreed to in writing, software
-*	distributed under the License is distributed on an "AS IS" BASIS,
-*	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-*	See the License for the specific language governing permissions and
-*	limitations under the License.
-*
-******************************************************************************/
+*	You may obtain a copy of the License in the accompanying LICENSE file or at
+*		http://www.apache.org/licenses/LICENSE-2.0
+*/
 #include <lfant/Sprite.h>
 
 // External
@@ -129,20 +119,22 @@ void Sprite::Load(Properties *props)
 //	material->texture->mode = GL_TEXTURE_RECTANGLE;
 	material->LoadFile(mat);
 	// Register Animation::Mode enum
+/*
 	props->SetEnum("Mode::Loop", Animation::Mode::Loop);
 	props->SetEnum("Mode::Bounce", Animation::Mode::Bounce);
 	props->SetEnum("Mode::Once", Animation::Mode::Once);
 	props->SetEnum("Mode::Default", Animation::Mode::Default);
+*/
 
-	deque<Properties*> panims = props->GetChildren("animation");
-	for(Properties*& pa : panims)
+//	deque<Properties*> panims = props->GetChildren("animation");
+	for(Properties* pa : *props->GetChild("animations"))
 	{
 		Animation anim;
-		anim.name = pa->id;
+		pa->Get("name", anim.name);
 		string mat = "materials/Diffuse.mat";
 		anim.material.LoadFile(pa->Get("material"));
 		pa->Get("frameRate", anim.frameRate);
-		pa->GetEnum("playMode", anim.mode);
+	//	pa->GetEnum("playMode", anim.mode);
 	}
 }
 

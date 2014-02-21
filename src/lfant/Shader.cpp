@@ -12,6 +12,9 @@
 // External
 #include <GL/glew.h>
 #include <boost/range/algorithm/remove_if.hpp>
+#include <glm/glm.hpp>
+
+using namespace std;
 
 namespace lfant
 {
@@ -73,6 +76,7 @@ void Shader::LoadFile(string file)
 
 void Shader::LoadFile(string vert, string frag, string geom, string comp)
 {
+	Log("Loading shader files");
 	LoadFile(vert);
 	LoadFile(frag);
 	LoadFile(geom);
@@ -106,12 +110,16 @@ void Shader::Compile()
 
 	if(vertex != "")
 	{
+		Log("Compiling vertex");
 		vert = Compile(GL_VERTEX_SHADER, vertex);
+		Log("Attaching vertex");
 		glAttachShader(id, vert);
 	}
 	if(fragment != "")
 	{
+		Log("Compiling fragment");
 		frag = Compile(GL_FRAGMENT_SHADER, fragment);
+		Log("Attaching fragment");
 		glAttachShader(id, frag);
 	}
 #if !LFANT_GLES
@@ -180,11 +188,13 @@ uint32 Shader::GetId()
 
 uint32 Shader::Compile(uint32 type, const string &path)
 {
+	Log("Shader::Compile() {");
 	ifstream stream(game->fileSystem->GetGamePath(path).string());
 	string line = "";
 	string source = "";
 
 	deque<string> str;
+	Log("Reading the file");
 	while(stream.good())
 	{
 		getline(stream, line);
@@ -210,13 +220,17 @@ uint32 Shader::Compile(uint32 type, const string &path)
 	}
 	stream.close();
 
+	Log("glCreateShader");
 	uint32 shader = glCreateShader(type);
-	const char* csource = source.c_str();
+	const char* csource = (source+"\0").c_str();
+	Log("glShaderSource");
 	glShaderSource(shader, 1, &csource, 0);
+	Log("glCompileShader");
 	glCompileShader(shader);
 
 	int32 logLength = 0;
 	int32 result = 0;
+	Log("Getting shader output values");
 	glGetShaderiv(shader, GL_COMPILE_STATUS, &result);
 	glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &logLength);
 	char error[logLength];
@@ -226,6 +240,7 @@ uint32 Shader::Compile(uint32 type, const string &path)
 		Log(error);
 	}
 
+	Log("}");
 	return shader;
 }
 

@@ -1,22 +1,11 @@
-/******************************************************************************
-*
-*	LFANT Source
-*	Copyright (C) 2012-2013 by LazyFox Studios
-*	Created: 2012-07-28 by Taylor Snead
+/*
+*	Copyright (C) 2013-2014, by loafofpiecrust
 *
 *	Licensed under the Apache License, Version 2.0 (the "License");
 *	you may not use this file except in compliance with the License.
-*	You may obtain a copy of the License at
-*
+*	You may obtain a copy of the License in the accompanying LICENSE file or at
 *		http://www.apache.org/licenses/LICENSE-2.0
-*
-*	Unless required by applicable law or agreed to in writing, software
-*	distributed under the License is distributed on an "AS IS" BASIS,
-*	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-*	See the License for the specific language governing permissions and
-*	limitations under the License.
-*
-******************************************************************************/
+*/
 #pragma once
 
 #include <lfant/stdafx.h>
@@ -59,9 +48,12 @@ struct remove_ref < T&& >
 
 namespace type {
 
+using std::enable_if;
+using std::is_pointer;
+
 string Name();
 
-string Demangle(string type);
+string Demangle(const string& type);
 string Descope(string type, int amount = -1);
 string Descope(string type, string nspace);
 
@@ -124,28 +116,28 @@ bool Compare(T1 p1)
 }
 
 // Type-Casting
-template<typename RT = vec2, typename IT>
+template<typename RT, typename IT>
 RT vec2_cast(IT v)
 {
 	RT vv {v[0], v[1]};
 	return vv;
 }
 
-template<typename RT = vec3, typename IT>
+template<typename RT, typename IT>
 RT vec3_cast(IT v)
 {
 	RT vv {v[0], v[1], v[2]};
 	return vv;
 }
 
-template<typename RT = vec4, typename IT>
+template<typename RT, typename IT>
 RT vec4_cast(IT v)
 {
 	RT vv = {v[0], v[1], v[2], v[3]};
 	return vv;
 }
 
-template<typename RT = quat, typename IT>
+template<typename RT, typename IT>
 RT quat_cast(IT q)
 {
 	RT qq {q[0], q[1], q[2], q[3]};

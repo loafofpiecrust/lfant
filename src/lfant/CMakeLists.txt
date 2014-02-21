@@ -72,6 +72,7 @@ include_directories(
 	${ROOT}/external/squirrel/include
 	${ROOT}/external/devil/include
 	${ROOT}/external/openal/include
+	${ROOT}/external/plaidaudio
 #	"${ROOT}/external/gameswf"
 	)
 
@@ -85,6 +86,7 @@ target_link_libraries(${PROJECT_NAME}
 	squirrel
 	jpeg
 	openal
+	json
 	)
 
 if(NOT ANDROID)

@@ -12,7 +12,6 @@ namespace editor {
 
 class MouseLook : public Component
 {
-	DECLARE_TYPE(Component, editor::MouseLook)
 public:
 	virtual void Load(Properties* prop);
 	virtual void Save(Properties* prop);

@@ -189,7 +189,7 @@ setting CMake options and regenerating, rather than editing directly.
 // Define the default place where cegui will look for loadable modules
 // this can be changed at runtime via the CEGUI_MODULE_DIR environment var.
 #if defined(_WIN32) || defined(__WIN32__)
-#   define CEGUI_MODULE_DIR "/home/android/piecrust/lfant/bin/arm/build/bin/"
+#   define CEGUI_MODULE_DIR "/home/taylorsnead/piecrust/lfant/bin/x64/linux/build/bin/"
 #else
 #   define CEGUI_MODULE_DIR "/usr/local//"
 #endif

@@ -1,22 +1,11 @@
-/******************************************************************************
-*
-*	LFANT Source
-*	Copyright (C) 2012-2013 by LazyFox Studios
-*	Created: 2013-03-16 by Taylor Snead
+/*
+*	Copyright (C) 2013-2014, by loafofpiecrust
 *
 *	Licensed under the Apache License, Version 2.0 (the "License");
 *	you may not use this file except in compliance with the License.
-*	You may obtain a copy of the License at
-*
+*	You may obtain a copy of the License in the accompanying LICENSE file or at
 *		http://www.apache.org/licenses/LICENSE-2.0
-*
-*	Unless required by applicable law or agreed to in writing, software
-*	distributed under the License is distributed on an "AS IS" BASIS,
-*	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-*	See the License for the specific language governing permissions and
-*	limitations under the License.
-*
-******************************************************************************/
+*/
 #pragma once
 #include <lfant/stdafx.h>
 
@@ -29,6 +18,7 @@
 // External
 #include <map>
 #include <iostream>
+//#include <json/value.h>
 
 namespace lfant {
 
@@ -42,124 +32,109 @@ class Entity;
  */
 
 /**
+ * Usage case:
+ *
+ * Properties prop; prop.LoadFile("settings.json");
  *
  */
 class Properties
 {
+	class Iterator
+	{
+	public:
+		Iterator(Properties* prop, uint pos) :
+			pos(pos), prop(prop)
+		{
+		}
+
+		Properties* operator*();
+		bool operator!=(const Iterator& other) const;
+		const Iterator& operator++();
+
+	private:
+		uint pos;
+		Properties* prop;
+	};
+
 //	friend class lfant::editor::gui::Window;
 public:
 
 	Properties();
 	Properties(string path);
+	Properties(Properties* parent, string type = "", string name = "");
 	~Properties();
+
+	Iterator begin();
+	Iterator end();
 
 	void LoadFile(string path);
 	void SaveFile(string path);
 
-	void LoadStream(istream& stream);
-	void SaveStream(ostream& stream);
+	void LoadStream(std::istream& stream);
+	void SaveStream(std::ostream& stream);
 
 	Properties* GetFirstChild();
 	Properties* GetChild(string type);
-	Properties* GetChildById(string id);
-
-	const deque<ptr<Properties>>& GetChildren();
-	deque<Properties*> GetChildren(string type);
-
-	qumap<string, string>& GetValues();
-
-	Properties* AddChild(Properties* prop);
-	Properties* AddChild(string type = "", string id = "");
-	Properties* AddChild(istream& stream, string type, string id, bool first = true);
+	Properties* GetChild(uint idx);
 
 	void Clear();
 
 	template<typename T>
 	void Set(string name, const T& value)
 	{
-		Set(name, lexical_cast<string>(value));
+		SetString(name, lexical_cast<string>(value));
 	}
-
-	void AddValue(string name, string value);
-	void SubtractValue(string name, string value);
 
 	template<typename T>
 	void Get(string name, T& ref)
 	{
-		string value = values[name];
-		if(value != "")
+		string value = GetString(name);
+		if(!value.empty())
 		{
-			ref = lexical_cast<T>(values[name]);
+			ref = lexical_cast<T>(value);
 		}
 	}
 
 	void Get(string name, Entity*& ref);
-
 	void Set(string name, Entity* const& value);
-	void Set(string name, string value);
 
 	template<typename T = string>
 	T Get(string name)
 	{
-		return lexical_cast<T>(values[name]);
+		return lexical_cast<T>(GetString(name));
 	}
 
-	template<typename T>
-	void SetEnum(string name, T value)
-	{
-		enums[name] = lexical_cast<string>((int)value);
-	}
+	string GetName();
 
-	template<typename T>
-	void GetEnum(string name, T& ref)
-	{
-		string e = enums[Get<string>(name)];
-		if(e != "")
-		{
-			ref = (T)lexical_cast<int>(e);
-		}
-	}
+//	Properties* AddArray(string name);
+	Properties* AddChild(string name = "");
 
-	void GetType(string& ref)
-	{
-		if(type != "")
-		{
-			ref = type;
-		}
-	}
-
-	void GetId(string& ref)
-	{
-		if(id != "")
-		{
-			ref = id;
-		}
-	}
+	bool IsType(string type);
+	bool IsNamed(string name);
 
 	string type = "";
-	string id = "";
+	string name = "";
 
-	qumap<string, string> values;
-	deque<ptr<Properties>> children;
-
+	std::map<string, string> values;
+	std::deque<ptr<Properties>> children;
 protected:
 
 private:
-	Properties(istream& stream, string type, string id = "", Properties* parent = nullptr, bool first = true);
-	Properties(ostream& stream, string type, string id = "", Properties* parent = nullptr, bool first = true);
-
-	void SkipSpace(istream& stream);
-	string TrimSpace(string str, bool onlyIndent = false);
-	string Expand(string value);
-	string GetIndent();
-
-	string ParseValue(string val);
-
 	Properties* GetTopParent();
 
-	qumap<string, string> enums;
+	string GetString(string name);
+	void SetString(string name, string value);
+
+//	qumap<string, string> enums;
 	Properties* parent = nullptr;
-	bool getFirstLine = true;
+//	bool getFirstLine = true;
+//	bool isArray = false;
+
+	string Expand(string value);
+	void TrimSpace(string& str, bool onlyIndent);
+	void SkipSpace(std::istream& stream);
+	Properties* AddChild(Properties* prop);
+	string GetIndent();
 };
 
 /** @} */

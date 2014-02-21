@@ -1,7 +1,5 @@
-/******************************************************************************
-*
-*	LFANT Source
-*	Copyright (C) 2012-2013 by LazyFox Studios
+/*
+*	Copyright (C) 2013-2014, by loafofpiecrust
 *	Created: 2012-07-28 by Taylor Snead
 *
 *	Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,6 +23,8 @@
 // External
 #include <lfant/util/lexical_cast.h>
 
+using namespace std;
+
 namespace lfant {
 namespace type {
 
@@ -33,9 +33,13 @@ string Name()
 	return "";
 }
 
-string Demangle(string type)
+string Demangle(const string& type)
 {
-	return string(abi::__cxa_demangle(type.c_str(), 0, 0, (int*)0));
+	int result = 0;
+	char* c = abi::__cxa_demangle(type.c_str(), 0, 0, &result);
+	string final = string(c);
+	if(c) delete[] c;
+	return final;
 }
 
 string Descope(string type, int amount)

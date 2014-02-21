@@ -50,11 +50,6 @@
 // General Preprocessor
 #define GLFW_DLL 1
 
-/**
- *	Gives a null type for non-pointers
- *	@todo Make this a class so type specification is not needed.
- */
-#define null(type) *((type*)nullptr)
 #define GLM_SWIZZLE 1
 #define GLM_FORCE_RADIANS 1
 #define BOOST_EXCEPTION_DISABLE

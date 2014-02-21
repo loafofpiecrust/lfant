@@ -1,22 +1,11 @@
-/******************************************************************************
-*
-*	LFANT Source
-*	Copyright (C) 2012-2013 by LazyFox Studios
-*	Created: 2012-10-28 by Taylor Snead
+/*
+*	Copyright (C) 2013-2014, by loafofpiecrust
 *
 *	Licensed under the Apache License, Version 2.0 (the "License");
 *	you may not use this file except in compliance with the License.
-*	You may obtain a copy of the License at
-*
+*	You may obtain a copy of the License in the accompanying LICENSE file or at
 *		http://www.apache.org/licenses/LICENSE-2.0
-*
-*	Unless required by applicable law or agreed to in writing, software
-*	distributed under the License is distributed on an "AS IS" BASIS,
-*	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-*	See the License for the specific language governing permissions and
-*	limitations under the License.
-*
-******************************************************************************/
+*/
 #pragma once
 #include <lfant/stdafx.h>
 
@@ -25,8 +14,10 @@
 // Internal
 #include <lfant/TypeInfo.h>
 #include <lfant/Properties.h>
+#include <lfant/ptr.h>
 
 // External
+#include <boost/algorithm/string.hpp>
 #include <boost/signals2.hpp>
 #include <boost/bind.hpp>
 #include <boost/bind/placeholders.hpp>
@@ -102,7 +93,7 @@ class Object
 	class Event0 : public EventBase
 	{
 		typedef boost::function<void()> funcType;
-		deque<funcType> functions;
+		std::deque<funcType> functions;
 
 		Event0(string name, Object* sender) :
 			EventBase(name, sender)
@@ -147,7 +138,7 @@ class Object
 	{
 	public:
 		typedef boost::function<void(P...)> funcType;
-		deque<funcType> functions;
+		std::deque<funcType> functions;
 
 		Event(string name, Object* sender) :
 			EventBase(name, sender)
@@ -220,6 +211,8 @@ class Object
 			name(name), time(time)
 		{
 		}
+
+		~Timer() {}
 	};
 
 public:
@@ -285,7 +278,7 @@ public:
 	template<typename R>
 	static void ConnectEvent(Object* sender, string name, R* receiver, void (R::*func)(), bool dis = false)
 	{
-		erase_all(name, " ");
+		boost::algorithm::erase_all(name, " ");
 		name = name + "()";
 		for(auto& evt : Object::events)
 		{
@@ -307,7 +300,7 @@ public:
 	template<typename R, typename P1, typename... P>
 	static void ConnectEvent(Object* sender, string name, R* receiver, void (R::*func)(P1, P...), bool dis = false)
 	{
-		erase_all(name, " ");
+	//	erase_all(name, " ");
 		name = name + "(" + type::Name<P1, P...>() + ")";
 		for(auto& evt : Object::events)
 		{
@@ -341,7 +334,7 @@ public:
 	template<typename T>
 	static void ConnectEvent(Object* sender, string name, T* var)
 	{
-		erase_all(name, " ");
+	//	erase_all(name, " ");
 		name = name + "(" + type::Name<T>() + ")";
 		EventVar<T>* con = nullptr;
 		for(auto& evt : Object::events)
@@ -362,7 +355,7 @@ public:
 
 	void TriggerEvent(string name)
 	{
-		erase_all(name, " ");
+	//	erase_all(name, " ");
 		name = name + "()";
 		for(auto& evt : Object::events)
 		{
@@ -379,7 +372,7 @@ public:
 	template<typename P1>
 	void TriggerEvent(string name, P1 arg)
 	{
-		erase_all(name, " ");
+	//	erase_all(name, " ");
 		name = name + "(" + type::Name<P1>() + ")";
 		for(auto& evt : Object::events)
 		{
@@ -407,7 +400,7 @@ public:
 	template<typename P1, typename... P>
 	void TriggerEvent(string name, P1 arg1, P... args)
 	{
-		erase_all(name, " ");
+	//	erase_all(name, " ");
 		name = name + "(" + type::Name<P1, P...>() + ")";
 		for(auto& evt : Object::events)
 		{
@@ -511,9 +504,8 @@ private:
 	// For scripts
 	void ConnectScriptEvent(Object* sender, string name, Sqrat::Object* receiver, Sqrat::Function* func);
 
-	static deque<ptr<EventBase>> events;
-	deque<Timer*> timers;
-
+	static std::deque<ptr<EventBase>> events;
+	std::vector<Timer> timers;
 };
 
 /// @}

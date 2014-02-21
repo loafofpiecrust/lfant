@@ -116,10 +116,10 @@ protected:
 	static qumap<string, int> ids;
 	static int currId;
 	wxAuiManager* manager = nullptr;
-	deque<wxAuiNotebook*> notebooks;
+	std::deque<wxAuiNotebook*> notebooks;
 
-	deque<wxObject*> widgetStack;
-	deque<wxMenu*> menuStack;
+	std::deque<wxObject*> widgetStack;
+	std::deque<wxMenu*> menuStack;
 
 	wxMenuBar* menuBar = nullptr;
 	GLCanvas* canvas = nullptr;

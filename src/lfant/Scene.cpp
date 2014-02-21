@@ -45,6 +45,8 @@ Scene::~Scene()
 void Scene::Init()
 {
 	Subsystem::Init();
+
+	root = new Entity();
 	if(game->defaultScene != "")
 	{
 		Log("About to load '"+game->defaultScene+"' as default.");
@@ -55,36 +57,18 @@ void Scene::Init()
 void Scene::Update()
 {
 	Subsystem::Update();
-	for(auto& ent : entities)
-	{
-		if(!ent || !ent->active)
-			continue;
-
-		ent->Update();
-	}
+	GetRoot()->Update();
 }
 
 void Scene::Render()
 {
 	Subsystem::Render();
-	for(auto& ent : entities)
-	{
-		if(!ent || !ent->active)
-			continue;
-
-		ent->Render();
-	}
+	root->Render();
 }
 
 void Scene::FixedUpdate()
 {
-	for(auto& ent : entities)
-	{
-		if(!ent || !ent->active)
-			continue;
-
-		ent->FixedUpdate();
-	}
+	root->FixedUpdate();
 }
 
 void Scene::Deinit()
@@ -95,106 +79,22 @@ void Scene::Deinit()
 
 void Scene::Clear()
 {
-	for(auto& ent : entities)
-	{
-		Log("Scene::Destroy: Destroying ", ent->name);
-		ent->Deinit();
-	}
-	entities.clear();
-}
-
-void Scene::RemoveEntity(Entity* ent, bool destroy)
-{
-	for(auto i = entities.begin(); i != entities.end(); ++i)
-	{
-		if(*i == ent)
-		{
-			Log("Scene::RemoveEntity: Touch.");
-			if(!destroy)
-			{
-				*i = nullptr;
-			}
-			entities.erase(i);
-			return;
-		}
-	}
-	Log("Scene::RemoveEntity: Finished.");
-}
-
-Entity* Scene::GetEntity(string name, bool recursive) const
-{
-	for(auto& ent : entities)
-	{
-		if(ent->name == name)
-		{
-			return ent;
-		}
-		if(recursive)
-		{
-			if(Entity* child = ent->GetChild(name, true))
-			{
-				return child;
-			}
-		}
-	}
-	return nullptr;
-}
-
-Entity* Scene::GetEntityById(uint32_t id, bool recursive) const
-{
-	for(auto& ent : entities)
-	{
-		if(ent->GetId() == id)
-		{
-			return ent;
-		}
-		if(recursive)
-		{
-			for(auto& child : ent->children)
-			{
-				if(child->GetId() == id)
-				{
-					return child;
-				}
-			}
-		}
-	}
-	return nullptr;
+//	root->ClearChildren();
 }
 
 uint32_t Scene::GenerateEntityId()
 {
-	/*
-	uint32_t result = 1;
-	for(auto& ent : entities)
-	{
-		if(ent->GetId() == result)
-		{
-			++result;
-		}
-		for(auto& child : ent->children)
-		{
-			if(child->GetId() == result)
-			{
-				++result;
-			}
-		}
-	}
-	return result;
-	*/
 	return ++currentId;
 }
 
 void Scene::Save(Properties* prop) const
 {
 	double t = game->time->GetTime();
-	prop->type = "scene";
-	prop->id = name;
+//	prop->Set("name", "scene");
+//	prop->Set("file", name);
 
-	for(auto& ent : entities)
-	{
-		ent->Save(prop->AddChild());
-	}
+//	root->Save(prop->AddChild(""));
+	root->Save(new Properties(prop));
 	Log("Saving scene took ", game->time->GetTime() - t, " seconds");
 }
 
@@ -203,31 +103,29 @@ void Scene::Load(Properties *prop)
 	double t = game->time->GetTime();
 	currentId = 0;
 	Log("Scene::Load: Loading scene node");
-	for(auto& i : prop->GetChildren("system"))
+//	Properties* systems = prop->GetChild("systems");
+	for(Properties* p : prop->children)
 	{
-		if(i->id == "Physics")
+		if(p->type == "System")
 		{
-			Log("Loading physics from scene");
-			game->physics->Load(i);
+			if(p->name == "Physics")
+			{
+				Log("Loading physics from scene");
+				game->physics->Load(p);
+			}
+			else if(p->name == "Network")
+			{
+				game->network->Load(p);
+			}
+		/*	else if(i->id == "Renderer")
+			{
+				game->renderer->Load(i);
+			}*/
 		}
-		else if(i->id == "Network")
-		{
-			game->network->Load(i);
-		}
-	/*	else if(i->id == "Renderer")
-		{
-			game->renderer->Load(i);
-		}*/
 	}
 
-	Entity* ent = nullptr;
-	for(auto& i : prop->GetChildren("entity"))
-	{
-		Log("About to spawn");
-		ent = Spawn(nullptr, i->id);
-		Log("Spawned the entity!");
-		ent->Load(i);
-	}
+	GetRoot()->Load(prop);
+
 	Log("Loading scene took ", game->time->GetTime() - t, " seconds");
 }
 
@@ -237,50 +135,10 @@ void Scene::LoadFile(string path)
 	currentFile = path;
 }
 
-void Scene::AddEntity(Entity* ent)
+std::deque<Entity*> Scene::GetEntities(string tag) const
 {
-	if(!ent->parent)
-	{
-		entities.push_back(ent);
-		Log("Scene::AddEntity: pushed in.");
-	}
-	else
-	{
-		ent->parent->AddChild(ent);
-	}
-	ent->Init();
-	TriggerEvent("AddEntity", ent);
-	Log("Scene::AddEntity: Finished.");
-}
-
-Entity* Scene::Spawn(Entity* parent, string name)
-{
-	Entity* ent = new Entity;
-	Log("Scene::Spawn: Allocated Entity pointer.");
-	ent->parent = parent;
-	Log("Scene::Spawn: Set parent.");
-	ent->name = name;
-	Log("Scene::Spawn: Set name.");
-	AddEntity(ent);
-	Log("Scene::Spawn: Finished.");
-	return ent;
-}
-
-Entity* Scene::SpawnAndLoad(Properties* prop, Entity* parent, string name)
-{
-	Entity* ent = new Entity;
-	ent->parent = parent;
-	ent->name = name;
-	ent->Load(prop);
-	AddEntity(ent);
-
-	return ent;
-}
-
-deque<Entity*> Scene::GetEntities(string tag) const
-{
-	deque<Entity*> result;
-	for(auto& ent : entities)
+	std::deque<Entity*> result;
+	for(auto& ent : root->children)
 	{
 		if(ent->HasTag(tag))
 		{
@@ -288,11 +146,6 @@ deque<Entity*> Scene::GetEntities(string tag) const
 		}
 	}
 	return result;
-}
-
-const deque<ptr<Entity>>& Scene::GetEntities() const
-{
-	return entities;
 }
 
 }

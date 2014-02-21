@@ -1,7 +1,5 @@
-/******************************************************************************
-*
-*	LFANT Source
-*	Copyright (C) 2012-2013 by LazyFox Studios
+/*
+*	Copyright (C) 2013-2014, by loafofpiecrust
 *	Created: 2012-07-23 by Taylor Snead
 *
 *	Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,6 +19,9 @@
 #include <lfant/Camera.h>
 
 // External
+#include <glm/gtx/projection.hpp>
+#include <glm/detail/func_matrix.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 // Internal
 #include <lfant/Transform.h>
@@ -104,9 +105,9 @@ void Camera::Update()
 	UpdateView();
 //	UpdateProjection();
 
-	focalLength += game->time->deltaTime * game->input->GetAxis("SetFocalLength");
-	focalDepth += game->time->deltaTime * game->input->GetAxis("SetFocalDepth");
-	aperture += game->time->deltaTime * game->input->GetAxis("SetFstop");
+	focalLength += game->time->deltaTime * game->input->GetAxis("SetFocalLength")->GetValue();
+	focalDepth += game->time->deltaTime * game->input->GetAxis("SetFocalDepth")->GetValue();
+	aperture += game->time->deltaTime * game->input->GetAxis("SetFstop")->GetValue();
 
 	if(game->input->GetButtonDown("ShowDof"))
 	{
@@ -138,7 +139,7 @@ void Camera::UpdateProjection()
 		}
 		case Mode::Orthographic:
 		{
-			projection = ortho(0.0f, fov * aspectRatio, 0.0f, fov / aspectRatio, viewRange.min, viewRange.max);
+			projection = glm::ortho(0.0f, fov * aspectRatio, 0.0f, fov / aspectRatio, viewRange.min, viewRange.max);
 			break;
 		}
 	}

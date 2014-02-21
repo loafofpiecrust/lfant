@@ -15,7 +15,6 @@ namespace tcp {
 
 class Server : public net::User
 {
-	DECLARE_TYPE(net::User, net::tcp::Server)
 public:
 	Server();
 	virtual ~Server();

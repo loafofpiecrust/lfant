@@ -1,22 +1,11 @@
-/******************************************************************************
-*
-*	LFANT Source
-*	Copyright (C) 2012-2013 by LazyFox Studios
-*	Created: 2013-06-12 by Taylor Snead
+/*
+*	Copyright (C) 2013-2014, by loafofpiecrust
 *
 *	Licensed under the Apache License, Version 2.0 (the "License");
 *	you may not use this file except in compliance with the License.
-*	You may obtain a copy of the License at
-*
-*	http://www.apache.org/licenses/LICENSE-2.0
-*
-*	Unless required by applicable law or agreed to in writing, software
-*	distributed under the License is distributed on an "AS IS" BASIS,
-*	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-*	See the License for the specific language governing permissions and
-*	limitations under the License.
-*
-******************************************************************************/
+*	You may obtain a copy of the License in the accompanying LICENSE file or at
+*		http://www.apache.org/licenses/LICENSE-2.0
+*/
 #pragma once
 #include <lfant/stdafx.h>
 
@@ -77,8 +66,8 @@ public:
 protected:
 	uint32_t id = 0;
 
-	deque<string> textureNames;
-	deque<Texture*> textures;
+	std::deque<string> textureNames;
+	std::deque<Texture*> textures;
 	Texture* currentTex = nullptr;
 	Texture* depthTexture = nullptr;
 	string depthTexName = "";
@@ -87,7 +76,7 @@ protected:
 //	Mesh::Buffer<vec2> uvBuffer = 0;
 	ptr<Shader> shader;
 
-	vector<uint32_t> drawBuffers;
+	std::vector<uint32_t> drawBuffers;
 	uint32_t depthBuffer = 0;
 
 	static FrameBuffer* current;

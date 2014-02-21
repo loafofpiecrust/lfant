@@ -68,7 +68,7 @@ protected:
 	bool setup = false;
 	Entity* entity = nullptr;
 
-	deque<Inspector::Item*> items;
+	std::deque<Inspector::Item*> items;
 };
 
 } // namespace gui

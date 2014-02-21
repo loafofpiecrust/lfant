@@ -1,22 +1,12 @@
-/******************************************************************************
-*
-*	LFANT Source
-*	Copyright (C) 2012-2013 by LazyFox Studios
+/*
+*	Copyright (C) 2013-2014, by loafofpiecrust
 *	Created: 2012-07-17 by Taylor Snead
 *
 *	Licensed under the Apache License, Version 2.0 (the "License");
 *	you may not use this file except in compliance with the License.
-*	You may obtain a copy of the License at
-*
-*	http://www.apache.org/licenses/LICENSE-2.0
-*
-*	Unless required by applicable law or agreed to in writing, software
-*	distributed under the License is distributed on an "AS IS" BASIS,
-*	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-*	See the License for the specific language governing permissions and
-*	limitations under the License.
-*
-******************************************************************************/
+*	You may obtain a copy of the License in the accompanying LICENSE file or at
+*		http://www.apache.org/licenses/LICENSE-2.0
+*/
 
 #include <lfant/Renderer.h>
 
@@ -72,7 +62,7 @@ Renderer::~Renderer()
 void Renderer::Load(Properties* prop)
 {
 	Subsystem::Load(prop);
-	Log("Renderer::Load: Got root child, '", prop->id, "'.");
+//	Log("Renderer::Load: Got root child, '", prop->Get(""), "'.");
 
 	prop->Get("resolution", resolution);
 	prop->Get("version", version);
@@ -157,7 +147,7 @@ void Renderer::Init()
 	}
 
 #endif
-	
+
 	glShadeModel(GL_SMOOTH);
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
@@ -189,7 +179,7 @@ void Renderer::Init()
 //	glEnable(GL_TEXTURE_RECTANGLE);
 
 	Log("Renderer: Initialized");
-	
+
 	frameBuffer = new FrameBuffer();
 	frameBuffer->AddTexture("lightTex", Texture::Format::RGBA, Texture::Format::RGBA);
 	frameBuffer->AddTexture("diffuseTex", Texture::Format::RGBA, Texture::Format::RGBA);

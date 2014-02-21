@@ -36,27 +36,27 @@ void Player::Update()
 {
 	Component::Update();
 
-	Transform* cam = game->scene->mainCamera->GetOwner()->transform;
+//	Transform* cam = game->scene->mainCamera->GetOwner()->transform;
 
 	float value = 0.0f;
-	if((value = game->input->GetAxis("Horizontal")) != 0.0f)
+	if((value = game->input->GetAxis("Horizontal")->GetValue()) != 0.0f)
 	{
 		TriggerEvent("Move", owner->transform->GetRight() * value);
 	}
-	if((value = game->input->GetAxis("Vertical")) != 0.0f)
+	if((value = game->input->GetAxis("Vertical")->GetValue()) != 0.0f)
 	{
 		TriggerEvent("Move", owner->transform->GetDirection() * value);
 	}
 
-	if((value = game->input->GetAxis("HRotation")) != 0.0f)
+	if((value = game->input->GetAxis("HRotation")->GetValue()) != 0.0f)
 	{
 		TriggerEvent("Look", vec3(0,0,1), value);
 	}
-	if((value = game->input->GetAxis("VRotation")) != 0.0f)
+	if((value = game->input->GetAxis("VRotation")->GetValue()) != 0.0f)
 	{
 		TriggerEvent("Look", vec3(1,0,0), -value);
 	}
-	if((value = game->input->GetAxis("ZRotation")) != 0.0f)
+	if((value = game->input->GetAxis("ZRotation")->GetValue()) != 0.0f)
 	{
 		TriggerEvent("Look", vec3(0,1,0), -value);
 	}

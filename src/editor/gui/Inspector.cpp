@@ -32,8 +32,10 @@ Inspector::Item::Item(wxWindow* parent, wxWindowID id, string label, long style)
 	sizer->SetSizeHints(GetPane());
 	sizer->SetMinSize(50, 50);
 
+	GetPane()->Fit();
+	GetPane()->SetSize({100,150});
+
 	grid->FitInside();
-	grid->SetSize({100,100});
 }
 
 Inspector::Item::~Item()
@@ -105,7 +107,7 @@ void Inspector::OnSetValue(wxCommandEvent& evt)
 	wxTextCtrl* win = (wxTextCtrl*)evt.GetEventObject();
 	if(win->GetName() == "name")
 	{
-		GetEntity()->SetName(win->GetLineText(0));
+		GetEntity()->Rename(win->GetLineText(0));
 		tree->UpdateName(GetEntity());
 	}
 	else
@@ -117,7 +119,7 @@ void Inspector::OnSetValue(wxCommandEvent& evt)
 void Inspector::Item::AddProp(wxPGProperty* parent, Properties* prop)
 {
 	Log("Inspector:AddPropToGrid: Touch");
-	string compName = prop->id;
+	string compName = prop->name;
 	if(compName.empty()) compName = prop->type;
 
 	Log("Inspector:AddPropToGrid: Appending container '"+compName+"'");
@@ -128,20 +130,23 @@ void Inspector::Item::AddProp(wxPGProperty* parent, Properties* prop)
 	//	Log("Inspector:AddPropToGrid: Appending value '"+val.first+"'");
 	//	AppendItem(win, val.first, NO_IMAGE, (wxClientData*)&(val.second));
 		wxStringProperty* prop = new wxStringProperty(val.first, compName+"."+val.first, val.second);
-		prop->SetClientData(&(val.second));
+		prop->SetClientData((void*)&(val.second));
+
 		if(parent != grid->GetRoot())
 			grid->AppendIn(parent, prop);
 		else
 			grid->Append(prop);
 	}
 
-	for(auto& c : prop->children)
+	for(auto& child : prop->children)
 	{
-	//	Log("Inspector:AddPropToGrid: Appending child "+c->id);
-		wxPGProperty* prop = new wxPGProperty(c->id, compName+"."+c->id);
-		GetGrid()->AppendIn(parent, prop);
+		if(child->type == "Component")
+		{
+			wxPGProperty* pgp = new wxPGProperty(child->name, compName+"."+child->name);
+			GetGrid()->AppendIn(parent, pgp);
 
-		AddProp(prop, c);
+			AddProp(pgp, prop->GetChild(child->name));
+		}
 	}
 }
 
@@ -166,6 +171,16 @@ void Inspector::Refresh()
 
 	///@todo Add buttons for 'Refresh' and 'Apply' here.
 
+	{
+		wxBoxSizer* btnSizer = new wxBoxSizer(wxVERTICAL);
+		GetSizer()->Add(btnSizer);
+
+		btnSizer->Add(new wxButton(this, Window::GetId("Entity.Refresh"), "Refresh"));
+		btnSizer->Add(new wxButton(this, Window::GetId("Entity.Apply"), "Apply"));
+
+		btnSizer->Layout();
+	}
+
 	// Clear all items
 	Log("Inspector:Refresh: clearing items");
 //	GetStore()->DeleteAllItems();
@@ -176,24 +191,30 @@ void Inspector::Refresh()
 //	AppendItem(wxDataViewItem(0), "name");
 	wxPropertyGrid* grid = AppendItem("Entity")->GetGrid();
 
-	for(auto& val : props->values)
+/*	for(auto& val : props->GetRoot())
 	{
-		wxStringProperty* prop = new wxStringProperty(val.first, "Entity."+val.first, val.second);
-		prop->SetClientData(&(val.second));
+		string first = val.name;
+		string second = (string)val.element.CastTo<json::String>();
+
+		wxStringProperty* prop = new wxStringProperty(first, "Entity."+first, second);
+		prop->SetClientData((void*)&(val));
 		grid->Append(prop);
-	}
+	}*/
+
+	GetSizer()->AddSpacer(12);
 
 	// Container to hold components
 	Log("Inspector:Refresh: appending component container");
 //	compNode = AppendContainer(wxDataViewItem(0), "Components");
 
-	for(auto& comp : props->children)
+//	deque<Properties*> comps = props->GetChildren("component");
+	for(Properties* comp : *props)
 	{
-		if(comp->type == "component")
-		{
-			Item* item = AppendItem(comp->id);
-			item->AddProp(item->GetGrid()->GetRoot(), comp);
-		}
+		if(comp->type != "component") continue;
+
+		Item* item = AppendItem(comp->Get("type"));
+		item->AddProp(item->GetGrid()->GetRoot(), comp);
+		GetSizer()->AddSpacer(12);
 	}
 
 	Layout();
