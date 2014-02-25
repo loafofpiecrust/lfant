@@ -1,15 +1,5 @@
 project(lfant)
 
-# Versioning
-set(VERSION_MAJOR 0)
-set(VERSION_MINOR 1)
-
-# Library Search Paths
-link_directories(
-	${LIBRARY_OUTPUT_PATH}
-	# System
-	/usr/lib/x86_64-linux-gnu/mesa
-	)
 
 # Source Info
 file(GLOB SRC_FILES
@@ -45,16 +35,10 @@ list(REMOVE_ITEM SRC_FILES
 	${PROJECT_SOURCE_DIR}/ParticleSystem.cpp
 	${PROJECT_SOURCE_DIR}/net/udp/*.cpp
 	)
-
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ggdb")
-#set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -g")
+	
 
 # Output Library Info
 add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
-#add_executable(${PROJECT_NAME} ${SRC_FILES})
-
-# Dependencies
-#add_dependencies(${PROJECT_NAME} ${ROOT}/external)
 
 # Includes Info
 include_directories(
@@ -62,19 +46,20 @@ include_directories(
 	${ROOT}/external/png
 	${ROOT}/external/jpeg
 	${ROOT}/external/zlib
-	${ROOT}/external/bass
+#	${ROOT}/external/bass
 	${ROOT}/external/assimp/include
 	${ROOT}/external/glm
 	${ROOT}/external/boost
 	${ROOT}/external/bullet/src
 	${ROOT}/external/glfw/include
 	${ROOT}/external/cegui/cegui/include
-	${ROOT}/external/squirrel/include
-	${ROOT}/external/devil/include
 	${ROOT}/external/openal/include
-	${ROOT}/external/plaidaudio
-#	"${ROOT}/external/gameswf"
+	${ROOT}/external/squirrel/include
 	)
+
+	
+set_target_properties(${PROJECT_NAME} PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "stdafx.h")
+cotire(${PROJECT_NAME})
 
 # Linker Options
 target_link_libraries(${PROJECT_NAME}
@@ -86,7 +71,6 @@ target_link_libraries(${PROJECT_NAME}
 	squirrel
 	jpeg
 	openal
-	json
 	)
 
 if(NOT ANDROID)

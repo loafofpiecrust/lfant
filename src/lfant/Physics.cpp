@@ -88,11 +88,12 @@ void Physics::Init()
 	world = new btDiscreteDynamicsWorld( dispatcher, broadphase, solver, collisionConfig );
 
 	world->setInternalTickCallback(&Physics::OnTick);
+	
 //	debugRenderer = new physics::DebugRenderer;
 
-//	gContactAddedCallback = &Physics::OnCollideEnter;
+	gContactAddedCallback = &Physics::OnCollideEnter;
 //	gContactProcessedCallback = &Physics::OnCollideStay;
-//	gContactDestroyedCallback = &Physics::OnCollideExit;
+	gContactDestroyedCallback = &Physics::OnCollideExit;
 
 	Log("Physics::Init: Contact callbacks set.");
 
@@ -224,10 +225,10 @@ void Physics::SetGravityPoint(string name, float force)
 bool Physics::OnCollide(string func, btManifoldPoint& cp, const btCollisionObjectWrapper* colObj0, int partId0, int index0,
 						const btCollisionObjectWrapper* colObj1, int partId1, int index1)
 {
-	Rigidbody *body0 = nullptr;
-	Rigidbody *body1 = nullptr;
+	Rigidbody *body0 = (Rigidbody*)colObj0->m_collisionObject->getUserPointer();
+	Rigidbody *body1 = (Rigidbody*)colObj1->m_collisionObject->getUserPointer();
 
-	for (auto& rb : game->physics->bodies)
+/*	for (auto& rb : game->physics->bodies)
 	{
 		if (rb->body == colObj0->m_collisionObject)
 		{
@@ -239,9 +240,9 @@ bool Physics::OnCollide(string func, btManifoldPoint& cp, const btCollisionObjec
 			Log("Body one found.");
 			body1 = rb;
 		}
-	}
+	}*/
 
-	Log("Collision called, OnCollide", func, ", on entity ", body1->owner->GetName());
+//	Log("Collision called, OnCollide", func, ", on entity ", body1->owner->GetName()+" and "+body0->owner->GetName());
 
 	Collision col;
 	col.contacts.push_back(ContactPoint(vec3_cast<vec3>(cp.getPositionWorldOnA()), vec3_cast<vec3>(cp.m_normalWorldOnB)));
@@ -260,7 +261,7 @@ bool Physics::OnCollide(string func, btManifoldPoint& cp, const btCollisionObjec
 bool Physics::OnCollideEnter(btManifoldPoint& cp, const btCollisionObjectWrapper* colObj0, int partId0, int index0,
 							 const btCollisionObjectWrapper* colObj1, int partId1, int index1)
 {
-	Log("Collision enter");
+//	Log("Collision enter");
 	return OnCollide("Enter", cp, colObj0, partId0, index0, colObj1, partId1, index1);
 }
 

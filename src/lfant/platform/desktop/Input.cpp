@@ -26,26 +26,9 @@ Key_Initializer::Key_Initializer()
 	_key["f10"] = GLFW_KEY_F10;
 	_key["f11"] = GLFW_KEY_F11;
 	_key["f12"] = GLFW_KEY_F12;
-	/*
-	_key[","] = ',';
-	_key["."] = '.';
-	_key["/"] = '/';
-	*/
-	_key["!"] = '!';
+//	_key["!"] = '!';
 	_key["null"] = '\0';
-	_key["\n"] = '\n';
-	/*
-	_key["0"] = '0';
-	_key["1"] = '1';
-	_key["2"] = '2';
-	_key["3"] = '3';
-	_key["4"] = '4';
-	_key["5"] = '5';
-	_key["6"] = '6';
-	_key["7"] = '7';
-	_key["8"] = '8';
-	_key["9"] = '9';
-	*/
+//	_key["\n"] = '\n';
 	_key["space"] = GLFW_KEY_SPACE;
 //	_key[" "] = GLFW_KEY_SPACE;
 	_key["esc"] = GLFW_KEY_ESCAPE;
@@ -78,6 +61,7 @@ Key_Initializer::Key_Initializer()
 	_key["mouseright"] = 400+GLFW_MOUSE_BUTTON_RIGHT;
 	_key["mousemiddle"] = 400+GLFW_MOUSE_BUTTON_MIDDLE;
 
+	/// @todo Needed?
 	_key["joy1"] = 500;
 	_key["joy2"] = 501;
 	_key["joy3"] = 502;

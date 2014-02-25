@@ -66,10 +66,10 @@ void Mesh::Load(Properties *prop)
 		Log("Loading material from file");
 		string mat = "";
 		prop->Get("material", mat);
-		if(mat != "") material->LoadFile(mat);
+		if(!mat.empty()) material->LoadFile(mat);
 	}
-
-	LoadFile(f);
+	
+	if(!f.empty()) LoadFile(f);
 }
 
 void Mesh::Save(Properties *prop) const
@@ -275,6 +275,8 @@ uint32 Mesh::CreateBuffer(void* data, uint32 size, int target, int mode)
 
 void Mesh::LoadFile(string path)
 {
+	if(path.empty()) return;
+	
 	if(this->file == path && loaded)
 	{
 		Log("Mesh LoadFile rejected (the Mesh has already loaded this file)");

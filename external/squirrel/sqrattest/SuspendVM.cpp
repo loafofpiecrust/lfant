@@ -49,24 +49,19 @@ TEST_F(SqratTest, SuspendVM)
     
     RootTable().Bind(_SC("C"), cclass);
     Script script;
-    try 
-    {
-        script.CompileString(_SC("\
-            c <- C(); \
-            //c.suspend(); /* this would fail in the curent Sqrat; no solution yet */\
-            ::suspend(); \
-            gTest.EXPECT_INT_EQ(1, 0); /* should not reach here */ \
-            "));
-        
-    } catch (Exception ex)
-    {
-        FAIL() << _SC("Compile Failed: ") << ex.Message();        
+    script.CompileString(_SC("\
+        c <- C(); \
+        //c.suspend(); /* this would fail in the curent Sqrat; no solution yet */\
+        ::suspend(); \
+        gTest.EXPECT_INT_EQ(1, 0); /* should not reach here */ \
+        "));
+    if (Sqrat::Error::Instance().Occurred(vm)) {
+        FAIL() << _SC("Compile Failed: ") << Sqrat::Error::Instance().Message(vm);        
     }
 
-    try {
-        script.Run();
-    } catch(Exception ex) {
-        FAIL() << _SC("Run Failed: ") << ex.Message();
+    script.Run();
+    if (Sqrat::Error::Instance().Occurred(vm)) {
+        FAIL() << _SC("Run Failed: ") << Sqrat::Error::Instance().Message(vm);
     }
     
 }

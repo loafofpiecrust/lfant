@@ -279,28 +279,29 @@ bool Renderer::OpenWindow()
 #if !ANDROID
 	if(game->standAlone)
 	{
-	Log("Renderer::OpenWindow: About to set window hints.");
-	glfwWindowHint(GLFW_SAMPLES, fsaa);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, version.major);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, version.minor);
-//	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	glfwWindowHint(GLFW_RESIZABLE, windowResizable);
+		Log("Renderer::OpenWindow: About to set window hints.");
+		glfwWindowHint(GLFW_SAMPLES, fsaa);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, version.major);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, version.minor);
+	//	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+		glfwWindowHint(GLFW_RESIZABLE, windowResizable);
 
-	Log("Renderer::OpenWindow: Window hints set.");
+		Log("Renderer::OpenWindow: Window hints set.");
 
-	ivec2 res = GetResolution();
-	if( !(window = glfwCreateWindow( res.x, res.y, windowTitle.c_str(), nullptr, nullptr )) )
-	{
-		Log( "Renderer::OpenWindow: Failed to open GLFW window." );
-		glfwTerminate();
-		return false;
-	}
-	glfwMakeContextCurrent(window);
-	Log("Renderer::OpenWindow: Window opened.");
+		ivec2 res = GetResolution();
+		if( !(window = glfwCreateWindow( res.x, res.y, windowTitle.c_str(), nullptr, nullptr )) )
+		{
+			Log( "Renderer::OpenWindow: Failed to open GLFW window." );
+			glfwTerminate();
+			return false;
+		}
+		glfwMakeContextCurrent(window);
+		Log("Renderer::OpenWindow: Window opened.");
 
-//	SetWindowTitle(windowTitle);
-	SetWindowPos(windowPos);
-	Log("Renderer::OpenWindow: Window successfully opened.");
+	//	SetWindowTitle(windowTitle);
+		SetWindowPos(windowPos);
+		OnSetResolution(window, res.x, res.y);
+		Log("Renderer::OpenWindow: Window successfully opened.");
 	}
 	glewExperimental = true;     // Needed for core profile
 	if (glewInit() != GLEW_OK)
@@ -309,6 +310,8 @@ bool Renderer::OpenWindow()
 		return false;
 	}
 	Log("Renderer::OpenWindow: GLEW Initialised.");
+	
+	
 #endif
 
 	return true;

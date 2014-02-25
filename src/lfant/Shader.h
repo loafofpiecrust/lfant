@@ -15,6 +15,7 @@
 #include <lfant/util/qumap.h>
 
 // External
+#include <unordered_map>
 #include <forward_list>
 
 namespace lfant {
@@ -83,7 +84,7 @@ protected:
 	string geometry = "";
 	string compute = "";
 	uint32 id = -1;
-	qumap<string, uint32> uniforms;
+	std::unordered_map<string, uint32> uniforms;
 
 	static std::deque<Shader*> shaders;
 	static Shader* current;

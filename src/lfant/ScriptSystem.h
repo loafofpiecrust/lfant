@@ -13,10 +13,9 @@
 #include <lfant/Subsystem.h>
 
 // External
-#include <sqrat.h>
+#include <sqrat/sqratVM.h>
 
-namespace lfant
-{
+namespace lfant {
 
 class Script
 {
@@ -26,22 +25,24 @@ public:
 	class ClassBase
 	{
 	public:
-		ClassBase() {}
+		ClassBase()
+		{
+		}
 
 		template<typename T>
-		void Func(string name, T (C::* func))
+		void Func(string name, T func)
 		{
 			inst.Func(name.c_str(), func);
 		}
 
 		template<typename T>
-		void StaticFunc(string name, T (C::*func))
+		void StaticFunc(string name, T func)
 		{
 			inst.StaticFunc(name.c_str(), func);
 		}
 
 		template<typename T>
-		void Var(string name, T (C::* var))
+		void Var(string name, T var)
 		{
 			inst.Var(name.c_str(), var);
 		}
@@ -59,24 +60,24 @@ public:
 		}
 
 		template<typename T>
-		void Prop(string name, T (C::*get)(), void (C::*set)(T))
+		void Prop(string name, T (C::*get)() const, void (C::*set)(T))
 		{
 			inst.Prop(name.c_str(), get, set);
 		}
 
 		template<typename T>
-		void StaticVar(string name, T (C::* var))
+		void StaticVar(string name, T var)
 		{
 			inst.StaticVar(name.c_str(), var);
 		}
 
-		void Bind()
+		void Bind(string type = "")
 		{
+			if(type.empty()) type = type::Descope(type::Name<C>(), "lfant");
 			Sqrat::RootTable().Bind(type.c_str(), inst);
 		}
 
 	private:
-		string type;
 		CC inst;
 	};
 
@@ -92,11 +93,16 @@ public:
 
 	Script();
 
-	void LoadFile(string path);
+	static Script& LoadFile(string path);
 	void Run();
+	void Call(string func);
+	
+	Sqrat::Script& GetInst() { return inst; }
 
 private:
 	Sqrat::Script inst;
+	
+	static std::deque<Script> scripts;
 };
 
 /**

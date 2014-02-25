@@ -112,9 +112,10 @@ void Rigidbody::Init()
 	game->physics->AddRigidbody(this);
 
 	// reactions
-	ConnectEvent(SENDER(owner, OnSetPosition), RECEIVER(this, OnSetPos));
-	ConnectEvent(SENDER(owner, OnSetRotation), RECEIVER(this, OnSetRot));
-	ConnectEvent(SENDER(owner, OnSetComponentCollider), RECEIVER(this, OnSetCollider));
+	ConnectEvent(SENDER(owner, SetPosition), RECEIVER(this, OnSetPos));
+	ConnectEvent(SENDER(owner, SetRotation), RECEIVER(this, OnSetRot));
+	ConnectEvent(SENDER(owner, AddComponent), RECEIVER(this, OnAddComponent));
+	ConnectEvent(SENDER(owner, RemoveComponent), RECEIVER(this, OnRemoveComponent));
 
 	// actions
 	ConnectEvent(SENDER(owner, ApplyForce), RECEIVER(this, ApplyForce));
@@ -122,11 +123,13 @@ void Rigidbody::Init()
 	ConnectEvent(SENDER(owner, Accelerate), RECEIVER(this, Accelerate));
 	ConnectEvent(SENDER(owner, SetTrigger), RECEIVER(this, SetTrigger));
 
-	body->getWorldTransform().setOrigin(vec3_cast<btVector3>(owner->transform->GetPosition()));
+	body->getWorldTransform().setOrigin(vec3_cast<btVector3>(owner->transform->GetWorldPosition()));
 	body->forceActivationState(DISABLE_DEACTIVATION);
-//	body->setCollisionFlags(body->getCollisionFlags() /*| btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK*/);
+	body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
 	Log("Rigidbody is trigger? ", IsTrigger());
 	if(IsTrigger()) SetTrigger(true);
+	
+	body->setUserPointer(this);
 }
 
 void Rigidbody::Update()
@@ -158,6 +161,22 @@ void Rigidbody::Update()
 void Rigidbody::Deinit()
 {
 //	game->physics->RemoveRigidbody(this);
+}
+
+void Rigidbody::Enable(bool on)
+{
+	Component::Enable(on);
+	if(on)
+	{
+		body->forceActivationState(DISABLE_DEACTIVATION);
+		body->setGravity(vec3_cast<btVector3>(game->physics->GetGravity()));
+	}
+	else
+	{
+		Log("Disabling rigidbody on ", GetOwner());
+		body->forceActivationState(0);
+		body->setGravity({0.0f,0.0f,0.0f});
+	}
 }
 
 
@@ -248,21 +267,28 @@ void Rigidbody::SetVelocity(vec3 vel)
 	TriggerEvent("OnSetVelocity", vel);
 }
 
-void Rigidbody::OnSetCollider(Collider *collider)
+void Rigidbody::OnAddComponent(Component* comp)
 {
-	delete body->getCollisionShape();
-	if(!collider)
+	Collider* collider = dynamic_cast<Collider*>(comp);
+	if(collider)
 	{
-		body->setCollisionShape(new btEmptyShape);
-		this->collider = nullptr;
-	}
-	else
-	{
+		delete body->getCollisionShape();
 		Log("Collider set for entity, setting for rigidbody, type: '", type::Name(collider), "'.");
 		body->setCollisionShape(collider->GetShape());
 		this->collider = collider;
+		body->getWorldTransform().setOrigin(vec3_cast<btVector3>(owner->transform->GetWorldPosition()));
 	}
-	body->getWorldTransform().setOrigin(vec3_cast<btVector3>(owner->transform->GetPosition()));
+}
+
+void Rigidbody::OnRemoveComponent(Component* comp)
+{
+	Collider* collider = dynamic_cast<Collider*>(comp);
+	if(collider)
+	{
+		delete body->getCollisionShape();
+		body->setCollisionShape(new btEmptyShape);
+		this->collider = nullptr;
+	}
 }
 
 void Rigidbody::ApplyCentralForce(vec3 force)

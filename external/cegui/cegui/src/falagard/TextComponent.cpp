@@ -299,7 +299,7 @@ namespace CEGUI
         initColoursRect(srcWindow, modColours, finalColours);
 
         // add geometry for text to the target window.
-        d_formattedRenderedString->draw(&srcWindow, srcWindow.getGeometryBuffer(),
+        d_formattedRenderedString->draw(&srcWindow, srcWindow.getGeometryBuffers(),
                                         destRect.getPosition(),
                                         &finalColours, clipper);
     }
@@ -459,7 +459,7 @@ String TextComponent::getEffectiveVisualText(const Window& wnd) const
         return visual;
     }
     // do we use a static text string from the looknfeel
-    else if (d_text.empty())
+    else if (d_textLogical.empty())
         return wnd.getTextVisual();
     else
         getTextVisual();

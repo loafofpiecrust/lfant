@@ -31,51 +31,48 @@ TEST_F(SqratTest, CallSquirrelFunction) {
     DefaultVM::Set(vm);
 
     Script script;
-
-    try {
-        script.CompileString(_SC(" \
-			function AddTwo(a, b) { \
-				return a + b; \
-			} \
-			function MultiplyTwo(a, b) { \
-				return a * b; \
-			} \
-			function returnTrue() { \
-			    return true; \
-			}\
-			function returnFalse() { \
-			    return false; \
-			}\
-			"));
-    } catch(Exception ex) {
-        FAIL() << _SC("Script Compile Failed: ") << ex.Message();
+    script.CompileString(_SC(" \
+        function AddTwo(a, b) { \
+            return a + b; \
+        } \
+        function MultiplyTwo(a, b) { \
+            return a * b; \
+        } \
+        function returnTrue() { \
+            return true; \
+        }\
+        function returnFalse() { \
+            return false; \
+        }\
+        "));
+    if (Sqrat::Error::Instance().Occurred(vm)) {
+        FAIL() << _SC("Script Compile Failed: ") << Sqrat::Error::Instance().Message(vm);
     }
 
-    try {
-        script.Run(); // Must run the script before the function will be available
-    } catch(Exception ex) {
-        FAIL() << _SC("Script Run Failed: ") << ex.Message();
+    script.Run(); // Must run the script before the function will be available
+    if (Sqrat::Error::Instance().Occurred(vm)) {
+        FAIL() << _SC("Script Run Failed: ") << Sqrat::Error::Instance().Message(vm);
     }
 
     // Method one for function retrieval: via the constructor
     Function addTwo(RootTable(), _SC("AddTwo"));
     ASSERT_FALSE(addTwo.IsNull());
-    EXPECT_EQ(addTwo.Evaluate<int>(1, 2), 3);
+    EXPECT_EQ(*addTwo.Evaluate<int>(1, 2), 3);
 
     // Method two for function retrieval: from the class or table
     Function multiplyTwo = RootTable().GetFunction(_SC("MultiplyTwo"));
     ASSERT_FALSE(multiplyTwo.IsNull());
-    EXPECT_EQ(multiplyTwo.Evaluate<int>(2, 3), 6);
+    EXPECT_EQ(*multiplyTwo.Evaluate<int>(2, 3), 6);
     
     Function returnTrue = RootTable().GetFunction(_SC("returnTrue"));
     ASSERT_FALSE(returnTrue.IsNull());
-    ASSERT_TRUE(returnTrue.Evaluate<bool>());
-    ASSERT_TRUE(returnTrue.Evaluate<SQBool>()); 
+    ASSERT_TRUE(*returnTrue.Evaluate<bool>());
+    ASSERT_TRUE(*returnTrue.Evaluate<SQBool>()); 
  
     Function returnFalse = RootTable().GetFunction(_SC("returnFalse"));
     ASSERT_FALSE(returnFalse.IsNull());
-    ASSERT_FALSE(returnFalse.Evaluate<bool>());
-    ASSERT_FALSE(returnFalse.Evaluate<SQBool>());  
+    ASSERT_FALSE(*returnFalse.Evaluate<bool>());
+    ASSERT_FALSE(*returnFalse.Evaluate<SQBool>());  
  
 }
 
@@ -83,7 +80,7 @@ int NativeOp(int a, int b, Function opFunc) {
     if(opFunc.IsNull()) {
         return -1;
     }
-    return opFunc.Evaluate<int>(a, b);
+    return *opFunc.Evaluate<int>(a, b);
 }
 
 TEST_F(SqratTest, FunctionAsArgument) {
@@ -92,21 +89,18 @@ TEST_F(SqratTest, FunctionAsArgument) {
     RootTable().Func(_SC("NativeOp"), &NativeOp);
 
     Script script;
-
-    try {
-        script.CompileString(_SC(" \
-			function SubTwo(a, b) { \
-				return a - b; \
-			} \
-			gTest.EXPECT_INT_EQ(::NativeOp(5, 1, SubTwo), 4); \
-			"));
-    } catch(Exception ex) {
-        FAIL() << _SC("Script Compile Failed: ") << ex.Message();
+    script.CompileString(_SC(" \
+        function SubTwo(a, b) { \
+            return a - b; \
+        } \
+        gTest.EXPECT_INT_EQ(::NativeOp(5, 1, SubTwo), 4); \
+        "));
+    if (Sqrat::Error::Instance().Occurred(vm)) {
+        FAIL() << _SC("Script Compile Failed: ") << Sqrat::Error::Instance().Message(vm);
     }
 
-    try {
-        script.Run();
-    } catch(Exception ex) {
-        FAIL() << _SC("Script Run Failed: ") << ex.Message();
+    script.Run();
+    if (Sqrat::Error::Instance().Occurred(vm)) {
+        FAIL() << _SC("Script Run Failed: ") << Sqrat::Error::Instance().Message(vm);
     }
 }

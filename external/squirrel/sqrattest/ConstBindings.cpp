@@ -40,22 +40,19 @@ TEST_F(SqratTest, ConstBindings) {
     ConstTable().Const(_SC("Version"), _SC("1.0.0"));
 
     Script script;
-
-    try {
-        script.CompileString(_SC(" \
-			gTest.EXPECT_INT_EQ(Color.Black, 0); \
-			gTest.EXPECT_INT_EQ(Color.Red, 1); \
-			gTest.EXPECT_INT_EQ(Color.Green, 2); \
-			gTest.EXPECT_INT_EQ(Color.Blue, 3); \
-			gTest.EXPECT_STR_EQ(Version, \"1.0.0\"); \
-			"));
-    } catch(Exception ex) {
-        FAIL() << _SC("Compile Failed: ") << ex.Message();
+    script.CompileString(_SC(" \
+        gTest.EXPECT_INT_EQ(Color.Black, 0); \
+        gTest.EXPECT_INT_EQ(Color.Red, 1); \
+        gTest.EXPECT_INT_EQ(Color.Green, 2); \
+        gTest.EXPECT_INT_EQ(Color.Blue, 3); \
+        gTest.EXPECT_STR_EQ(Version, \"1.0.0\"); \
+        "));
+    if (Sqrat::Error::Instance().Occurred(vm)) {
+        FAIL() << _SC("Compile Failed: ") << Sqrat::Error::Instance().Message(vm);
     }
 
-    try {
-        script.Run();
-    } catch(Exception ex) {
-        FAIL() << _SC("Run Failed: ") << ex.Message();
+    script.Run();
+    if (Sqrat::Error::Instance().Occurred(vm)) {
+        FAIL() << _SC("Run Failed: ") << Sqrat::Error::Instance().Message(vm);
     }
 }

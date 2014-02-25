@@ -1,4 +1,7 @@
+//
 // wrapper for the Squirrel VM under Sqrat
+//
+
 //
 // Copyright (c) 2011 Alston Chen
 //
@@ -21,7 +24,6 @@
 //  3. This notice may not be removed or altered from any source
 //  distribution.
 //
-//
 
 #if !defined(_SCRAT_VM_H_)
 #define _SCRAT_VM_H_
@@ -42,13 +44,15 @@
 namespace Sqrat
 {
 
-
 #ifdef SQUNICODE
 #define scvprintf vwprintf
 #else
 #define scvprintf vprintf
 #endif
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// Helper class that wraps a Squirrel virtual machine in a C++ API
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class SqratVM
 {
 private:
@@ -125,17 +129,38 @@ private:
     {
         //scprintf(_SC("%s(%d:%d): %s\n"), source, line, column, desc);
         SQChar buf[512];
-        scsprintf(buf, _SC("%s(%d:%d): %s"), source, (int)line, (int)column, desc);
+        scsprintf(buf, _SC("%s(%d:%d): %s"), source, (int) line, (int) column, desc);
+        buf[sizeof(buf) - 1] = 0;
         s_getVM(v)->m_lastErrorMsg = buf;
     }
 
 public:
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// Enumeration representing the different types of errors that may occur within a SqratVM
+    ///
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     enum ERROR_STATE
     {
-        SQRAT_NO_ERROR, SQRAT_COMPILE_ERROR, SQRAT_RUNTIME_ERROR
+        SQRAT_NO_ERROR,      ///< For when no error has occurred
+        SQRAT_COMPILE_ERROR, ///< For when a script compiling error has occurred
+        SQRAT_RUNTIME_ERROR  ///< For when a script running error has occurred
     };
 
-    SqratVM(int initialStackSize = 1024): m_vm(sq_open(initialStackSize))
+    static const unsigned char LIB_IO   = 0x01;                                              ///< Input/Output library
+    static const unsigned char LIB_BLOB = 0x02;                                              ///< Blob library
+    static const unsigned char LIB_MATH = 0x04;                                              ///< Math library
+    static const unsigned char LIB_SYST = 0x08;                                              ///< System library
+    static const unsigned char LIB_STR  = 0x10;                                              ///< String library
+    static const unsigned char LIB_ALL  = LIB_IO | LIB_BLOB | LIB_MATH | LIB_SYST | LIB_STR; ///< All libraries
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// Default constructor
+    ///
+    /// \param initialStackSize Initial size of the execution stack (if the stack is too small it will automatically grow)
+    /// \param libsToLoad       Specifies what standard Squirrel libraries should be loaded
+    ///
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    SqratVM(int initialStackSize = 1024, unsigned char libsToLoad = LIB_ALL): m_vm(sq_open(initialStackSize))
         , m_rootTable(new Sqrat::RootTable(m_vm))
         , m_script(new Sqrat::Script(m_vm))
         , m_lastErrorMsg()
@@ -143,16 +168,25 @@ public:
         s_addVM(m_vm, this);
         //register std libs
         sq_pushroottable(m_vm);
-        sqstd_register_iolib(m_vm);
-        sqstd_register_bloblib(m_vm);
-        sqstd_register_mathlib(m_vm);
-        sqstd_register_systemlib(m_vm);
-        sqstd_register_stringlib(m_vm);
+        if (libsToLoad & LIB_IO)
+            sqstd_register_iolib(m_vm);
+        if (libsToLoad & LIB_BLOB)
+            sqstd_register_bloblib(m_vm);
+        if (libsToLoad & LIB_MATH)
+            sqstd_register_mathlib(m_vm);
+        if (libsToLoad & LIB_SYST)
+            sqstd_register_systemlib(m_vm);
+        if (libsToLoad & LIB_STR)
+            sqstd_register_stringlib(m_vm);
         sq_pop(m_vm, 1);
-        setPrintFunc(printFunc, printFunc);
-        setErrorHandler(runtimeErrorHandler, compilerErrorHandler);
+        SetPrintFunc(printFunc, printFunc);
+        SetErrorHandler(runtimeErrorHandler, compilerErrorHandler);
     }
 
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// Destructor
+    ///
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ~SqratVM()
     {
         s_deleteVM(m_vm);
@@ -161,43 +195,99 @@ public:
         sq_close(m_vm);
     }
 
-
-    HSQUIRRELVM getVM()
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// Gets the underlying Squirrel VM
+    ///
+    /// \return Underlying Squirrel VM
+    ///
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    HSQUIRRELVM GetVM()
     {
         return m_vm;
     }
-    Sqrat::RootTable& getRootTable()
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// Gets the root table for this VM
+    ///
+    /// \return RootTable for the VM
+    ///
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    Sqrat::RootTable& GetRootTable()
     {
         return *m_rootTable;
     }
-    Sqrat::Script& getScript()
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// Gets the associated Script for this VM
+    ///
+    /// \return Script for the VM
+    ///
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    Sqrat::Script& GetScript()
     {
         return *m_script;
     }
 
-    Sqrat::string getLastErrorMsg()
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// Gets the error message for the most recent Squirrel error with the VM
+    ///
+    /// \return String containing a nice error message
+    ///
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    Sqrat::string GetLastErrorMsg()
     {
         return m_lastErrorMsg;
     }
-    void setLastErrorMsg(const Sqrat::string& str)
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// Overwrites the most recent Squirrel error for this VM
+    ///
+    /// \param str A nice error message
+    ///
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    void SetLastErrorMsg(const Sqrat::string& str)
     {
         m_lastErrorMsg = str;
     }
 
-    void setPrintFunc(SQPRINTFUNCTION printFunc, SQPRINTFUNCTION errFunc)
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// Sets the print function of the virtual machine
+    ///
+    /// \param printFunc A pointer to the print func or NULL to disable the output
+    /// \param errFunc   A pointer to the error func or NULL to disable the output
+    ///
+    /// \remarks
+    /// The print function is used by the built-in Squirrel print function to output text.
+    ///
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    void SetPrintFunc(SQPRINTFUNCTION printFunc, SQPRINTFUNCTION errFunc)
     {
         sq_setprintfunc(m_vm, printFunc, errFunc);
     }
 
-    void setErrorHandler(SQFUNCTION runErr, SQCOMPILERERROR comErr)
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// Sets the Squirrel error handlers
+    ///
+    /// \param runErr A pointer to the runtime error handler func
+    /// \param comErr A pointer to the compile error handler func
+    ///
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    void SetErrorHandler(SQFUNCTION runErr, SQCOMPILERERROR comErr)
     {
         sq_newclosure(m_vm, runErr, 0);
         sq_seterrorhandler(m_vm);
         sq_setcompilererrorhandler(m_vm, comErr);
     }
 
-
-    ERROR_STATE doString(const Sqrat::string& str)
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// Runs a string containing a Squirrel script
+    ///
+    /// \param str String containing a Squirrel script
+    ///
+    /// \return An ERROR_STATE representing what happened
+    ///
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ERROR_STATE DoString(const Sqrat::string& str)
     {
         Sqrat::string msg;
         m_lastErrorMsg.clear();
@@ -220,7 +310,15 @@ public:
         return SQRAT_NO_ERROR;
     }
 
-    ERROR_STATE doFile(const Sqrat::string& file)
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// Runs a file containing a Squirrel script
+    ///
+    /// \param file File path containing a Squirrel script
+    ///
+    /// \return An ERROR_STATE representing what happened
+    ///
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ERROR_STATE DoFile(const Sqrat::string& file)
     {
         Sqrat::string msg;
         m_lastErrorMsg.clear();

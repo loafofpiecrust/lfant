@@ -132,20 +132,21 @@ void Inspector::Item::AddProp(wxPGProperty* parent, Properties* prop)
 		wxStringProperty* prop = new wxStringProperty(val.first, compName+"."+val.first, val.second);
 		prop->SetClientData((void*)&(val.second));
 
-		if(parent != grid->GetRoot())
+	//	if(parent != grid->GetRoot())
 			grid->AppendIn(parent, prop);
-		else
-			grid->Append(prop);
+	//	else
+	//		grid->Append(prop);
 	}
 
 	for(auto& child : prop->children)
 	{
-		if(child->type == "Component")
+	//	if(child->IsType("Component"))
 		{
-			wxPGProperty* pgp = new wxPGProperty(child->name, compName+"."+child->name);
+			string newcomp = child->name.empty() ? child->type : child->name;
+			wxPGProperty* pgp = new wxPGProperty(newcomp, compName+"."+newcomp);
 			GetGrid()->AppendIn(parent, pgp);
 
-			AddProp(pgp, prop->GetChild(child->name));
+			AddProp(pgp, child);
 		}
 	}
 }
@@ -168,6 +169,16 @@ void Inspector::Refresh()
 
 	Log("Inspector:Refresh: Entity saved");
 	// New method
+	
+	// Clear all items
+	Log("Inspector:Refresh: clearing items");
+	
+//	DestroyChildren();
+	GetSizer()->Clear(true);
+	items.clear();
+	
+	Layout();
+	
 
 	///@todo Add buttons for 'Refresh' and 'Apply' here.
 
@@ -181,25 +192,16 @@ void Inspector::Refresh()
 		btnSizer->Layout();
 	}
 
-	// Clear all items
-	Log("Inspector:Refresh: clearing items");
-//	GetStore()->DeleteAllItems();
-	GetSizer()->Clear();
-
 	// Basic entity properties
 	Log("Inspector:Refresh: appending entity vars to ");
-//	AppendItem(wxDataViewItem(0), "name");
 	wxPropertyGrid* grid = AppendItem("Entity")->GetGrid();
 
-/*	for(auto& val : props->GetRoot())
+	for(auto& val : props->values)
 	{
-		string first = val.name;
-		string second = (string)val.element.CastTo<json::String>();
-
-		wxStringProperty* prop = new wxStringProperty(first, "Entity."+first, second);
-		prop->SetClientData((void*)&(val));
+		wxStringProperty* prop = new wxStringProperty(val.first, "Entity."+val.first, val.second);
+		prop->SetClientData((void*)&(val.second));
 		grid->Append(prop);
-	}*/
+	}
 
 	GetSizer()->AddSpacer(12);
 
@@ -208,13 +210,14 @@ void Inspector::Refresh()
 //	compNode = AppendContainer(wxDataViewItem(0), "Components");
 
 //	deque<Properties*> comps = props->GetChildren("component");
-	for(Properties* comp : *props)
+	for(auto& comp : props->children)
 	{
-		if(comp->type != "component") continue;
-
-		Item* item = AppendItem(comp->Get("type"));
-		item->AddProp(item->GetGrid()->GetRoot(), comp);
-		GetSizer()->AddSpacer(12);
+		if(comp->IsType("Component"))
+		{
+			Item* item = AppendItem(comp->name);
+			item->AddProp(item->GetGrid()->GetRoot(), comp);
+			GetSizer()->AddSpacer(12);
+		}
 	}
 
 	Layout();

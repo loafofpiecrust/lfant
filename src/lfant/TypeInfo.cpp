@@ -33,12 +33,12 @@ string Name()
 	return "";
 }
 
-string Demangle(const string& type)
+string Demangle(string type)
 {
 	int result = 0;
 	char* c = abi::__cxa_demangle(type.c_str(), 0, 0, &result);
 	string final = string(c);
-	if(c) delete[] c;
+	if(c) free(c);
 	return final;
 }
 

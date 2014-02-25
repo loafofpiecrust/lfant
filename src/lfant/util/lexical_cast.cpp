@@ -626,6 +626,21 @@ vector<string> lexical_cast<vector<string>, string>(const string& src)
 	return result;
 }
 
+static string TrimSpace(const string& str)
+{
+	std::size_t firstLetter = str.find_first_not_of(" \t\n");
+	std::size_t lastLetter = str.find_last_not_of(" \t\n");
+	
+	if(firstLetter == string::npos)
+	{
+		return "";
+	}
+	else
+	{
+		return str.substr(firstLetter, lastLetter-firstLetter+1);
+	}
+}
+
 template<>
 deque<string> lexical_cast<deque<string>, string>(const string& src)
 {
@@ -651,7 +666,12 @@ deque<string> lexical_cast<deque<string>, string>(const string& src)
 			}
 		}
 
-		result.push_back(toks[i]);
+		if(!toks[i].empty())
+		{
+			toks[i] = TrimSpace(toks[i]);
+		}
+		
+		if(!toks[i].empty()) result.push_back(toks[i]);
 	}
 	return result;
 }

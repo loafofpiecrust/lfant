@@ -53,8 +53,8 @@ protected:
 
 	virtual btCollisionShape* GetShape() = 0;
 
-	virtual vec3 GetSize() const { return size; }
-	virtual void SetSize(vec3 size) { this->size = size; }
+	vec3 GetSize() const;
+	virtual void SetSize(vec3 size);
 
 	Rigidbody* rigidbody;
 	vec3 size = vec3(1);

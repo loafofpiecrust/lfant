@@ -92,35 +92,32 @@ TEST_F(SqratTest, ClassProperties) {
                     );
 
     Script script;
-
-    try {
-        script.CompileString(_SC(" \
-			p <- Player(); \
-			gTest.EXPECT_INT_EQ(p.health, 10); \
-			p.health = 5; \
-			gTest.EXPECT_INT_EQ(p.health, 5); \
-			p.health -= 3; \
-			gTest.EXPECT_INT_EQ(p.health, 2); \
-			p.health -= 3; \
-			gTest.EXPECT_INT_EQ(p.health, 0); \
-			gTest.EXPECT_TRUE(p.dead); \
-			\
-			item1 <- Item(); \
-			item1.name = \"Sword\"; \
-			p.rightHand = item1; \
-			item2 <- Item(); \
-			item2.name = \"Shield\"; \
-			p.leftHand = item2; \
-			gTest.EXPECT_STR_EQ(p.rightHand.name, \"Sword\"); \
-			gTest.EXPECT_STR_EQ(p.leftHand.name, \"Shield\"); \
-			"));
-    } catch(Exception ex) {
-        FAIL() << _SC("Compile Failed: ") << ex.Message();
+    script.CompileString(_SC(" \
+        p <- Player(); \
+        gTest.EXPECT_INT_EQ(p.health, 10); \
+        p.health = 5; \
+        gTest.EXPECT_INT_EQ(p.health, 5); \
+        p.health -= 3; \
+        gTest.EXPECT_INT_EQ(p.health, 2); \
+        p.health -= 3; \
+        gTest.EXPECT_INT_EQ(p.health, 0); \
+        gTest.EXPECT_TRUE(p.dead); \
+        \
+        item1 <- Item(); \
+        item1.name = \"Sword\"; \
+        p.rightHand = item1; \
+        item2 <- Item(); \
+        item2.name = \"Shield\"; \
+        p.leftHand = item2; \
+        gTest.EXPECT_STR_EQ(p.rightHand.name, \"Sword\"); \
+        gTest.EXPECT_STR_EQ(p.leftHand.name, \"Shield\"); \
+        "));
+    if (Sqrat::Error::Instance().Occurred(vm)) {
+        FAIL() << _SC("Compile Failed: ") << Sqrat::Error::Instance().Message(vm);
     }
 
-    try {
-        script.Run();
-    } catch(Exception ex) {
-        FAIL() << _SC("Run Failed: ") << ex.Message();
+    script.Run();
+    if (Sqrat::Error::Instance().Occurred(vm)) {
+        FAIL() << _SC("Run Failed: ") << Sqrat::Error::Instance().Message(vm);
     }
 }

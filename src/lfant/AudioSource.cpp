@@ -42,9 +42,9 @@ AudioSource::~AudioSource()
 
 void AudioSource::Init()
 {
-	ConnectEvent(SENDER(owner, OnSetPosition), RECEIVER(this, OnSetPosition));
-	ConnectEvent(SENDER(owner, OnSetRotation), RECEIVER(this, OnSetRotation));
-	ConnectEvent(SENDER(owner, OnSetVelocity), RECEIVER(this, OnSetVelocity));
+	ConnectEvent(SENDER(owner, SetPosition), RECEIVER(this, OnSetPosition));
+	ConnectEvent(SENDER(owner, SetRotation), RECEIVER(this, OnSetRotation));
+	ConnectEvent(SENDER(owner, SetVelocity), RECEIVER(this, OnSetVelocity));
 }
 
 Sound* AudioSource::AddSound(string name)

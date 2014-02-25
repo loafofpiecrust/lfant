@@ -158,8 +158,8 @@ void OpenGLGLXPBTextureTarget::initialisePBuffer()
 {
     int creation_attrs[] =
     {
-        GLX_PBUFFER_WIDTH, (int)d_area.getWidth(),
-        GLX_PBUFFER_HEIGHT, (int)d_area.getHeight(),
+        GLX_PBUFFER_WIDTH, (int)floor(d_area.getWidth()),
+        GLX_PBUFFER_HEIGHT, (int)floor(d_area.getHeight()),
         GLX_LARGEST_PBUFFER, True,
         GLX_PRESERVED_CONTENTS, True,
         None

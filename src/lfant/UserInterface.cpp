@@ -256,7 +256,7 @@ void UserInterface::Movie::Pause()
 
 void UserInterface::CreateWindow(Properties* prop, CEGUI::Window* parent)
 {
-	CEGUI::Window* win = windowManager->createWindow(prop->Get("type"), prop->Get("name"));
+	CEGUI::Window* win = windowManager->createWindow(prop->Get("type"), prop->name);
 
 	string type = type::Descope(type::Name(win));
 	if(type == "PushButton")
@@ -277,20 +277,20 @@ void UserInterface::CreateWindow(Properties* prop, CEGUI::Window* parent)
 		parent->addChild(win);
 	}
 
-/*	for(auto& val : prop->GetValues())
+	for(auto& val : prop->values)
 	{
 		if(val.first == "type")
 		{
 			continue;
 		}
-	//	Log("UserInterface::CreateWindow: Setting Property '"+val.first+"' to '"+val.second+"'.");
+		Log("UserInterface::CreateWindow: Setting Property '"+val.first+"' to '"+val.second+"'.");
 		win->setProperty(val.first, val.second);
 	}
 
-	for(auto& child : prop->GetChildren("window"))
+	for(auto& child : prop->children)
 	{
-		CreateWindow(child, win);
-	}*/
+		if(child->IsType("window")) CreateWindow(child, win);
+	}
 
 }
 
@@ -321,15 +321,15 @@ void UserInterface::Load(Properties *prop)
 		CEGUI::SchemeManager::getSingleton().createFromFile(i+".scheme", "schemes");
 	}
 
-	if(pfont != "")
+	if(!pfont.empty())
 	{
 		CEGUI::Font& font = CEGUI::FontManager::getSingleton().createFromFile(pfont+".font");
 		context->setDefaultFont(&font);
 	}
 
-	if(pcursor != "")
+	if(!pcursor.empty())
 	{
-		context->getMouseCursor().setDefaultImage(pcursor);
+		context->getPointerIndicator().setDefaultImage(pcursor);
 	}
 
 	context->setDefaultTooltipType(prop->Get<string>("tooltip"));
@@ -356,6 +356,7 @@ void UserInterface::Init()
 		windowManager = CEGUI::WindowManager::getSingletonPtr();
 		system = CEGUI::System::getSingletonPtr();
 		context = &system->getDefaultGUIContext();
+		input = new CEGUI::InputAggregator(context);
 	}
 
 	renderer->enableExtraStateSettings(true);
@@ -385,7 +386,7 @@ void UserInterface::Init()
 	}
 	context->setRootWindow(rootWindow);
 
-	context->getMouseCursor().setInitialMousePosition(vec2_cast<CEGUI::Vector2f>((vec2)game->input->GetMousePos()));
+	context->getPointerIndicator().setInitialPointerPosition(vec2_cast<CEGUI::Vector2f>((vec2)game->input->GetMousePos()));
 
 	ConnectEvent(SENDER(game->input, KeyPress), RECEIVER(this, OnKey));
 	ConnectEvent(SENDER(game->input, CharPress), RECEIVER(this, OnChar));
@@ -405,7 +406,7 @@ void UserInterface::Update()
 
 	if(resized)
 	{
-		system->notifyDisplaySizeChanged(CEGUI::Sizef((float)size.x, (float)size.y));
+		system->notifyDisplaySizeChanged(CEGUI::Sizef(size.x, size.y));
 		resized = false;
 	}
 
@@ -421,6 +422,7 @@ void UserInterface::Update()
 void UserInterface::Deinit()
 {
 	system->destroy();
+	delete input;
 }
 
 void UserInterface::RemoveWindow(string fileName)
@@ -470,21 +472,21 @@ void UserInterface::OnKey(uint16 key, int mode)
 	{
 		if(newKey != CEGUI::Key::Unknown)
 		{
-			context->injectKeyDown(newKey);
+			input->injectKeyDown(newKey);
 		}
 	}
 	else
 	{
 		if(newKey != CEGUI::Key::Unknown)
 		{
-			context->injectKeyUp(newKey);
+			input->injectKeyUp(newKey);
 		}
 	}
 }
 
 void UserInterface::OnChar(char key)
 {
-	context->injectChar(key);
+	input->injectChar(key);
 }
 
 void UserInterface::OnMouseButton(uint16 btn, int mode)
@@ -507,31 +509,36 @@ void UserInterface::OnMouseButton(uint16 btn, int mode)
 	{
 		if(newBtn != CEGUI::NoButton)
 		{
-			context->injectMouseButtonDown(newBtn);
+			input->injectMouseButtonDown(newBtn);
 		}
 	}
 	else
 	{
 		if(newBtn != CEGUI::NoButton)
 		{
-			context->injectMouseButtonUp(newBtn);
+			input->injectMouseButtonUp(newBtn);
+			
 		}
 	}
 }
 
 void UserInterface::OnMouseMove(vec2 pos)
 {
-	context->injectMousePosition(pos.x, pos.y);
-	//context->getMouseCursor().setPosition(vec2_cast<CEGUI::Vector2f>(vec2(x,y)));
+	input->injectMousePosition(pos.x, pos.y);
+//	context->getMouseCursor().setPosition(vec2_cast<CEGUI::Vector2f>(vec2(x,y)));
+//	context->getPointerIndicator().setPosition(vec2_cast<CEGUI::Vector2f>(pos));
 }
 
-void UserInterface::OnWindowResize(int32_t width, int32_t height)
+void UserInterface::OnWindowResize(int width, int height)
 {
+	Log("UserInterface::OnWindowResize(): Touch.");
 	if(system)
 	{
+		Log("UserInterface::OnWindowResize(): There is in fact a system");
 		resized = true;
-		size = ivec2(width, height);
-		//	rootWindow->setMaxSize(CEGUI::USize(cegui_reldim(1.0f), cegui_reldim( 1.0f)));
+		size = vec2(width, height);
+		Log("UserInterface::OnWindowResize(): Resizing to ", size);
+	//	system->notifyDisplaySizeChanged(CEGUI::Sizef((float)size.x, (float)size.y));
 	}
 }
 

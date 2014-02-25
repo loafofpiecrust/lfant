@@ -1,8 +1,5 @@
 project(CEGUI)
 
-#set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
-#include(CEGUIMacros)
-#include(CMakeDependentOption)
 
 set(CMAKE_BUILD_TYPE Release)
 
@@ -31,20 +28,6 @@ set(CEGUI_STATIC ON)
 configure_file( "${PROJECT_SOURCE_DIR}/cegui/include/CEGUI/Version.h.in" "${PROJECT_SOURCE_DIR}/cegui/include/CEGUI/Version.h" )
 configure_file( "${PROJECT_SOURCE_DIR}/cegui/include/CEGUI/Config.h.in" "${PROJECT_SOURCE_DIR}/cegui/include/CEGUI/Config.h" )
 
-#add_subdirectory(cegui/src)
-#add_subdirectory(cegui/src/RendererModules)
-#add_subdirectory(cegui/src/XMLParserModules)
-#add_subdirectory(cegui/src/ImageCodecModules)
-#add_subdirectory(cegui/src/WindowRendererSets)
-#add_subdirectory(cegui/src/ScriptModules)
-#add_subdirectory(cegui/src/CommonDialogs)
-
-# Library Search Paths
-link_directories(
-	${LIBRARY_OUTPUT_PATH}
-	/usr/lib/x86_64-linux-gnu/mesa
-	)
-
 # Source Info
 file(GLOB SRC_FILES
 	cegui/src/*.cpp
@@ -57,6 +40,7 @@ file(GLOB SRC_FILES
 	cegui/include/CEGUI/tinyxml/*.cpp
 	cegui/src/CommonDialogs/*.cpp
 	cegui/src/CommonDialogs/ColourPicker/*.cpp
+	cegui/src/svg/*.cpp
 	)
 
 file(GLOB HEADER_FILES

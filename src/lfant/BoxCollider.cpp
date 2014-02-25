@@ -14,6 +14,7 @@
 #include <btBulletCollisionCommon.h>
 
 // Internal
+#include "lfant/Console.h"
 
 namespace lfant
 {
@@ -22,13 +23,20 @@ IMPLEMENT_SUBTYPE(Component, BoxCollider, Collider)
 
 void BoxCollider::Init()
 {
-	shape = new btBoxShape(vec3_cast<btVector3>(size));
+	shape = new btBoxShape(/*vec3_cast<btVector3>(size)*/btVector3(0.5f, 0.5f, 0.5f));
 	Collider::Init();
 }
 
 btCollisionShape *BoxCollider::GetShape()
 {
 	return shape;
+}
+
+void BoxCollider::SetSize(vec3 size)
+{
+	lfant::Collider::SetSize(size);
+	
+	Log("BoxCollider::SetSize(): final dimensions ", vec3_cast<vec3>(shape->getImplicitShapeDimensions()));
 }
 
 }

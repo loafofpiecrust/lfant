@@ -1,6 +1,11 @@
 
 class TestComponent extends Component
 {
+	constructor()
+	{
+		base.constructor(this);
+	}
+
 	function Init()
 	{
 		base.Init();
@@ -11,8 +16,8 @@ class TestComponent extends Component
 		base.Update();
 	}
 
-	function OnDestroy()
+	function Deinit()
 	{
-		base.OnDestroy();
+		base.Deinit();
 	}
 }

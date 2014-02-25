@@ -74,7 +74,7 @@ public:
 	void SaveStream(std::ostream& stream);
 
 	Properties* GetFirstChild();
-	Properties* GetChild(string type);
+	Properties* GetChild(string type, string name = "");
 	Properties* GetChild(uint idx);
 
 	void Clear();
@@ -131,7 +131,7 @@ private:
 //	bool isArray = false;
 
 	string Expand(string value);
-	void TrimSpace(string& str, bool onlyIndent);
+	static string TrimSpace(const string& str, bool onlyIndent);
 	void SkipSpace(std::istream& stream);
 	Properties* AddChild(Properties* prop);
 	string GetIndent();

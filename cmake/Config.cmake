@@ -165,3 +165,9 @@ if(PLATFORM STREQUAL "windows" AND CMAKE_C_COMPILER STREQUAL "clang")
 	)
 
 endif()
+
+if(PLATFORM STREQUAL "linux")
+	link_directories(
+		/usr/lib/x86_64-linux-gnu/mesa
+	)
+endif()

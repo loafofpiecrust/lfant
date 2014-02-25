@@ -39,9 +39,7 @@
 #if defined(_MSC_VER)
 #include <dbghelp.h>
 #elif defined(__linux__) || defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__HAIKU__)
-#   ifndef ANDROID
-#       include <execinfo.h>
-#   endif
+#include <execinfo.h>
 #include <dlfcn.h>
 #include <cxxabi.h>
 #include <cstdlib>
@@ -56,7 +54,6 @@ bool Exception::d_stdErrEnabled(true);
 //----------------------------------------------------------------------------//
 static void dumpBacktrace(size_t frames)
 {
-#ifndef ANDROID
 #if defined(_DEBUG) || defined(DEBUG)
 #if defined(_MSC_VER)
     SymSetOptions(SYMOPT_DEFERRED_LOADS | SYMOPT_INCLUDE_32BIT_MODULES);
@@ -168,7 +165,6 @@ static void dumpBacktrace(size_t frames)
     }
 
     logger.logEvent("==========  End of Backtrace  ==========", Errors);
-#endif
 #endif
 #endif
 }

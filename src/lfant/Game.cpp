@@ -57,6 +57,10 @@ Game::Game() :
 {
 }
 
+Game::Game(const Game& other)
+{
+}
+
 Game::~Game()
 {
 }
@@ -144,9 +148,13 @@ void Game::Save(Properties* prop) const
 	prop->Set("defaultScene", defaultScene);
 }
 
-void Game::Bind()
+void Game::ScriptBind()
 {
-//	Script::Class<Game, Object> inst;
+	Script::Class<Game, Object> inst;
+	/// @todo Figure out how to bind and access smart pointers
+//	inst.Prop("fileSystem", &ptr<FileSystem>::get(), &ptr<FileSystem>::reset);
+	
+	inst.Bind();
 }
 
 /*******************************************************************************

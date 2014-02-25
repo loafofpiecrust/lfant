@@ -171,6 +171,7 @@ void Properties::LoadStream(istream& stream)
 						curr = stream.get();
 						if(curr == '/')
 						{
+							curr = stream.get();
 							break;
 						}
 					}
@@ -189,7 +190,10 @@ void Properties::LoadStream(istream& stream)
 				if(token == "{")
 				{
 					to_lower(stype);
+					erase_all(stype, " ");
+					erase_all(sname, " ");
 					obj = new Properties(obj, stype, sname);
+					std::cout << GetIndent()+"new structure named '"+stype+" "+sname+"'\n";
 					stype.clear();
 					sname.clear();
 				}
@@ -232,8 +236,8 @@ void Properties::LoadStream(istream& stream)
 					value.push_back(curr);
 					curr = stream.get();
 				}
-				TrimSpace(value, false);
-				obj->Set(stype, value);
+				value = TrimSpace(value, false);
+				if(!value.empty()) obj->Set(stype, value);
 
 				stype.clear();
 				value.clear();
@@ -257,9 +261,11 @@ void Properties::SaveStream(ostream &stream)
 	if(parent)
 	{
 		stream << ind << type;
+		if(!type.empty())
+			stream << " ";
 		if(!name.empty())
-			stream << " "+name+"\n";
-		stream << ind << "{\n";
+			stream << name;
+		stream << "\n"+ind+"{\n";
 	}
 
 	for(auto& i : values)
@@ -269,6 +275,7 @@ void Properties::SaveStream(ostream &stream)
 
 	for(auto& child : children)
 	{
+		stream << "\n";
 		child->SaveStream(stream);
 	}
 
@@ -295,12 +302,12 @@ void Properties::SaveFile(string path)
 	out.close();
 }
 
-Properties* Properties::GetChild(string type)
+Properties* Properties::GetChild(string type, string name)
 {
 	to_lower(type);
 	for(auto& child : children)
 	{
-		if(child->type == type)
+		if(child->type == type && (name.empty() || child->name == name))
 		{
 			Log("Properties::GetChild: Got child namespace '"+child->type+"'.");
 			return child;
@@ -345,6 +352,7 @@ Properties* Properties::AddChild(string name)
 
 bool Properties::IsType(string type)
 {
+	to_lower(type);
 	return this->type == type;
 }
 
@@ -355,7 +363,11 @@ bool Properties::IsNamed(string name)
 
 void Properties::Clear()
 {
-
+	type.clear();
+	name.clear();
+	
+	values.clear();
+	children.clear();
 }
 
 void Properties::SkipSpace(istream &stream)
@@ -375,33 +387,22 @@ void Properties::SkipSpace(istream &stream)
 }
 
 /// @todo Switch to new string instead of erasing?
-void Properties::TrimSpace(string& str, bool onlyIndent)
+string Properties::TrimSpace(const string& str, bool onlyIndent)
 {
-	uint end = 0;
-	for(uint i = 0; i < str.size(); ++i)
+	std::size_t firstLetter = str.find_first_not_of(" \t\n");
+	std::size_t lastLetter = str.find_last_not_of(" \t\n");
+	
+	if(firstLetter == string::npos)
 	{
-		if(!(IsWhitespace(str[i]) /*|| str[i] == '\n'*/))
-		{
-			end = i;
-			break;
-		}
+		return "";
 	}
-	if(end != 0) str.erase(str.begin(), str.begin()+(end));
-
-	if(onlyIndent) return;
-
-	end = 0;
-	if(str.size() > 0)
+	else if(onlyIndent)
 	{
-		for(uint i = str.size()-1; i > 0; --i)
-		{
-			if(!(IsWhitespace(str[i])))
-			{
-				end = i;
-				break;
-			}
-		}
-		str.erase(str.begin()+end+1, str.end());
+		return str.substr(firstLetter);
+	}
+	else
+	{
+		return str.substr(firstLetter, lastLetter-firstLetter+1);
 	}
 }
 

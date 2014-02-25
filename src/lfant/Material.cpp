@@ -53,8 +53,8 @@ void Material::Load(Properties* prop)
 void Material::Save(Properties *prop) const
 {
 	Object::Save(prop);
-	texture->Save(prop->AddChild());
-	shader->Save(prop->AddChild());
+	texture->Save(prop->AddChild("texture"));
+	shader->Save(prop->AddChild("shader"));
 }
 
 }

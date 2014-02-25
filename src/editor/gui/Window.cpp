@@ -41,9 +41,6 @@ namespace lfant {
 namespace editor {
 namespace gui {
 
-//BEGIN_EVENT_TABLE(Window, wxFrame)
-//	EVT_BUTTON(Window::SaveCurrentEntity)
-//END_EVENT_TABLE()
 
 int Window::currId = 1;
 qumap<string, int> Window::ids;
@@ -382,7 +379,7 @@ void Window::OnLoadProject(wxCommandEvent& event)
 
 void Window::SaveScene(wxCommandEvent& event)
 {
-	game->scene->SaveFile(game->scene->currentFile);
+	game->scene->SaveFile("Saved.prop");
 }
 
 int Window::GetId(string name)

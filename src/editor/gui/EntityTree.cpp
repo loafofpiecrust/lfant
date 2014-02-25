@@ -24,7 +24,7 @@ EntityTree::~EntityTree()
 
 void EntityTree::Init()
 {
-	AddRoot("scene");
+	AddRoot("root", -1, -1, (wxTreeItemData*)game->scene->GetRoot());
 
 	wxTreeCtrl::Bind(wxEVT_COMMAND_TREE_ITEM_RIGHT_CLICK, &EntityTree::OnSetCurrent, this, GetId());
 
@@ -44,8 +44,9 @@ void EntityTree::AppendItem(const wxTreeItemId& parent, Entity* ent)
 
 void EntityTree::AppendItem(Entity* entity)
 {
+	Log("EntityTree::AppendItem(): Touch");
 	wxTreeItemId id = GetRootItem();
-	if(!entity->GetParent())
+	if(entity->GetParent() == game->scene->GetRoot())
 	{
 		AppendItem(id, entity);
 	}
@@ -116,13 +117,12 @@ void EntityTree::UpdateName(Entity* ent)
 void EntityTree::OnSetCurrent(wxTreeEvent& evt)
 {
 	Log("EntityTree::OnSetCurrent: Touch");
-	if(evt.GetItem() == GetRootItem())
+/*	if(evt.GetItem() == GetRootItem())
 	{
 		return;
 	}
-
 	Log("EntityTree::OnSetCurrent: Past root check");
-
+*/
 	current = (Entity*)GetItemData(evt.GetItem());
 	TriggerEvent("SetCurrent");
 }

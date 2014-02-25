@@ -34,23 +34,20 @@ TEST_F(SqratTest, ImportScript) {
     sqrat_register_importlib(vm);
 
     Script script;
-
-    try {
-        script.CompileString(_SC(" \
-			::import(\"scripts/samplemodule\"); \
-			\
-			gTest.EXPECT_FLOAT_EQ(3.1415, ::PI); \
-			gTest.EXPECT_INT_EQ(10, ::RectArea(2, 5)); \
-			gTest.EXPECT_FLOAT_EQ(12.566, ::CircleArea(2)); \
-			"));
-    } catch(Exception ex) {
-        FAIL() << _SC("Compile Failed: ") << ex.Message();
+    script.CompileString(_SC(" \
+        ::import(\"scripts/samplemodule\"); \
+        \
+        gTest.EXPECT_FLOAT_EQ(3.1415, ::PI); \
+        gTest.EXPECT_INT_EQ(10, ::RectArea(2, 5)); \
+        gTest.EXPECT_FLOAT_EQ(12.566, ::CircleArea(2)); \
+        "));
+    if (Sqrat::Error::Instance().Occurred(vm)) {
+        FAIL() << _SC("Compile Failed: ") << Sqrat::Error::Instance().Message(vm);
     }
 
-    try {
-        script.Run();
-    } catch(Exception ex) {
-        FAIL() << _SC("Run Failed: ") << ex.Message();
+    script.Run();
+    if (Sqrat::Error::Instance().Occurred(vm)) {
+        FAIL() << _SC("Run Failed: ") << Sqrat::Error::Instance().Message(vm);
     }
 }
 
@@ -60,22 +57,19 @@ TEST_F(SqratTest, ImportScriptIntoTable) {
     sqrat_register_importlib(vm);
 
     Script script;
-
-    try {
-        script.CompileString(_SC(" \
-			mod <- ::import(\"scripts/samplemodule\", {}); \
-			\
-			gTest.EXPECT_FLOAT_EQ(3.1415, mod.PI); \
-			gTest.EXPECT_INT_EQ(10, mod.RectArea(2, 5)); \
-			gTest.EXPECT_FLOAT_EQ(12.566, mod.CircleArea(2)); \
-			"));
-    } catch(Exception ex) {
-        FAIL() << _SC("Compile Failed: ") << ex.Message();
+    script.CompileString(_SC(" \
+        mod <- ::import(\"scripts/samplemodule\", {}); \
+        \
+        gTest.EXPECT_FLOAT_EQ(3.1415, mod.PI); \
+        gTest.EXPECT_INT_EQ(10, mod.RectArea(2, 5)); \
+        gTest.EXPECT_FLOAT_EQ(12.566, mod.CircleArea(2)); \
+        "));
+    if (Sqrat::Error::Instance().Occurred(vm)) {
+        FAIL() << _SC("Compile Failed: ") << Sqrat::Error::Instance().Message(vm);
     }
 
-    try {
-        script.Run();
-    } catch(Exception ex) {
-        FAIL() << _SC("Run Failed: ") << ex.Message();
+    script.Run();
+    if (Sqrat::Error::Instance().Occurred(vm)) {
+        FAIL() << _SC("Run Failed: ") << Sqrat::Error::Instance().Message(vm);
     }
 }

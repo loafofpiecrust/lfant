@@ -4,7 +4,7 @@
 
 SQUIRREL_INCLUDE=/usr/local/include/squirrel
 SQUIRREL_LIB=/usr/local/lib
-CFLAGS="-fpermissive -g -O0 -I. -I../include -I../gtest-1.3.0/include -I${SQUIRREL_INCLUDE}" 
+CFLAGS="-g -O0 -I. -I../include -I../gtest-1.3.0/include -I${SQUIRREL_INCLUDE}" 
 LDFLAGS=-L${SQUIRREL_LIB}
 LIBS="../gtest-1.3.0/libgtest.a -lsqstdlib -lsquirrel -lstdc++ -lm "
 
@@ -26,7 +26,8 @@ TEST_CPPS="ClassBinding.cpp\
     RunStackHandling.cpp \
     SuspendVM.cpp \
     NullPointerReturn.cpp\
-    FuncInputArgumentType.cpp "
+    FuncInputArgumentType.cpp \
+    ArrayBinding.cpp "
 
 for f in $TEST_CPPS; do
     gcc $CFLAGS \

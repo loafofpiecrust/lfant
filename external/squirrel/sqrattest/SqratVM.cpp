@@ -41,8 +41,8 @@ void bind(HSQUIRRELVM vm)
 {
     Sqrat::Class<simpleclass> sqClass(vm);
     sqClass               
-    .Func("memfun", &simpleclass::memfun);
-    Sqrat::RootTable(vm).Bind("simpleclass", sqClass);    
+    .Func(_SC("memfun"), &simpleclass::memfun);
+    Sqrat::RootTable(vm).Bind(_SC("simpleclass"), sqClass);    
 
 }
 
@@ -51,7 +51,7 @@ TEST_F(SqratTest, SqratVM)
     SqratVM vm1;
     SqratVM vm2;
     
-    bind(vm1.getVM());
-    bind(vm2.getVM());
+    bind(vm1.GetVM());
+    bind(vm2.GetVM());
     
 }

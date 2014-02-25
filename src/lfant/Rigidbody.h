@@ -73,6 +73,8 @@ public:
 
 	virtual void Load(Properties* prop);
 	virtual void Save(Properties* prop) const;
+	
+	virtual void Enable(bool on = true);
 
 	// Methods
 	btTypedConstraint* GetConstraint(uint16_t idx);
@@ -134,8 +136,8 @@ public:
 	// Variables
 	Mode mode;
 
-	bool useWorldGravity;
-	bool usePointGravity;
+	bool useWorldGravity = true;
+	bool usePointGravity = false;
 
 	float drag = 1.0f;
 
@@ -147,13 +149,15 @@ protected:
 	virtual void Init();
 	virtual void Update();
 	virtual void Deinit();
+	
 
 	// Slots
 	void OnSetPos(vec3 pos);
 	void OnSetRot(quat rot);
 	void OnSetScale(vec3 scale);
 	void OnSetMesh(Mesh* mesh);
-	void OnSetCollider(Collider* collider);
+	void OnAddComponent(Component* comp);
+	void OnRemoveComponent(Component* comp);
 
 	/// The current mass of this object, in kg.
 	float mass = 1.0f;

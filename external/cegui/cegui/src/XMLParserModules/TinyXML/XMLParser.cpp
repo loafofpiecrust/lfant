@@ -1,7 +1,7 @@
 /***********************************************************************
-	filename:   CEGUITinyXMLParser.cpp
-	created:    Sun Mar 13 2005
-	author:     Paul D Turner
+    filename:   CEGUITinyXMLParser.cpp
+    created:    Sun Mar 13 2005
+    author:     Paul D Turner
 *************************************************************************/
 /***************************************************************************
  *   Copyright (C) 2004 - 2006 Paul D Turner & The CEGUI Development Team
@@ -47,126 +47,126 @@
 // Start of CEGUI namespace section
 namespace CEGUI
 {
-	class TinyXMLDocument : public TiXmlDocument
-	{
-	public:
-		TinyXMLDocument(XMLHandler& handler, const RawDataContainer& source, const String& schemaName);
-		~TinyXMLDocument()
-		{}
-	protected:
-		void processElement(const TiXmlElement* element);
+    class TinyXMLDocument : public TiXmlDocument
+    {
+    public:
+        TinyXMLDocument(XMLHandler& handler, const RawDataContainer& source, const String& schemaName);
+        ~TinyXMLDocument()
+        {}
+    protected:
+        void processElement(const TiXmlElement* element);
 
-	private:
-		XMLHandler* d_handler;
-	};
+    private:
+        XMLHandler* d_handler;
+    };
 
-	TinyXMLDocument::TinyXMLDocument(XMLHandler& handler, const RawDataContainer& source, const String& /*schemaName*/)
-	{
-		d_handler = &handler;
+    TinyXMLDocument::TinyXMLDocument(XMLHandler& handler, const RawDataContainer& source, const String& /*schemaName*/)
+    {
+        d_handler = &handler;
 
-		// Create a buffer with extra bytes for a newline and a terminating null
-		size_t size = source.getSize();
-		char* buf = new char[size + 2];
-		memcpy(buf, source.getDataPtr(), size);
-		// PDT: The addition of the newline is a kludge to resolve an issue
-		// whereby parse returns 0 if the xml file has no newline at the end but
-		// is otherwise well formed.
-		buf[size] = '\n';
-		buf[size+1] = 0;
+        // Create a buffer with extra bytes for a newline and a terminating null
+        size_t size = source.getSize();
+        char* buf = new char[size + 2];
+        memcpy(buf, source.getDataPtr(), size);
+        // PDT: The addition of the newline is a kludge to resolve an issue
+        // whereby parse returns 0 if the xml file has no newline at the end but
+        // is otherwise well formed.
+        buf[size] = '\n';
+        buf[size+1] = 0;
 
-		// Parse the document
-		TiXmlDocument doc;
-		if (!doc.Parse((const char*)buf))
-		{
-			// error detected, cleanup out buffers
-			delete[] buf;
+        // Parse the document
+        TiXmlDocument doc;
+        if (!doc.Parse((const char*)buf))
+        {
+            // error detected, cleanup out buffers
+            delete[] buf;
 
-			// throw exception
-			CEGUI_THROW(FileIOException("an error occurred while "
-				"parsing the XML document - check it for potential errors!."));
-		}
+            // throw exception
+            CEGUI_THROW(FileIOException("an error occurred while "
+                "parsing the XML document - check it for potential errors!."));
+        }
 
-		const TiXmlElement* currElement = doc.RootElement();
-		if (currElement)
-		{
-			CEGUI_TRY
-			{
-				// function called recursively to parse xml data
-				processElement(currElement);
-			}
-			CEGUI_CATCH(...)
-			{
-				delete [] buf;
+        const TiXmlElement* currElement = doc.RootElement();
+        if (currElement)
+        {
+            CEGUI_TRY
+            {
+                // function called recursively to parse xml data
+                processElement(currElement);
+            }
+            CEGUI_CATCH(...)
+            {
+                delete [] buf;
 
-				CEGUI_RETHROW;
-			}
-		} // if (currElement)
+                CEGUI_RETHROW;
+            }
+        } // if (currElement)
 
-		// Free memory
-		delete [] buf;
-	}
+        // Free memory
+        delete [] buf;
+    }
 
-	void TinyXMLDocument::processElement(const TiXmlElement* element)
-	{
-		// build attributes block for the element
-		XMLAttributes attrs;
+    void TinyXMLDocument::processElement(const TiXmlElement* element)
+    {
+        // build attributes block for the element
+        XMLAttributes attrs;
 
-		const TiXmlAttribute *currAttr = element->FirstAttribute();
-		while (currAttr)
-		{
-			attrs.add((encoded_char*)currAttr->Name(), (encoded_char*)currAttr->Value());
-			currAttr = currAttr->Next();
-		}
+        const TiXmlAttribute *currAttr = element->FirstAttribute();
+        while (currAttr)
+        {
+            attrs.add((encoded_char*)currAttr->Name(), (encoded_char*)currAttr->Value());
+            currAttr = currAttr->Next();
+        }
 
-		// start element
-		d_handler->elementStart((encoded_char*)element->Value(), attrs);
+        // start element
+        d_handler->elementStart((encoded_char*)element->Value(), attrs);
 
-		// do children
-		const TiXmlNode* childNode = element->FirstChild();
-		while (childNode)
-		{
-			switch(childNode->Type())
-			{
-			case TiXmlNode::CEGUI_TINYXML_ELEMENT:
-				processElement(childNode->ToElement());
-				break;
-			case TiXmlNode::CEGUI_TINYXML_TEXT:
-				if (childNode->ToText()->Value() != (const char*)'\0')
-					d_handler->text((encoded_char*)childNode->ToText()->Value());
-				break;
+        // do children
+        const TiXmlNode* childNode = element->FirstChild();
+        while (childNode)
+        {
+            switch(childNode->Type())
+            {
+            case TiXmlNode::CEGUI_TINYXML_ELEMENT:
+                processElement(childNode->ToElement());
+                break;
+            case TiXmlNode::CEGUI_TINYXML_TEXT:
+                if (childNode->ToText()->Value() != "\0")
+                    d_handler->text((encoded_char*)childNode->ToText()->Value());
+                break;
 
-				// Silently ignore unhandled node type
-			};
-			childNode = childNode->NextSibling();
-		}
+                // Silently ignore unhandled node type
+            };
+            childNode = childNode->NextSibling();
+        }
 
-		// end element
-		d_handler->elementEnd((encoded_char*)element->Value());
-	}
+        // end element
+        d_handler->elementEnd((encoded_char*)element->Value());
+    }
 
-	TinyXMLParser::TinyXMLParser(void)
-	{
-		// set ID string
-		d_identifierString = "CEGUI::TinyXMLParser - Official tinyXML based parser module for CEGUI";
-	}
+    TinyXMLParser::TinyXMLParser(void)
+    {
+        // set ID string
+        d_identifierString = "CEGUI::TinyXMLParser - Official tinyXML based parser module for CEGUI";
+    }
 
-	TinyXMLParser::~TinyXMLParser(void)
-	{}
+    TinyXMLParser::~TinyXMLParser(void)
+    {}
 
-	void TinyXMLParser::parseXML(XMLHandler& handler, const RawDataContainer& source, const String& schemaName)
-	{
-	  TinyXMLDocument doc(handler, source, schemaName);
-	}
+    void TinyXMLParser::parseXML(XMLHandler& handler, const RawDataContainer& source, const String& schemaName)
+    {
+      TinyXMLDocument doc(handler, source, schemaName);
+    }
 
-	bool TinyXMLParser::initialiseImpl(void)
-	{
-		// This used to prevent deletion of line ending in the middle of a text.
-		// WhiteSpace cleaning will be available throught the use of String methods directly
-		//TiXmlDocument::SetCondenseWhiteSpace(false);
-		return true;
-	}
+    bool TinyXMLParser::initialiseImpl(void)
+    {
+        // This used to prevent deletion of line ending in the middle of a text.
+        // WhiteSpace cleaning will be available throught the use of String methods directly
+        //TiXmlDocument::SetCondenseWhiteSpace(false);
+        return true;
+    }
 
-	void TinyXMLParser::cleanupImpl(void)
-	{}
+    void TinyXMLParser::cleanupImpl(void)
+    {}
 
 } // End of  CEGUI namespace section

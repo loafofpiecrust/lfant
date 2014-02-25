@@ -81,9 +81,9 @@ public:
 
 	void Load(Properties* prop, bool init);
 
-	static void Bind() __attribute__((constructor));
+	static void ScriptBind();
 
-	Entity* AddChild();
+	Entity* AddChild(string name = "");
 	void RemoveChild(Entity* ent);
 
 	/**
@@ -128,23 +128,29 @@ public:
 	{
 	//	string type = type::Name<C>();
 		C* result = nullptr;
-		for(auto& comp : components)
+		for(ptr<Component>& comp : components)
 		{
+			if(!comp.get())
+			{
+				std::cout << "Wartf comp doesnt exist\n";
+			}
+			
+			std::cout << "(" << this << ")::GetComponent() curr = " << type::Name(comp.get()) << "\n";
+			
 			result = dynamic_cast<C*>(comp.get());
-		//	if(type::Name(comp) == type || Component::registry)
 			if(result)
 			{
-			//	return dynamic_cast<C*>(comp.get());
+				std::cout << "Successful GetComponent() " << result << "\n";
 				return result;
 			}
 		}
 		return nullptr;
 	}
 
-	Component* GetComponent(string name);
+	Component* GetComponent(string name) const;
 
 	template<typename C>
-	std::deque<C*> GetComponents()
+	std::deque<C*> GetComponents() const
 	{
 		std::deque<C*> comps;
 		for(auto& comp : components)
@@ -157,11 +163,10 @@ public:
 		return comps;
 	}
 
-	Entity* GetChild(string name, bool recursive = false);
-	Entity* GetChild(uint idx);
+	Entity* GetChild(string name, bool recursive = false) const;
 
 	template<typename C>
-	std::deque<C*> GetChildrenWithComponent(bool recursive = false)
+	std::deque<C*> GetChildrenWithComponent(bool recursive = false) const
 	{
 		C* temp = nullptr;
 		std::deque<C*> result;
@@ -175,10 +180,12 @@ public:
 		}
 		return result;
 	}
+	
+	const std::deque<ptr<Entity>>& GetChildren() const;
 
 //	Entity* SpawnChild();
 
-	bool HasTag(string tag);
+	bool HasTag(string tag) const;
 
 	uint32_t GetId() const { return id; }
 
@@ -240,13 +247,13 @@ private:
 
 	std::deque<ptr<Component>> components;
 
-	string name = "Entity";
+	string name = "root";
 
 	/// Scene-unique identifier.
 	uint32_t id = 0;
 
 	/// The layer of this entity for primarily display filtering
-	uint32_t layer = -1;
+	uint32_t layer = 0;
 
 	Entity* parent = nullptr;
 

@@ -243,7 +243,7 @@ public:
 	 */
 	virtual void SaveFile(string path) const;
 
-	static void Bind() __attribute__((constructor));
+	static void ScriptBind();
 
 	template<typename C>
 	static void RegisterEventFunc(Event<>* evt, C* receiver, void (C::*func)())
@@ -279,7 +279,7 @@ public:
 	static void ConnectEvent(Object* sender, string name, R* receiver, void (R::*func)(), bool dis = false)
 	{
 		boost::algorithm::erase_all(name, " ");
-		name = name + "()";
+		name.append("()");
 		for(auto& evt : Object::events)
 		{
 			if(evt->name == name && evt->sender == sender)
@@ -301,7 +301,7 @@ public:
 	static void ConnectEvent(Object* sender, string name, R* receiver, void (R::*func)(P1, P...), bool dis = false)
 	{
 	//	erase_all(name, " ");
-		name = name + "(" + type::Name<P1, P...>() + ")";
+		name.append("(" + type::Name<P1, P...>() + ")");
 		for(auto& evt : Object::events)
 		{
 			if(evt->name == name && evt->sender == sender)
@@ -335,7 +335,7 @@ public:
 	static void ConnectEvent(Object* sender, string name, T* var)
 	{
 	//	erase_all(name, " ");
-		name = name + "(" + type::Name<T>() + ")";
+		name.append("(" + type::Name<T>() + ")");
 		EventVar<T>* con = nullptr;
 		for(auto& evt : Object::events)
 		{
@@ -356,7 +356,7 @@ public:
 	void TriggerEvent(string name)
 	{
 	//	erase_all(name, " ");
-		name = name + "()";
+		name.append("()");
 		for(auto& evt : Object::events)
 		{
 			if(evt->sender == this && evt->name == name)
@@ -373,7 +373,7 @@ public:
 	void TriggerEvent(string name, P1 arg)
 	{
 	//	erase_all(name, " ");
-		name = name + "(" + type::Name<P1>() + ")";
+		name.append("(" + type::Name<P1>() + ")");
 		for(auto& evt : Object::events)
 		{
 			if(evt->sender == this && evt->name == name)
@@ -401,7 +401,7 @@ public:
 	void TriggerEvent(string name, P1 arg1, P... args)
 	{
 	//	erase_all(name, " ");
-		name = name + "(" + type::Name<P1, P...>() + ")";
+		name.append("(" + type::Name<P1, P...>() + ")");
 		for(auto& evt : Object::events)
 		{
 			if(evt->sender == this && evt->name == name)

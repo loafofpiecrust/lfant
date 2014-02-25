@@ -93,8 +93,7 @@ void Scene::Save(Properties* prop) const
 //	prop->Set("name", "scene");
 //	prop->Set("file", name);
 
-//	root->Save(prop->AddChild(""));
-	root->Save(new Properties(prop));
+	root->Save(prop->AddChild());
 	Log("Saving scene took ", game->time->GetTime() - t, " seconds");
 }
 
@@ -106,7 +105,7 @@ void Scene::Load(Properties *prop)
 //	Properties* systems = prop->GetChild("systems");
 	for(Properties* p : prop->children)
 	{
-		if(p->type == "System")
+		if(p->IsType("System"))
 		{
 			if(p->name == "Physics")
 			{

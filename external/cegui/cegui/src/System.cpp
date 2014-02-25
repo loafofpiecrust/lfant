@@ -37,7 +37,7 @@
 #include "CEGUI/SchemeManager.h"
 #include "CEGUI/RenderEffectManager.h"
 #include "CEGUI/AnimationManager.h"
-#include "CEGUI/MouseCursor.h"
+#include "CEGUI/PointerIndicator.h"
 #include "CEGUI/Window.h"
 #include "CEGUI/Exceptions.h"
 #include "CEGUI/ScriptModule.h"
@@ -57,6 +57,7 @@
 #include "CEGUI/ImageCodec.h"
 #include "CEGUI/widgets/All.h"
 #include "CEGUI/RegexMatcher.h"
+#include "CEGUI/svg/SVGDataManager.h"
 #ifdef CEGUI_HAS_PCRE_REGEX
 #   include "CEGUI/PCRERegexMatcher.h"
 #endif
@@ -235,7 +236,7 @@ System::System(Renderer& renderer,
 
     // set up defaults
     config.initialiseDefaultFont();
-    config.initialiseDefaultMouseCursor();
+    config.initialiseDefaultPointerIndicator();
     config.initialiseDefaulTooltip();
 
     // scripting available?
@@ -691,6 +692,7 @@ void System::createSingletons()
     CEGUI_NEW_AO WidgetLookManager();
     CEGUI_NEW_AO WindowRendererManager();
     CEGUI_NEW_AO RenderEffectManager();
+    CEGUI_NEW_AO SVGDataManager();
 }
 
 void System::destroySingletons()
@@ -705,6 +707,7 @@ void System::destroySingletons()
     CEGUI_DELETE_AO FontManager::getSingletonPtr();
     CEGUI_DELETE_AO ImageManager::getSingletonPtr();
     CEGUI_DELETE_AO GlobalEventSet::getSingletonPtr();
+    CEGUI_DELETE_AO SVGDataManager::getSingletonPtr();
 }
 
 //----------------------------------------------------------------------------//
@@ -943,7 +946,7 @@ void System::setDefaultCustomRenderedStringParser(RenderedStringParser* parser)
 void System::invalidateAllCachedRendering()
 {
     invalidateAllWindows();
-    //MouseCursor::getSingleton().invalidate();
+    //PointerIndicator::getSingleton().invalidate();
 }
 
 //----------------------------------------------------------------------------//

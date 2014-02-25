@@ -66,10 +66,11 @@ void Component::Save(Properties *prop) const
 {
 	/// @todo Implement Properties::SetName()
 //	prop->SetName("component");
-	prop->Set("type", type::Descope(type::Name(this)));
+	prop->type = "component";
+	prop->name = type::Descope(type::Name(this));
 	prop->Set("enabled", enabled);
 	
-	prop->LoadFile("suckit");
+//	prop->LoadFile("suckit");
 	
 }
 
@@ -102,7 +103,7 @@ void Component::Deinit()
 {
 	Object::Deinit();
 }
-
+/*
 void Component::OnEnable()
 {
 }
@@ -110,7 +111,7 @@ void Component::OnEnable()
 void Component::OnDisable()
 {
 }
-
+*/
 void Component::TriggerEvent(string name)
 {
 	owner->TriggerEvent(name);
@@ -127,17 +128,14 @@ void Component::SetOwner(Entity* ent)
 	ent->AddComponent(this);
 }
 
+Entity* Component::GetOwner() const
+{
+	return owner;
+}
+
 void Component::Enable(bool enable)
 {
 	enabled = enable;
-	if(enabled)
-	{
-		OnEnable();
-	}
-	else
-	{
-		OnDisable();
-	}
 }
 
 
@@ -146,17 +144,20 @@ bool Component::IsEnabled()
 	return enabled;
 }
 
-void Component::Bind()
+void Component::ScriptBind()
 {
-/*
 	Script::Class<Component, Object> inst;
 
-	inst.Var("owner", &Component::owner);
+	inst.Prop("owner", &Component::GetOwner, &Component::SetOwner);
 
 	inst.Func("Init", &Component::Init);
+	inst.Func("Update", &Component::Update);
+	inst.Func("Deinit", &Component::Deinit);
+	inst.Func("Destroy", &Component::Destroy);
 	inst.Func("IsEnabled", &Component::IsEnabled);
 	inst.Func("Enable", &Component::Enable);
-*/
+	
+	inst.Bind("ComponentBase");
 }
 
 }

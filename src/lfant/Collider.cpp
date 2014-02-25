@@ -10,12 +10,13 @@
 
 #include <lfant/Collider.h>
 
-// External
-#include <btBulletCollisionCommon.h>
-
 // Internal
 #include <lfant/Rigidbody.h>
 #include <lfant/Transform.h>
+#include "lfant/Console.h"
+
+// External
+#include <btBulletCollisionCommon.h>
 
 namespace lfant
 {
@@ -39,12 +40,31 @@ void Collider::Init()
 	TriggerEvent("SetComponentCollider", this);
 	ConnectEvent(SENDER(owner, SetScale), RECEIVER(this, OnSetScale));
 	ConnectEvent(SENDER(owner, SetComponentRigidbody), rigidbody);
-	OnSetScale(vec3(1));
+//	OnSetScale(vec3(1));
+	SetSize(size);
 }
 
 void Collider::OnSetScale(vec3 scale)
 {
-	GetShape()->setLocalScaling(vec3_cast<btVector3>(owner->transform->GetWorldScale()));
+//	GetShape()->setLocalScaling(vec3_cast<btVector3>(owner->transform->GetWorldScale()));
+	SetSize(size);
+}
+
+vec3 Collider::GetSize() const
+{
+	return size;
+}
+
+void Collider::SetSize(vec3 size) 
+{
+	Log("Collider::SetSize(", GetOwner()->GetName(), ")");
+	Log("transform scale: ", owner->transform->GetWorldScale());
+	Log("collider size: ", size);
+	btVector3 newSize = vec3_cast<btVector3>(owner->transform->GetWorldScale()*size);
+	GetShape()->setLocalScaling(newSize);
+	Log("Final shape scaling: ", vec3_cast<vec3>(GetShape()->getLocalScaling()), ")");
+	
+	this->size = size;
 }
 
 }

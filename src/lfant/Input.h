@@ -14,6 +14,7 @@
 #include <lfant/util/qumap.h>
 
 // External
+#include <unordered_map>
 #include <bitset>
 
 struct GLFWwindow;
@@ -35,7 +36,7 @@ public:
 	Key_Initializer();
 	uint16_t operator[](string in);
 private:
-	qumap<string, uint16_t> _key;
+	std::unordered_map<string, uint16_t> _key;
 };
 
 extern Key_Initializer Key;

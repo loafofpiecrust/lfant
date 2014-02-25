@@ -49,12 +49,13 @@ class Game : public Subsystem
 {
 public:
 	Game();
+	Game(const Game& other);
 	virtual ~Game();
 
 	virtual void Load(Properties *prop);
 	virtual void Save(Properties *prop) const;
 
-	static void Bind() __attribute__((constructor));
+	static void ScriptBind();
 
 	/**
 	 *	This function is called right when the game is launched.

@@ -64,7 +64,7 @@ public:
     
 };
 
-static const char *sq_code = "\
+static const SQChar *sq_code = _SC("\
     local v = Vector2();\
     local v2 = Vector2();\
     \
@@ -91,7 +91,7 @@ static const char *sq_code = "\
     print(\"1\\n\");\
     local raised = false;\
     try { \
-        v.add(10); /*was crashing*/  \
+        v.add(10);  \
 		gTest.EXPECT_INT_EQ(0, 1); \
 	} catch (ex) {\
         raised = true;\
@@ -101,7 +101,7 @@ static const char *sq_code = "\
     print(\"2\\n\");\
     raised = false;\
     try { \
-        v.add(); /*was crashing*/  \
+        v.add();  \
 		gTest.EXPECT_INT_EQ(0, 1); \
 	} catch (ex) {\
         raised = true;\
@@ -111,7 +111,7 @@ static const char *sq_code = "\
     print(\"3\\n\");\
     raised = false;\
     try {\
-        v.add(\"text\"); /*was crashing*/  \
+        v.add(\"text\");  \
 		gTest.EXPECT_INT_EQ(0, 1); \
 	} catch (ex) {\
         raised = true;\
@@ -119,7 +119,7 @@ static const char *sq_code = "\
     }\
     gTest.EXPECT_TRUE(raised); \
     print(\"4\\n\");\
-       ";
+       ");
 
 
 
@@ -128,23 +128,66 @@ TEST_F(SqratTest, NumericArgumentTypeConversionAndCheck) {
     
     Sqrat::Class<Vector2> classVector2(vm);
     
-    classVector2.Func("add", &Vector2::add);
+    classVector2.Func(_SC("add"), &Vector2::add);
     
-    classVector2.Func("boolFunc", &Vector2::boolFunc);
-    classVector2.Func("boolFunc2", &Vector2::boolFunc2);
-    Sqrat::RootTable(vm).Bind("Vector2", classVector2);
+    classVector2.Func(_SC("boolFunc"), &Vector2::boolFunc);
+    classVector2.Func(_SC("boolFunc2"), &Vector2::boolFunc2);
+    Sqrat::RootTable(vm).Bind(_SC("Vector2"), classVector2);
             
     Script script;
-    try {
-        script.CompileString(_SC(sq_code));
-    } catch(Exception ex) {
-        FAIL() << _SC("Compile Failed: ") << ex.Message();
+    script.CompileString(sq_code);
+    if (Sqrat::Error::Instance().Occurred(vm)) {
+        FAIL() << _SC("Compile Failed: ") << Sqrat::Error::Instance().Message(vm);
     }
 
-    try {
-        script.Run();
-    } catch(Exception ex) {
-        FAIL() << _SC("Run Failed: ") << ex.Message();
+    script.Run();
+    if (Sqrat::Error::Instance().Occurred(vm)) {
+        FAIL() << _SC("Run Failed: ") << Sqrat::Error::Instance().Message(vm);
+    }
+
+}
+
+class F
+{
+public:
+    int func(int i, char j)
+    {
+        return 1;
+    }
+    
+    const char * func(char c, const char *s)
+    {
+        return s;
+    }
+    
+};
+
+static const char *sq_code2 = _SC("\
+         f <- F();\
+         gTest.EXPECT_INT_EQ(1, f.f1(2. 'v'));\
+         gTest.EXPECT_STR_EQ(\"test\", f.f2('t', \"test\")); \
+    ");
+
+
+
+TEST_F(SqratTest, FunctionOfSameNumberOfArgumentsButDifferentTypesBinding) {
+    DefaultVM::Set(vm);
+    
+    Sqrat::Class<F> Fclass(vm);
+    Fclass.Func<int (F::*)(int, char)>(_SC("f1"), &F::func);
+    Fclass.Func<const char * (F::*)(char, const char*)>(_SC("f2"), &F::func);
+    
+    Sqrat::RootTable(vm).Bind(_SC("F"), Fclass);
+            
+    Script script;
+    script.CompileString(sq_code2);
+    if (Sqrat::Error::Instance().Occurred(vm)) {
+        FAIL() << _SC("Compile Failed: ") << Sqrat::Error::Instance().Message(vm);
+    }
+
+    script.Run();
+    if (Sqrat::Error::Instance().Occurred(vm)) {
+        FAIL() << _SC("Run Failed: ") << Sqrat::Error::Instance().Message(vm);
     }
 
 }

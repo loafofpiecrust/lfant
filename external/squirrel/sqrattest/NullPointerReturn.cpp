@@ -37,12 +37,12 @@ public:
 };
 
 
-static const char *sq_code = "\
+static const SQChar *sq_code = _SC("\
     local entity = Entity(); \
     gTest.EXPECT_FALSE(entity == null); \
     entity = entity.FindEntity(); \
     gTest.EXPECT_TRUE(entity == null); \
-       ";
+       ");
 
 
 
@@ -54,16 +54,14 @@ TEST_F(SqratTest, NullPointerReturn) {
     RootTable().Bind(_SC("Entity"), entity);
         
     Script script;
-    try {
-        script.CompileString(_SC(sq_code));
-    } catch(Exception ex) {
-        FAIL() << _SC("Compile Failed: ") << ex.Message();
+    script.CompileString(sq_code);
+    if (Sqrat::Error::Instance().Occurred(vm)) {
+        FAIL() << _SC("Compile Failed: ") << Sqrat::Error::Instance().Message(vm);
     }
 
-    try {
-        script.Run();
-    } catch(Exception ex) {
-        FAIL() << _SC("Run Failed: ") << ex.Message();
+    script.Run();
+    if (Sqrat::Error::Instance().Occurred(vm)) {
+        FAIL() << _SC("Run Failed: ") << Sqrat::Error::Instance().Message(vm);
     }
 
 }

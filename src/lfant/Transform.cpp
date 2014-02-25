@@ -63,13 +63,18 @@ void Transform::Load(Properties *prop)
 	prop->Get("position", position);
 	prop->Get("rotation", rotation);
 	prop->Get("scale", scale);
+	
+	// Do this to ensure the callbacks are called
+	SetPosition(position);
+	SetRotation(rotation);
+	SetScale(scale);
 
 	Log("Loaded position: "+lexical_cast<string>(position));
 }
 
 void Transform::OnSetWorldPos()
 {
-	TriggerEvent("OnSetPosition");
+	TriggerEvent("SetPosition");
 
 	updateMatrix = true;
 }
@@ -83,7 +88,7 @@ void Transform::SetPosition(vec3 pos)
 {
 //	pos.y = -pos.y;
 	position = pos;
-	TriggerEvent("OnSetPosition", position);
+	TriggerEvent("SetPosition", position);
 }
 
 quat Transform::GetRotationQuat()
@@ -100,7 +105,7 @@ void Transform::SetRotationQuat(quat rot)
 //	SetRotation(degrees(eulerAngles(rot))); // degrees
 	rotationQuat = rot;
 	rotation = degrees(eulerAngles(rot));
-	TriggerEvent("OnSetRotation", rot);
+	TriggerEvent("SetRotation", rot);
 }
 
 vec3 Transform::GetRotation()
@@ -120,8 +125,8 @@ void Transform::SetRotation(vec3 rot)
 	rotationQuat = quat(radians(rotation));
 //	Log("Setting rotation to ", lexical_cast<string>(rotation));
 
-	TriggerEvent("OnSetRotation", rot);
-	TriggerEvent("OnSetRotation", rotationQuat);
+	TriggerEvent("SetRotation", rot);
+	TriggerEvent("SetRotation", rotationQuat);
 //	TriggerEvent("SetRotation", rotationQuat);
 }
 
@@ -133,7 +138,7 @@ vec3 Transform::GetScale()
 void Transform::SetScale(vec3 scl)
 {
 	scale = scl;
-	TriggerEvent("OnSetScale", scale);
+	TriggerEvent("SetScale", scale);
 }
 
 vec3 Transform::GetWorldPosition()
@@ -388,7 +393,7 @@ vec3 Transform::GetDirection()
 
 vec3 Transform::GetRight()
 {
-	return -vec3(matrix[0].xyz());
+	return vec3(matrix[0].xyz());
 }
 
 vec3 Transform::GetUp()

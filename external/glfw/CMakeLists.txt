@@ -41,12 +41,6 @@ if(PLATFORM STREQUAL "macosx")
 	set(SRC_FILES ${SRC_FILES} ${SRC_FILES_PLAT})
 endif()
 
-# Library Search Paths
-link_directories(
-	${LIBRARY_OUTPUT_PATH}
-	# System
-#	/usr/lib/x86_64-linux-gnu/mesa
-	)
 
 # Output Library Info
 add_library(${PROJECT_NAME} SHARED ${SRC_FILES})

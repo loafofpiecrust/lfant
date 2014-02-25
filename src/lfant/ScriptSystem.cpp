@@ -10,6 +10,7 @@
 
 // External
 #include <sqrat.h>
+#include <sqrat/sqratVM.h>
 #include <boost/chrono.hpp>
 
 namespace lfant
@@ -48,7 +49,7 @@ void ScriptSystem::Init()
 {
 	Subsystem::Init();
 
-	Sqrat::DefaultVM::Set(vm.getVM());
+	Sqrat::DefaultVM::Set(vm.GetVM());
 }
 
 void ScriptSystem::Deinit()
@@ -62,11 +63,13 @@ void ScriptSystem::CallFunction(string module, string call)
 template<typename T>
 void ScriptSystem::RegisterFunction(string decl, T* func)
 {
+	vm.GetRootTable().Func(decl, func);
 }
 
 template<typename T>
 void ScriptSystem::RegisterVariable(string name, T* var)
 {
+	vm.GetRootTable().SetInstance(name, var);
 }
 
 }

@@ -6,6 +6,7 @@ set(LFANT "${ROOT}")
 set(CMAKE_MODULE_PATH "${ROOT}/cmake")
 
 include(Config)
+include(cotire)
 
 set(EDITOR ON CACHE BOOL "Build the editor?")
 option(BUILD_EXAMPLES "Should the examples be built?" ON)

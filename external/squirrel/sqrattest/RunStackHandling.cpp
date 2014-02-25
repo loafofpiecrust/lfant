@@ -26,59 +26,51 @@
 #include <sqrat.h>
 #include "Fixture.h"
 
-/* this test would generally not fail.  Its main purpose is to test for leaks 
+/* this test would generally not fail.  Its main purpose is to test for leaks
    when compiling scripts in memory multiple times; need to use valgrind or just watch
    memory increase when run */
-   
+
 using namespace Sqrat;
 
 //#define DUMPSTACK sq_dumpstack(vm); /* require atai's version of Squirrel */
-#define DUMPSTACK 
+#define DUMPSTACK
 
 TEST_F(SqratTest, RunStackHandling)
 {
     DefaultVM::Set(vm);
     static const int num_run = 1024 * 10 ; /* 10 times the typical Squirrel stack size */
-    int i; 
+    int i;
     Script script;
 
-    try
-    {
-        script.CompileString(_SC("function f(a) { return a + 1; } ; t <- 1;  t = f(t); "));
+    script.CompileString(_SC("function f(a) { return a + 1; } ; t <- 1;  t = f(t); "));
+    if (Sqrat::Error::Instance().Occurred(vm)) {
+        FAIL() << _SC("Compile failed: ") << Sqrat::Error::Instance().Message(vm);
     }
-    catch(Exception ex)
+    script.Run();
+    Script script2;
+    DUMPSTACK
+    for (i = 0; i < num_run; i++)
     {
-        FAIL() << _SC("Compile failed: ") << ex.Message();
-    }    
-    try
-    {
-        script.Run();
-        Script script2;
+
+        script2.CompileString(_SC("t = f(t); /*print(t.tostring() + \"\\n\");*/"));
+        script2.Run();
         DUMPSTACK
-        for (i = 0; i < num_run; i++)
-        {
-            
-            script2.CompileString(_SC("t = f(t); /*print(t.tostring() + \"\\n\");*/"));
-            script2.Run();  
-            DUMPSTACK
-        }
     }
-    catch (Exception ex)
-    {
-        FAIL() << _SC("Run failed: ") << ex.Message();
+    if (Sqrat::Error::Instance().Occurred(vm)) {
+        FAIL() << _SC("Run failed: ") << Sqrat::Error::Instance().Message(vm);
     }
-    std::string err_msg;
+    string err_msg;
     bool b ;
 
     for (i = 0; i < num_run; i++)
     {
         Script script3;
-        err_msg = "";
+        err_msg = _SC("");
         script3.CompileString(_SC("t = f(t); /*print(t.tostring() + \"\\n\");*/"));
-        b = script3.Run(err_msg);    
+        b = script3.Run(err_msg);
         ASSERT_TRUE(b);
-        ASSERT_TRUE(err_msg == "");
+        ASSERT_TRUE(err_msg == _SC(""));
         DUMPSTACK
     }
-    
+
 }

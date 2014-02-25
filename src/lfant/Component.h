@@ -61,7 +61,7 @@ public:
 	virtual void Destroy() final;
 
 	/// @todo Rename Bind() to something clearer
-	static void Bind() __attribute__((constructor));
+	static void ScriptBind();
 
 	/**
 	 *	Returns whether this component is enabled.
@@ -71,10 +71,10 @@ public:
 	/**
 	 *	Enables or disables this component.
 	 */
-	void Enable(bool enable = true);
+	virtual void Enable(bool enable = true);
 
 	void SetOwner(Entity* ent);
-	Entity* GetOwner() { return owner; }
+	Entity* GetOwner() const;
 
 	/// The owner of this Component.
 	Entity* owner = nullptr;
@@ -88,8 +88,8 @@ protected:
 	virtual void Render();
 	virtual void Deinit(); // Rename to OnDestroy()?
 
-	virtual void OnEnable();
-	virtual void OnDisable();
+//	virtual void OnEnable();
+//	virtual void OnDisable();
 
 	virtual void TriggerEvent(string name) final;
 

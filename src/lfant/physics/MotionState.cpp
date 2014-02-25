@@ -29,11 +29,13 @@ void MotionState::getWorldTransform(btTransform& worldTrans) const
 
 void MotionState::setWorldTransform(const btTransform& trans)
 {
+	if(!rigidbody->IsEnabled()) return;
+	
 	vec3 pos = vec3_cast<vec3>(trans.getOrigin());
-//	quat rot = quat_cast<quat>(trans.getRotation());
+	quat rot = quat_cast<quat>(trans.getRotation());
 
 	vec3 oldPos = rigidbody->owner->transform->GetWorldPosition();
-//	vec3 oldRot = rigidbody->owner->transform->GetRotationQuat();
+	quat oldRot = rigidbody->owner->transform->GetRotationQuat();
 	if(rigidbody->lockPosition.x)
 	{
 		pos.x = oldPos.x;
@@ -47,13 +49,13 @@ void MotionState::setWorldTransform(const btTransform& trans)
 		pos.z = oldPos.z;
 	}
 	
-	if(pos != oldPos)
+//	if(pos != oldPos)
 	{
 	//	Log("MotionState::setWorldTransform(): new pos ", pos, " from ", oldPos);
 		rigidbody->owner->transform->SetWorldPosition(pos);
 	}
 
-/*	if(rigidbody->lockRotation.x)
+	if(rigidbody->lockRotation.x)
 	{
 		rot.x = oldRot.x;
 	}
@@ -64,8 +66,11 @@ void MotionState::setWorldTransform(const btTransform& trans)
 	if(rigidbody->lockRotation.z)
 	{
 		rot.z = oldRot.z;
-	}*/
-//	rigidbody->owner->transform->SetRotationQuat(rot);
+		rot.w = oldRot.w;
+	}
+	
+//	if(rot != oldRot)
+	rigidbody->owner->transform->SetRotationQuat(rot);
 
 //	rigidbody->body->getWorldTransform().setOrigin(vec3_cast<btVector3>(pos));
 //	rigidbody->body->getWorldTransform().setRotation(quat_cast<btQuaternion>(rigidbody->owner->transform->GetRotationQuat()));

@@ -1,4 +1,3 @@
-
 //
 // SqratClassType: Type Translators
 //
@@ -33,16 +32,16 @@
 #include <map>
 
 #include "sqratUtil.h"
+
 namespace Sqrat
 {
 
-//
-// ClassType
-//
+/// @cond DEV
 
-// Get the Copy Function for this Class
+// The copy function for a class
 typedef SQInteger (*COPYFUNC)(HSQUIRRELVM, SQInteger, const void*);
 
+// Every Squirrel class object made by Sqrat has its type tag set to a unique ClassTypeDataBase object
 struct ClassTypeDataBase {
     HSQOBJECT    classObj;
     HSQOBJECT    getTable;
@@ -56,10 +55,10 @@ struct ClassTypeDataBase {
     ClassTypeDataBase() : ctorCalled(false){}
 };
 
+// Keeps track of the nearest base class and the class associated with a ClassTypeDataBase in order to cast pointers to the right base class
 template<class C, class B>
 struct ClassTypeData : public ClassTypeDataBase {
     virtual SQUserPointer Cast(SQUserPointer ptr, SQUserPointer classType) {
-
         if (classType != this) {
             ptr = baseClass->Cast(static_cast<B*>(static_cast<C*>(ptr)), classType);
         }
@@ -67,26 +66,30 @@ struct ClassTypeData : public ClassTypeDataBase {
     }
 };
 
+// Internal helper class for managing classes
 template<class C>
 struct ClassType {
-
-    static std::map< HSQUIRRELVM, ClassTypeDataBase* > s_classTypeDataMap;
+    
+    static inline std::map<HSQUIRRELVM, ClassTypeDataBase*>& s_classTypeDataMap() {
+        static std::map< HSQUIRRELVM, ClassTypeDataBase* > s_classTypeDataMap;
+        return s_classTypeDataMap;
+    }
 
     static inline ClassTypeDataBase*& getClassTypeData(HSQUIRRELVM vm) {
         //TODO: use mutex to lock s_classTypeDataMap in multithreaded environment
-        return s_classTypeDataMap[vm];
+        return s_classTypeDataMap()[vm];
     }
 
     static inline bool hasClassTypeData(HSQUIRRELVM vm) {
         //TODO: use mutex to lock s_classTypeDataMap in multithreaded environment
-        return (s_classTypeDataMap.find(vm) != s_classTypeDataMap.end());
+        return (s_classTypeDataMap().find(vm) != s_classTypeDataMap().end());
     }
 
     static inline void deleteClassTypeData(HSQUIRRELVM vm) {
         //TODO: use mutex to lock s_classTypeDataMap in multithreaded environment
-        std::map< HSQUIRRELVM, ClassTypeDataBase* >::iterator it = s_classTypeDataMap.find(vm);
-        if(it != s_classTypeDataMap.end()) {
-            s_classTypeDataMap.erase(it);
+        std::map< HSQUIRRELVM, ClassTypeDataBase* >::iterator it = s_classTypeDataMap().find(vm);
+        if(it != s_classTypeDataMap().end()) {
+            s_classTypeDataMap().erase(it);
         }
     }
 
@@ -118,14 +121,21 @@ struct ClassType {
     }
 
     static void PushInstance(HSQUIRRELVM vm, C* ptr) {
+#if !defined (SCRAT_NO_ERROR_CHECKING)
         if (ptr != NULL) {
             sq_pushobject(vm, ClassObject(vm));
             sq_createinstance(vm, -1);
             sq_remove(vm, -2);
             sq_setinstanceup(vm, -1, ptr);
         }
-        else 
+        else
             sq_pushnull(vm);
+#else
+        sq_pushobject(vm, ClassObject(vm));
+        sq_createinstance(vm, -1);
+        sq_remove(vm, -2);
+        sq_setinstanceup(vm, -1, ptr);
+#endif
     }
 
     static void PushInstanceCopy(HSQUIRRELVM vm, const C& value) {
@@ -138,8 +148,22 @@ struct ClassType {
     static C* GetInstance(HSQUIRRELVM vm, SQInteger idx) {
         SQUserPointer ptr = NULL;
         ClassTypeDataBase* classType = getClassTypeData(vm);
-        if (SQ_FAILED(sq_getinstanceup(vm, idx, &ptr, classType))) {
-            Error::Instance().Throw(vm, Sqrat::Error::FormatTypeError(vm, idx, ClassName(vm)));
+        if (classType != 0) /* type checking only done if the value has type data else it may be enum */
+        {
+#if !defined (SCRAT_NO_ERROR_CHECKING)
+            if (SQ_FAILED(sq_getinstanceup(vm, idx, &ptr, classType))) {
+                Error::Instance().Throw(vm, Sqrat::Error::FormatTypeError(vm, idx, ClassName(vm)));
+                return NULL;
+            }
+#else
+            sq_getinstanceup(vm, idx, &ptr, 0);
+#endif
+        }
+        else /* value is likely of integral type like enums, cannot return a pointer */
+        {
+#if !defined (SCRAT_NO_ERROR_CHECKING)
+            Error::Instance().Throw(vm, Sqrat::Error::FormatTypeError(vm, idx, _SC("unknown")));
+#endif
             return NULL;
         }
         ClassTypeDataBase* actualType;
@@ -160,8 +184,7 @@ struct ClassType {
     }
 };
 
-template<class C>
-std::map< HSQUIRRELVM, ClassTypeDataBase* > ClassType<C>::s_classTypeDataMap;
+/// @endcond
 
 }
 

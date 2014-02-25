@@ -35,6 +35,8 @@ public:
 	void Init();
 //	void Update();
 
+	virtual void SetSize(vec3 size);
+	
 protected:
 	btCollisionShape* GetShape();
 

@@ -191,9 +191,6 @@ static HSQAPI sqrat_newapi() {
     return sq;
 }
 
-static void sqrat_deleteapi(HSQAPI sq) {
-    sq_free(sq, sizeof(sq_api));
-}
 
 static SQRESULT sqrat_importscript(HSQUIRRELVM v, const SQChar* moduleName) {
     std::basic_string<SQChar> filename(moduleName);
@@ -209,6 +206,10 @@ static SQRESULT sqrat_importscript(HSQUIRRELVM v, const SQChar* moduleName) {
 }
 
 static SQRESULT sqrat_importbin(HSQUIRRELVM v, const SQChar* moduleName) {
+#ifdef SQUNICODE
+#warning sqrat_importbin() Not Implemented
+    return SQ_ERROR;
+#else
     SQMODULELOAD modLoad = 0;
 
 #if defined(_WIN32)
@@ -248,6 +249,7 @@ static SQRESULT sqrat_importbin(HSQUIRRELVM v, const SQChar* moduleName) {
     SQRESULT res = modLoad(v, sqapi);
 
     return res;
+#endif
 }
 
 SQRESULT sqrat_import(HSQUIRRELVM v) {
@@ -255,7 +257,7 @@ SQRESULT sqrat_import(HSQUIRRELVM v) {
     HSQOBJECT table;
     SQRESULT res = SQ_OK;
 
-    SQInteger top = sq_gettop(v);
+
     sq_getstring(v, -2, &moduleName);
     sq_getstackobj(v, -1, &table);
     sq_addref(v, &table);

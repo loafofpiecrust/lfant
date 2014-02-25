@@ -23,6 +23,7 @@ class WindowManager;
 class System;
 class GUIContext;
 class EventArgs;
+class InputAggregator;
 }
 
 /*
@@ -91,7 +92,7 @@ public:
 	virtual void OnChar(char key);
 	virtual void OnMouseButton(uint16 btn, int mode);
 	virtual void OnMouseMove(vec2 pos);
-	virtual void OnWindowResize(int32_t width, int32_t height);
+	virtual void OnWindowResize(int width, int height);
 
 
 //	Movie* LoadMovie(string name, string path);
@@ -111,6 +112,7 @@ protected:
 //	std::deque<CEGUI::Window*> windows;
 	CEGUI::System* system = nullptr;
 	CEGUI::GUIContext* context = nullptr;
+	CEGUI::InputAggregator* input = nullptr;
 #endif
 
 	/*
@@ -129,7 +131,7 @@ protected:
 	*/
 
 	bool resized = false;
-	ivec2 size;
+	vec2 size;
 
 	string rootResFolder = "gui";
 };

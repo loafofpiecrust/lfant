@@ -48,7 +48,6 @@ uint32_t Object::GetEventCount()
 
 void Object::Init()
 {
-	Bind();
 }
 
 void Object::Update()
@@ -134,11 +133,10 @@ void Object::Save(Properties *prop) const
 	prop->SetName(type);*/
 }
 
-void Object::Bind()
+void Object::ScriptBind()
 {
-	/*
 	Script::BaseClass<Object> inst;
-
+	
 	inst.Func("Init", &Object::Init);
 	inst.Func("Update", &Object::Update);
 	inst.Func("Destroy", &Object::Destroy);
@@ -151,7 +149,8 @@ void Object::Bind()
 	inst.Func("Save", &Object::Save);
 	inst.Func("LoadFile", &Object::LoadFile);
 	inst.Func("SaveFile", &Object::SaveFile);
-	*/
+	
+	inst.Bind();
 }
 
 void Object::ConnectScriptEvent(Object* sender, string name, Sqrat::Object* receiver, Sqrat::Function* func)
