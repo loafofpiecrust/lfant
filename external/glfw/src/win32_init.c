@@ -1,8 +1,5 @@
 //========================================================================
-// GLFW - An OpenGL library
-// Platform:    Win32/WGL
-// API version: 3.0
-// WWW:         http://www.glfw.org/
+// GLFW 3.1 Win32 - www.glfw.org
 //------------------------------------------------------------------------
 // Copyright (c) 2002-2006 Marcus Geelnard
 // Copyright (c) 2006-2010 Camilla Berglund <elmindreda@elmindreda.org>
@@ -39,6 +36,15 @@
 #endif // __BORLANDC__
 
 
+#if defined(_GLFW_USE_OPTIMUS_HPG)
+
+// Applications exporting this symbol with this value will be automatically
+// directed to the high-performance GPU on nVidia Optimus systems
+//
+GLFWAPI DWORD NvOptimusEnablement = 0x00000001;
+
+#endif // _GLFW_USE_OPTIMUS_HPG
+
 #if defined(_GLFW_BUILD_DLL)
 
 // GLFW DLL entry point
@@ -57,9 +63,13 @@ static GLboolean initLibraries(void)
 #ifndef _GLFW_NO_DLOAD_WINMM
     // winmm.dll (for joystick and timer support)
 
-    _glfw.win32.winmm.instance = LoadLibrary(L"winmm.dll");
+    _glfw.win32.winmm.instance = LoadLibraryW(L"winmm.dll");
     if (!_glfw.win32.winmm.instance)
+    {
+        _glfwInputError(GLFW_PLATFORM_ERROR,
+                        "Win32: Failed to load winmm.dll");
         return GL_FALSE;
+    }
 
     _glfw.win32.winmm.joyGetDevCaps = (JOYGETDEVCAPS_T)
         GetProcAddress(_glfw.win32.winmm.instance, "joyGetDevCapsW");
@@ -75,18 +85,22 @@ static GLboolean initLibraries(void)
         !_glfw.win32.winmm.joyGetPosEx ||
         !_glfw.win32.winmm.timeGetTime)
     {
+        _glfwInputError(GLFW_PLATFORM_ERROR,
+                        "Win32: Failed to load winmm functions");
         return GL_FALSE;
     }
 #endif // _GLFW_NO_DLOAD_WINMM
 
-    _glfw.win32.user32.instance = LoadLibrary(L"user32.dll");
+    _glfw.win32.user32.instance = LoadLibraryW(L"user32.dll");
     if (_glfw.win32.user32.instance)
     {
         _glfw.win32.user32.SetProcessDPIAware = (SETPROCESSDPIAWARE_T)
             GetProcAddress(_glfw.win32.user32.instance, "SetProcessDPIAware");
+        _glfw.win32.user32.ChangeWindowMessageFilterEx = (CHANGEWINDOWMESSAGEFILTEREX_T)
+            GetProcAddress(_glfw.win32.user32.instance, "ChangeWindowMessageFilterEx");
     }
 
-    _glfw.win32.dwmapi.instance = LoadLibrary(L"dwmapi.dll");
+    _glfw.win32.dwmapi.instance = LoadLibraryW(L"dwmapi.dll");
     if (_glfw.win32.dwmapi.instance)
     {
         _glfw.win32.dwmapi.DwmIsCompositionEnabled = (DWMISCOMPOSITIONENABLED_T)
@@ -98,7 +112,7 @@ static GLboolean initLibraries(void)
 
 // Unload used libraries (DLLs)
 //
-static void freeLibraries(void)
+static void terminateLibraries(void)
 {
 #ifndef _GLFW_NO_DLOAD_WINMM
     if (_glfw.win32.winmm.instance != NULL)
@@ -107,6 +121,12 @@ static void freeLibraries(void)
         _glfw.win32.winmm.instance = NULL;
     }
 #endif // _GLFW_NO_DLOAD_WINMM
+
+    if (_glfw.win32.user32.instance)
+        FreeLibrary(_glfw.win32.user32.instance);
+
+    if (_glfw.win32.dwmapi.instance)
+        FreeLibrary(_glfw.win32.dwmapi.instance);
 }
 
 
@@ -140,7 +160,7 @@ WCHAR* _glfwCreateWideStringFromUTF8(const char* source)
     if (!length)
         return NULL;
 
-    target = (WCHAR*) malloc(sizeof(WCHAR) * (length + 1));
+    target = calloc(length + 1, sizeof(WCHAR));
 
     if (!MultiByteToWideChar(CP_UTF8, 0, source, -1, target, length + 1))
     {
@@ -162,7 +182,7 @@ char* _glfwCreateUTF8FromWideString(const WCHAR* source)
     if (!length)
         return NULL;
 
-    target = (char*) malloc(length + 1);
+    target = calloc(length + 1, sizeof(char));
 
     if (!WideCharToMultiByte(CP_UTF8, 0, source, -1, target, length + 1, NULL, NULL))
     {
@@ -183,10 +203,10 @@ int _glfwPlatformInit(void)
     // To make SetForegroundWindow work as we want, we need to fiddle
     // with the FOREGROUNDLOCKTIMEOUT system setting (we do this as early
     // as possible in the hope of still being the foreground process)
-    SystemParametersInfo(SPI_GETFOREGROUNDLOCKTIMEOUT, 0,
-                         &_glfw.win32.foregroundLockTimeout, 0);
-    SystemParametersInfo(SPI_SETFOREGROUNDLOCKTIMEOUT, 0, UIntToPtr(0),
-                         SPIF_SENDCHANGE);
+    SystemParametersInfoW(SPI_GETFOREGROUNDLOCKTIMEOUT, 0,
+                          &_glfw.win32.foregroundLockTimeout, 0);
+    SystemParametersInfoW(SPI_SETFOREGROUNDLOCKTIMEOUT, 0, UIntToPtr(0),
+                          SPIF_SENDCHANGE);
 
     if (!initLibraries())
         return GL_FALSE;
@@ -204,7 +224,6 @@ int _glfwPlatformInit(void)
         return GL_FALSE;
 
     _glfwInitTimer();
-
     _glfwInitJoysticks();
 
     return GL_TRUE;
@@ -214,25 +233,25 @@ void _glfwPlatformTerminate(void)
 {
     if (_glfw.win32.classAtom)
     {
-        UnregisterClass(_GLFW_WNDCLASSNAME, GetModuleHandle(NULL));
+        UnregisterClassW(_GLFW_WNDCLASSNAME, GetModuleHandleW(NULL));
         _glfw.win32.classAtom = 0;
     }
 
-    _glfwTerminateContextAPI();
+    // Restore previous foreground lock timeout system setting
+    SystemParametersInfoW(SPI_SETFOREGROUNDLOCKTIMEOUT, 0,
+                          UIntToPtr(_glfw.win32.foregroundLockTimeout),
+                          SPIF_SENDCHANGE);
+
+    free(_glfw.win32.clipboardString);
 
     _glfwTerminateJoysticks();
-
-    freeLibraries();
-
-    // Restore previous FOREGROUNDLOCKTIMEOUT system setting
-    SystemParametersInfo(SPI_SETFOREGROUNDLOCKTIMEOUT, 0,
-                         UIntToPtr(_glfw.win32.foregroundLockTimeout),
-                         SPIF_SENDCHANGE);
+    _glfwTerminateContextAPI();
+    terminateLibraries();
 }
 
 const char* _glfwPlatformGetVersionString(void)
 {
-    const char* version = _GLFW_VERSION_FULL " Win32"
+    const char* version = _GLFW_VERSION_NUMBER " Win32"
 #if defined(_GLFW_WGL)
         " WGL"
 #elif defined(_GLFW_EGL)
@@ -241,7 +260,7 @@ const char* _glfwPlatformGetVersionString(void)
 #if defined(__MINGW32__)
         " MinGW"
 #elif defined(_MSC_VER)
-        " VisualC "
+        " VisualC"
 #elif defined(__BORLANDC__)
         " BorlandC"
 #endif

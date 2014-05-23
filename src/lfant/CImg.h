@@ -44267,7 +44267,7 @@ namespace cimg_library_suffixed {
 
       // Read video frames
       const unsigned int numBytes = avpicture_get_size(ffmpeg_pixfmt,codec_ctx->width,codec_ctx->height);
-      uint8_t *const buffer = new uint8_t[numBytes];
+      uint8 *const buffer = new uint8[numBytes];
       avpicture_fill((AVPicture *)converted_frame,buffer,ffmpeg_pixfmt,codec_ctx->width,codec_ctx->height);
       const T foo = (T)0;
       AVPacket packet;
@@ -45042,7 +45042,7 @@ namespace cimg_library_suffixed {
       tmp_pict->linesize[0] = (src_pxl_fmt==PIX_FMT_RGB24)?3*frame_dimx:frame_dimx;
       tmp_pict->type = FF_BUFFER_TYPE_USER;
       int tmp_size = avpicture_get_size(src_pxl_fmt,frame_dimx,frame_dimy);
-      uint8_t *tmp_buffer = (uint8_t*)av_malloc(tmp_size);
+      uint8 *tmp_buffer = (uint8*)av_malloc(tmp_size);
       if (!tmp_buffer) { // Failed to allocate memory for tmp buffer.
         av_free(tmp_pict);
         avcodec_close(video_str->codec);
@@ -45068,7 +45068,7 @@ namespace cimg_library_suffixed {
       }
 
       int size = avpicture_get_size(c->pix_fmt,frame_dimx,frame_dimy);
-      uint8_t *buffer = (uint8_t*)av_malloc(size);
+      uint8 *buffer = (uint8*)av_malloc(size);
       if (!buffer) { // Failed to allocate picture frame buffer.
         av_free(picture);
         av_free(tmp_pict->data[0]);
@@ -45116,9 +45116,9 @@ namespace cimg_library_suffixed {
                               filename);
       }
       int ret = 0, out_size;
-      uint8_t *video_outbuf = 0;
+      uint8 *video_outbuf = 0;
       int video_outbuf_size = 1000000;
-      video_outbuf = (uint8_t*)av_malloc(video_outbuf_size);
+      video_outbuf = (uint8*)av_malloc(video_outbuf_size);
       if (!video_outbuf) {
 	// if (!(fmt->flags & AVFMT_NOFILE)) url_fclose(&oc->pb);
 	av_free(picture->data);
@@ -45135,7 +45135,7 @@ namespace cimg_library_suffixed {
 
       // Loop through each desired image in list.
       cimglist_for(*this,i) {
-        CImg<uint8_t> currentIm = _data[i], red, green, blue, gray;
+        CImg<uint8> currentIm = _data[i], red, green, blue, gray;
         if (src_pxl_fmt==PIX_FMT_RGB24) {
           red = currentIm.get_shared_channel(0);
           green = currentIm.get_shared_channel(1);

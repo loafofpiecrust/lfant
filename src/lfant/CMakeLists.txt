@@ -1,19 +1,24 @@
 project(lfant)
 
+set(GUI gwen)
 
 # Source Info
 file(GLOB SRC_FILES
 	*.cpp
+	physics/*.cpp
+	util/*.cpp
+	net/*.cpp
+	net/tcp/*.cpp
+	platform/${PLATFORM}/*.cpp
+	gui/*.cpp
+	gui/${GUI}/*.cpp
+	*.h
 	)
 
-file(GLOB_RECURSE SRC_FILES_REC
-	*.h
-	net/*.cpp
-	util/*.cpp
-	physics/*.cpp
-	platform/${PLATFORM}/*.cpp
-	)
-list(APPEND SRC_FILES "${SRC_FILES_REC}")
+#file(GLOB_RECURSE SRC_FILES_REC
+#	*.h
+#	)
+#list(APPEND SRC_FILES "${SRC_FILES_REC}")
 
 if(PLATFORM STREQUAL "android")
 	list(REMOVE_ITEM SRC_FILES
@@ -21,7 +26,6 @@ if(PLATFORM STREQUAL "android")
 		)
 	file(GLOB_RECURSE SRC_FILES_PLAT
 		platform/mobile/*.cpp
-	#	platform/mobile/*.c
 		)
 	list(APPEND SRC_FILES "${SRC_FILES_PLAT}")
 else()
@@ -31,11 +35,23 @@ else()
 	list(APPEND SRC_FILES "${SRC_FILES_PLAT}")
 endif()
 
+
 list(REMOVE_ITEM SRC_FILES
-	${PROJECT_SOURCE_DIR}/ParticleSystem.cpp
+#	${PROJECT_SOURCE_DIR}/ParticleSystem.cpp
 	${PROJECT_SOURCE_DIR}/net/udp/*.cpp
+#	${PROJECT_SOURCE_DIR}/gui/Font.cpp
 	)
-	
+
+set(INCLUDES "")
+set(LIBS "")
+
+#add_subdirectory(gui/gwen)
+
+message(STATUS "lfant utput: ${ROOT}/bin/${ARCH}/${PLATFORM}")
+
+link_directories(
+	${ROOT}/bin/${ARCH}/${PLATFORM}
+)
 
 # Output Library Info
 add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
@@ -46,7 +62,6 @@ include_directories(
 	${ROOT}/external/png
 	${ROOT}/external/jpeg
 	${ROOT}/external/zlib
-#	${ROOT}/external/bass
 	${ROOT}/external/assimp/include
 	${ROOT}/external/glm
 	${ROOT}/external/boost
@@ -55,14 +70,24 @@ include_directories(
 	${ROOT}/external/cegui/cegui/include
 	${ROOT}/external/openal/include
 	${ROOT}/external/squirrel/include
-	)
+	${ROOT}/external/sfml/include
+	${ROOT}/external/irrklang/include
+	${ROOT}/external/oglplus/include
 
-	
+#	${ROOT}/external/rocket/Include
+#	${ROOT}/external/sfgui/include
+	${ROOT}/external/gwen/include
+	${ROOT}/external/${GUI}/include
+	${ROOT}/external/freetype/include
+	${ROOT}/external/AntTweakBar/include
+)
+
+
 set_target_properties(${PROJECT_NAME} PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "stdafx.h")
-cotire(${PROJECT_NAME})
+#cotire(${PROJECT_NAME})
 
 # Linker Options
-target_link_libraries(${PROJECT_NAME}
+target_link_libraries(${PROJECT_NAME} ${LIBS}
 	assimp
 	boost
 	bullet
@@ -70,7 +95,11 @@ target_link_libraries(${PROJECT_NAME}
 	z
 	squirrel
 	jpeg
-	openal
+	freetype
+	sfml
+	IrrKlang
+#	openal
+	${GUI}
 	)
 
 if(NOT ANDROID)
@@ -80,9 +109,9 @@ include_directories(
 
 target_link_libraries(${PROJECT_NAME}
 	glfw
-	OpenCL
-	CEGUI
+#	OpenCL
 	glew
+	AntTweakBar
 	)
 
 else()
@@ -102,5 +131,19 @@ endif()
 if(PLATFORM STREQUAL "linux")
 	target_link_libraries(${PROJECT_NAME}
 		rt
-		)
+		openal
+		OpenCL
+		freeimage
+	)
+endif()
+
+if(PLATFORM STREQUAL "windows")
+	target_link_libraries(${PROJECT_NAME}
+		":C:/Windows/System32/OpenAL32.dll"
+		":C:/Windows/System32/OpenCL.dll"
+	#	:FreeImage.lib
+		wsock32
+		freeimage
+		ws2_32
+	)
 endif()

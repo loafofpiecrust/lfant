@@ -31,7 +31,7 @@
 //#include <boost/bind.hpp>
 //#include <boost/type_traits.hpp>
 //#include <boost/config.hpp>
-//#include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string.hpp>
 
 #ifdef major
 #	undef major
@@ -43,10 +43,10 @@ using std::string;
 //using namespace glm::detail;
 //using namespace boost;
 //using namespace boost::assign;
-//using namespace boost::algorithm;
+using namespace boost::algorithm;
 
 // Boost usings
 
 // Typedefs
-typedef uint8_t byte;
+typedef uint8 byte;
 typedef unsigned int uint; // Generally used in 'for' loops

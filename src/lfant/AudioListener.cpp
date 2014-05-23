@@ -17,6 +17,9 @@
 ******************************************************************************/
 
 #include <lfant/AudioListener.h>
+#include "Transform.h"
+#include "Rigidbody.h"
+#include <ik_ISoundEngine.h>
 
 // External
 
@@ -26,6 +29,28 @@
 namespace lfant
 {
 
-//IMPLEMENT_TYPE(Component, AudioListener)
+IMPLEMENT_TYPE(Component, AudioListener)
+
+void AudioListener::Init()
+{
+	ConnectEvent(SENDER(owner->transform, SetPosition), RECEIVER(this, OnSetPosition));
+	ConnectComponent<Rigidbody>(rigidbody);
+}
+
+void AudioListener::OnSetPosition(vec3 pos)
+{
+	vec3 vel(0);
+	if(rigidbody)
+	{
+		vel = rigidbody->GetVelocity();
+	}
+	
+	GetGame()->audio->engine->setListenerPosition(vec3_cast<irrklang::vec3df>(owner->transform->GetWorldPosition()),
+								    vec3_cast<irrklang::vec3df>(owner->transform->GetDirection()),
+								    vec3_cast<irrklang::vec3df>(vel),
+								    vec3_cast<irrklang::vec3df>(owner->transform->GetUp())
+								   );
+}
+
 
 }

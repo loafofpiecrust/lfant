@@ -21,6 +21,9 @@ subject to the following restrictions:
 btScalar					gContactBreakingThreshold = btScalar(0.02);
 ContactDestroyedCallback	gContactDestroyedCallback = 0;
 ContactProcessedCallback	gContactProcessedCallback = 0;
+
+CollisionStartedCallback	gCollisionStartedCallback = 0;
+CollisionEndedCallback		gCollisionEndedCallback = 0;
 ///gContactCalcArea3Points will approximate the convex hull area using 3 points
 ///when setting it to false, it will use 4 points to compute the area: it is more accurate but slower
 bool						gContactCalcArea3Points = true;

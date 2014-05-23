@@ -1,374 +1,116 @@
-/*
-*	Copyright (C) 2013-2014, by loafofpiecrust
-*	Created: 2012-07-19 by Taylor Snead
-*
-*	Licensed under the Apache License, Version 2.0 (the "License");
-*	you may not use this file except in compliance with the License.
-*	You may obtain a copy of the License at
-*
-*		http://www.apache.org/licenses/LICENSE-2.0
-*
-*	Unless required by applicable law or agreed to in writing, software
-*	distributed under the License is distributed on an "AS IS" BASIS,
-*	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-*	See the License for the specific language governing permissions and
-*	limitations under the License.
-*
-******************************************************************************/
+#include "Mesh.h"
 
-#include <lfant/Mesh.h>
-
-// External
-#include <GL/glew.h>
-#include <assimp/scene.h>
-#include <assimp/cimport.h>
-#include <assimp/postprocess.h>
-
-// Internal
-#include <lfant/util/String.h>
-#include <lfant/Transform.h>
-#include <lfant/Console.h>
-#include <lfant/Renderer.h>
-#include <lfant/MeshLoader.h>
-#include <lfant/Scene.h>
-#include <lfant/Camera.h>
-#include <lfant/FileSystem.h>
-#include <lfant/FrameBuffer.h>
-#include <lfant/Thread.h>
+#include "lfant/Geometry.h"
+#include "lfant/Material.h"
+#include "lfant/Scene.h"
+#include "lfant/Camera.h"
+#include "lfant/Transform.h"
+#include "lfant/Texture.h"
+#include "lfant/Console.h"
+#include "lfant/FileSystem.h"
 
 namespace lfant
 {
 
-IMPLEMENT_TYPE(Component, Mesh)
+//static const TypeRegistry<Component>::Entry<Mesh> type_registryEntry_ {Component::typeRegistry, "Mesh", "Renderable"};
+IMPLEMENT_SUBTYPE(Component, Mesh, Renderable)
 
 Mesh::Mesh()
 {
-	initBeforeLoad = false;
-}
-
-Mesh::~Mesh()
-{
+	render = true;
 }
 
 void Mesh::Load(Properties *prop)
 {
-	Component::Load(prop);
+	Renderable::Load(prop);
 
-	string f = "";
-	prop->Get("file", f);
-
-	if(Properties* pmat = prop->GetChild("material"))
+	string meshFile = prop->Get("file");
+	if(!meshFile.empty())
 	{
-		material->Load(pmat);
+		GetGame()->Log("Loading mesh fillet");
+		mesh = Geometry::LoadFile(GetGame()->GetAssetPath(meshFile).string());
+	}
+
+	if(Properties* child = prop->GetChild("material"))
+	{
+		material.Load(child);
 	}
 	else
 	{
-		Log("Loading material from file");
-		string mat = "";
-		prop->Get("material", mat);
-		if(!mat.empty()) material->LoadFile(mat);
+		string matFile = prop->Get("material");
+		if(!matFile.empty()) material.LoadFile(matFile);
 	}
-	
-	if(!f.empty()) LoadFile(f);
+
+	Init();
 }
 
 void Mesh::Save(Properties *prop) const
 {
-	Component::Save(prop);
-
-	prop->Set("file", file);
-
-	material->Save(prop->AddChild("material"));
-}
-
-void Mesh::SetShape(string preset)
-{
-	if(preset == "Cube")
-	{
-	}
+	Renderable::Save(prop);
 }
 
 void Mesh::Init()
 {
-	if(material->shader->GetId() == -1)
-	{
-		Log("Mesh init rejected (shader)");
-		return;
-	}
-
-	if(material->texture->GetId() == -1)
-	{
-		Log("Mesh init rejected (texture)");
-		return;
-	}
-
-	if(loaded)
-	{
-		Log("Mesh init rejected (loaded)");
-		return;
-	}
-
-	FrameBuffer* fbo = FrameBuffer::GetCurrent();
-	if(fbo && !fboQuad)
-	{
-		Log("Unbinding fbo for mesh init.");
-		fbo->Unbind();
-	}
-
-	Log("Mesh init proceeding");
-
-/*	if(material->shader->GetId() == -1)
-	{
-		Log("Loading default shader.");
-		material->shader->LoadFile("shaders/simple/Diffuse.vert", "shaders/simple/Diffuse.frag");
-	}*/
-
-/*	if(material->texture->GetId() == -1)
-	{
-		Log("Manually loading texture.");
-		material->texture->LoadFile();
-	}*/
-
-//	if(material->shader->GetId() != -1)
-	{
-		Log("Adding uniforms..");
-		material->shader->AddUniform("M");
-		material->shader->AddUniform("V");
-		material->shader->AddUniform("P");
-		material->shader->AddUniform("textureSampler");
-		material->shader->AddUniform("tiling");
-	//	material->shader->AddUniform("modelMatrix");
-	}
-
-//	IndexVBO();
-
-	CreateBuffer(vertexBuffer, GL_ARRAY_BUFFER);
-	CreateBuffer(uvBuffer, GL_ARRAY_BUFFER);
-	CreateBuffer(normalBuffer, GL_ARRAY_BUFFER);
-	CreateBuffer(indexBuffer, GL_ELEMENT_ARRAY_BUFFER);
-	/*
-	vertexBuffer.Create(GL_ARRAY_BUFFER);
-	uvBuffer.Create(GL_ARRAY_BUFFER);
-	normalBuffer.Create(GL_ARRAY_BUFFER);
-	indexBuffer.Create(GL_ELEMENT_ARRAY_BUFFER);
-	*/
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	if(fbo && !fboQuad)
-	{
-		Log("Rebinding fbo after mesh init.");
-		fbo->Bind();
-	}
-
 	Renderable::Init();
-}
 
-void Mesh::Update()
-{
-	Renderable::Update();
-}
+	GetGame()->Log("Mesh::Init()");
 
-void Mesh::Deinit()
-{
-	vertexBuffer.Destroy();
-	uvBuffer.Destroy();
-	normalBuffer.Destroy();
-	indexBuffer.Destroy();
-	material->texture->Destroy();
+	if(!mesh)
+	{
+		GetGame()->Log("No mesh. Disabling");
+	//	Enable(false);
+		return;
+	}
 
-	Renderable::Deinit();
+	if(!material.shader || !material.texture)
+	{
+		material.LoadFile(GetGame()->GetAssetPath("materials/Diffuse.prop").string());
+	}
+
+//	material.shader->Bind();
+
+	material.shader->AddUniform("M");
+	material.shader->AddUniform("V");
+	material.shader->AddUniform("P");
+	material.shader->AddUniform("textureSampler");
+	material.shader->AddUniform("tiling");
 }
 
 void Mesh::Render()
 {
-	if(material->shader->GetId() == -1)
+	if(!mesh)
 	{
-	//	Log("Mesh render rejected (shader)");
 		return;
 	}
 
-	if(material->texture->GetId() == -1)
-	{
-	//	Log("Mesh render rejected (texture)");
-		return;
-	}
+//	glBindVertexArray(mesh->vertexArray);
+	material.shader->Bind();
 
-	if(!loaded)
-	{
-	//	Log("Mesh render rejected (!loaded)");
-		return;
-	}
-
-//	Log("Rendering mesh '", owner->name, "'.");
-
-//	glUseProgram(material->shader->GetId());
-//	Log("Binding shader for ", owner->name);
-	material->shader->Bind();
-
-//	mat4 mvp = mat4(1);
 	if(owner && usingCamera)
 	{
-		material->shader->SetUniform("P", game->scene->mainCamera->GetProjection());
-		material->shader->SetUniform("V", game->scene->mainCamera->GetView());
-		material->shader->SetUniform("M", owner->transform->GetMatrix());
+		material.shader->SetUniform("P", GetGame()->scene->mainCamera->GetProjection());
+		material.shader->SetUniform("V", GetGame()->scene->mainCamera->GetView());
+		material.shader->SetUniform("M", owner->transform->GetMatrix());
 	}
 
-//	if(material->shader->GetUniform("modelMatrix"))
+	if(material.texture)
 	{
-//		material->shader->SetUniform("modelMatrix", );
+	//	GetGame()->Log("Setting texture uniforms.");
+		material.shader->SetUniform("tiling", material.tiling);
+
+		material.shader->SetUniform("textureSampler", material.texture.get());
 	}
 
-//	Log("mesh mvp: ", lexical_cast<string>(mvp));
+	mesh->Render();
 
-//	glActiveTexture(GL_TEXTURE0);
-//	glBindTexture(GL_TEXTURE_2D, material->texture->GetId());
-//	glUniform1i(material->shader->GetUniform("textureSampler"), 0);
-	if(material->texture->GetId() != -1)
-	{
-	//	Log("Setting texture uniforms.");
-		material->shader->SetUniform("textureSampler", material->texture.get());
-		material->shader->SetUniform("tiling", material->texture->tiling);
-	}
-
-	glEnableVertexAttribArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-
-	glEnableVertexAttribArray(1);
-	glBindBuffer(GL_ARRAY_BUFFER, uvBuffer);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
-
-	glEnableVertexAttribArray(2);
-	glBindBuffer(GL_ARRAY_BUFFER, normalBuffer);
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
-	glDrawElements(GL_TRIANGLES, indexBuffer.size(), GL_UNSIGNED_INT, (void*)0);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	glDisableVertexAttribArray(2);
-	glDisableVertexAttribArray(1);
-	glDisableVertexAttribArray(0);
-
-	material->texture->Unbind();
-
-//	material->shader->Unbind();
-	glUseProgram(0);
+//	material.texture->Unbind();
+//	glUseProgram(0);
+//	glBindVertexArray(0);
 }
 
-uint32 Mesh::CreateBuffer(void* data, uint32 size, int target, int mode)
+void Mesh::Deinit()
 {
-	if(mode == 0)
-	{
-		mode = GL_STATIC_DRAW;
-	}
-	uint32 id = 0;
-	glGenBuffers(1, &id);
-	glBindBuffer(target, id);
-	glBufferData(target, size, data, mode);
-	return id;
+	mesh.reset();
 }
 
-void Mesh::LoadFile(string path)
-{
-	if(path.empty()) return;
-	
-	if(this->file == path && loaded)
-	{
-		Log("Mesh LoadFile rejected (the Mesh has already loaded this file)");
-		return;
-	}
-
-	if(!material->loaded)
-	{
-		material->LoadFile("materials/Diffuse.prop");
-	}
-
-	Log("Loading mesh file '"+path+"'.");
-	this->file = path;
-	path = game->fileSystem->GetGamePath(path).string();
-
-	const aiScene* scene = aiImportFile(path.c_str(), aiProcessPreset_TargetRealtime_MaxQuality);
-	Log("Loaded mesh.. filling buffers");
-	for(uint i = 0; i < scene->mNumMeshes; ++i)
-	{
-		const aiMesh* mesh = scene->mMeshes[i];
-		vertexBuffer.data.reserve(vertexBuffer.size()+mesh->mNumVertices);
-		uvBuffer.data.reserve(uvBuffer.size()+mesh->mNumVertices);
-		normalBuffer.data.reserve(normalBuffer.size()+mesh->mNumVertices);
-	//	indexBuffer.data.reserve(indexBuffer.size()+mesh->mNumFaces*3);
-
-		for(uint k = 0; k < mesh->mNumVertices; ++k)
-		{
-			vertexBuffer.push_back(vec3_cast<vec3>(mesh->mVertices[k]));
-			if(mesh->mTextureCoords[0] && mesh->mTextureCoords[0][k][0])
-			{
-				uvBuffer.push_back(vec2_cast<vec2>(mesh->mTextureCoords[0][k]));
-			}
-			normalBuffer.push_back(vec3_cast<vec3>(mesh->mNormals[k]));
-		}
-		for(uint k = 0; k < mesh->mNumFaces; ++k)
-		{
-			for(uint j = 0; j < mesh->mFaces[k].mNumIndices; ++j)
-			{
-				indexBuffer.push_back(mesh->mFaces[k].mIndices[j]);
-			}
-		}
-	}
-	aiReleaseImport(scene);
-
-	if(loaded)
-	{
-		Deinit();
-	}
-	Init();
-}
-
-/// @fixme Something is horribly wrong.
-void Mesh::IndexVBO()
-{
-	indexBuffer.data.clear();
-//	vector<uint32> indices;
-	bool found = false;
-
-	Log("INDEXING VBO.");
-
-	for(uint i = 0; i < vertexBuffer.size(); ++i)
-	{
-		for(uint k = 0; k < indexBuffer.size(); ++k)
-		{
-			if(vertexBuffer[indexBuffer[k]] == vertexBuffer[i])
-			{
-				indexBuffer.push_back(indexBuffer[k]);
-				found = true;
-			}
-		}
-		if(found)
-		{
-			found = false;
-			continue;
-		}
-		else
-		{
-			indexBuffer.push_back(i);
-		}
-	}
-
-	/*
-	for(uint i = 0; i < vertexBuffer.size(); ++i)
-	{
-		indexBuffer.push_back(i);
-	}
-	*/
-}
-
-void BufferBase::Destroy()
-{
-	glDeleteBuffers(1, &id);
-}
-
-}
+} // namespace lfant

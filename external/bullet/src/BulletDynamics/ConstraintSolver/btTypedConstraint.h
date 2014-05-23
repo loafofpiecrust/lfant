@@ -43,6 +43,7 @@ enum btTypedConstraintType
 	CONTACT_CONSTRAINT_TYPE,
 	D6_SPRING_CONSTRAINT_TYPE,
 	GEAR_CONSTRAINT_TYPE,
+	FIXED_CONSTRAINT_TYPE,
 	MAX_CONSTRAINT_TYPE
 };
 
@@ -413,7 +414,7 @@ struct	btTypedConstraintData
 	int		m_isEnabled;
 	
 };
-#endif BACKWARDS_COMPATIBLE
+#endif //BACKWARDS_COMPATIBLE
 
 struct	btTypedConstraintDoubleData
 {

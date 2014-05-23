@@ -24,7 +24,7 @@ IMPLEMENT_TYPE(net::User, ChatServer)
 
 ChatServer::ChatServer()
 {
-	name = game->systemInfo->computerName;
+	name = "compy";
 }
 
 ChatServer::~ChatServer()
@@ -62,15 +62,15 @@ void ChatServer::SendMessage(string msg)
 
 //	msg = sender+":"+msg;
 //	Server::SendData(msg);
-	
+
 	for(uint i = 0; i < connections.size(); ++i)
 	{
 	//	if(con->ip == sender) continue;
 		connections[i]->SendData(msg);
 	}
-	
+
 //	messages.push_back(msg);
-//	Log("Message sent: '"+msg+"' to ", connections.size()-1, " clients.");
+//	GetGame()->Log("Message sent: '"+msg+"' to ", connections.size()-1, " clients.");
 }
 
 }

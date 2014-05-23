@@ -29,7 +29,8 @@
 namespace lfant
 {
 
-SystemInfo::SystemInfo()
+SystemInfo::SystemInfo(Game* game) :
+	Subsystem(game)
 {
 }
 
@@ -129,7 +130,7 @@ void SystemInfo::Init()
 				memcpy(CPUBrandString + 32, CPUInfo, sizeof(CPUInfo));
 			}
 		}
-		cpu.cores = (typeof(cpu.cores))info.dwNumberOfProcessors;             //(t >> 16) & 0xff;
+		cpu.cores = (decltype(cpu.cores))info.dwNumberOfProcessors;             //(t >> 16) & 0xff;
 		cpu.name = CPUBrandString;        //info.dwProcessorType;
 	}
 	/*
@@ -203,7 +204,7 @@ void SystemInfo::Init()
 	Subsystem::Init();
 
 	FILE* cmd;
-	int status;
+//	int status;
 	char result[250];
 
 	cmd = popen("/bin/uname -a", "r");
@@ -224,7 +225,7 @@ void SystemInfo::Init()
 	deque<string> line;
 	while(fgets(result, sizeof(result) - 1, cmd) != 0)
 	{
-		Log("Count: ", cnt);
+		GetGame()->Log("Count: ", cnt);
 		if(cnt == 0)
 		{
 			++cnt;
@@ -238,29 +239,29 @@ void SystemInfo::Init()
 				if(line[i] == "Resolution:")
 				{
 					deque<string> res = Split(line[i+1], "x");
-					monitor.resolution.x = lexical_cast<uint16_t>(res[0]);
-					monitor.resolution.y = lexical_cast<uint16_t>(res[2]);
+					monitor.resolution.x = lexical_cast<uint16>(res[0]);
+					monitor.resolution.y = lexical_cast<uint16>(res[2]);
 					break;
 				}
 			}
 		}
 		else if(cnt == 2)
 		{
-			Log("Past split, res: ", result);
+			GetGame()->Log("Past split, res: ", result);
 			line = Split(string(result), " \t");
 			int begin = 0, diff = 0;
 			for(uint i = 0; i < line.size(); ++i)
 			{
-				Log("Line portion: ", line[i]);
+				GetGame()->Log("Line portion: ", line[i]);
 				if(line[i] == "Renderer:")
 				{
 					begin = i;
-					Log("Begin ", begin);
+					GetGame()->Log("Begin ", begin);
 				}
 				else if(line[i] == "GLX" && line[i+1] == "Version:")
 				{
 					diff = i-begin;
-					Log("Diff: ", diff);
+					GetGame()->Log("Diff: ", diff);
 				}
 			}
 
@@ -273,15 +274,15 @@ void SystemInfo::Init()
 				}
 			}
 
-			Log("Gpu: "+gpu);
+			GetGame()->Log("Gpu: "+gpu);
 
 			// OpenGL Version supported
 			for(uint i = 0; i < line.size(); ++i)
 			{
 				if(line[i] == "Version:")
 				{
-					glVersion.major = lexical_cast<uint16_t>(line[i+1][0]);
-					glVersion.minor = lexical_cast<uint16_t>(line[i+1][2]);
+					glVersion.major = lexical_cast<uint16>(line[i+1][0]);
+					glVersion.minor = lexical_cast<uint16>(line[i+1][2]);
 					break;
 				}
 			}

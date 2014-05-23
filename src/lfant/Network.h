@@ -18,6 +18,7 @@
 #include <boost/asio.hpp>
 #include <forward_list>
 #include <type_traits>
+#include <mutex>
 
 namespace lfant
 {
@@ -42,7 +43,7 @@ class Network : public Subsystem
 {
 	friend class Game;
 public:
-	Network();
+	Network(Game* game);
 	virtual ~Network();
 
 	virtual void Init();
@@ -69,7 +70,11 @@ protected:
 public:
 	std::deque<ptr<net::User>> users;
 
+	std::mutex mutex;
+
 private:
+
+	void RunLoop();
 
 };
 

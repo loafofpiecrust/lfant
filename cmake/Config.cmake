@@ -70,21 +70,32 @@ endif()
 
 message("Platform: ${PLATFORM}")
 
+if(COMPILER STREQUAL "gcc")
+	set(CMAKE_C_COMPILER "gcc")
+	set(CMAKE_CXX_COMPILER "g++")
+endif()
+if(COMPILER STREQUAL "clang")
+	set(CMAKE_C_COMPILER "clang")
+	set(CMAKE_CXX_COMPILER "clang++")
+endif()
+
 set(CMAKE_BUILD_TYPE Release)
-set(BASE_FLAGS "-O3 -Wall -D__STRICT_ANSI__ -fPIC")
+set(BASE_FLAGS "-Wall -D__STRICT_ANSI__")
 if(NOT ANDROID)
 	set(BASE_FLAGS "${BASE_FLAGS} -m${ARCH_OPTION}")
 endif()
 if(NOT WIN32)
-#	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
+        set(BASE_FLAGS "${BASE_FLAGS} -fPIC")
 endif()
 
 if(DEBUG)
-	set(BASE_FLAGS "${BASE_FLAGS} -g")
+	set(BASE_FLAGS "${BASE_FLAGS} -O3 -g")
+else()
+	set(BASE_FLAGS "${BASE_FLAGS} -O3")
 endif()
 
 set(CMAKE_C_FLAGS "${BASE_FLAGS} -std=c11")
-set(CMAKE_CXX_FLAGS "${BASE_FLAGS} -std=gnu++11 -Wno-invalid-offsetof -Wno-overloaded-virtual")
+set(CMAKE_CXX_FLAGS "-std=c++11 ${BASE_FLAGS} -Wno-invalid-offsetof -Wno-overloaded-virtual")
 
 # RPathing
 set(CMAKE_SKIP_BUILD_RPATH TRUE)
@@ -120,14 +131,6 @@ if(NOT ROOT STREQUAL LFANT AND NOT EXISTS "${LIBRARY_OUTPUT_PATH}/lib")
 endif()
 
 
-if(COMPILER STREQUAL "gcc")
-	set(CMAKE_C_COMPILER "gcc")
-	set(CMAKE_CXX_COMPILER "g++")
-endif()
-if(COMPILER STREQUAL "clang")
-	set(CMAKE_C_COMPILER "clang")
-	set(CMAKE_CXX_COMPILER "clang++")
-endif()
 # Add a case for VCC?
 
 
@@ -163,6 +166,15 @@ if(PLATFORM STREQUAL "windows" AND CMAKE_C_COMPILER STREQUAL "clang")
 		${MINGW_ARCH_DIR}/include
 		${MINGW_ARCH_DIR}/include/c++
 	)
+
+endif()
+
+if(PLATFORM STREQUAL "windows")
+
+#	link_directories(
+	#	C:/Windows/System32
+	#	C:/Windows/SysWOW64
+#	)
 
 endif()
 

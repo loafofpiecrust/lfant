@@ -25,7 +25,8 @@ IMPLEMENT_TYPE(net::User, ChatClient)
 
 ChatClient::ChatClient()
 {
-	name = game->systemInfo->computerName;
+//	name = GetGame()->systemInfo->computerName;
+	name = "glub";
 }
 
 ChatClient::ChatClient(asio::io_service& new_io) :
@@ -54,7 +55,7 @@ void ChatClient::SendMessage(string msg)
 		con->SendData(msg);
 	}
 	messages.push_back(msg);
-	Log("Message sent: '"+msg+"'.");
+	GetGame()->Log("Message sent: '"+msg+"'.");
 }
 
 void ChatClient::Disconnect(string ip)
@@ -75,10 +76,10 @@ void ChatClient::OnConnect(const boost::system::error_code &error, net::Connecti
 {
 	if(error) return;
 	Client::OnConnect(error, con);
-	
+
 	con->SendData("Yola");
 
-	Log("ChatClient::OnConnect: Success.");
+	GetGame()->Log("ChatClient::OnConnect: Success.");
 }
 
 void ChatClient::OnGetData(string data, net::Connection* con)

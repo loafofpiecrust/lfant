@@ -16,7 +16,7 @@
 
 namespace lfant {
 
-path operator+(path const& p, string s)
+boost::filesystem::path operator+(boost::filesystem::path const& p, string s)
 {
 	return p.string()+s;
 }

@@ -5,6 +5,7 @@
 #include <lfant/util/String.h>
 #include <lfant/Range.h>
 #include <lfant/Console.h>
+#include <lfant/Rect.h>
 
 // External
 #include <glm/gtx/quaternion.hpp>
@@ -343,6 +344,15 @@ string lexical_cast<string, Range<Range<vec4>>>(const Range<Range<vec4>>& src)
 	return "("+lexical_cast<string>(src.start)+")-("+lexical_cast<string>(src.end)+")";
 }
 
+template<>
+string lexical_cast<string, Rect>(const Rect& src)
+{
+	return "("+lexical_cast<string>(src.x)+","+
+		lexical_cast<string>(src.y)+","+
+		lexical_cast<string>(src.width)+","+
+		lexical_cast<string>(src.height)+")";
+}
+
 
 /*
  *	Primitive to primitive
@@ -429,9 +439,9 @@ vec3 lexical_cast<vec3, string>(const string& val)
 			valstr.erase(i, 1);
 		}
 	}*/
-//	Log("First char in vec3 lexcast: '", (int)val[0], "'");
+//	GetGame()->Log("First char in vec3 lexcast: '", (int)val[0], "'");
 	std::deque<string> str = lfant::Split(valstr, " x:,()");
-	Log("Lexcasting vec3, size: ", str.size());
+//	GetGame()->Log("Lexcasting vec3, size: ", str.size());
 	result.x = lexical_cast<float>(str[0]);
 	if(str.size() > 1)
 	{
@@ -446,7 +456,7 @@ vec3 lexical_cast<vec3, string>(const string& val)
 		result.y = result.x;
 		result.z = result.x;
 	}
-	Log("Lexcast vec3(", result.x, ",", result.y, ",", result.z, ")");
+//	GetGame()->Log("Lexcast vec3(", result.x, ",", result.y, ",", result.z, ")");
 	return result;
 }
 
@@ -475,7 +485,7 @@ template<>
 vec4 lexical_cast<vec4, string>(const string& src)
 {
 	vec4 result(0);
-	Log("lexcasting vec4 '", src, "'");
+//	GetGame()->Log("lexcasting vec4 '", src, "'");
 	deque<string> str = lfant::Split(src, " x,()");
 	result.r = lexical_cast<float>(str[0]);
 	if(str.size() > 1)
@@ -540,7 +550,7 @@ Range<vec3> lexical_cast<Range<vec3>, string>(const string &src)
 template<>
 Range<vec4> lexical_cast<Range<vec4>, string>(const string &src)
 {
-	Log("lexcasting Range<vec4> '", src, "'");
+//	GetGame()->Log("lexcasting Range<vec4> '", src, "'");
 	Range<vec4> result(vec4(0));
 	deque<string> str = lfant::Split(src, " -");
 	result.min = lexical_cast<vec4>(str[0]);
@@ -567,7 +577,7 @@ Range<Range<float>> lexical_cast<Range<Range<float>>, string>(const string& src)
 template<>
 Range<Range<vec4>> lexical_cast<Range<Range<vec4>>, string>(const string& src)
 {
-	Log("lexcasting Range<Range<vec4>> '", src, "'");
+//	GetGame()->Log("lexcasting Range<Range<vec4>> '", src, "'");
 	Range<Range<vec4>> result;
 	deque<string> str = lfant::Split(src, " -");
 	result.min = lexical_cast<Range<vec4>>(str[0]+"-"+str[1]);
@@ -595,6 +605,22 @@ Range<Range<vec3>> lexical_cast<Range<Range<vec3>>, string>(const string& src)
 /*
  *	String to Containers
  */
+
+template<>
+string lexical_cast<string, vector<string>>(const vector<string>& src)
+{
+	string result = "{";
+	for(uint i = 0; i < src.size(); ++i)
+	{
+		result.append(src[i]);
+		if(i != src.size()-1)
+		{
+			result.append(",");
+		}
+	}
+	result.append("}");
+	return result;
+}
 
 template<>
 vector<string> lexical_cast<vector<string>, string>(const string& src)
@@ -630,7 +656,7 @@ static string TrimSpace(const string& str)
 {
 	std::size_t firstLetter = str.find_first_not_of(" \t\n");
 	std::size_t lastLetter = str.find_last_not_of(" \t\n");
-	
+
 	if(firstLetter == string::npos)
 	{
 		return "";
@@ -670,7 +696,7 @@ deque<string> lexical_cast<deque<string>, string>(const string& src)
 		{
 			toks[i] = TrimSpace(toks[i]);
 		}
-		
+
 		if(!toks[i].empty()) result.push_back(toks[i]);
 	}
 	return result;

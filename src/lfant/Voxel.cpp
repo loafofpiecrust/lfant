@@ -61,7 +61,7 @@ Voxel::Chunk::~Chunk()
 
 void Voxel::Chunk::BeginRender()
 {
-	blockBuffer.data.clear();
+	blockBuffer.clear();
 	for(uint x = 0; x < blocks.size(); ++x)
 	{
 		for(uint y = 0; y < blocks[x].size(); ++y)
@@ -75,14 +75,14 @@ void Voxel::Chunk::BeginRender()
 			}
 		}
 	}
-	
+
 	if(blockBuffer.id)
 	{
 		glDeleteBuffers(1, &blockBuffer.id);
 	}
 
 	glGenBuffers(1, &blockBuffer.id);
-	glBindBuffer(GL_ARRAY_BUFFER, blockBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, blockBuffer.id);
 	glBufferData(GL_ARRAY_BUFFER, blockBuffer.size(), &blockBuffer[0], GL_DYNAMIC_DRAW);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -91,7 +91,7 @@ void Voxel::Chunk::BeginRender()
 void Voxel::Chunk::Render()
 {
 //	glEnableVertexAttribute(0);
-	glBindBuffer(GL_ARRAY_BUFFER, blockBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, blockBuffer.id);
 	glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
 
 	glDrawArrays(GL_POINTS, 0, blockBuffer.size());
@@ -99,7 +99,7 @@ void Voxel::Chunk::Render()
 
 void Voxel::Chunk::EndRender()
 {
-	
+
 }
 
 // Voxel
@@ -111,9 +111,9 @@ Voxel::Voxel() :
 {
 	chunks.emplace_back();
 //	vec3 pos(0);
-	uint32_t i1 = chunks.size()-1;
-	uint32_t i2 = chunks[i1].size()-1;
-	uint32_t i3 = chunks[i1][i2].size()-1;
+	uint32 i1 = chunks.size()-1;
+	uint32 i2 = chunks[i1].size()-1;
+	uint32 i3 = chunks[i1][i2].size()-1;
 	Chunk& chunk = chunks[i1][i2][i3];
 	for(uint x = 0; x < chunk.blocks.size(); ++x)
 	{
@@ -169,10 +169,10 @@ void Voxel::Render()
 {
 	shader->Bind();
 
-	mat4 mvp = game->scene->mainCamera->GetProjection() * game->scene->mainCamera->GetView() * owner->transform->GetMatrix();
+	mat4 mvp = GetGame()->scene->mainCamera->GetProjection() * GetGame()->scene->mainCamera->GetView() * owner->transform->GetMatrix();
 	shader->SetUniform("MVP", mvp);
 	shader->SetUniform("textureSampler", texture);
-	shader->SetUniform("tiling", texture->tiling);
+//	shader->SetUniform("tiling", texture->tiling);
 
 	for(uint x = 0; x < chunks.size(); ++x)
 	{

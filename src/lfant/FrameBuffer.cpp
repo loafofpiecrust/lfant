@@ -18,6 +18,7 @@
 #include <lfant/Scene.h>
 #include <lfant/Transform.h>
 #include <lfant/Input.h>
+#include "lfant/Window.h"
 
 // External
 #if !ANDROID
@@ -33,7 +34,8 @@ namespace lfant {
 
 FrameBuffer* FrameBuffer::current = nullptr;
 
-FrameBuffer::FrameBuffer()
+FrameBuffer::FrameBuffer(Game* game) :
+	game(game)
 {
 }
 
@@ -43,7 +45,7 @@ FrameBuffer::~FrameBuffer()
 
 void FrameBuffer::Clear()
 {
-	Log("Clearing framebuffer");
+	GetGame()->Log("Clearing framebuffer");
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
@@ -52,34 +54,27 @@ void FrameBuffer::Init()
 	glGenFramebuffers(1, &id);
 	glBindFramebuffer(GL_FRAMEBUFFER, id);
 
-//	int bcount = textures.size() + (hasDepth ? 1 : 0);
+	GetGame()->Log(glGetError());
+
 	drawBuffers.clear();
-//	bcount = 0;
 	Texture* tex = nullptr;
 	if(textures.size() > 0)
 	{
-	//	Texture::resetUnit(textureUnitOffset);
 		for(uint i = 0; i < textures.size(); ++i)
 		{
 			tex = textures[i];
-		//	Texture* tex = Texture::newFromNextUnit();
-		//	tex->setupForFramebuffer(size.x, size.y, GL_RGB32F);
-		//	if(linearFilter) tex->SetFilters(GL_LINEAR, GL_LINEAR);
-			tex->scaleFilter = Texture::ScaleFilter::Linear;
+		//	tex->scaleFilter = Texture::ScaleFilter::Linear;
 			tex->wrapMode = Texture::WrapMode::Clamp;
 		//	tex->mode = GL_TEXTURE_2D_MULTISAMPLE;
-		//	tex->msaa = 2;
 			tex->size = uvec2(rect.width, rect.height);
 			tex->SetIndex(startIndex+i);
 			tex->InitData(0);
 
-			uint32_t attachment = startIndex+GL_COLOR_ATTACHMENT0+i;
-			Log("Setting up textures for FrameBuffer, tex ", i, " gets attachment ", attachment, ". GL_COLOR_ATTACHMENT0 = ", GL_COLOR_ATTACHMENT0);
+			uint32 attachment = startIndex+GL_COLOR_ATTACHMENT0+i;
+			GetGame()->Log("Setting up textures for FrameBuffer, tex ", i, " gets attachment ", attachment, ". GL_COLOR_ATTACHMENT0 = ", GL_COLOR_ATTACHMENT0);
 
 			tex->Bind();
 			glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, tex->GetMode(), tex->GetId(), 0);
-		//	glFramebufferTexture(GL_FRAMEBUFFER, attachment, tex->GetId(), 0);
-		//	tex->Unbind();
 
 			drawBuffers.push_back(attachment);
 		}
@@ -87,61 +82,65 @@ void FrameBuffer::Init()
 
 	if(hasDepth)
 	{
-		glGenRenderbuffers(1, &depthBuffer);
+	/*	glGenRenderbuffers(1, &depthBuffer);
 		glBindRenderbuffer(GL_RENDERBUFFER, depthBuffer);
-		Log("Setting up depth for FrameBuffer, size: (", rect.width, ", ", rect.height, ").");
-		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, rect.width, rect.height);
-		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthBuffer);
-
+		GetGame()->Log("stuff lel ", depthBuffer);
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, rect.width, rect.height);
+		GetGame()->Log(glGetError());
+		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, depthBuffer);
+	*/
 		if(depthTexture)
 		{
+		//	depthTexture->SetFormat(Texture::Format::Depth32F_Stencil8, Texture::Format::Depth);
 			depthTexture->SetFormat(Texture::Format::Depth32F, Texture::Format::Depth);
 			depthTexture->wrapMode = Texture::WrapMode::Clamp;
-		//	depthTexture->dataType = Texture::DataType::Float;
+			depthTexture->dataType = Texture::DataType::Float;
 			depthTexture->size = uvec2(rect.width, rect.height);
-			tex->SetIndex(startIndex+textures.size());
+			depthTexture->SetIndex(startIndex+textures.size());
 			depthTexture->InitData(0);
 
 			depthTexture->Bind();
-			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depthTexture->GetMode(), depthTexture->GetId(), 0);
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, depthTexture->GetMode(), depthTexture->GetId(), 0);
 
-		//	drawBuffers.push_back(GL_DEPTH_ATTACHMENT);
+			GetGame()->Log(glGetError());
 		}
 	}
-	/*
-	if(textures.size() > 0)
-	{
-		for(uint i = 0; i < textures.size(); ++i)
-		{
-			tex = textures[i];
-		}
-	}
-	*/
+
 	DrawBuffers();
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	BeginRender();
+
+	Unbind();
 }
 
 void FrameBuffer::Deinit()
 {
 	posBuffer.Destroy();
-	shader->Destroy();
+	shader.reset();
 
 	for(auto& tex : textures)
 	{
 		tex->Destroy();
-		if(tex)
-		{
-			delete tex;
-		}
 	}
+	textures.clear();
+
+	depthTexture->Destroy();
+	depthTexture.reset();
+
 	glDeleteFramebuffers(1, &id);
+}
+
+Game* FrameBuffer::GetGame() const
+{
+	return game;
 }
 
 void FrameBuffer::AddTexture(string name, Texture::Format form1, Texture::Format form2)
 {
-	textures.push_back(new Texture);
-	textureNames.push_back(name);
-	textures[textures.size()-1]->SetFormat(form1, form2);
+	Texture* tex = new Texture;
+	tex->path = name;
+	tex->SetFormat(form1, form2);
+	textures.push_back(tex);
 }
 
 void FrameBuffer::AddDepthTexture(string name, Texture::Format form1, Texture::Format form2)
@@ -150,7 +149,7 @@ void FrameBuffer::AddDepthTexture(string name, Texture::Format form1, Texture::F
 	{
 		depthTexture = new Texture;
 	}
-	depthTexName = name;
+	depthTexture->path = name;
 	hasDepth = true;
 }
 
@@ -162,7 +161,7 @@ void FrameBuffer::GetTextures(Shader* sh) const
 		for(uint i = 0; i < textures.size(); ++i)
 		{
 			textures[i]->Bind();
-			sh->SetUniform(textureNames[i], textures[i]);
+			sh->SetUniform(textures[i]->path, textures[i]);
 		}
 		textures[0]->Unbind();
 		sh->Unbind();
@@ -171,40 +170,54 @@ void FrameBuffer::GetTextures(Shader* sh) const
 
 Texture* FrameBuffer::GetTexture(string name) const
 {
-	if(name == depthTexName)
+	if(name == depthTexture->path)
 	{
 		return depthTexture;
 	}
 	for(uint i = 0; i < textures.size(); ++i)
 	{
-		if(textureNames[i] == name)
+		if(textures[i]->path == name)
 		{
 			return textures[i];
 		}
 	}
+	return nullptr;
 }
 
-void FrameBuffer::SetCurrentTexture(string name)
+void FrameBuffer::BindTextures(Shader* sh)
 {
-	currentTex = GetTexture(name);
+	if(!sh)
+	{
+		for(uint i = 0; i < textures.size(); ++i)
+		{
+			textures[i]->Bind();
+		}
+	}
+	else
+	{
+		for(uint i = 0; i < textures.size(); ++i)
+		{
+			sh->SetUniform(textures[i]->path, textures[i]);
+		}
+	}
 }
 
 FrameBuffer* FrameBuffer::GetCurrent()
 {
-//	Log("Getting current fbo, ", FrameBuffer::current);
+//	GetGame()->Log("Getting current fbo, ", FrameBuffer::current);
 	return FrameBuffer::current;
 }
 
 void FrameBuffer::Bind()
 {
-//	Log("Binding FBO ", id);
+//	GetGame()->Log("Binding FBO ", id);
 	glBindFramebuffer(GL_FRAMEBUFFER, id);
 	FrameBuffer::current = this;
 }
 
 void FrameBuffer::Unbind()
 {
-//	Log("Unbinding FBO");
+//	GetGame()->Log("Unbinding FBO");
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	FrameBuffer::current = nullptr;
 }
@@ -231,18 +244,24 @@ void FrameBuffer::UnbindRead()
 
 void FrameBuffer::DrawBuffers()
 {
+	glDrawBuffer(GL_NONE);
 //	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, id);
 #if !LFANT_GLES
 	glDrawBuffers(drawBuffers.size(), &drawBuffers[0]);
 #endif
 	if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 	{
-		Log("Framebuffer failed to draw.");
+		GetGame()->Log("Framebuffer failed to draw.");
 	}
 //	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 }
 
-uint32_t FrameBuffer::GetAttachment(uint32_t idx)
+void FrameBuffer::DrawBuffer(int idx)
+{
+	glDrawBuffer(drawBuffers[idx]);
+}
+
+uint32 FrameBuffer::GetAttachment(uint32 idx)
 {
 	return GL_COLOR_ATTACHMENT0 + idx;
 }
@@ -259,30 +278,38 @@ void FrameBuffer::Resize()
 
 void FrameBuffer::BeginRender()
 {
-	Log("FrameBuffer::BeginRender() {");
-	Log("shader = new Shader");
-	shader = new Shader;
-	Log("shader->LoadFile()");
-	shader->LoadFile("shaders/FrameBuffer.vert", "shaders/FrameBuffer.frag");
+//	GLuint VertexArrayID;
+//	glGenVertexArrays(1, &VertexArrayID);
+//	glBindVertexArray(VertexArrayID);
+
+	GetGame()->Log("FrameBuffer::BeginRender() {");
+//	shader = new Shader;
+	GetGame()->Log("Shader::LoadFile()");
+//	shader->LoadFile("shaders/FrameBuffer.vert", "shaders/FrameBuffer.frag");
+	shader = Shader::LoadFile("shaders/FrameBuffer.vert", "shaders/FrameBuffer.frag");
+	GetGame()->Log(glGetError());
 
 	for(uint i = 0; i < textures.size(); ++i)
 	{
-		shader->AddUniform(textureNames[i]);
+		shader->AddUniform(textures[i]->path);
 	}
-	if(depthTexName != "")
+	if(!depthTexture->path.empty())
 	{
-		shader->AddUniform(depthTexName);
+		shader->AddUniform(depthTexture->path);
 	}
+	GetGame()->Log(glGetError());
 
-	Log("Add uniforms to shader");
+	GetGame()->Log("Add uniforms to shader");
 	shader->AddUniform("cameraRange");
 	shader->AddUniform("focalDepth");
 	shader->AddUniform("focalLength");
 	shader->AddUniform("fstop");
 	shader->AddUniform("focus");
 	shader->AddUniform("textureSize");
+	shader->AddUniform("useDof");
 
-	Log("Make buffers");
+
+	GetGame()->Log("Make buffers");
 
 	posBuffer.push_back(vec2(-1, -1));
 	posBuffer.push_back(vec2(1, -1));
@@ -292,50 +319,62 @@ void FrameBuffer::BeginRender()
 	posBuffer.push_back(vec2(1, -1));
 	posBuffer.push_back(vec2(1, 1));
 
-	Mesh::CreateBuffer(posBuffer, GL_ARRAY_BUFFER);
-	Log("}");
+	Geometry::CreateBuffer(posBuffer, GL_ARRAY_BUFFER);
+	GetGame()->Log("}");
+
+	GetGame()->Log(glGetError());
 }
+
+
 
 void FrameBuffer::Render()
 {
 	shader->Bind();
 
-	for(uint i = 0; i < textures.size(); ++i)
-	{
-		shader->SetUniform(textureNames[i], textures[i]);
-	}
-	if(depthTexture)
-	{
-		shader->SetUniform(depthTexName, depthTexture);
-	}
+//	GetGame()->Log(glGetError());
 
 //	shader->SetUniform("cameraPosition", game->scene->mainCamera->owner->transform->GetWorldPosition());
 //	shader->SetUniform("cameraDof", vec2(game->scene->mainCamera->dof - game->scene->mainCamera->dofWidth, game->scene->mainCamera->dof + game->scene->mainCamera->dofWidth));
-	if(game->scene->mainCamera)
+	if(GetGame()->scene->mainCamera)
 	{
-		shader->SetUniform("focalDepth", game->scene->mainCamera->focalDepth);
-		shader->SetUniform("focalLength", game->scene->mainCamera->focalLength);
-		shader->SetUniform("fstop", game->scene->mainCamera->aperture);
-		shader->SetUniform("focus", game->scene->mainCamera->focus);
-		shader->SetUniform("cameraRange", vec2_cast<vec2>(game->scene->mainCamera->GetViewRange()));
+		shader->SetUniform("focalDepth", GetGame()->scene->mainCamera->focalDepth);
+		shader->SetUniform("focalLength", GetGame()->scene->mainCamera->focalLength);
+		shader->SetUniform("fstop", GetGame()->scene->mainCamera->aperture);
+		shader->SetUniform("focus", GetGame()->scene->mainCamera->focus);
+		shader->SetUniform("cameraRange", vec2_cast<vec2>(GetGame()->scene->mainCamera->GetViewRange()));
+		shader->SetUniform("useDof", GetGame()->scene->mainCamera->useDof);
 	}
-	shader->SetUniform("textureSize", (vec2)game->renderer->GetResolution());
+	shader->SetUniform("textureSize", (vec2)GetGame()->window->GetSize());
+//	GetGame()->Log(glGetError());
+
+	for(uint32 i = 0; i < textures.size(); ++i)
+	{
+		if(shader->GetUniform(textures[i]->path) != -1)
+		{
+		//	shader->SetUniform(textures[i]->path, textures[i]->GetIndex());
+			shader->SetUniform(textures[i]->path, textures[i]);
+		}
+	}
+	if(depthTexture) shader->SetUniform(depthTexture->path, depthTexture);
 
 	glEnableVertexAttribArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, posBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, posBuffer.id);
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
 	glDrawArrays(GL_TRIANGLES, 0, posBuffer.size());
 
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+//	GetGame()->Log(glGetError());
+
+//	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glDisableVertexAttribArray(0);
 
-	for(uint i = 0; i < textures.size(); ++i)
+
+/*	for(uint i = 0; i < textures.size(); ++i)
 	{
 		textures[i]->Unbind();
 	}
 
-	shader->Unbind();
+	shader->Unbind();*/
 }
 
 void FrameBuffer::EndRender()

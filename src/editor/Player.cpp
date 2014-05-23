@@ -39,44 +39,44 @@ void Player::Update()
 //	Transform* cam = game->scene->mainCamera->GetOwner()->transform;
 
 	float value = 0.0f;
-	if((value = game->input->GetAxis("Horizontal")->GetValue()) != 0.0f)
+	if((value = GetGame()->input->GetAxis("Horizontal")->GetValue()) != 0.0f)
 	{
 		TriggerEvent("Move", owner->transform->GetRight() * value);
 	}
-	if((value = game->input->GetAxis("Vertical")->GetValue()) != 0.0f)
+	if((value = GetGame()->input->GetAxis("Vertical")->GetValue()) != 0.0f)
 	{
 		TriggerEvent("Move", owner->transform->GetDirection() * value);
 	}
 
-	if((value = game->input->GetAxis("HRotation")->GetValue()) != 0.0f)
+	if((value = GetGame()->input->GetAxis("HRotation")->GetValue()) != 0.0f)
 	{
 		TriggerEvent("Look", vec3(0,0,1), value);
 	}
-	if((value = game->input->GetAxis("VRotation")->GetValue()) != 0.0f)
+	if((value = GetGame()->input->GetAxis("VRotation")->GetValue()) != 0.0f)
 	{
 		TriggerEvent("Look", vec3(1,0,0), -value);
 	}
-	if((value = game->input->GetAxis("ZRotation")->GetValue()) != 0.0f)
+	if((value = GetGame()->input->GetAxis("ZRotation")->GetValue()) != 0.0f)
 	{
 		TriggerEvent("Look", vec3(0,1,0), -value);
 	}
 
-	if(game->input->GetButtonDown("ShowFPS"))
+	if(GetGame()->input->GetButtonDown("ShowFPS"))
 	{
-		Log("deltaTime: ", game->time->deltaTime);
-		Log("Game FPS: ", game->time->frameRate);
-		Log("Object events: ", Object::GetEventCount());
+		GetGame()->Log("deltaTime: ", GetGame()->time->deltaTime);
+		GetGame()->Log("Game FPS: ", GetGame()->time->frameRate);
+		GetGame()->Log("Object events: ", Object::GetEventCount());
 	}
 
-	if (game->input->GetButtonDown("ShowLoc"))
+	if (GetGame()->input->GetButtonDown("ShowLoc"))
 	{
-		Log("Player position: ", owner->transform->GetPosition());
+		GetGame()->Log("Player position: ", owner->transform->GetPosition());
 	}
-	if (game->input->GetButtonDown("ShowRot"))
+	if (GetGame()->input->GetButtonDown("ShowRot"))
 	{
-		Log("Camera rotation: ", game->scene->mainCamera->owner->transform->GetWorldRotation());
-		Log("Camera direction: ", game->scene->mainCamera->owner->transform->GetDirection());
-		Log("Camera matrix: ", game->scene->mainCamera->owner->transform->GetMatrix());
+		GetGame()->Log("Camera rotation: ", GetGame()->scene->mainCamera->owner->transform->GetWorldRotation());
+		GetGame()->Log("Camera direction: ", GetGame()->scene->mainCamera->owner->transform->GetDirection());
+		GetGame()->Log("Camera matrix: ", GetGame()->scene->mainCamera->owner->transform->GetMatrix());
 	}
 }
 

@@ -1,0 +1,525 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QGroupBox" name="horizontalGroupBox">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>50</y>
+      <width>541</width>
+      <height>453</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QTabWidget" name="tabWidget_2">
+       <property name="currentIndex">
+        <number>1</number>
+       </property>
+       <widget class="QWidget" name="tab_3">
+        <attribute name="title">
+         <string>Tab 1</string>
+        </attribute>
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <item>
+          <widget class="QTableWidget" name="tableWidget"/>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="tab_4">
+        <attribute name="title">
+         <string>Tab 2</string>
+        </attribute>
+        <layout class="QHBoxLayout" name="horizontalLayout_6">
+         <item>
+          <widget class="lfant::editor::EntityTree" name="entitytree">
+           <column>
+            <property name="text">
+             <string>Entity</string>
+            </property>
+           </column>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </widget>
+     </item>
+     <item>
+      <widget class="QTabWidget" name="tabWidget">
+       <property name="currentIndex">
+        <number>1</number>
+       </property>
+       <widget class="QWidget" name="tab">
+        <attribute name="title">
+         <string>Tab 1</string>
+        </attribute>
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <item>
+          <layout class="QFormLayout" name="formLayout">
+           <property name="fieldGrowthPolicy">
+            <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+           </property>
+           <item row="0" column="0">
+            <widget class="QLabel" name="nameLabel">
+             <property name="text">
+              <string>Name</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QLineEdit" name="nameLineEdit"/>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="dblspinLabel">
+             <property name="text">
+              <string>dblspin</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QDoubleSpinBox" name="dblspinDoubleSpinBox"/>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="speenLabel">
+             <property name="text">
+              <string>speen</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="QSpinBox" name="speenSpinBox"/>
+           </item>
+           <item row="3" column="0">
+            <widget class="QLabel" name="diaelLabel">
+             <property name="text">
+              <string>diael</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="1">
+            <widget class="QDial" name="diaelDial"/>
+           </item>
+           <item row="4" column="0">
+            <widget class="QLabel" name="coemboLabel">
+             <property name="text">
+              <string>coembo</string>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="1">
+            <widget class="QComboBox" name="coemboComboBox"/>
+           </item>
+           <item row="5" column="0">
+            <widget class="QLabel" name="quietLabel">
+             <property name="text">
+              <string>quiet</string>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="1">
+            <widget class="QWidget" name="quietWidget" native="true">
+             <layout class="QHBoxLayout" name="horizontalLayout_4">
+              <item>
+               <widget class="QSlider" name="horizontalSlider">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QSpinBox" name="spinBox"/>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item row="6" column="0">
+            <widget class="QLabel" name="haiLabel">
+             <property name="text">
+              <string>hai</string>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="1">
+            <widget class="QWidget" name="haiWidget" native="true">
+             <layout class="QHBoxLayout" name="horizontalLayout_5">
+              <item>
+               <widget class="QScrollArea" name="scrollArea">
+                <property name="widgetResizable">
+                 <bool>true</bool>
+                </property>
+                <widget class="QWidget" name="scrollAreaWidgetContents">
+                 <property name="geometry">
+                  <rect>
+                   <x>0</x>
+                   <y>0</y>
+                   <width>135</width>
+                   <height>68</height>
+                  </rect>
+                 </property>
+                 <widget class="QWidget" name="formLayoutWidget">
+                  <property name="geometry">
+                   <rect>
+                    <x>20</x>
+                    <y>10</y>
+                    <width>135</width>
+                    <height>70</height>
+                   </rect>
+                  </property>
+                  <layout class="QFormLayout" name="formLayout_2">
+                   <item row="0" column="0">
+                    <widget class="QLabel" name="yoyozLabel">
+                     <property name="text">
+                      <string>yoyoz</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="0" column="1">
+                    <widget class="QLineEdit" name="yoyozLineEdit"/>
+                   </item>
+                  </layout>
+                 </widget>
+                </widget>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="tab_inspector">
+        <attribute name="title">
+         <string>Tab 2</string>
+        </attribute>
+        <layout class="QHBoxLayout" name="horizontalLayout_7">
+         <item>
+          <widget class="lfant::editor::Inspector" name="inspector" native="true"/>
+         </item>
+        </layout>
+       </widget>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionNew_Project"/>
+    <addaction name="actionOpen_Project"/>
+    <addaction name="actionSave_Project"/>
+    <addaction name="separator"/>
+    <addaction name="actionOpenGame"/>
+    <addaction name="actionClose_Game"/>
+    <addaction name="actionExit"/>
+   </widget>
+   <widget class="QMenu" name="menuEdit">
+    <property name="title">
+     <string>Edit</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuScene">
+    <property name="title">
+     <string>Scene</string>
+    </property>
+    <addaction name="actionAdd_Child_Entity"/>
+   </widget>
+   <widget class="QMenu" name="menuEntity">
+    <property name="title">
+     <string>Entity</string>
+    </property>
+    <addaction name="actionRefresh"/>
+    <addaction name="actionAdd_Component"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuEdit"/>
+   <addaction name="menuScene"/>
+   <addaction name="menuEntity"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar">
+   <property name="toolTip">
+    <string>~ Welcome</string>
+   </property>
+  </widget>
+  <action name="actionNew_Project">
+   <property name="text">
+    <string>New Project</string>
+   </property>
+  </action>
+  <action name="actionOpen_Project">
+   <property name="text">
+    <string>Open Project...</string>
+   </property>
+  </action>
+  <action name="actionSave_Project">
+   <property name="text">
+    <string>Save Project</string>
+   </property>
+  </action>
+  <action name="actionOpenGame">
+   <property name="text">
+    <string>Open Game</string>
+   </property>
+  </action>
+  <action name="actionAdd_Child_Entity">
+   <property name="text">
+    <string>Add Child Entity</string>
+   </property>
+  </action>
+  <action name="actionRefresh">
+   <property name="text">
+    <string>Refresh</string>
+   </property>
+  </action>
+  <action name="actionAdd_Component">
+   <property name="text">
+    <string>Add Component</string>
+   </property>
+  </action>
+  <action name="actionClose_Game">
+   <property name="text">
+    <string>Close Game</string>
+   </property>
+  </action>
+  <action name="actionExit">
+   <property name="text">
+    <string>Exit</string>
+   </property>
+  </action>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>lfant::editor::Inspector</class>
+   <extends>QWidget</extends>
+   <header>editor/Inspector.h</header>
+   <container>1</container>
+   <slots>
+    <slot>SetGame(lfant::Game*)</slot>
+    <slot>Refresh()</slot>
+    <slot>SetEntity(lfant::Entity*)</slot>
+   </slots>
+  </customwidget>
+  <customwidget>
+   <class>lfant::editor::EntityTree</class>
+   <extends>QTreeWidget</extends>
+   <header>editor/EntityTree.h</header>
+   <slots>
+    <signal>EntityChanged(lfant::Entity*)</signal>
+    <slot>SetGame(lfant::Game*)</slot>
+   </slots>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>actionExit</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>Exit()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>horizontalSlider</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>spinBox</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>508</x>
+     <y>340</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>568</x>
+     <y>340</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinBox</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>horizontalSlider</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>568</x>
+     <y>340</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>508</x>
+     <y>340</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionOpen_Project</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>OpenProjectDialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionSave_Project</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>SaveProject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>MainWindow</sender>
+   <signal>SetGame(lfant::Game*)</signal>
+   <receiver>entitytree</receiver>
+   <slot>SetGame(lfant::Game*)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>399</x>
+     <y>299</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>280</x>
+     <y>317</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>MainWindow</sender>
+   <signal>SetGame(lfant::Game*)</signal>
+   <receiver>inspector</receiver>
+   <slot>SetGame(lfant::Game*)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>399</x>
+     <y>299</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>542</x>
+     <y>317</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionRefresh</sender>
+   <signal>triggered()</signal>
+   <receiver>inspector</receiver>
+   <slot>Refresh()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>542</x>
+     <y>317</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>entitytree</sender>
+   <signal>EntityChanged(lfant::Entity*)</signal>
+   <receiver>inspector</receiver>
+   <slot>SetEntity(lfant::Entity*)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>280</x>
+     <y>317</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>542</x>
+     <y>317</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionOpenGame</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>OpenGame()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionClose_Game</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>CloseGame()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <signal>SetGame(lfant::Game*)</signal>
+  <slot>OpenProjectDialog()</slot>
+  <slot>Exit()</slot>
+  <slot>SaveProject()</slot>
+  <slot>NewProject(QString,QString)</slot>
+  <slot>OpenGame()</slot>
+  <slot>CloseGame()</slot>
+ </slots>
+</ui>

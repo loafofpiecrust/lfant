@@ -22,17 +22,17 @@
 #include <lfant/Audio.h>
 
 // Internal
-#include <lfant/Console.h>
+#include <lfant/Game.h>
 #include <lfant/Audio.h>
 
 // External
-#include <AL/al.h>
-#include <AL/alc.h>
+#include <irrKlang.h>
 
 namespace lfant
 {
 
-Audio::Audio()
+Audio::Audio(Game* game) :
+	Subsystem(game)
 {
 	//ctor
 }
@@ -45,18 +45,11 @@ Audio::~Audio()
 void Audio::Init()
 {
 	Subsystem::Init();
-
-	device = alcOpenDevice(0);
-	if(!device)
+	engine = irrklang::createIrrKlangDevice();
+	if(!engine)
 	{
-	// failed to create
-	}
-
-	context = alcCreateContext(device, 0);
-	alcMakeContextCurrent(context);
-	if(!context)
-	{
-	// failed to create
+		// Something went wrong
+		GetGame()->Log("Failed to create audio engine.");
 	}
 }
 
@@ -67,6 +60,12 @@ void Audio::Update()
 
 void Audio::Deinit()
 {
+	engine->drop();
+}
+
+void Audio::PlaySound(string file, bool loop)
+{
+	engine->play2D(file.c_str(), loop);
 }
 
 }

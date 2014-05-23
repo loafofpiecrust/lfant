@@ -38,3 +38,9 @@ sed -i "s*projectName*$projName*g" "$projDir/src/launcher/main.cpp"
 
 sed -i "s*projectName*$projName*g" "$projDir/android/AndroidManifest.xml"
 sed -i "s*projectTitle*$projTitle*g" "$projDir/android/AndroidManifest.xml"
+
+
+echo "$currDir" > $projDir/bin/x86/linux/lfantdir.txt
+
+ln -s $currDir/bin/x86/linux $projDir/bin/x86/linux/lib
+ln -s $currDir/bin/x64/linux $projDir/bin/x64/linux/lib

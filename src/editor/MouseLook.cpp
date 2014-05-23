@@ -7,6 +7,7 @@
 #include <lfant/Transform.h>
 #include <lfant/Renderer.h>
 #include <lfant/Time.h>
+#include <lfant/Window.h>
 
 // external
 
@@ -49,7 +50,7 @@ void MouseLook::Look(vec3 axis, float value)
 	}
 	else*/
 	{
-		owner->transform->Rotate(axis, value * lookSpeed * game->time->deltaTime);
+		owner->transform->Rotate(axis, value * lookSpeed * GetGame()->time->deltaTime);
 	}
 
 }
@@ -57,13 +58,13 @@ void MouseLook::Look(vec3 axis, float value)
 void MouseLook::OnSetMousePos(ivec2 pos)
 {
 	ivec2 mousePos = pos-lastMouse;
-	ivec2 screenCenter = game->renderer->GetResolution()/2;
+	ivec2 screenCenter = GetGame()->window->GetSize()/2;
 	Look({1,0,0}, mousePos.y);
 	Look({0,0,1}, -mousePos.x);
 //	Look(vec3(mousePos.y, -mousePos.x, 0));
 //	if(pos.x )
 #if !ANDROID
-	game->input->SetMousePos(screenCenter);
+	GetGame()->input->SetMousePos(screenCenter);
 #endif
 //	lastMouse = pos;
 	lastMouse = screenCenter;

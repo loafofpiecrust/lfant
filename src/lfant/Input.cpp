@@ -27,24 +27,46 @@ using namespace boost::algorithm;
 namespace lfant
 {
 
-Key_Initializer Key;
+KeyMap Key;
 
-uint16 Key_Initializer::operator[](string in)
+uint16 KeyMap::operator[](string in)
 {
-	if(in.size() == 1)
+/*	if(in.size() == 1)
 	{
 		to_upper(in);
 		return in[0];
 	}
+	auto dat = _key.left.find(in);
+	if(dat != _key.left.end())
+	{
+		return dat->second;
+	}
 	else
 	{
-		to_lower(in);
-	//	Log("Key key, ", _key[in], ", Esc: ", GLFW_KEY_ESCAPE);
-		return _key[in];
+		return 0;
 	}
+	*/
+	to_lower(in);
+	return _key[in];
 }
 
-Input::Input() :
+string KeyMap::operator[](uint16 c)
+{
+/*	auto dat = _key.right.find(c);
+	if(dat != _key.right.end())
+	{
+		return dat->second;
+	}
+	else
+	{
+		return "";
+	}
+	*/
+	return "";
+}
+
+Input::Input(Game* game) :
+	Subsystem(game),
 	lockMouse(false),
 	mouseSpeed(0.005f)
 {
@@ -60,25 +82,7 @@ void Input::Update()
 	{
 		if(axis.down || axis.up)
 		{
-		//	TriggerEvent(axis.name);
-			TriggerEvent(axis.name, axis.value);
-			TriggerEvent("All", axis.name, axis.value);
-
-			if(axis.down)
-			{
-				TriggerEvent(axis.name+"_Down");
-			}
-			else if(axis.up)
-			{
-				TriggerEvent(axis.name+"_Up");
-			}
-		}
-		if(axis.down)
-		{
 			axis.down = false;
-		}
-		if(axis.up)
-		{
 			axis.up = false;
 		}
 		if(axis.snap || (abs(axis.value) <= axis.dead && !axis.posHeld && !axis.negHeld))
@@ -117,18 +121,16 @@ void Input::Load(Properties* prop)
 {
 	Subsystem::Load(prop);
 
-	Log("Loading input props...");
+	GetGame()->Log("Loading input props...");
 //	deque<Properties*> binds = prop->GetChildren("axis");
 //	Properties* binds = prop->GetChild("axes");
-	Axis axis("");
 	for(auto& b : prop->children)
 	{
-		if(!b->IsType("axis")) continue;
+		if(!b->IsType("axis") || b->name.empty()) continue;
 
-		axis.name = b->name;
-		if(axis.name == "") continue;
+		Axis axis {b->name};
 
-		Log("Adding axis '"+axis.name+"'");
+		GetGame()->Log("Adding axis '"+axis.name+"' mapped to ", (char)Key[b->Get("positive")]);
 
 		axis.positive = Key[b->Get("positive")];
 		axis.negative = Key[b->Get("negative")];
@@ -150,18 +152,6 @@ void Input::Save(Properties* prop) const
 	Subsystem::Save(prop);
 }
 
-/*******************************************************************************
-*
-*		Return functions
-*
-*******************************************************************************/
-
-
-/*******************************************************************************
-*
-*		Mouse Functions
-*
-*******************************************************************************/
 
 
 }

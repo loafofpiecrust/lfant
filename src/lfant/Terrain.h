@@ -9,13 +9,13 @@
 #pragma once
 
 // internal
-#include <lfant/Mesh.h>
+#include <lfant/Geometry.h>
 
 // external
 
 namespace lfant {
 
-class Terrain : public Mesh
+class Terrain : public Geometry
 {
 public:
 	Terrain();

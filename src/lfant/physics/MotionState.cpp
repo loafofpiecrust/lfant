@@ -22,7 +22,7 @@ MotionState::~MotionState()
 
 void MotionState::getWorldTransform(btTransform& worldTrans) const
 {
-	Log("MotionState::getWorldTransform: Touch.");
+//	GetGame()->Log("MotionState::getWorldTransform: Touch.");
 	worldTrans.setOrigin(vec3_cast<btVector3>(rigidbody->GetOwner()->transform->GetWorldPosition()));
 	worldTrans.setRotation(quat_cast<btQuaternion>(rigidbody->GetOwner()->transform->GetRotationQuat()));
 }
@@ -30,7 +30,7 @@ void MotionState::getWorldTransform(btTransform& worldTrans) const
 void MotionState::setWorldTransform(const btTransform& trans)
 {
 	if(!rigidbody->IsEnabled()) return;
-	
+
 	vec3 pos = vec3_cast<vec3>(trans.getOrigin());
 	quat rot = quat_cast<quat>(trans.getRotation());
 
@@ -48,10 +48,10 @@ void MotionState::setWorldTransform(const btTransform& trans)
 	{
 		pos.z = oldPos.z;
 	}
-	
+
 //	if(pos != oldPos)
 	{
-	//	Log("MotionState::setWorldTransform(): new pos ", pos, " from ", oldPos);
+	//	GetGame()->Log("MotionState::setWorldTransform(): new pos ", pos, " from ", oldPos);
 		rigidbody->owner->transform->SetWorldPosition(pos);
 	}
 
@@ -68,7 +68,7 @@ void MotionState::setWorldTransform(const btTransform& trans)
 		rot.z = oldRot.z;
 		rot.w = oldRot.w;
 	}
-	
+
 //	if(rot != oldRot)
 	rigidbody->owner->transform->SetRotationQuat(rot);
 

@@ -26,7 +26,7 @@ namespace projectName
 
 		void Init();
 		void Update();
-		void OnDestroy();
+		void Deinit();
 
 	protected:
 

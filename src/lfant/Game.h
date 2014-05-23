@@ -10,11 +10,15 @@
 #include <lfant/stdafx.h>
 
 // External
+#include <thread>
+#include <functional>
 
 // Internal
 #include <lfant/ptr.h>
 
 #include <lfant/Subsystem.h>
+#include <lfant/Console.h>
+#include <lfant/util/Path.h>
 
 namespace lfant {
 
@@ -25,12 +29,13 @@ class Physics;
 class Audio;
 class Scene;
 class FileSystem;
-class Console;
+//class Console;
 class SystemInfo;
 class UserInterface;
 class Network;
 class ScriptSystem;
 class OpenCL;
+class Window;
 
 /** @addtogroup Game
  *	@{
@@ -45,7 +50,7 @@ class OpenCL;
  *	scripts. It doesn't directly control these, but it holds pointers to
  *	the classes that do.
  */
-class Game : public Subsystem
+class Game : public Object
 {
 public:
 	Game();
@@ -56,6 +61,8 @@ public:
 	virtual void Save(Properties *prop) const;
 
 	static void ScriptBind();
+
+	virtual Game* GetGame() const;
 
 	/**
 	 *	This function is called right when the game is launched.
@@ -81,29 +88,30 @@ public:
 	 *	Adds the given function to a new or existing thread.
 	 *	@param func The function to execute.
 	 */
-	void AddThread(boost::function<void()> func);
+	std::thread& AddThread(std::function<void()> th);
 
 	bool IsExited();
 
-	// Subsystems
-	ptr<Console> console;
-	ptr<FileSystem> fileSystem;
-	ptr<SystemInfo> systemInfo;
-	ptr<Time> time;
-	ptr<Physics> physics;
-	ptr<Renderer> renderer;
-	ptr<UserInterface> userInterface;
-	ptr<Scene> scene;
-	ptr<Input> input;
-	ptr<Audio> audio;
-	ptr<Network> network;
-	ptr<ScriptSystem> scriptSystem;
+	template<typename T = const char*>
+	void Log(T msg)
+	{
+		console->Print(msg);
+	}
 
-#if !ANDROID
-	ptr<OpenCL> openCL;
-#endif
-	//boost::scoped_ptr<AISystem>			aiSystem;
-	//boost::scoped_ptr<FGSystem>			flowgraph;
+	template<typename T, typename P, typename ... A>
+	void Log(T msg, P msg2, A... args)
+	{
+		console->LinePrint(msg);
+		Log(msg2, args...);
+	}
+
+
+	boost::filesystem::path GetUserPath(string name) const;
+	boost::filesystem::path GetAssetPath(string name) const;
+
+	std::deque<boost::filesystem::path> GetGameFiles(string dir) const;
+
+	string GetProgramDir();
 
 	bool standAlone = true;
 
@@ -111,13 +119,43 @@ public:
 	string gameName = "lfant";
 	string defaultScene = "";
 
+	string programFolder = "./";
+	string gameFolder = "../..";
+	string userFolder;
+
+	// Subsystems
+	ptr<Console> console;
+	ptr<Time> time;
+	ptr<SystemInfo> systemInfo;
+	ptr<Window> window;
+	ptr<Renderer> renderer;
+	ptr<Input> input;
+
+	ptr<Physics> physics;
+	ptr<Network> network;
+	ptr<ScriptSystem> scriptSystem;
+	ptr<UserInterface> userInterface;
+	ptr<Audio> audio;
+#if !ANDROID
+	ptr<OpenCL> openCL;
+#endif
+
+	ptr<Scene> scene;
+
+
+	//boost::scoped_ptr<AISystem>			aiSystem;
+	//boost::scoped_ptr<FGSystem>			flowgraph;
+
+
 protected:
 
 private:
+	std::deque<std::thread> threads;
 	bool destroy = false;
+
 };
 
-extern Game* game;
+//extern Game* game;
 
 
 /** @} */

@@ -18,7 +18,7 @@
 //#include <GL/gl.h>
 //#include <SFML/Graphics.hpp>
 #if !ANDROID
-#include <GLFW/glfw3.h>
+//#include <GLFW/glfw3.h>
 #endif
 
 #include <glm/gtc/type_ptr.hpp>
@@ -34,12 +34,14 @@
 
 #include <lfant/Console.h>
 #include <lfant/Mesh.h>
-#include <lfant/ParticleSystem.h>
 #include <lfant/Sprite.h>
 #include <lfant/Scene.h>
 #include <lfant/Camera.h>
 #include <lfant/FileSystem.h>
 #include <lfant/UserInterface.h>
+#include <lfant/Physics.h>
+#include <lfant/Input.h>
+#include "lfant/Window.h"
 
 #include <lfant/TextureLoader.h>
 #include <lfant/MeshLoader.h>
@@ -49,9 +51,12 @@
 #include <lfant/Thread.h>
 #include <lfant/Light.h>
 
+#include <AntTweakBar.h>
+
 namespace lfant {
 
-Renderer::Renderer()
+Renderer::Renderer(Game* game) :
+	Subsystem(game)
 {
 }
 
@@ -62,33 +67,20 @@ Renderer::~Renderer()
 void Renderer::Load(Properties* prop)
 {
 	Subsystem::Load(prop);
-//	Log("Renderer::Load: Got root child, '", prop->Get(""), "'.");
+//	GetGame()->Log("Renderer::Load: Got root child, '", prop->Get(""), "'.");
 
-	prop->Get("resolution", resolution);
-	prop->Get("version", version);
 	prop->Get("vsync", vsync);
-	prop->Get("fullscreen", fullscreen);
-	prop->Get("fsaa", fsaa);
-	prop->Get("windowResizable", windowResizable);
-	prop->Get("windowPos", windowPos);
-	prop->Get("windowTitle", windowTitle);
 	prop->Get("motionBlur", motionBlur);
 
-	Log("Window title: '"+windowTitle+"'.");
-	Log("OpenGL Version loaded: ", lexical_cast<string>(version));
+//	GetGame()->Log("Window title: '"+windowTitle+"'.");
+//	GetGame()->Log("OpenGL Version loaded: ", lexical_cast<string>(version));
 }
 
 void Renderer::Save(Properties *prop) const
 {
 	Subsystem::Save(prop);
 
-	prop->Set("resolution", resolution);
-	prop->Set("version", version);
 	prop->Set("vsync", vsync);
-	prop->Set("fullscreen", fullscreen);
-	prop->Set("fsaa", fsaa);
-	prop->Set("windowResizable", windowResizable);
-	prop->Set("windowTitle", windowTitle);
 	prop->Set("motionBlur", motionBlur);
 }
 
@@ -97,56 +89,13 @@ void Renderer::Save(Properties *prop) const
 *		Game Loop
 *
 *******************************************************************************/
-/*
-void Renderer::OnError(uint source, uint type, uint id, uint severity, int length, const char* message, void* user)
-{
-	Log("OpenGL Error (", severity, "): ", message);
-}*/
 
-void Renderer::OnError(int error, const char* msg)
-{
-	Log("GLFW Error(", error, "): '", msg, "'.");
-}
-
+ivec2 res;
 void Renderer::Init()
 {
 	Subsystem::Init();
 
-	Log("Renderer::Init: About to start GLFW");
-
-#if !ANDROID
-	if(game->standAlone)
-	{
-		if(!glfwInit())
-		{
-			Log("Renderer::Init: GLFW failed to initialise.");
-			game->Destroy();
-		}
-	}
-#endif
-
-//	if(game->standAlone)
-	{
-		if(!OpenWindow())
-		{
-			// Window opening failed
-			game->Destroy();
-		}
-
-		HideMouse(hideMouse);
-	}
-
-#if !ANDROID
-
-	if(game->standAlone)
-	{
-		glfwSwapInterval(vsync);
-		glfwSetWindowCloseCallback(window, &Renderer::OnCloseWindow);
-		glfwSetWindowSizeCallback(window, &Renderer::OnSetResolution);
-		glfwSetErrorCallback(&Renderer::OnError);
-	}
-
-#endif
+//	GetGame()->Log("Renderer::Init: About to start GLFW");
 
 	glShadeModel(GL_SMOOTH);
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
@@ -156,45 +105,36 @@ void Renderer::Init()
 
 	// Enable depth test
 	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LEQUAL);
+	glDepthFunc(GL_LESS);
 	glDepthMask(GL_TRUE);
 
 	// Backface culling
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
-	glFrontFace(GL_CCW);
+//	glEnable(GL_CULL_FACE);
+//	glFrontFace(GL_CCW);
 
 	// Texture and shading
 	glEnable(GL_TEXTURE_2D);
 
 	// Point sprites
-//	glEnable(GL_POINT_SPRITE);
-//	glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-//	glEnable(GL_DEBUG_OUTPUT);
-//	glDebugMessageCallback(OnError, 0);
+//	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+//	glEnable(GL_BLEND);
 
 //	glEnable(GL_TEXTURE_RECTANGLE);
 
-	Log("Renderer: Initialized");
+	GetGame()->Log("Renderer: Initialized");
 
-	frameBuffer = new FrameBuffer();
-	frameBuffer->AddTexture("lightTex", Texture::Format::RGBA, Texture::Format::RGBA);
+	frameBuffer = new FrameBuffer(GetGame());
 	frameBuffer->AddTexture("diffuseTex", Texture::Format::RGBA, Texture::Format::RGBA);
 	frameBuffer->AddTexture("positionTex", Texture::Format::RGB32F, Texture::Format::RGB);
 	frameBuffer->AddTexture("normalTex", Texture::Format::RGB32F, Texture::Format::RGB);
+	frameBuffer->AddTexture("lightTex", Texture::Format::RGBA, Texture::Format::RGBA);
 //	frameBuffer->AddTexture("specularTex", Texture::Format::RGBA, Texture::Format::RGBA);
 	frameBuffer->AddDepthTexture("depthTex");
 
-	frameBuffer->SetRect({0,0,(uint32_t)resolution.x,(uint32_t)resolution.y});
-//	frameBuffer->hasDepth = true;
+	res = game->window->GetSize();
+	GetGame()->Log("making framebuffer of size ", res);
+	frameBuffer->SetRect({0,0,(uint32)res.x,(uint32)res.y});
 	frameBuffer->Init();
-	frameBuffer->Bind();
-	frameBuffer->BeginRender();
-	frameBuffer->Unbind();
-
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -207,137 +147,140 @@ void Renderer::Init()
 			shader->LoadFile(shs[i].string());
 			shaders.push_back(shader);
 	   }*/
+
+
 }
 
-static bool fboDrawn = false;
-
-void Renderer::PreUpdate()
-{
-#if !ANDROID
-	if(game->standAlone)
-	{
-		glfwSwapBuffers(window);
-		glfwPollEvents();
-	}
-#endif
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-//	glEnable(GL_DEPTH_TEST);
-	frameBuffer->Bind();
-	glViewport(0,0,resolution.x,resolution.y);
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-}
+TwBar* bar = nullptr;
 
 void Renderer::Update()
 {
-	if(lights.size() > 0)
-	{
-	//	frameBuffer->Unbind();
-	//	glDepthMask(GL_FALSE);
-	//	glDisable(GL_DEPTH_TEST);
-	//	glBlendEquation(GL_FUNC_ADD);
-		glBlendFunc(GL_ONE, GL_ONE);
-		for(auto& light : lights)
-		{
-			light->Render();
-		}
-	//	frameBuffer->UnbindRead();
+	// outline:
+	//
+	// flip buffers
+	// bind fbo
+	// glDrawBuffers(main/all textures)
+	// draw scene
+	// glDrawBuffers(none)
+	// draw stencil for lights
+	// glDrawBuffers(light texture)
+	// bind fbo textures
+	// draw lights
+	// unbind fbo
+	// draw fbo quad
+	//
 
-	//	glDepthMask(GL_TRUE);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	//	glEnable(GL_DEPTH_TEST);
+	GetGame()->window->Render();
+
+	frameBuffer->Bind();
+	frameBuffer->DrawBuffers();
+	Resize(res);
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+//	glDepthMask(true);
+	glEnable(GL_DEPTH_TEST);
+
+	static bool physicsSwitch = false;
+	if(GetGame()->input->GetButtonDown("SwitchRendering") == 1)
+	{
+		physicsSwitch = !physicsSwitch;
+		std::cout << "switch\n";
 	}
 
-//	glEnable(GL_DEPTH_TEST);
+	if(physicsSwitch)
+	{
+		GetGame()->physics->Render();
+	}
+	else
+	{
+		GetGame()->scene->Render();
+	}
 
-	// Rendering to the framebuffer
 
+	if(lights.size() > 0)
+	{
+		glDrawBuffer(GL_NONE);
+
+		//
+		// stencil pass
+		//
+		glEnable(GL_STENCIL_TEST);
+		glEnable(GL_DEPTH_TEST);
+		glDisable(GL_CULL_FACE);
+		glClear(GL_STENCIL_BUFFER_BIT);
+
+		glStencilFunc(GL_ALWAYS, 0, 0);
+		glStencilOpSeparate(GL_BACK, GL_KEEP, GL_INCR_WRAP, GL_KEEP);
+		glStencilOpSeparate(GL_FRONT, GL_KEEP, GL_DECR_WRAP, GL_KEEP);
+
+		for(auto& l : lights)
+		{
+			l->RenderStencil();
+		}
+
+		//
+		// light pass
+		//
+		frameBuffer->DrawBuffer(3);
+		frameBuffer->BindTextures();
+
+		glStencilFunc(GL_NOTEQUAL, 0, 0xFF);
+
+		glDisable(GL_DEPTH_TEST);
+		glEnable(GL_BLEND);
+		glBlendEquation(GL_FUNC_ADD);
+		glBlendFunc(GL_ONE, GL_ONE);
+
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_FRONT);
+
+		for(auto& l : lights)
+		{
+			l->Render();
+		}
+
+		glCullFace(GL_BACK);
+		glDisable(GL_BLEND);
+		glDisable(GL_STENCIL_TEST);
+	}
+
+	Resize(res);
+
+	//
+	// final pass
+	//
 	frameBuffer->Unbind();
-	glViewport(0,0,resolution.x,resolution.y);
-
 	frameBuffer->Render();
+
+	if(!bar)
+	{
+		ConnectEvent(SENDER(GetGame()->input.get(), MouseMove), RECEIVER(this, OnMouseMove));
+		ConnectEvent(SENDER(GetGame()->input.get(), MouseButton), RECEIVER(this, OnMouseButton));
+
+		TwInit(TW_OPENGL, nullptr);
+		auto size = GetGame()->window->GetSize();
+		TwWindowSize(size.x, size.y);
+
+		bar = TwNewBar("Camera DoF Settings");
+		TwAddVarRW(bar, "dof", TW_TYPE_BOOLCPP, &GetGame()->scene->mainCamera->useDof, "");
+		TwAddVarRW(bar, "autoFocus", TW_TYPE_BOOLCPP, &GetGame()->scene->mainCamera->autoFocus, "");
+		TwAddVarRW(bar, "focalLength", TW_TYPE_FLOAT, &GetGame()->scene->mainCamera->focalLength, "");
+		TwAddVarRW(bar, "focalDepth", TW_TYPE_FLOAT, &GetGame()->scene->mainCamera->focalDepth, "");
+		TwAddVarRW(bar, "aperture", TW_TYPE_FLOAT, &GetGame()->scene->mainCamera->aperture, "");
+		TwAddVarRW(bar, "focus", TW_TYPE_FLOAT, &GetGame()->scene->mainCamera->focus, "");
+	}
+	else
+	{
+		TwDraw();
+	}
 }
 
 void Renderer::Deinit()
 {
 	frameBuffer->Deinit();
-	Log("Renderer::Deinit(): Touch");
-#if !ANDROID
-	if(game->standAlone) glfwTerminate();
-#endif
-}
-
-/*******************************************************************************
-*
-*		Windowing
-*
-*******************************************************************************/
-
-bool Renderer::OpenWindow()
-{
-#if !ANDROID
-	if(game->standAlone)
-	{
-		Log("Renderer::OpenWindow: About to set window hints.");
-		glfwWindowHint(GLFW_SAMPLES, fsaa);
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, version.major);
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, version.minor);
-	//	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-		glfwWindowHint(GLFW_RESIZABLE, windowResizable);
-
-		Log("Renderer::OpenWindow: Window hints set.");
-
-		ivec2 res = GetResolution();
-		if( !(window = glfwCreateWindow( res.x, res.y, windowTitle.c_str(), nullptr, nullptr )) )
-		{
-			Log( "Renderer::OpenWindow: Failed to open GLFW window." );
-			glfwTerminate();
-			return false;
-		}
-		glfwMakeContextCurrent(window);
-		Log("Renderer::OpenWindow: Window opened.");
-
-	//	SetWindowTitle(windowTitle);
-		SetWindowPos(windowPos);
-		OnSetResolution(window, res.x, res.y);
-		Log("Renderer::OpenWindow: Window successfully opened.");
-	}
-	glewExperimental = true;     // Needed for core profile
-	if (glewInit() != GLEW_OK)
-	{
-		Log("Renderer::OpenWindow: Failed to initialize GLEW.");
-		return false;
-	}
-	Log("Renderer::OpenWindow: GLEW Initialised.");
-	
-	
-#endif
-
-	return true;
-}
-
-void Renderer::OnCloseWindow(GLFWwindow* win)
-{
-	Log("Renderer::WindowClosed: Touch.");
-	game->Exit();
-}
-
-void Renderer::OnSetResolution(GLFWwindow* win, int x, int y)
-{
-//	Log("Renderer::OnSetResolution: Touch.");
-	game->renderer->resolution = ivec2(x, y);
-	/*
-	game->renderer->frameBuffer->Unbind();
-	glViewport(0, 0, x, y);
-	game->renderer->frameBuffer->Bind();
-	glViewport(0, 0, x, y);
-	game->renderer->frameBuffer->rect.width = x;
-	game->renderer->frameBuffer->rect.height = y;
-	game->renderer->frameBuffer->Render();
-//	frameBuffer->ResizeViewport();
-	*/
-	game->renderer->TriggerEvent("SetResolution", x, y);
+//	Texture::textureCache.clear();
+	GetGame()->Log("Renderer::Deinit(): Touch");
 }
 
 /*******************************************************************************
@@ -346,9 +289,9 @@ void Renderer::OnSetResolution(GLFWwindow* win, int x, int y)
 *
 *******************************************************************************/
 
-ivec2 Renderer::GetResolution()
+void Renderer::Resize(ivec2 size)
 {
-	return resolution;
+	glViewport(0,0,size.x,size.y);
 }
 
 void Renderer::SetRendering(bool render)
@@ -396,6 +339,17 @@ void Renderer::RemoveLight(Light* light)
 			lights.erase(lights.begin()+i);
 		}
 	}
+}
+
+void Renderer::OnMouseMove(ivec2 pos)
+{
+	TwEventMousePosGLFW(pos.x, pos.y);
+}
+
+void Renderer::OnMouseButton(uint16 button, int action)
+{
+	std::cout << "mussolinni\n";
+	TwEventMouseButtonGLFW((int)button, action);
 }
 
 }

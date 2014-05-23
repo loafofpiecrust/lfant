@@ -14,7 +14,8 @@
 
 // External
 
-namespace lfant {
+namespace lfant
+{
 
 class Animation : public Component
 {
@@ -35,7 +36,7 @@ public:
 		{
 		}
 
-		Clip(string name, uint16_t start, uint16_t end, uint16_t fps) :
+		Clip(string name, uint16 start, uint16 end, uint16 fps) :
 			start(start), end(end), frameRate(fps)
 		{
 		}
@@ -44,9 +45,9 @@ public:
 		virtual void Load(Properties* prop);
 
 		string name = "";
-		uint16_t start = 1;
-		uint16_t end = 2;
-		uint16_t frameRate = 15;
+		uint16 start = 1;
+		uint16 end = 2;
+		uint16 frameRate = 15;
 		Mode mode = Mode::Default;
 	};
 

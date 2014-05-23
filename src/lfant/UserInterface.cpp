@@ -23,14 +23,17 @@
 
 // External
 #if !LFANT_GLES
-#include <GLFW/glfw3.h>
+//#include <GLFW/glfw3.h>
 
+/*
 #include <CEGUI/CEGUI.h>
 #include <CEGUI/RendererModules/OpenGL/GL3Renderer.h>
 #include <CEGUI/SchemeManager.h>
 #include <CEGUI/DefaultResourceProvider.h>
 #include <CEGUI/ImageManager.h>
 #include <CEGUI/XMLParserModules/TinyXML/XMLParser.h>
+*/
+#include "FrameBuffer.h"
 
 #endif
 /*
@@ -47,7 +50,8 @@ using namespace std;
 
 namespace lfant {
 
-UserInterface::UserInterface()
+UserInterface::UserInterface(Game* game) :
+	Subsystem(game)
 {
 }
 
@@ -61,12 +65,12 @@ UserInterface::~UserInterface()
 static tu_file*	file_opener(const char* url)
 // Callback function.  This opens files for the gameswf library.
 {
-	return new tu_file(game->fileSystem->GetGamePath(url).c_str(), "rb");
+	return new tu_file(game->GetAssetPath(url).c_str(), "rb");
 }
 
 static void log_callback(bool error, const char* message)
 {
-	Log(message);
+	GetGame()->Log(message);
 }
 
 void UserInterface::Init()
@@ -98,27 +102,27 @@ void UserInterface::Update()
 //	static Movie* m = root;
 	for(ptr<Movie>& m : movies)
 	{
-		Log("Player has root? ", player->get_root());
+		GetGame()->Log("Player has root? ", player->get_root());
 		if(m->swf)
 		{
-			Log("Movie ptr of '", m->name, "' is ", m->swf->get_root_movie());
+			GetGame()->Log("Movie ptr of '", m->name, "' is ", m->swf->get_root_movie());
 			static auto res = game->renderer->GetResolution();
-		//	Log("Updating swf '", m->name, "', movie type: ", Type(m->swf->m_movie.get()));
-			Log("Setting movie res '"+m->name+"'. ", lexical_cast<string>(res));
+		//	GetGame()->Log("Updating swf '", m->name, "', movie type: ", Type(m->swf->m_movie.get()));
+			GetGame()->Log("Setting movie res '"+m->name+"'. ", lexical_cast<string>(res));
 		//	m->swf->set_display_viewport(0, 0, res.x, res.y);
-			Log("Setting back alpha '"+m->name+"'.");
+			GetGame()->Log("Setting back alpha '"+m->name+"'.");
 			m->swf->set_background_alpha(0.1f);
-			Log("Notifying mouse pos '"+m->name+"'.");
+			GetGame()->Log("Notifying mouse pos '"+m->name+"'.");
 			res = game->input->GetMousePos();
 			m->swf->notify_mouse_state(res.x,res.y,0);
-			Log("Updating movie '"+m->name+"', at delta ", game->time->deltaTime, ".");
+			GetGame()->Log("Updating movie '"+m->name+"', at delta ", game->time->deltaTime, ".");
 			m->swf->advance(game->time->deltaTime);
-			Log("Rendering movie '"+m->name+"'.");
+			GetGame()->Log("Rendering movie '"+m->name+"'.");
 			m->swf->display();
 		}
 		else
 		{
-		//	Log("Setting root swf to player root movie.");
+		//	GetGame()->Log("Setting root swf to player root movie.");
 		//	m->swf = player->get_root();
 		}
 	}
@@ -216,7 +220,7 @@ UserInterface::Movie *UserInterface::LoadMovie(string name, string path)
 	Movie* m = new Movie(name, player->load_file(path.c_str()));
 	movies.push_back(m);
 	player->set_root(m->swf);
-	Log("Movie ptr of '", m->name, "' is ", m->swf->get_root_movie());
+	GetGame()->Log("Movie ptr of '", m->name, "' is ", m->swf->get_root_movie());
 	return m;
 }
 
@@ -253,7 +257,7 @@ void UserInterface::Movie::Pause()
 */
 
 // CEGUI
-
+/*
 void UserInterface::CreateWindow(Properties* prop, CEGUI::Window* parent)
 {
 	CEGUI::Window* win = windowManager->createWindow(prop->Get("type"), prop->name);
@@ -283,7 +287,7 @@ void UserInterface::CreateWindow(Properties* prop, CEGUI::Window* parent)
 		{
 			continue;
 		}
-		Log("UserInterface::CreateWindow: Setting Property '"+val.first+"' to '"+val.second+"'.");
+		GetGame()->Log("UserInterface::CreateWindow: Setting Property '"+val.first+"' to '"+val.second+"'.");
 		win->setProperty(val.first, val.second);
 	}
 
@@ -298,7 +302,7 @@ void UserInterface::Load(Properties *prop)
 {
 	if(!prop) return;
 	Subsystem::Load(prop);
-	Log("UserInterface::Load: Touch.");
+	GetGame()->Log("UserInterface::Load: Touch.");
 	deque<string> schemes;
 	string pfont = "";
 	string pcursor = "";
@@ -309,7 +313,7 @@ void UserInterface::Load(Properties *prop)
 	prop->Get("file", file);
 	prop->Get("rootFolder", rootResFolder);
 
-	Log("UserInterface, file to load: '"+file+"'.");
+	GetGame()->Log("UserInterface, file to load: '"+file+"'.");
 	if(file != "")
 	{
 		LoadFile(file);
@@ -317,7 +321,7 @@ void UserInterface::Load(Properties *prop)
 
 	for(auto& i : schemes)
 	{
-		Log("Attempting to load scheme '"+i+"'.");
+		GetGame()->Log("Attempting to load scheme '"+i+"'.");
 		CEGUI::SchemeManager::getSingleton().createFromFile(i+".scheme", "schemes");
 	}
 
@@ -359,19 +363,19 @@ void UserInterface::Init()
 		input = new CEGUI::InputAggregator(context);
 	}
 
-	renderer->enableExtraStateSettings(true);
+//	renderer->enableExtraStateSettings(true);
 
 	CEGUI::DefaultResourceProvider* rp = static_cast<CEGUI::DefaultResourceProvider*>(system->getResourceProvider());
-	rp->setResourceGroupDirectory("root", game->fileSystem->GetGamePath(rootResFolder).string());
+	rp->setResourceGroupDirectory("root", game->GetAssetPath(rootResFolder).string());
 	rp->setDefaultResourceGroup("root");
 
-	rp->setResourceGroupDirectory("imagesets", game->fileSystem->GetGamePath(rootResFolder+"/imagesets").string());
-	rp->setResourceGroupDirectory("schemes", game->fileSystem->GetGamePath(rootResFolder+"/schemes").string());
-	rp->setResourceGroupDirectory("xml_schemas", game->fileSystem->GetGamePath(rootResFolder+"/xml_schemas").string());
-	rp->setResourceGroupDirectory("styles", game->fileSystem->GetGamePath(rootResFolder+"/styles").string());
-	rp->setResourceGroupDirectory("layouts", game->fileSystem->GetGamePath(rootResFolder+"/layouts").string());
-	rp->setResourceGroupDirectory("fonts", game->fileSystem->GetGamePath(rootResFolder+"/fonts").string());
-	rp->setResourceGroupDirectory("looknfeel", game->fileSystem->GetGamePath(rootResFolder+"/looks").string());
+	rp->setResourceGroupDirectory("imagesets", game->GetAssetPath(rootResFolder+"/imagesets").string());
+	rp->setResourceGroupDirectory("schemes", game->GetAssetPath(rootResFolder+"/schemes").string());
+	rp->setResourceGroupDirectory("xml_schemas", game->GetAssetPath(rootResFolder+"/xml_schemas").string());
+	rp->setResourceGroupDirectory("styles", game->GetAssetPath(rootResFolder+"/styles").string());
+	rp->setResourceGroupDirectory("layouts", game->GetAssetPath(rootResFolder+"/layouts").string());
+	rp->setResourceGroupDirectory("fonts", game->GetAssetPath(rootResFolder+"/fonts").string());
+	rp->setResourceGroupDirectory("looknfeel", game->GetAssetPath(rootResFolder+"/looks").string());
 
 	CEGUI::ImageManager::setImagesetDefaultResourceGroup("imagesets");
 	CEGUI::Scheme::setDefaultResourceGroup("schemes");
@@ -394,13 +398,17 @@ void UserInterface::Init()
 	ConnectEvent(SENDER(game->input, MouseMove), RECEIVER(this, OnMouseMove));
 	ConnectEvent(SENDER(game->renderer, SetResolution), RECEIVER(this, OnWindowResize));
 
-	Log("UserInterface::Init: Calling Subsystem::Init at end.");
+	GetGame()->Log("UserInterface::Init: Calling Subsystem::Init at end.");
 
 	Subsystem::Init();
 }
 
 void UserInterface::Update()
 {
+	glActiveTexture(GL_TEXTURE0);
+	glDisable(GL_CULL_FACE);
+	glDisable(GL_DEPTH_TEST);
+
 	system->injectTimePulse(game->time->deltaTime);
 	context->injectTimePulse(game->time->deltaTime);
 
@@ -417,6 +425,7 @@ void UserInterface::Update()
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 void UserInterface::Deinit()
@@ -517,7 +526,7 @@ void UserInterface::OnMouseButton(uint16 btn, int mode)
 		if(newBtn != CEGUI::NoButton)
 		{
 			input->injectMouseButtonUp(newBtn);
-			
+
 		}
 	}
 }
@@ -531,25 +540,25 @@ void UserInterface::OnMouseMove(vec2 pos)
 
 void UserInterface::OnWindowResize(int width, int height)
 {
-	Log("UserInterface::OnWindowResize(): Touch.");
+	GetGame()->Log("UserInterface::OnWindowResize(): Touch.");
 	if(system)
 	{
-		Log("UserInterface::OnWindowResize(): There is in fact a system");
+		GetGame()->Log("UserInterface::OnWindowResize(): There is in fact a system");
 		resized = true;
 		size = vec2(width, height);
-		Log("UserInterface::OnWindowResize(): Resizing to ", size);
+		GetGame()->Log("UserInterface::OnWindowResize(): Resizing to ", size);
 	//	system->notifyDisplaySizeChanged(CEGUI::Sizef((float)size.x, (float)size.y));
 	}
 }
 
 bool UserInterface::OnClickButton(const CEGUI::EventArgs &evt)
 {
-	Log("BUTTON CLICKED!");
+	GetGame()->Log("BUTTON CLICKED!");
 	const CEGUI::WindowEventArgs* args = dynamic_cast<const CEGUI::WindowEventArgs*>(&evt);
 	if(!args) return false;
 
 	TriggerEvent("ClickButton", (CEGUI::Window*)args->window);
-	Log("Triggad");
+	GetGame()->Log("Triggad");
 	return true;
 }
 
@@ -562,6 +571,24 @@ bool UserInterface::OnCloseWindow(const CEGUI::EventArgs &evt)
 
 	args->window->destroy();
 }
+*/
+
+// generic
+void UserInterface::Init()
+{
+	Subsystem::Init();
+}
+
+void UserInterface::Update()
+{
+}
+
+void UserInterface::Deinit()
+{
+}
+
+
+
 
 #else // if we are mobile...
 

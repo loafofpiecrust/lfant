@@ -34,7 +34,7 @@ void Server::Host(uint16 port, string password)
 	acceptor.bind(endpoint);
 	acceptor.listen();*/
 	started = true;
-	Log("Server::Accept: Calling acceptor.async_accept().");
+//	GetGame()->Log("Server::Accept: Calling acceptor.async_accept().");
 
 	Accept();
 }
@@ -42,7 +42,7 @@ void Server::Host(uint16 port, string password)
 void Server::Accept()
 {
 	auto con = AddConnection<net::tcp::Connection>();
-	Log("Accepting by new connection: ", con);
+//	GetGame()->Log("Accepting by new connection: ", con);
 	Accept(con);
 }
 
@@ -55,12 +55,12 @@ void Server::OnAccept(const boost::system::error_code& error, net::Connection* c
 {
 	if(error)
 	{
-		Log("Server::OnAccept: Error.");
-		Log(error.message());
+//		GetGame()->Log("Server::OnAccept: Error.");
+//		GetGame()->Log(error.message());
 		started = false;
 	}
 
-	Log("Server::OnAccept: Server 'accepted'(?), do something with it.");
+//	GetGame()->Log("Server::OnAccept: Server 'accepted'(?), do something with it.");
 	con->GetData();
 //	Accept(con);
 	Accept();

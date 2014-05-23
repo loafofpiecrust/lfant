@@ -1,5 +1,6 @@
 /*
 ** The OpenGL Extension Wrangler Library
+** Copyright (C) 2008-2013, Nigel Stewart <nigels[]users sourceforge net>
 ** Copyright (C) 2002-2008, Milan Ikits <milan ikits[]ieee org>
 ** Copyright (C) 2002-2008, Marcelo E. Magallon <mmagallo[]debian org>
 ** Copyright (C) 2002, Lev Povalahev
@@ -831,6 +832,38 @@ typedef GLXPixmap ( * PFNGLXCREATEGLXPIXMAPMESAPROC) (Display* dpy, XVisualInfo 
 
 #endif /* GLX_MESA_pixmap_colormap */
 
+/* ------------------------ GLX_MESA_query_renderer ------------------------ */
+
+#ifndef GLX_MESA_query_renderer
+#define GLX_MESA_query_renderer 1
+
+#define GLX_RENDERER_VENDOR_ID_MESA 0x8183
+#define GLX_RENDERER_DEVICE_ID_MESA 0x8184
+#define GLX_RENDERER_VERSION_MESA 0x8185
+#define GLX_RENDERER_ACCELERATED_MESA 0x8186
+#define GLX_RENDERER_VIDEO_MEMORY_MESA 0x8187
+#define GLX_RENDERER_UNIFIED_MEMORY_ARCHITECTURE_MESA 0x8188
+#define GLX_RENDERER_PREFERRED_PROFILE_MESA 0x8189
+#define GLX_RENDERER_OPENGL_CORE_PROFILE_VERSION_MESA 0x818A
+#define GLX_RENDERER_OPENGL_COMPATIBILITY_PROFILE_VERSION_MESA 0x818B
+#define GLX_RENDERER_OPENGL_ES_PROFILE_VERSION_MESA 0x818C
+#define GLX_RENDERER_OPENGL_ES2_PROFILE_VERSION_MESA 0x818D
+#define GLX_RENDERER_ID_MESA 0x818E
+
+typedef Bool ( * PFNGLXQUERYCURRENTRENDERERINTEGERMESAPROC) (int attribute, unsigned int* value);
+typedef const char* ( * PFNGLXQUERYCURRENTRENDERERSTRINGMESAPROC) (int attribute);
+typedef Bool ( * PFNGLXQUERYRENDERERINTEGERMESAPROC) (Display* dpy, int screen, int renderer, int attribute, unsigned int *value);
+typedef const char* ( * PFNGLXQUERYRENDERERSTRINGMESAPROC) (Display *dpy, int screen, int renderer, int attribute);
+
+#define glXQueryCurrentRendererIntegerMESA GLXEW_GET_FUN(__glewXQueryCurrentRendererIntegerMESA)
+#define glXQueryCurrentRendererStringMESA GLXEW_GET_FUN(__glewXQueryCurrentRendererStringMESA)
+#define glXQueryRendererIntegerMESA GLXEW_GET_FUN(__glewXQueryRendererIntegerMESA)
+#define glXQueryRendererStringMESA GLXEW_GET_FUN(__glewXQueryRendererStringMESA)
+
+#define GLXEW_MESA_query_renderer GLXEW_GET_VAR(__GLXEW_MESA_query_renderer)
+
+#endif /* GLX_MESA_query_renderer */
+
 /* ------------------------ GLX_MESA_release_buffers ----------------------- */
 
 #ifndef GLX_MESA_release_buffers
@@ -887,6 +920,19 @@ typedef void ( * PFNGLXCOPYIMAGESUBDATANVPROC) (Display *dpy, GLXContext srcCtx,
 #define GLXEW_NV_copy_image GLXEW_GET_VAR(__GLXEW_NV_copy_image)
 
 #endif /* GLX_NV_copy_image */
+
+/* ------------------------ GLX_NV_delay_before_swap ----------------------- */
+
+#ifndef GLX_NV_delay_before_swap
+#define GLX_NV_delay_before_swap 1
+
+typedef Bool ( * PFNGLXDELAYBEFORESWAPNVPROC) (Display* dpy, GLXDrawable drawable, GLfloat seconds);
+
+#define glXDelayBeforeSwapNV GLXEW_GET_FUN(__glewXDelayBeforeSwapNV)
+
+#define GLXEW_NV_delay_before_swap GLXEW_GET_VAR(__GLXEW_NV_delay_before_swap)
+
+#endif /* GLX_NV_delay_before_swap */
 
 /* -------------------------- GLX_NV_float_buffer -------------------------- */
 
@@ -1473,6 +1519,11 @@ GLXEW_FUN_EXPORT PFNGLXCOPYSUBBUFFERMESAPROC __glewXCopySubBufferMESA;
 
 GLXEW_FUN_EXPORT PFNGLXCREATEGLXPIXMAPMESAPROC __glewXCreateGLXPixmapMESA;
 
+GLXEW_FUN_EXPORT PFNGLXQUERYCURRENTRENDERERINTEGERMESAPROC __glewXQueryCurrentRendererIntegerMESA;
+GLXEW_FUN_EXPORT PFNGLXQUERYCURRENTRENDERERSTRINGMESAPROC __glewXQueryCurrentRendererStringMESA;
+GLXEW_FUN_EXPORT PFNGLXQUERYRENDERERINTEGERMESAPROC __glewXQueryRendererIntegerMESA;
+GLXEW_FUN_EXPORT PFNGLXQUERYRENDERERSTRINGMESAPROC __glewXQueryRendererStringMESA;
+
 GLXEW_FUN_EXPORT PFNGLXRELEASEBUFFERSMESAPROC __glewXReleaseBuffersMESA;
 
 GLXEW_FUN_EXPORT PFNGLXSET3DFXMODEMESAPROC __glewXSet3DfxModeMESA;
@@ -1481,6 +1532,8 @@ GLXEW_FUN_EXPORT PFNGLXGETSWAPINTERVALMESAPROC __glewXGetSwapIntervalMESA;
 GLXEW_FUN_EXPORT PFNGLXSWAPINTERVALMESAPROC __glewXSwapIntervalMESA;
 
 GLXEW_FUN_EXPORT PFNGLXCOPYIMAGESUBDATANVPROC __glewXCopyImageSubDataNV;
+
+GLXEW_FUN_EXPORT PFNGLXDELAYBEFORESWAPNVPROC __glewXDelayBeforeSwapNV;
 
 GLXEW_FUN_EXPORT PFNGLXBINDVIDEODEVICENVPROC __glewXBindVideoDeviceNV;
 GLXEW_FUN_EXPORT PFNGLXENUMERATEVIDEODEVICESNVPROC __glewXEnumerateVideoDevicesNV;
@@ -1602,10 +1655,12 @@ GLXEW_VAR_EXPORT GLboolean __GLXEW_INTEL_swap_event;
 GLXEW_VAR_EXPORT GLboolean __GLXEW_MESA_agp_offset;
 GLXEW_VAR_EXPORT GLboolean __GLXEW_MESA_copy_sub_buffer;
 GLXEW_VAR_EXPORT GLboolean __GLXEW_MESA_pixmap_colormap;
+GLXEW_VAR_EXPORT GLboolean __GLXEW_MESA_query_renderer;
 GLXEW_VAR_EXPORT GLboolean __GLXEW_MESA_release_buffers;
 GLXEW_VAR_EXPORT GLboolean __GLXEW_MESA_set_3dfx_mode;
 GLXEW_VAR_EXPORT GLboolean __GLXEW_MESA_swap_control;
 GLXEW_VAR_EXPORT GLboolean __GLXEW_NV_copy_image;
+GLXEW_VAR_EXPORT GLboolean __GLXEW_NV_delay_before_swap;
 GLXEW_VAR_EXPORT GLboolean __GLXEW_NV_float_buffer;
 GLXEW_VAR_EXPORT GLboolean __GLXEW_NV_multisample_coverage;
 GLXEW_VAR_EXPORT GLboolean __GLXEW_NV_present_video;

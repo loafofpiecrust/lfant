@@ -11,7 +11,7 @@
 
 // Internal
 #include <lfant/Light.h>
-#include <lfant/Mesh.h>
+#include <lfant/Geometry.h>
 
 // External
 
@@ -27,27 +27,32 @@ public:
 	virtual void Load(Properties* prop);
 
 	virtual void Init();
-	void PostUpdate();
+	virtual void Update();
+	virtual void Deinit();
 
-	void BeginRender();
-	virtual void Render();
-	void EndRender();
+	void Render();
+	void RenderStencil();
 
 	virtual void LoadFile(string path);
 
 protected:
+
+	void InternalRender();
+
 	float ambientIntensity = 1.0f;
 	float diffuseIntensity = 1.0f;
-	float attenConst = 1.0f;
-	float attenLinear = 1.0f;
-	float attenExp = 1.0f;
+	float attenConst = 0.7f;
+	float attenLinear = 0.5f;
+	float attenExp = 0.3f;
 	float specularPower = 1.0f;
 	float specularIntensity = 1.0f;
 	float radius = 1.0f;
 
 	Buffer<vec3> posBuffer;
 	Buffer<vec2> uvBuffer;
-	Buffer<uint32_t> indexBuffer;
+	Buffer<uint32> indexBuffer;
+
+	std::shared_ptr<Shader> stencilShader;
 
 private:
 };

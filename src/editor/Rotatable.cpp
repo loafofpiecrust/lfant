@@ -29,25 +29,25 @@ void Rotatable::Update()
 	vec3 worldY = vec3(0,1,0) + (vec3(0,1,0) - GetOwner()->transform->GetUp());
 	vec3 worldZ = vec3(0,0,1) + (vec3(0,0,1) - GetOwner()->transform->GetDirection());
 
-	if((value = game->input->GetAxis("HRotation2")->GetValue()) != 0.0f)
+	if((value = GetGame()->input->GetAxis("HRotation2")->GetValue()) != 0.0f)
 	{
 	//	GetOwner()->transform->Rotate({0,0,1}, value * game->time->deltaTime * 5.0f);
-		GetOwner()->transform->Rotate(worldZ, value * game->time->deltaTime * 5.0f);
+		GetOwner()->transform->Rotate(worldZ, value * GetGame()->time->deltaTime * 5.0f);
 	}
-	if((value = game->input->GetAxis("VRotation2")->GetValue()) != 0.0f)
+	if((value = GetGame()->input->GetAxis("VRotation2")->GetValue()) != 0.0f)
 	{
 	//	GetOwner()->transform->Rotate({1,0,0}, -value * game->time->deltaTime * 5.0f);
-		GetOwner()->transform->Rotate(worldX, -value * game->time->deltaTime * 5.0f);
+		GetOwner()->transform->Rotate(worldX, -value * GetGame()->time->deltaTime * 5.0f);
 	}
-	if((value = game->input->GetAxis("ZRotation2")->GetValue()) != 0.0f)
+	if((value = GetGame()->input->GetAxis("ZRotation2")->GetValue()) != 0.0f)
 	{
 	//	GetOwner()->transform->Rotate({0,1,0}, -value * game->time->deltaTime * 5.0f);
-		GetOwner()->transform->Rotate(worldY, -value * game->time->deltaTime * 5.0f);
+		GetOwner()->transform->Rotate(worldY, -value * GetGame()->time->deltaTime * 5.0f);
 	}
 
-	if(game->input->GetButtonDown("ShowRot"))
+	if(GetGame()->input->GetButtonDown("ShowRot"))
 	{
-		Log("Object rotation: ", GetOwner()->transform->GetRotation());
+		GetGame()->Log("Object rotation: ", GetOwner()->transform->GetRotation());
 	}
 }
 

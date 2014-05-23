@@ -27,7 +27,7 @@ namespace physics {
 }
 
 class Collider;
-class Mesh;
+class Geometry;
 
 
 /** @addtogroup Game
@@ -59,26 +59,18 @@ public:
 		ContinuousDynamic
 	};
 
-	enum class ColliderType : byte
-	{
-		Mesh,
-		Box,
-		Cylinder,
-		Capsule
-	};
-
 	// ctor and dtor
 	Rigidbody();
 	virtual ~Rigidbody();
 
 	virtual void Load(Properties* prop);
 	virtual void Save(Properties* prop) const;
-	
-	virtual void Enable(bool on = true);
+
+	virtual void Enable(bool on);
 
 	// Methods
-	btTypedConstraint* GetConstraint(uint16_t idx);
-	void RemoveConstraint(uint16_t idx);
+	btTypedConstraint* GetConstraint(int idx);
+	void RemoveConstraint(int idx);
 
 	void ApplyForce(vec3 force, vec3 pos);
 	void ApplyCentralForce(vec3 force);
@@ -149,13 +141,13 @@ protected:
 	virtual void Init();
 	virtual void Update();
 	virtual void Deinit();
-	
+
 
 	// Slots
 	void OnSetPos(vec3 pos);
 	void OnSetRot(quat rot);
 	void OnSetScale(vec3 scale);
-	void OnSetMesh(Mesh* mesh);
+	void OnSetMesh(Geometry* mesh);
 	void OnAddComponent(Component* comp);
 	void OnRemoveComponent(Component* comp);
 
@@ -164,8 +156,8 @@ protected:
 	bool isTrigger = false;
 	float maxSpeed = 0.0f;
 
-	btRigidBody* body;
-	btMotionState* motionState;
+	ptr<btRigidBody> body;
+	ptr<btMotionState> motionState;
 	Collider* collider = nullptr;
 	vec3 inertia = vec3(0);
 

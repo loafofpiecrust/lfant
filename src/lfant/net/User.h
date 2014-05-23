@@ -41,7 +41,7 @@ public:
 
 	void RemoveConnection(net::Connection* con);
 
-	virtual uint32_t GetConnectionCount() { return connections.size(); }
+	virtual uint32 GetConnectionCount() { return connections.size(); }
 
 
 	string name = "";

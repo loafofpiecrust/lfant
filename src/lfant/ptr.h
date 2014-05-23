@@ -18,6 +18,7 @@ class ptr_base
 template<typename T>
 class ptr : public ptr_base
 {
+	friend class Game;
 public:
 	ptr()
 	{
@@ -43,6 +44,27 @@ public:
 	T* get() const noexcept
 	{
 		return value;
+	}
+
+
+	template<typename TT, typename... _Args>
+	void init(_Args&&... args)
+	{
+		if(value)
+		{
+			return;
+		}
+		value = new TT(args...);
+	}
+
+	template<typename... _Args>
+	void init(_Args&&... args)
+	{
+		if(value)
+		{
+			return;
+		}
+		value = new T(args...);
 	}
 
 	void reset(T* v = nullptr)
@@ -88,7 +110,7 @@ public:
 		return value != nullptr;
 	}
 
-	T& operator[](uint32_t i)
+	T& operator[](uint32 i)
 	{
 		return value[i];
 	}

@@ -21,7 +21,7 @@ namespace lfant
 
 Light::Light()
 {
-
+	render = false;
 }
 
 Light::~Light()
@@ -45,8 +45,9 @@ void Light::Save(Properties* prop) const
 
 void Light::Init()
 {
-	game->renderer->AddLight(this);
+	GetGame()->renderer->AddLight(this);
 	Renderable::Init();
+//	Enable(false);
 }
 
 void Light::Update()
@@ -56,7 +57,7 @@ void Light::Update()
 
 void Light::Render()
 {
-	
+
 }
 
 }

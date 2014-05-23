@@ -13,6 +13,7 @@
 // Internal
 #include <lfant/util/String.h>
 #include <lfant/FileSystem.h>
+#include <lfant/Game.h>
 
 // External
 #include <lfant/util/lexical_cast.h>
@@ -22,7 +23,8 @@ using namespace std;
 
 namespace lfant {
 
-Console::Console()
+Console::Console(Game* game) :
+	Subsystem(game)
 {
 }
 
@@ -34,7 +36,7 @@ void Console::Init()
 {
 	Subsystem::Init();
 
-	logFile.open(game->fileSystem->GetProgramDir()+"/"+logName);
+	logFile.open(game->GetProgramDir()+"/"+logName);
 	logFile.clear();
 
 	// Default commands
@@ -72,36 +74,36 @@ void Console::Save(Properties* prop) const
 
 void Console::CmdGetVar(deque<string> args)
 {
-//	Log("get: Value of '" + args[0] + "':" + game->settings->GetValue(args[0]));
+//	GetGame()->Log("get: Value of '" + args[0] + "':" + game->settings->GetValue(args[0]));
 }
 
 void Console::CmdSetVar(deque<string> args)
 {
 	if(args.size() < 2)
 	{
-		Log("set: No value given.");
+		GetGame()->Log("set: No value given.");
 		return;
 	}
 //	game->settings->SetValue(args[0], args[1]);
-//	Log("set: Changed '" + args[0] + "' to " + game->settings->GetValue(args[0]));
+//	GetGame()->Log("set: Changed '" + args[0] + "' to " + game->settings->GetValue(args[0]));
 }
 
 void Console::CmdHelp(deque<string> args)
 {
 	if(Command* cmd = GetCommand(args[0]))
 	{
-		Log("help: "+cmd->help);
+		GetGame()->Log("help: "+cmd->help);
 		return;
 	}
 	/*
 	string var = game->settings->GetHelp(args[0]);
 	if(var != "")
 	{
-		Log("help: "+var);
+		GetGame()->Log("help: "+var);
 		return;
 	}
 	*/
-	Log("help: none found.");
+	GetGame()->Log("help: none found.");
 }
 
 void Console::Input(string line)
@@ -197,9 +199,9 @@ void Console::Input(string line)
 
 void Console::RegisterCommand(CommandDefault::funcTypeRaw func, string name, string help)
 {
-	for(auto cmd : commands)
+	for(auto& cmd : commands)
 	{
-		CommandDefault* d = dynamic_cast<CommandDefault*>(cmd);
+		CommandDefault* d = dynamic_cast<CommandDefault*>(cmd.get());
 		if(d && cmd->name == name)
 		{
 			d->func = boost::bind(func, this, _1);
@@ -212,9 +214,9 @@ void Console::RegisterCommand(CommandDefault::funcTypeRaw func, string name, str
 
 void Console::RegisterCommand(CommandSimple::funcTypeRaw func, string name, string help)
 {
-	for(auto cmd : commands)
+	for(auto& cmd : commands)
 	{
-		CommandSimple* s = dynamic_cast<CommandSimple*>(cmd);
+		CommandSimple* s = dynamic_cast<CommandSimple*>(cmd.get());
 		if(s && cmd->name == name)
 		{
 			s->func = boost::bind(func, this);
@@ -227,9 +229,9 @@ void Console::RegisterCommand(CommandSimple::funcTypeRaw func, string name, stri
 
 bool Console::CallCommand(string name, deque<string> args)
 {
-	for(auto cmd : commands)
+	for(auto& cmd : commands)
 	{
-		auto d = dynamic_cast<CommandDefault*>(cmd);
+		auto d = dynamic_cast<CommandDefault*>(cmd.get());
 		if(d && cmd->name == name)
 		{
 			d->func(args);
@@ -241,9 +243,9 @@ bool Console::CallCommand(string name, deque<string> args)
 
 bool Console::CallCommand(string name)
 {
-	for(auto cmd : commands)
+	for(auto& cmd : commands)
 	{
-		auto s = dynamic_cast<CommandSimple*>(cmd);
+		auto s = dynamic_cast<CommandSimple*>(cmd.get());
 		if(s && cmd->name == name)
 		{
 			s->func();
@@ -255,7 +257,7 @@ bool Console::CallCommand(string name)
 
 Console::Command* Console::GetCommand(string name)
 {
-	for(auto cmd : commands)
+	for(auto& cmd : commands)
 	{
 		if(cmd->name == name)
 		{

@@ -1,8 +1,5 @@
 //========================================================================
-// GLFW - An OpenGL library
-// Platform:    Win32/WGL
-// API version: 3.0
-// WWW:         http://www.glfw.org/
+// GLFW 3.1 Win32 - www.glfw.org
 //------------------------------------------------------------------------
 // Copyright (c) 2002-2006 Marcus Geelnard
 // Copyright (c) 2006-2010 Camilla Berglund <elmindreda@elmindreda.org>
@@ -33,6 +30,7 @@
 #include <stdlib.h>
 #include <malloc.h>
 #include <windowsx.h>
+#include <shellapi.h>
 
 #define _GLFW_KEY_INVALID -2
 
@@ -48,7 +46,7 @@ static void updateClipRect(_GLFWwindow* window)
     ClipCursor(&clipRect);
 }
 
-// Hide mouse cursor
+// Hide the mouse cursor
 //
 static void hideCursor(_GLFWwindow* window)
 {
@@ -70,9 +68,9 @@ static void hideCursor(_GLFWwindow* window)
     }
 }
 
-// Capture mouse cursor
+// Disable the mouse cursor
 //
-static void captureCursor(_GLFWwindow* window)
+static void disableCursor(_GLFWwindow* window)
 {
     if (!window->win32.cursorHidden)
     {
@@ -84,9 +82,9 @@ static void captureCursor(_GLFWwindow* window)
     SetCapture(window->win32.handle);
 }
 
-// Show mouse cursor
+// Restores the mouse cursor
 //
-static void showCursor(_GLFWwindow* window)
+static void restoreCursor(_GLFWwindow* window)
 {
     POINT pos;
 
@@ -102,7 +100,7 @@ static void showCursor(_GLFWwindow* window)
     if (GetCursorPos(&pos))
     {
         if (WindowFromPoint(pos) == window->win32.handle)
-            SetCursor(LoadCursor(NULL, IDC_ARROW));
+            SetCursor(LoadCursorW(NULL, IDC_ARROW));
     }
 }
 
@@ -148,7 +146,7 @@ static int translateKey(WPARAM wParam, LPARAM lParam)
 {
     // Check for numeric keypad keys
     // NOTE: This way we always force "NumLock = ON", which is intentional since
-    // the returned key code should correspond to a physical location.
+    //       the returned key code should correspond to a physical location.
     if ((HIWORD(lParam) & 0x100) == 0)
     {
         switch (MapVirtualKey(HIWORD(lParam) & 0xFF, 1))
@@ -203,7 +201,7 @@ static int translateKey(WPARAM wParam, LPARAM lParam)
             // is a RALT message. In that case, this is a false LCTRL!
             time = GetMessageTime();
 
-            if (PeekMessage(&next, NULL, 0, 0, PM_NOREMOVE))
+            if (PeekMessageW(&next, NULL, 0, 0, PM_NOREMOVE))
             {
                 if (next.message == WM_KEYDOWN ||
                     next.message == WM_SYSKEYDOWN ||
@@ -371,14 +369,14 @@ static int translateKey(WPARAM wParam, LPARAM lParam)
 static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg,
                                    WPARAM wParam, LPARAM lParam)
 {
-    _GLFWwindow* window = (_GLFWwindow*) GetWindowLongPtr(hWnd, 0);
+    _GLFWwindow* window = (_GLFWwindow*) GetWindowLongPtrW(hWnd, 0);
 
     switch (uMsg)
     {
         case WM_CREATE:
         {
-            CREATESTRUCT* cs = (CREATESTRUCT*) lParam;
-            SetWindowLongPtr(hWnd, 0, (LONG_PTR) cs->lpCreateParams);
+            CREATESTRUCTW* cs = (CREATESTRUCTW*) lParam;
+            SetWindowLongPtrW(hWnd, 0, (LONG_PTR) cs->lpCreateParams);
             break;
         }
 
@@ -391,10 +389,21 @@ static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg,
 
             if (focused && iconified)
             {
-                // This is a workaround for window iconification using the
-                // taskbar leading to windows being told they're focused and
-                // iconified and then never told they're defocused
-                focused = FALSE;
+                if (window->iconified && _glfw.focusedWindow != window)
+                {
+                    // This is a workaround for window restoration using the
+                    // Win+D hot key leading to windows being told they're
+                    // focused and iconified and then never told they're
+                    // restored
+                    iconified = FALSE;
+                }
+                else
+                {
+                    // This is a workaround for window iconification using the
+                    // taskbar leading to windows being told they're focused and
+                    // iconified and then never told they're defocused
+                    focused = FALSE;
+                }
             }
 
             if (!focused && _glfw.focusedWindow == window)
@@ -402,7 +411,7 @@ static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg,
                 // The window was defocused (or iconified, see above)
 
                 if (window->cursorMode != GLFW_CURSOR_NORMAL)
-                    showCursor(window);
+                    restoreCursor(window);
 
                 if (window->monitor)
                 {
@@ -420,10 +429,8 @@ static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg,
             {
                 // The window was focused
 
-                if (window->cursorMode == GLFW_CURSOR_DISABLED)
-                    captureCursor(window);
-                else if (window->cursorMode == GLFW_CURSOR_HIDDEN)
-                    hideCursor(window);
+                if (window->cursorMode != GLFW_CURSOR_NORMAL)
+                    _glfwPlatformApplyCursorMode(window);
 
                 if (window->monitor)
                     _glfwSetVideoMode(window->monitor, &window->videoMode);
@@ -431,6 +438,19 @@ static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg,
 
             _glfwInputWindowFocus(window, focused);
             _glfwInputWindowIconify(window, iconified);
+            return 0;
+        }
+
+        case WM_ACTIVATEAPP:
+        {
+            if (!wParam && IsIconic(hWnd))
+            {
+                // This is a workaround for full screen windows losing focus
+                // through Alt+Tab leading to windows being told they're
+                // unfocused and restored and then never told they're iconified
+                _glfwInputWindowIconify(window, GL_TRUE);
+            }
+
             return 0;
         }
 
@@ -483,6 +503,7 @@ static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg,
         }
 
         case WM_CHAR:
+        case WM_SYSCHAR:
         {
             _glfwInputChar(window, (unsigned int) wParam);
             return 0;
@@ -595,7 +616,7 @@ static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg,
             if (newCursorX != window->win32.oldCursorX ||
                 newCursorY != window->win32.oldCursorY)
             {
-                double x, y;
+                int x, y;
 
                 if (window->cursorMode == GLFW_CURSOR_DISABLED)
                 {
@@ -656,8 +677,11 @@ static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg,
 
         case WM_SIZE:
         {
-            if (window->cursorMode == GLFW_CURSOR_DISABLED)
-                updateClipRect(window);
+            if (_glfw.focusedWindow == window)
+            {
+                if (window->cursorMode == GLFW_CURSOR_DISABLED)
+                    updateClipRect(window);
+            }
 
             _glfwInputFramebufferSize(window, LOWORD(lParam), HIWORD(lParam));
             _glfwInputWindowSize(window, LOWORD(lParam), HIWORD(lParam));
@@ -666,10 +690,17 @@ static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg,
 
         case WM_MOVE:
         {
-            if (window->cursorMode == GLFW_CURSOR_DISABLED)
-                updateClipRect(window);
+            if (_glfw.focusedWindow == window)
+            {
+                if (window->cursorMode == GLFW_CURSOR_DISABLED)
+                    updateClipRect(window);
+            }
 
-            _glfwInputWindowPos(window, LOWORD(lParam), HIWORD(lParam));
+            // NOTE: This cannot use LOWORD/HIWORD recommended by MSDN, as
+            // those macros do not handle negative window positions correctly
+            _glfwInputWindowPos(window,
+                                GET_X_LPARAM(lParam),
+                                GET_Y_LPARAM(lParam));
             return 0;
         }
 
@@ -681,12 +712,14 @@ static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg,
 
         case WM_SETCURSOR:
         {
-            if (window->cursorMode == GLFW_CURSOR_HIDDEN &&
-                window->win32.handle == GetForegroundWindow() &&
-                LOWORD(lParam) == HTCLIENT)
+            if (_glfw.focusedWindow == window && LOWORD(lParam) == HTCLIENT)
             {
-                SetCursor(NULL);
-                return TRUE;
+                if (window->cursorMode == GLFW_CURSOR_HIDDEN ||
+                    window->cursorMode == GLFW_CURSOR_DISABLED)
+                {
+                    SetCursor(NULL);
+                    return TRUE;
+                }
             }
 
             break;
@@ -715,6 +748,40 @@ static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg,
             // TODO: Restore vsync if compositing was disabled
             break;
         }
+
+        case WM_DROPFILES:
+        {
+            HDROP hDrop = (HDROP) wParam;
+            POINT pt;
+            int i;
+
+            const int count = DragQueryFileW(hDrop, 0xffffffff, NULL, 0);
+            char** names = calloc(count, sizeof(char*));
+
+            // Move the mouse to the position of the drop
+            DragQueryPoint(hDrop, &pt);
+            _glfwInputCursorMotion(window, pt.x, pt.y);
+
+            for (i = 0;  i < count;  i++)
+            {
+                const UINT length = DragQueryFileW(hDrop, i, NULL, 0);
+                WCHAR* buffer = calloc(length + 1, sizeof(WCHAR));
+
+                DragQueryFileW(hDrop, i, buffer, length + 1);
+                names[i] = _glfwCreateUTF8FromWideString(buffer);
+
+                free(buffer);
+            }
+
+            _glfwInputDrop(window, count, (const char**) names);
+
+            for (i = 0;  i < count;  i++)
+                free(names[i]);
+            free(names);
+
+            DragFinish(hDrop);
+            return 0;
+        }
     }
 
     return DefWindowProc(hWnd, uMsg, wParam, lParam);
@@ -737,7 +804,7 @@ static void getFullWindowSize(_GLFWwindow* window,
 //
 static ATOM registerWindowClass(void)
 {
-    WNDCLASS wc;
+    WNDCLASSW wc;
     ATOM classAtom;
 
     // Set window class parameters
@@ -745,21 +812,21 @@ static ATOM registerWindowClass(void)
     wc.lpfnWndProc   = (WNDPROC) windowProc;
     wc.cbClsExtra    = 0;                           // No extra class data
     wc.cbWndExtra    = sizeof(void*) + sizeof(int); // Make room for one pointer
-    wc.hInstance     = GetModuleHandle(NULL);
-    wc.hCursor       = LoadCursor(NULL, IDC_ARROW);
+    wc.hInstance     = GetModuleHandleW(NULL);
+    wc.hCursor       = LoadCursorW(NULL, IDC_ARROW);
     wc.hbrBackground = NULL;                        // No background
     wc.lpszMenuName  = NULL;                        // No menu
     wc.lpszClassName = _GLFW_WNDCLASSNAME;
 
     // Load user-provided icon if available
-    wc.hIcon = LoadIcon(GetModuleHandle(NULL), L"GLFW_ICON");
+    wc.hIcon = LoadIconW(GetModuleHandleW(NULL), L"GLFW_ICON");
     if (!wc.hIcon)
     {
         // No user-provided icon found, load default icon
-        wc.hIcon = LoadIcon(NULL, IDI_WINLOGO);
+        wc.hIcon = LoadIconW(NULL, IDI_WINLOGO);
     }
 
-    classAtom = RegisterClass(&wc);
+    classAtom = RegisterClassW(&wc);
     if (!classAtom)
     {
         _glfwInputError(GLFW_PLATFORM_ERROR,
@@ -774,6 +841,7 @@ static ATOM registerWindowClass(void)
 //
 static int createWindow(_GLFWwindow* window,
                         const _GLFWwndconfig* wndconfig,
+                        const _GLFWctxconfig* ctxconfig,
                         const _GLFWfbconfig* fbconfig)
 {
     int xpos, ypos, fullWidth, fullHeight;
@@ -821,18 +889,30 @@ static int createWindow(_GLFWwindow* window,
         return GL_FALSE;
     }
 
-    window->win32.handle = CreateWindowEx(window->win32.dwExStyle,
-                                          _GLFW_WNDCLASSNAME,
-                                          wideTitle,
-                                          window->win32.dwStyle,
-                                          xpos, ypos,
-                                          fullWidth, fullHeight,
-                                          NULL, // No parent window
-                                          NULL, // No window menu
-                                          GetModuleHandle(NULL),
-                                          window); // Pass object to WM_CREATE
+    window->win32.handle = CreateWindowExW(window->win32.dwExStyle,
+                                           _GLFW_WNDCLASSNAME,
+                                           wideTitle,
+                                           window->win32.dwStyle,
+                                           xpos, ypos,
+                                           fullWidth, fullHeight,
+                                           NULL, // No parent window
+                                           NULL, // No window menu
+                                           GetModuleHandleW(NULL),
+                                           window); // Pass object to WM_CREATE
 
     free(wideTitle);
+
+    if (_glfw_ChangeWindowMessageFilterEx)
+    {
+        _glfw_ChangeWindowMessageFilterEx(window->win32.handle,
+                                        WM_DROPFILES, MSGFLT_ALLOW, NULL);
+        _glfw_ChangeWindowMessageFilterEx(window->win32.handle,
+                                        WM_COPYDATA, MSGFLT_ALLOW, NULL);
+        _glfw_ChangeWindowMessageFilterEx(window->win32.handle,
+                                        WM_COPYGLOBALDATA, MSGFLT_ALLOW, NULL);
+    }
+
+    DragAcceptFiles(window->win32.handle, TRUE);
 
     if (!window->win32.handle)
     {
@@ -840,7 +920,7 @@ static int createWindow(_GLFWwindow* window,
         return GL_FALSE;
     }
 
-    if (!_glfwCreateContext(window, wndconfig, fbconfig))
+    if (!_glfwCreateContext(window, ctxconfig, fbconfig))
         return GL_FALSE;
 
     return GL_TRUE;
@@ -866,6 +946,7 @@ static void destroyWindow(_GLFWwindow* window)
 
 int _glfwPlatformCreateWindow(_GLFWwindow* window,
                               const _GLFWwndconfig* wndconfig,
+                              const _GLFWctxconfig* ctxconfig,
                               const _GLFWfbconfig* fbconfig)
 {
     int status;
@@ -877,10 +958,10 @@ int _glfwPlatformCreateWindow(_GLFWwindow* window,
             return GL_FALSE;
     }
 
-    if (!createWindow(window, wndconfig, fbconfig))
+    if (!createWindow(window, wndconfig, ctxconfig, fbconfig))
         return GL_FALSE;
 
-    status = _glfwAnalyzeContext(window, wndconfig, fbconfig);
+    status = _glfwAnalyzeContext(window, ctxconfig, fbconfig);
 
     if (status == _GLFW_RECREATION_IMPOSSIBLE)
         return GL_FALSE;
@@ -904,7 +985,7 @@ int _glfwPlatformCreateWindow(_GLFWwindow* window,
 
         // First we clear the current context (the one we just created)
         // This is usually done by glfwDestroyWindow, but as we're not doing
-        // full window destruction, it's duplicated here
+        // full GLFW window destruction, it's duplicated here
         _glfwPlatformMakeContextCurrent(NULL);
 
         // Next destroy the Win32 window and WGL context (without resetting or
@@ -912,7 +993,7 @@ int _glfwPlatformCreateWindow(_GLFWwindow* window,
         destroyWindow(window);
 
         // ...and then create them again, this time with better APIs
-        if (!createWindow(window, wndconfig, fbconfig))
+        if (!createWindow(window, wndconfig, ctxconfig, fbconfig))
             return GL_FALSE;
     }
 
@@ -948,7 +1029,7 @@ void _glfwPlatformSetWindowTitle(_GLFWwindow* window, const char* title)
         return;
     }
 
-    SetWindowText(window->win32.handle, wideTitle);
+    SetWindowTextW(window->win32.handle, wideTitle);
     free(wideTitle);
 }
 
@@ -1002,7 +1083,7 @@ void _glfwPlatformSetWindowSize(_GLFWwindow* window, int width, int height)
 
         SetWindowPos(window->win32.handle, HWND_TOP,
                      0, 0, fullWidth, fullHeight,
-                     SWP_NOOWNERZORDER | SWP_NOMOVE | SWP_NOZORDER);
+                     SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOMOVE | SWP_NOZORDER);
     }
 }
 
@@ -1039,7 +1120,7 @@ void _glfwPlatformPollEvents(void)
     MSG msg;
     _GLFWwindow* window;
 
-    while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+    while (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE))
     {
         if (msg.message == WM_QUIT)
         {
@@ -1055,7 +1136,7 @@ void _glfwPlatformPollEvents(void)
         else
         {
             TranslateMessage(&msg);
-            DispatchMessage(&msg);
+            DispatchMessageW(&msg);
         }
     }
 
@@ -1081,7 +1162,7 @@ void _glfwPlatformPollEvents(void)
                 _glfwInputKey(window, GLFW_KEY_RIGHT_SHIFT, 0, GLFW_RELEASE, mods);
         }
 
-        // Did the cursor move in an focused window that has captured the cursor
+        // Did the cursor move in an focused window that has disabled the cursor
         if (window->cursorMode == GLFW_CURSOR_DISABLED &&
             !window->win32.cursorCentered)
         {
@@ -1106,22 +1187,22 @@ void _glfwPlatformSetCursorPos(_GLFWwindow* window, double xpos, double ypos)
     ClientToScreen(window->win32.handle, &pos);
     SetCursorPos(pos.x, pos.y);
 
-    window->win32.oldCursorX = xpos;
-    window->win32.oldCursorY = ypos;
+    window->win32.oldCursorX = (int) xpos;
+    window->win32.oldCursorY = (int) ypos;
 }
 
-void _glfwPlatformSetCursorMode(_GLFWwindow* window, int mode)
+void _glfwPlatformApplyCursorMode(_GLFWwindow* window)
 {
-    switch (mode)
+    switch (window->cursorMode)
     {
         case GLFW_CURSOR_NORMAL:
-            showCursor(window);
+            restoreCursor(window);
             break;
         case GLFW_CURSOR_HIDDEN:
             hideCursor(window);
             break;
         case GLFW_CURSOR_DISABLED:
-            captureCursor(window);
+            disableCursor(window);
             break;
     }
 }

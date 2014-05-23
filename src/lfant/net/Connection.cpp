@@ -11,10 +11,10 @@ namespace net {
 
 void Connection::OnSendData(const boost::system::error_code &error, size_t bytes)
 {
-	Log("Connection::OnSendData: Touch.");
+	std::cout<<("Connection::OnSendData: Touch.\n");
 	if(error)
 	{
-		Log("Connection::OnSendData: Error '"+error.message()+"'.");
+		std::cout<<("Connection::OnSendData: Error '"+error.message()+"'.\n");
 		return;
 	}
 	else
@@ -25,10 +25,10 @@ void Connection::OnSendData(const boost::system::error_code &error, size_t bytes
 
 void Connection::OnGetData(const boost::system::error_code &error)
 {
-	Log("tcp::Connection::OnGetData: Touch.");
+	std::cout<<("tcp::Connection::OnGetData: Touch.\n");
 	if(error)
 	{
-		Log("Connection::OnGetData: Error '"+error.message()+"'.");
+		std::cout<<("Connection::OnGetData: Error '"+error.message()+"'.\n");
 		if(error.message() == "End of file")
 		{
 			TriggerEvent("Remove", this);

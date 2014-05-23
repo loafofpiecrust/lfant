@@ -17,14 +17,14 @@ namespace lfant {
 namespace thread {
 
 #if WINDOWS
-void Sleep(uint32_t milli)
+void Sleep(uint32 milli)
 {
 	::Sleep(milli);
 }
 
 #elif UNIX
 
-void Sleep(uint32_t milli)
+void Sleep(uint32 milli)
 {
 	usleep(milli * 1000);
 }

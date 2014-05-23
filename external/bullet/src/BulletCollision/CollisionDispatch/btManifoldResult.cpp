@@ -83,6 +83,7 @@ void btManifoldResult::addContactPoint(const btVector3& normalOnBInWorld,const b
 //	if (depth > m_manifoldPtr->getContactProcessingThreshold())
 		return;
 
+	bool isNewCollision = m_manifoldPtr->getNumContacts() == 0;
 	bool isSwapped = m_manifoldPtr->getBody0() != m_body0Wrap->getCollisionObject();
 
 	btVector3 pointA = pointInWorld + normalOnBInWorld * depth;
@@ -148,6 +149,11 @@ void btManifoldResult::addContactPoint(const btVector3& normalOnBInWorld,const b
 		const btCollisionObjectWrapper* obj0Wrap = isSwapped? m_body1Wrap : m_body0Wrap;
 		const btCollisionObjectWrapper* obj1Wrap = isSwapped? m_body0Wrap : m_body1Wrap;
 		(*gContactAddedCallback)(m_manifoldPtr->getContactPoint(insertIndex),obj0Wrap,newPt.m_partId0,newPt.m_index0,obj1Wrap,newPt.m_partId1,newPt.m_index1);
+	}
+	
+	if (gCollisionStartedCallback && isNewCollision)
+	{
+		gCollisionStartedCallback(m_manifoldPtr);
 	}
 
 }

@@ -25,6 +25,8 @@ public:
 
 	virtual void Save(Properties* prop) const;
 	virtual void Load(Properties* prop);
+	
+	static void ScriptBind();
 
 	virtual void Init();
 	virtual void Update();
@@ -62,13 +64,14 @@ public:
 	vec3 GetRight();
 	vec3 GetUp();
 
+	vec3 position = vec3(0);
+	vec3 rotation = vec3(0);
+	vec3 scale = vec3(1);
+
 protected:
 
 	void OnSetWorldPos();
 
-	vec3 position = vec3(0);
-	vec3 rotation = vec3(0);
-	vec3 scale = vec3(1);
 	quat rotationQuat;
 	mat4 matrix = mat4(1);
 
@@ -76,9 +79,9 @@ protected:
 	vec3 right;
 	vec3 direction;*/
 
-	Transform* parent = nullptr;
-	bool updateMatrix = false;
-	u8vec3 rotOrder {2,0,1};
+//	Transform* parent = nullptr;
+//	bool updateMatrix = false;
+//	u8vec3 rotOrder {2,0,1};
 
 
 private:

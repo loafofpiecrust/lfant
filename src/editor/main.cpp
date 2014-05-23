@@ -1,11 +1,16 @@
+#include "MainWindow.h"
+#include <QApplication>
 
-#include <editor/Editor.h>
-//#include <iostream>
-/*
-int main()
+int main(int argc, char *argv[])
 {
-	std::cout << "Launching the shit\n";
-	lfant::editor::Launch();
-	return 0;
+	QApplication a(argc, argv);
+	lfant::editor::MainWindow w;
+	w.show();
+
+	while(!a.closingDown())
+	{
+		a.processEvents();
+		if(w.game)
+			w.game->Update();
+	}
 }
-*/

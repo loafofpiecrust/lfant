@@ -3,6 +3,8 @@
 
 // internal
 #include <volymerna/Sound.h>
+#include <volymerna/Listener.h>
+#include <volymerna/Source.h>
 
 // external
 

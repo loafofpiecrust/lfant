@@ -29,26 +29,31 @@
 
 namespace lfant {
 
-Subsystem::Subsystem()
+Subsystem::Subsystem(Game* game) :
+	game(game)
 {
-
 }
 
 Subsystem::~Subsystem()
 {
-	// TODO Auto-generated destructor stub
 }
 
 void Subsystem::Init()
 {
 	Object::Init();
-	if(type::Name(this) != "lfant::Scene")
+	if(typeid(*this) != typeid(lfant::Scene))
 	{
 		printf("About to load file for subsystem\n");
-		string type = type::Descope(type::Name(this));
+		string type = type::Descope(type::Name(this), -1);
 		type[0] = tolower(type[0]);
 		LoadFile("settings/"+type+".prop");
 	}
+}
+
+Game* Subsystem::GetGame() const
+{
+//	std::cout << "get game " << game << "\n";
+	return game;
 }
 
 void Subsystem::Destroy()

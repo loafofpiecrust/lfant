@@ -4,8 +4,8 @@ Copyright (c) 2003-2008 Erwin Coumans  http://bulletphysics.com
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -39,10 +39,10 @@ ATTRIBUTE_ALIGNED16(class) btKinematicCharacterController : public btCharacterCo
 protected:
 
 	btScalar m_halfHeight;
-	
+
 	btPairCachingGhostObject* m_ghostObject;
 	btConvexShape*	m_convexShape;//is also in m_ghostObject, but it needs to be convex, so we store it here to avoid upcast
-	
+
 	btScalar m_verticalVelocity;
 	btScalar m_verticalOffset;
 	btScalar m_fallSpeed;
@@ -53,7 +53,7 @@ protected:
 	btScalar m_gravity;
 
 	btScalar m_turnAngle;
-	
+
 	btScalar m_stepHeight;
 
 	btScalar	m_addedMargin;//@todo: remove this and fix the code
@@ -100,7 +100,7 @@ public:
 
 	btKinematicCharacterController (btPairCachingGhostObject* ghostObject,btConvexShape* convexShape,btScalar stepHeight, int upAxis = 1);
 	~btKinematicCharacterController ();
-	
+
 
 	///btActionInterface interface
 	virtual void updateAction( btCollisionWorld* collisionWorld,btScalar deltaTime)
@@ -108,7 +108,7 @@ public:
 		preStep ( collisionWorld);
 		playerStep (collisionWorld, deltaTime);
 	}
-	
+
 	///btActionInterface interface
 	void	debugDraw(btIDebugDraw* debugDrawer);
 
@@ -165,6 +165,9 @@ public:
 
 	bool onGround () const;
 	void setUpInterpolate (bool value);
+
+	void setShape(btConvexShape* shape);
+	btConvexShape* getShape();
 };
 
 #endif // BT_KINEMATIC_CHARACTER_CONTROLLER_H

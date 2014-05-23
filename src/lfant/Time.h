@@ -31,13 +31,27 @@ namespace lfant
 
 typedef boost::chrono::high_resolution_clock hclock;
 
+class Timer
+{
+public:
+	string name;
+	float time;
+
+	Timer(string name, float time) :
+		name(name), time(time)
+	{
+	}
+
+	~Timer() {}
+};
+
 /**
  *
  */
 class Time : public Subsystem
 {
 public:
-	Time();
+	Time(Game* game);
 	~Time();
 
 	virtual void Init();
@@ -47,14 +61,18 @@ public:
 	double GetTime();
 	void ResetTime();
 	void UpdateTimes();
-	
+
+	void SetTimer(string name, float time);
+	void CancelTimer(string name);
+	float* GetTimer(string name);
+
 	boost::posix_time::ptime& GetDate();
 
 	// Properties
 
 	/// Deltatime in seconds
-	float deltaTime = 0.016666667f;
-	float deltaTimeFixed = 0.016666667f;
+	float deltaTime = 0.016667f;
+	float deltaTimeFixed = 0.016667f;
 	float frameRate = 60.0f;
 	float timeScale = 1.0f;
 	double lastFrame;
@@ -62,6 +80,7 @@ public:
 private:
 	hclock::time_point startTime;
 	boost::posix_time::ptime dateTime;
+	std::vector<Timer> timers;
 };
 
 /** @} */

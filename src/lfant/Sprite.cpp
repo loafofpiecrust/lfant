@@ -21,6 +21,7 @@
 #include <lfant/Camera.h>
 #include <lfant/Transform.h>
 #include <lfant/Console.h>
+#include <lfant/Geometry.h>
 
 namespace lfant {
 
@@ -36,21 +37,20 @@ Sprite::~Sprite()
 
 void Sprite::Init()
 {
+	mesh->vertexBuffer.push_back(vec3(0, 0, 0));
+	mesh->vertexBuffer.push_back(vec3(1, 0, 0));
+	mesh->vertexBuffer.push_back(vec3(1, 1, 0));
+	mesh->vertexBuffer.push_back(vec3(0, 1, 0));
 
-	vertexBuffer.push_back(vec3(0, 0, 0));
-	vertexBuffer.push_back(vec3(1, 0, 0));
-	vertexBuffer.push_back(vec3(1, 1, 0));
-	vertexBuffer.push_back(vec3(0, 1, 0));
+	mesh->uvBuffer.push_back(vec2(0, 1));
+	mesh->uvBuffer.push_back(vec2(1, 1));
+	mesh->uvBuffer.push_back(vec2(1, 0));
+	mesh->uvBuffer.push_back(vec2(0, 0));
 
-	uvBuffer.push_back(vec2(0, 1));
-	uvBuffer.push_back(vec2(1, 1));
-	uvBuffer.push_back(vec2(1, 0));
-	uvBuffer.push_back(vec2(0, 0));
-
-	indexBuffer.push_back(0);
-	indexBuffer.push_back(1);
-	indexBuffer.push_back(2);
-	indexBuffer.push_back(3);
+	mesh->indexBuffer.push_back(0);
+	mesh->indexBuffer.push_back(1);
+	mesh->indexBuffer.push_back(2);
+	mesh->indexBuffer.push_back(3);
 
 	Mesh::Init();
 }
@@ -107,17 +107,17 @@ void Sprite::Render()
 
 void Sprite::Update()
 {
-	Renderable::Update();
+	Mesh::Update();
 }
 
 void Sprite::Load(Properties *props)
 {
-	Log("Loading a sprite from props");
+	GetGame()->Log("Loading a sprite from props");
 //	Mesh::Load(props);
 	string mat = "materials/Diffuse.mat";
 	props->Get("material", mat);
 //	material->texture->mode = GL_TEXTURE_RECTANGLE;
-	material->LoadFile(mat);
+	material.LoadFile(mat);
 	// Register Animation::Mode enum
 /*
 	props->SetEnum("Mode::Loop", Animation::Mode::Loop);
@@ -129,28 +129,26 @@ void Sprite::Load(Properties *props)
 //	deque<Properties*> panims = props->GetChildren("animation");
 	for(Properties* pa : *props->GetChild("animations"))
 	{
+		string name = "";
 		Animation anim;
-		pa->Get("name", anim.name);
-		string mat = "materials/Diffuse.mat";
-		anim.material.LoadFile(pa->Get("material"));
+		pa->Get("name", name);
 		pa->Get("frameRate", anim.frameRate);
-	//	pa->GetEnum("playMode", anim.mode);
+
+		if(!name.empty())
+		{
+			animations.insert({name, anim});
+		}
 	}
 }
 
 void Sprite::Deinit()
 {
-	vertexBuffer.Destroy();
-	uvBuffer.Destroy();
-	indexBuffer.Destroy();
-	material->texture->Destroy();
-
-	Renderable::Deinit();
+	Mesh::Deinit();
 }
 
-void Sprite::SetUV(uint32_t idx, vec2 value)
+void Sprite::SetUV(uint32 idx, vec2 value)
 {
-	uvBuffer[idx] = value;
+	mesh->uvBuffer[idx] = value;
 }
 
 }

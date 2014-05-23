@@ -17,7 +17,7 @@ class File
 {
 public:
 	File(Source* src) : source(src) {}
-//	~File() {}
+	virtual ~File() {}
 
 //	virtual void Load(std::string path) = 0;
 	virtual void PlayChunk() = 0;

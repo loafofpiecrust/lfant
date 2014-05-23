@@ -13,7 +13,6 @@
 // External
 
 // Internal
-#include <lfant/util/Path.h>
 #include <lfant/Subsystem.h>
 
 
@@ -33,24 +32,15 @@ class FileSystem : public Subsystem
 {
 	friend class Settings;
 public:
-	FileSystem();
+	FileSystem(Game* game);
 	~FileSystem();
 
 	virtual void Init();
 
-	path GetUserPath(string name) const;
-	path GetGamePath(string name) const;
-
-	std::deque<path> GetGameFiles(string dir) const;
-
-	string GetProgramDir();
 
 protected:
 
 public:
-	string programFolder = "./";
-	string gameFolder = "../..";
-	string userFolder;
 };
 
 /** @} */

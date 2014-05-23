@@ -27,7 +27,7 @@ public:
 	virtual void Accept();
 	virtual void Accept(net::tcp::Connection* con);
 
-	virtual uint32_t GetConnectionCount() { return User::GetConnectionCount()-1; }
+	virtual uint32 GetConnectionCount() { return User::GetConnectionCount()-1; }
 
 protected:
 	ptr<asio::ip::tcp::acceptor> acceptor;

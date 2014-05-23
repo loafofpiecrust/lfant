@@ -1,55 +1,45 @@
-/*
-*	Copyright (C) 2013-2014, by loafofpiecrust
-*
-*	Licensed under the Apache License, Version 2.0 (the "License");
-*	you may not use this file except in compliance with the License.
-*	You may obtain a copy of the License in the accompanying LICENSE file or at
-*		http://www.apache.org/licenses/LICENSE-2.0
-*/
+
 #pragma once
 
-#include <lfant/stdafx.h>
-
-// External
-
-// Internal
 #include <lfant/Component.h>
-#include <lfant/Range.h>
-#include <lfant/Sound.h>
+
+namespace irrklang {
+class ISoundSource;
+class ISound;
+}
 
 namespace lfant
 {
-/** @addtogroup Game
- *	@{
- */
-/** @addtogroup Audio
- *	@{
- */
 
-/**
- *
- */
+class Rigidbody;
+
 class AudioSource : public Component
 {
-//	DECLARE_TYPE(Component, AudioSource)
 public:
-	AudioSource();
-	virtual ~AudioSource();
 
-	virtual void Init();
+	void LoadFile(string file);
 
-	Sound* AddSound(string name);
-	Sound* GetSound(string name);
+	void Load(Properties* prop);
 
-protected:
+	void Init();
+	void Update();
+	void Deinit();
 
-	void OnSetPosition();
-	void OnSetRotation();
-	void OnSetVelocity(vec3 vel);
+	void PlayAtPosition(string file);
+	void PlayAtPosition(string file, vec3 pos);
 
-	std::deque<std::shared_ptr<Sound>> sounds;
+	float GetVolume();
+	void SetVolume(float vol);
 
 private:
-	string inputFile = "";
+
+	void OnSetPosition(vec3 pos);
+
+	float volume = 1.0f;
+	std::vector<irrklang::ISound*> sounds;
+
+	// Comps
+	Rigidbody* rigidbody;
 };
+
 }

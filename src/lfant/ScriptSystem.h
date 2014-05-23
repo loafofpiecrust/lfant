@@ -11,14 +11,20 @@
 
 // Internal
 #include <lfant/Subsystem.h>
+//#include <lfant/ScriptComp.h>
 
 // External
 #include <sqrat/sqratVM.h>
+#include <sqrat/sqratScript.h>
+#include <boost/filesystem.hpp>
 
 namespace lfant {
 
+class ScriptComp;
+
 class Script
 {
+	friend class ScriptSystem;
 public:
 
 	template<typename C, typename CC>
@@ -76,6 +82,11 @@ public:
 			if(type.empty()) type = type::Descope(type::Name<C>(), "lfant");
 			Sqrat::RootTable().Bind(type.c_str(), inst);
 		}
+		
+		const CC& GetInst()
+		{
+			return inst;
+		}
 
 	private:
 		CC inst;
@@ -91,17 +102,20 @@ public:
 	{
 	};
 
-	Script();
+	~Script();
 
-	static Script& LoadFile(string path);
+	static Script* LoadFile(boost::filesystem::path path);
 	void Run();
 	void Call(string func);
-	
+
 	Sqrat::Script& GetInst() { return inst; }
 
 private:
+	Script(string p);
+
 	Sqrat::Script inst;
-	
+	string path = "";
+
 	static std::deque<Script> scripts;
 };
 
@@ -112,6 +126,7 @@ class ScriptSystem : public Subsystem
 {
 	friend class Script;
 public:
+	ScriptSystem(Game* game);
 
 	virtual void Init();
 	virtual void Deinit();
@@ -125,10 +140,10 @@ public:
 
 	void CallFunction(string module, string call);
 
+	Sqrat::SqratVM vm;
 protected:
 
 private:
-	Sqrat::SqratVM vm;
 
 };
 

@@ -18,8 +18,8 @@ class SpriteAnimation : public Animation
 	{
 	public:
 
-		uint16_t columns = 1;
-		uint16_t rows = 1;
+		uint16 columns = 1;
+		uint16 rows = 1;
 
 	protected:
 

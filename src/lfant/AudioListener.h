@@ -18,6 +18,9 @@
 
 namespace lfant
 {
+
+class Rigidbody;
+
 /** @addtogroup Game
  *	@{
  */
@@ -32,12 +35,15 @@ class AudioListener : public Component
 {
 //	DECLARE_TYPE(Component, AudioListener)
 public:
+	void Init();
+
 	float gain;
 	vec3 velocity;
 
-protected:
-
 private:
+	void OnSetPosition(vec3 pos);
+
+	Rigidbody* rigidbody;
 
 };
 

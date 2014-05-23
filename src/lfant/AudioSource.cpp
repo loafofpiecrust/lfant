@@ -1,70 +1,84 @@
-/*
-*	Copyright (C) 2013-2014, by loafofpiecrust
-*	Created: 2013-02-07 by Taylor Snead
-*
-*	Licensed under the Apache License, Version 2.0 (the "License");
-*	you may not use this file except in compliance with the License.
-*	You may obtain a copy of the License at
-*
-*		http://www.apache.org/licenses/LICENSE-2.0
-*
-*	Unless required by applicable law or agreed to in writing, software
-*	distributed under the License is distributed on an "AS IS" BASIS,
-*	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-*	See the License for the specific language governing permissions and
-*	limitations under the License.
-*
-******************************************************************************/
 
 #include <lfant/AudioSource.h>
 
-// External
-//#include <plaid/audio.h>
-
-// Internal
-#include <lfant/Transform.h>
 #include <lfant/Audio.h>
+#include <lfant/Rigidbody.h>
+#include <lfant/Transform.h>
+#include "Transform.h"
 
-namespace lfant
+#include <ik_ISoundEngine.h>
+
+namespace lfant {
+
+void AudioSource::LoadFile(string file)
 {
-
-//IMPLEMENT_TYPE(Component, AudioSource)
-
-AudioSource::AudioSource()
-{
-	//ctor
+	vec3 pos = owner->transform->GetWorldPosition();
+	irrklang::ISound* snd = GetGame()->audio->engine->play3D(file.c_str(), {pos.x,pos.y,pos.z}, false);
+	sounds.push_back(snd);
+	snd->setVolume(volume);
 }
 
-AudioSource::~AudioSource()
+void AudioSource::Load(Properties* prop)
 {
-	//dtor
+	lfant::Component::Load(prop);
+	std::vector<string> files;
+	prop->Get("files", files);
+	for(auto& f : files)
+	{
+		LoadFile(f);
+	}
 }
-
+	
 void AudioSource::Init()
 {
-	ConnectEvent(SENDER(owner, SetPosition), RECEIVER(this, OnSetPosition));
-	ConnectEvent(SENDER(owner, SetRotation), RECEIVER(this, OnSetRotation));
-	ConnectEvent(SENDER(owner, SetVelocity), RECEIVER(this, OnSetVelocity));
+	ConnectEvent(SENDER(owner->transform, SetPosition), RECEIVER(this, OnSetPosition));
+	ConnectComponent<Rigidbody>(rigidbody);
 }
 
-Sound* AudioSource::AddSound(string name)
+void AudioSource::Update()
 {
 }
 
-Sound* AudioSource::GetSound(string name)
+void AudioSource::Deinit()
 {
 }
 
-void AudioSource::OnSetPosition()
+void AudioSource::OnSetPosition(vec3 pos)
 {
+	vec3 wpos = owner->transform->GetWorldPosition();
+	for(irrklang::ISound*& snd : sounds)
+	{
+		snd->setPosition({wpos.x, wpos.y, wpos.z});
+		if(rigidbody)
+		{
+			snd->setVelocity(vec3_cast<irrklang::vec3df>(rigidbody->GetVelocity()));
+		}
+	}
 }
 
-void AudioSource::OnSetRotation()
+void AudioSource::PlayAtPosition(string file, vec3 pos)
 {
+	GetGame()->audio->engine->play3D(file.c_str(), {pos.x,pos.y,pos.z}, false);
 }
 
-void AudioSource::OnSetVelocity(vec3 vel)
+void AudioSource::PlayAtPosition(string file)
 {
+	PlayAtPosition(file, owner->transform->GetWorldPosition());
 }
 
+float AudioSource::GetVolume()
+{
+	return volume;
+}
+
+void AudioSource::SetVolume(float vol)
+{
+	volume = vol;
+	for(irrklang::ISound*& snd : sounds)
+	{
+		snd->setVolume(volume);
+	}
+}
+
+	
 }

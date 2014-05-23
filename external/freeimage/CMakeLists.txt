@@ -8,7 +8,7 @@ link_directories(
 	)
 
 # Source Info
-file(GLOB_RECURSE SRC_FILES
+file(GLOB SRC_FILES
 	"Source/FreeImage/*.cpp"
 	"Source/FreeImageToolkit/*.cpp"
 	"Source/Metadata/*.cpp"
@@ -16,12 +16,17 @@ file(GLOB_RECURSE SRC_FILES
 #	"Source/LibJPEG/*.c"
 #	"Source/LibPNG/*.c"
 #	"Source/LibTIFF/*.c"
-	"Source/LibRawLite/*.c"
-	"Source/OpenEXR/*.c"
-	)
+#	"Source/LibRawLite/*.c"
+	"Source/OpenEXR/Half/half.cpp"
+)
 
-#list(REMOVE_ITEM SRC_FILES
-#	)
+list(REMOVE_ITEM SRC_FILES
+	${PROJECT_SOURCE_DIR}/Source/FreeImage/PluginRAW.cpp
+	${PROJECT_SOURCE_DIR}/Source/FreeImage/PluginJP2.cpp
+	${PROJECT_SOURCE_DIR}/Source/FreeImage/PluginJ2K.cpp
+	${PROJECT_SOURCE_DIR}/Source/FreeImage/J2KHelper.cpp
+	${PROJECT_SOURCE_DIR}/Source/FreeImage/PluginEXR.cpp
+)
 
 file(GLOB_RECURSE HEADER_FILES
 	"Source/*.h"
@@ -29,7 +34,6 @@ file(GLOB_RECURSE HEADER_FILES
 
 # Output Library Info
 add_library(${PROJECT_NAME} SHARED ${SRC_FILES} ${HEADER_FILES})
-#add_executable(${PROJECT_NAME} ${SRC_FILES} ${HEADER_FILES})
 
 # Includes Info
 include_directories(
@@ -45,7 +49,6 @@ target_link_libraries(${PROJECT_NAME}
 	tiff
 	z
 	jpeg
-	openjpeg
 	png
 #	exr
 	)

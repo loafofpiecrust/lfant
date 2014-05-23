@@ -69,8 +69,8 @@ public:
 };
 
 typedef TRect<float> Rect;
-typedef TRect<int32_t> IRect;
-typedef TRect<uint32_t> URect;
+typedef TRect<int32> IRect;
+typedef TRect<uint32> URect;
 
 /** @} */
 /** @} */

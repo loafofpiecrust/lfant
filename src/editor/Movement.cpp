@@ -63,7 +63,7 @@ void Movement::Move(vec3 velocity)
 	}
 	else
 	{
-		owner->transform->Translate(velocity * movementSpeed * game->time->deltaTime);
+		owner->transform->Translate(velocity * movementSpeed * GetGame()->time->deltaTime);
 	}
 }
 

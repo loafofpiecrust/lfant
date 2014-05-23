@@ -1,27 +1,38 @@
-/*
-*	Copyright (C) 2013-2014, by loafofpiecrust
+/******************************************************************************
+*
+*	LFANT Source
+*	Copyright (C) 2012-2013 by LazyFox Studios
+*	Created: 2012-08-02 by Taylor Snead
 *
 *	Licensed under the Apache License, Version 2.0 (the "License");
 *	you may not use this file except in compliance with the License.
-*	You may obtain a copy of the License in the accompanying LICENSE file or at
-*		http://www.apache.org/licenses/LICENSE-2.0
-*/
+*	You may obtain a copy of the License at
+*
+*	http://www.apache.org/licenses/LICENSE-2.0
+*
+*	Unless required by applicable law or agreed to in writing, software
+*	distributed under the License is distributed on an "AS IS" BASIS,
+*	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+*	See the License for the specific language governing permissions and
+*	limitations under the License.
+*
+******************************************************************************/
 #pragma once
 
 // External
-#include <boost/compute/container/vector.hpp>
 
 // Internal
+
 #include <lfant/Component.h>
 #include <lfant/Range.h>
 #include <lfant/Material.h>
 #include <lfant/Vertex.h>
 #include <lfant/Mesh.h>
-#include <lfant/OpenCL.h>
+#include <lfant/Geometry.h>
 
 namespace lfant
 {
-//class Particle;
+class Particle;
 
 /** @addtogroup Game
  *	 @{
@@ -29,19 +40,6 @@ namespace lfant
 /** @addtogroup Particles
  *	 @{
  */
-
-class Particle
-{
-public:
-	vec4 pos;
-	vec4 color;
-	vec4 vel;
-	vec4 velChange;
-	vec4 colorChange;
-	float sizeChange;
-	float life;
-	float size;
-} __attribute__ ((aligned (16)));
 
 /**	This class handles a ParticleSystem Component
  *		Gives functionality for emitting particles from this transform. The
@@ -68,7 +66,7 @@ public:
 	{
 		float time = 5.0f;
 		float current;
-		uint32_t particles = 10;
+		uint32 particles = 10;
 	};
 
 	/**
@@ -82,22 +80,36 @@ public:
 		Cone
 	};
 
-	enum class DisplayType : byte
-	{
-		Point,
-		Billboard
-	};
-
 	struct ParticleVertex
 	{
-		vec3 position;
-		u8vec4 color;
-		float size;
+		vec3 position = vec3(0.0f);
+		u8vec4 color {255};
+		float size {1.0f};
+
+		ParticleVertex()
+		{
+		}
 
 		ParticleVertex(vec3 pos, vec4 col, float size) :
 			position(pos), color(col), size(size)
 		{
 		}
+	};
+
+	template<typename T>
+	struct Field
+	{
+		enum class CurveType : byte
+		{
+			Linear,
+
+		};
+		Range<T> start;
+		Range<T> end;
+		CurveType curveType = CurveType::Linear;
+
+		void Load(Properties* prop);
+		void Save(Properties* prop) const;
 	};
 
 	ParticleSystem();
@@ -106,30 +118,32 @@ public:
 	virtual void Init();
 	virtual void Update();
 	virtual void PostUpdate();
-	virtual void Deinit();
+	virtual void OnDestroy();
 
 	void BeginRender();
 	void Render();
 	void EndRender();
 
-	void Save(Properties* prop);
+	void Save(Properties* prop) const;
 	void Load(Properties *prop);
 
 	/**
 	 *	Emits a specific amount of particles
 	 *	@param amount The amount of particles to emit.
 	 */
-	void Emit(uint32_t amount = 1);
+	void Emit(uint32 amount);
+	void Emit(Particle* pt = nullptr);
 	void Recycle(Particle* pt);
 	void Clear();
-	uint32_t GetCount();
+	uint32 GetCount();
+	void GenerateVelocity(Particle* pt);
 
 	// Particle properties
 	Range<float> lifetime = {1.0f, 5.0f};
-	Range<Range<vec4>> color = {{vec4(0), vec4(0.5f)}, {vec4(0.51f), vec4(1)}};
+	Range<Range<vec4>> color = {{vec4(0.01f), vec4(1.0f)}, {vec4(0.01f), vec4(1.0f)}};
 	Range<Range<float>> size = {{0.1f, 1.0f}, {0.5f, 2.0f}};
 //	Range<Range<float>> speed;
-	Range<Range<vec3>> velocity = {{vec3(0), vec3(5)}, {vec3(2), vec3(10)}};
+	Range<Range<vec3>> velocity = {{vec3(1), vec3(5)}, {vec3(2), vec3(10)}};
 
 	// Emitter properties
 	float radius = 1.0f;
@@ -139,24 +153,22 @@ public:
 	float duration;
 //	float timeScale = 1.0f;
 	float rate = 1.5f;
-	uint32_t maxParticles = 1500;
+	uint32 maxParticles = 1500;
 	vec3 dimensions = vec3(1.0f);
-	vec4 gravity = vec4(0.0f, 0.0f, 0.0f, 1.0f);
+	vec3 gravity = vec3(0.0f, 0.0f, 0.0f);
 	bool pausable = true;
 	bool paused = false;
 	bool looping = true;
 	bool inheritTransform = true;
 
-	DisplayType displayType;
-	EmitterType emitterType = EmitterType::Cone;
+	EmitterType emitterType = EmitterType::Sphere;
 
-//	deque<Particle> particles;
-	uint32_t particleCount = 0;
+	std::deque<Particle> particles;
 //	Buffer<Particle> particles;
 	std::deque<Burst> bursts;
 	std::deque<Particle*> recycle;
 
-	ptr<Material> material;
+	Material material;
 
 protected:
 
@@ -168,18 +180,7 @@ protected:
 private:
 //	Buffer<vec4> colorBuffer;
 //	Buffer<float> sizeBuffer;
-//	Buffer<ParticleVertex> particleBuffer;
-	uint32_t colorBuffer;
-	uint32_t posBuffer;
-	uint32_t sizeBuffer;
-	uint32_t vertexArray;
-
-	std::vector<uint32_t> buffers;
-	std::vector<boost::compute::buffer> clbuffers;
-
-	ptr<OpenCL::Kernel> updateKernel;
-	ptr<OpenCL::Kernel> emitKernel;
-
+	Buffer<ParticleVertex> particleBuffer;
 	bool rewriteBuffer = false;
 };
 

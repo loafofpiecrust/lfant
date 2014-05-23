@@ -29,19 +29,19 @@ public:
 	class Buffer : public Resource
 	{
 	public:
-		uint32_t id = 0;
+		uint32 id = 0;
 	};
 
 	class Stream : public Resource
 	{
 	public:
-		Stream(uint32_t& source, string path);
+		Stream(uint32& source, string path);
 
-		uint32_t bufferCount = 3;
-		std::vector<uint32_t> buffers;
-		uint16_t channelCount = 0;
-		uint32_t frequency = 0;
-		int32_t format = 0;
+		uint32 bufferCount = 3;
+		std::vector<uint32> buffers;
+		uint16 channelCount = 0;
+		uint32 frequency = 0;
+		int32 format = 0;
 
 		void Init();
 		bool Update();
@@ -51,9 +51,9 @@ public:
 
 	protected:
 		std::ifstream stream;
-		uint8_t* temp = (uint8_t*)malloc(4096);
+		uint8* temp = (uint8*)malloc(4096);
 
-		uint32_t& source;
+		uint32& source;
 	};
 
 	virtual void LoadBuffer(string path);
@@ -80,7 +80,7 @@ protected:
 
 	void SetPosition(vec3 pos);
 
-	uint32_t id = 0;
+	uint32 id = 0;
 
 	AudioSource* source = nullptr;
 

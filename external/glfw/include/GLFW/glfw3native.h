@@ -1,7 +1,6 @@
 /*************************************************************************
- * GLFW - An OpenGL library
- * API version: 3.0
- * WWW:         http://www.glfw.org/
+ * GLFW 3.0 - www.glfw.org
+ * A library for OpenGL, window and input
  *------------------------------------------------------------------------
  * Copyright (c) 2002-2006 Marcus Geelnard
  * Copyright (c) 2006-2010 Camilla Berglund <elmindreda@elmindreda.org>
@@ -74,6 +73,7 @@ extern "C" {
 #if defined(GLFW_EXPOSE_NATIVE_WIN32)
  #include <windows.h>
 #elif defined(GLFW_EXPOSE_NATIVE_COCOA)
+ #include <ApplicationServices/ApplicationServices.h>
  #if defined(__OBJC__)
   #import <Cocoa/Cocoa.h>
  #else
@@ -103,6 +103,12 @@ extern "C" {
  *************************************************************************/
 
 #if defined(GLFW_EXPOSE_NATIVE_WIN32)
+/*! @brief Returns the device name of the specified monitor.
+ *  @return The the device name of the specified monitor.
+ *  @ingroup native
+ */
+GLFWAPI const WCHAR* glfwGetWin32Monitor(GLFWmonitor* monitor);
+
 /*! @brief Returns the `HWND` of the specified window.
  *  @return The `HWND` of the specified window.
  *  @ingroup native
@@ -119,6 +125,12 @@ GLFWAPI HGLRC glfwGetWGLContext(GLFWwindow* window);
 #endif
 
 #if defined(GLFW_EXPOSE_NATIVE_COCOA)
+/*! @brief Returns the `CGDirectDisplayID` of the specified monitor.
+ *  @return The the `CGDirectDisplayID` of the specified monitor.
+ *  @ingroup native
+ */
+GLFWAPI CGDirectDisplayID glfwGetCocoaMonitor(GLFWmonitor* monitor);
+
 /*! @brief Returns the `NSWindow` of the specified window.
  *  @return The `NSWindow` of the specified window.
  *  @ingroup native
@@ -140,6 +152,13 @@ GLFWAPI id glfwGetNSGLContext(GLFWwindow* window);
  *  @ingroup native
  */
 GLFWAPI Display* glfwGetX11Display(void);
+
+/*! @brief Returns the `RRCrtc` of the specified monitor.
+ *  @return The the `RRCrtc` of the specified monitor.
+ *  @ingroup native
+ */
+GLFWAPI RRCrtc glfwGetX11Monitor(GLFWmonitor* monitor);
+
 /*! @brief Returns the `Window` of the specified window.
  *  @return The `Window` of the specified window.
  *  @ingroup native
@@ -161,11 +180,13 @@ GLFWAPI GLXContext glfwGetGLXContext(GLFWwindow* window);
  *  @ingroup native
  */
 GLFWAPI EGLDisplay glfwGetEGLDisplay(void);
+
 /*! @brief Returns the `EGLContext` of the specified window.
  *  @return The `EGLContext` of the specified window.
  *  @ingroup native
  */
 GLFWAPI EGLContext glfwGetEGLContext(GLFWwindow* window);
+
 /*! @brief Returns the `EGLSurface` of the specified window.
  *  @return The `EGLSurface` of the specified window.
  *  @ingroup native

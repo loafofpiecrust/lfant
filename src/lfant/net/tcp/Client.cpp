@@ -90,7 +90,7 @@ void Client::OnConnect(const boost::system::error_code& error, net::Connection* 
 {
 	if (error)
 	{
-		Log(error.message());
+//		GetGame()->Log(error.message());
 		return;
 	}
 	TriggerEvent("Connect", error.message());

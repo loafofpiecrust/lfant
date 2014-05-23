@@ -22,32 +22,31 @@ namespace lfant
 {
 
 Material::Material() :
-	texture(new Texture),
-	shader(new Shader)
+	texture {Texture::LoadFile("textures/Default.png")},
+	shader {Shader::LoadFile("shaders/simple/Diffuse.vert", "shaders/simple/Diffuse.frag")}
 {
-}
-
-Material::Material(string texture, string shader)
-{
-	this->texture->LoadFile(texture);
-	this->shader->LoadFile(shader);
 }
 
 void Material::Load(Properties* prop)
 {
 	Object::Load(prop);
 
+	string file = prop->Get("texture");
 	if(Properties* tex = prop->GetChild("texture"))
 	{
-		texture->Load(tex);
+		texture = Texture::Load(tex);
+	}
+	else if(!file.empty())
+	{
+		texture = Texture::LoadFile(file);
 	}
 
 	if(Properties* sh = prop->GetChild("shader"))
 	{
-		shader->Load(sh);
+		shader = Shader::Load(sh);
 	}
 
-	loaded = true;
+//	loaded = true;
 }
 
 void Material::Save(Properties *prop) const

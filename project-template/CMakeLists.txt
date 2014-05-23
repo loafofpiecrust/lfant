@@ -19,11 +19,6 @@ set(CMAKE_MODULE_PATH "${LFANT}/cmake")
 
 include(Config)
 
-if(UNIX AND NOT ANDROID)
-set(CMAKE_C_COMPILER "clang")
-set(CMAKE_CXX_COMPILER "clang++")
-endif()
-
 cmake_minimum_required(VERSION 2.8)
 cmake_policy(SET CMP0015 NEW)
 project(projectName)
@@ -59,15 +54,12 @@ endif()
 link_directories(
 	"${LIBRARY_OUTPUT_PATH}"
 	"${LIBRARY_OUTPUT_PATH}/lib"
-	# System
-#	"/usr/lib/x86_64-linux-gnu/mesa"
 	)
 
 # Output Library Info
 add_library(${PROJECT_NAME} SHARED ${GAME_SRC})
 target_link_libraries(${PROJECT_NAME}
 	lfant
-	CEGUI
 	)
 
 if(NOT ANDROID)
@@ -82,7 +74,6 @@ include_directories(
 	${LFANT}/external/boost
 	${LFANT}/external/glew/include
 	${LFANT}/external/glfw/include
-	${LFANT}/external/cegui/cegui/include
 	${LFANT}/external/squirrel/include
 	)
 

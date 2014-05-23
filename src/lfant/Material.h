@@ -32,19 +32,18 @@ class Material : public Object
 {
 public:
 	Material();
-	Material(string texture, string shader);
 
 	virtual void Load(Properties *prop);
 	virtual void Save(Properties *prop) const;
 
 	// Path and name for the texture file.
-	ptr<Texture> texture;
-	uint32_t textureUnif;
-	ptr<Shader> shader;
+	std::shared_ptr<Texture> texture;
+//	uint32 textureUnif;
+	std::shared_ptr<Shader> shader;
 	vec2 tiling { 1, 1 };
 	vec2 offset { 0, 0 };
 	u8vec4 color { 255, 255, 255, 255 };
-	bool loaded = false;
+//	bool loaded = false;
 };
 
 /// @}

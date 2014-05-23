@@ -19,12 +19,16 @@
 #include <lfant/Transform.h>
 #include <lfant/Console.h>
 #include <lfant/FileSystem.h>
+#include "lfant/Window.h"
+#include <lfant/Input.h>
+#include <lfant/Time.h>
 
 // External
 #include <GL/glew.h>
 #include <assimp/scene.h>
 #include <assimp/cimport.h>
 #include <assimp/postprocess.h>
+#include <glm/gtc/matrix_transform.hpp>
 
 namespace lfant {
 
@@ -32,31 +36,27 @@ IMPLEMENT_TYPE(Component, PointLight)
 
 PointLight::PointLight()
 {
+	color = vec3(0.5f);
+	stencilShader = Shader::LoadFile("shaders/light/Point.vert", "shaders/Null.frag");
 }
 
 PointLight::~PointLight()
 {
 }
 
-void PointLight::Init()
-{
-	Light::Init();
-	LoadFile("meshes/sphere.obj");
-}
-
 void PointLight::LoadFile(string path)
-{	
-	Log("Loading mesh file '"+path+"'.");
-	path = game->fileSystem->GetGamePath(path).string();
+{
+	GetGame()->Log("Loading mesh file '"+path+"'.");
+	path = GetGame()->GetAssetPath(path).string();
 
 	const aiScene* scene = aiImportFile(path.c_str(), aiProcessPreset_TargetRealtime_MaxQuality);
-	Log("Loaded mesh.. filling buffers");
+	GetGame()->Log("Loaded mesh.. filling buffers");
 	for(uint i = 0; i < scene->mNumMeshes; ++i)
 	{
 		const aiMesh* mesh = scene->mMeshes[i];
-		posBuffer.data.reserve(posBuffer.size()+mesh->mNumVertices);
-		uvBuffer.data.reserve(uvBuffer.size()+mesh->mNumVertices);
-		indexBuffer.data.reserve(indexBuffer.size()+mesh->mNumFaces*3);
+		posBuffer.reserve(posBuffer.size()+mesh->mNumVertices);
+		uvBuffer.reserve(uvBuffer.size()+mesh->mNumVertices);
+		indexBuffer.reserve(indexBuffer.size()+mesh->mNumFaces*3);
 
 		for(uint k = 0; k < mesh->mNumVertices; ++k)
 		{
@@ -75,8 +75,6 @@ void PointLight::LoadFile(string path)
 		}
 	}
 	aiReleaseImport(scene);
-
-	BeginRender();
 }
 
 void PointLight::Load(Properties* prop)
@@ -107,15 +105,15 @@ void PointLight::Save(Properties* prop) const
 	prop->Set("specularIntensity", specularIntensity);
 }
 
-void PointLight::PostUpdate()
+void PointLight::Init()
 {
-}
+	Light::Init();
 
-void PointLight::BeginRender()
-{
-	Light::BeginRender();
+	LoadFile("meshes/sphere.obj");
 
-	shader->LoadFile("shaders/light/Point.vert", "shaders/light/Point.frag");
+	GetGame()->Log("PointLight::BeginRender()");
+
+	shader = Shader::LoadFile("shaders/light/Point.vert", "shaders/light/Point.frag");
 
 	// Shader uniforms
 	shader->AddUniform("M");
@@ -137,42 +135,92 @@ void PointLight::BeginRender()
 	shader->AddUniform("cameraPosition");
 	shader->AddUniform("screenSize");
 
-	Mesh::CreateBuffer(posBuffer, GL_ARRAY_BUFFER);
-	Mesh::CreateBuffer(indexBuffer, GL_ELEMENT_ARRAY_BUFFER);
+	Geometry::CreateBuffer(posBuffer, GL_ARRAY_BUFFER);
+	Geometry::CreateBuffer(indexBuffer, GL_ELEMENT_ARRAY_BUFFER);
+}
+
+void PointLight::Update()
+{
+	float val = GetGame()->input->GetAxis("ShowFPS")->GetValue();
+	if(val != 0.0f)
+	{
+		ambientIntensity += val * 3.0f * GetGame()->time->deltaTime;
+		diffuseIntensity += val * 3.0f * GetGame()->time->deltaTime;
+
+	//	std::cout << "light intensity: " << ambientIntensity << "\n";
+	}
+
+	val = GetGame()->input->GetAxis("MoveLight")->GetValue();
+	if(val != 0.0f)
+	{
+		owner->transform->Translate({0.0f, 0.0f, val * GetGame()->time->deltaTime * 4.0f});
+	}
 }
 
 void PointLight::Render()
 {
-//	Log("Rendering point light");
+	if(!shader)
+	{
+		return;
+	}
+
 	shader->Bind();
 
-	shader->SetUniform("VP", game->scene->mainCamera->GetProjection() * game->scene->mainCamera->GetView());
-	shader->SetUniform("M", owner->transform->GetMatrix());
+	shader->SetUniform("VP", GetGame()->scene->mainCamera->GetProjection() * GetGame()->scene->mainCamera->GetView());
+	shader->SetUniform("M", glm::scale(owner->transform->GetMatrix(), vec3(radius)));
 	shader->SetUniform("lightPosition", owner->transform->GetWorldPosition());
-	shader->SetUniform("cameraPosition", game->scene->mainCamera->owner->transform->GetWorldPosition());
-	shader->SetUniform("screenSize", (vec2)game->renderer->GetResolution());
+	shader->SetUniform("cameraPosition", GetGame()->scene->mainCamera->owner->transform->GetWorldPosition());
+	shader->SetUniform("screenSize", (vec2)GetGame()->window->GetSize());
 	shader->SetUniform("lightColor", color);
 	shader->SetUniform("radius", radius);
-//	shader->SetUniform("ambientIntensity", ambientIntensity);
-//	shader->SetUniform("diffuseIntensity", diffuseIntensity);
-//	shader->SetUniform("attenuation", vec3(attenConst, attenLinear, attenExp));
-//	shader->SetUniform("specularPower", specularPower);
-//	shader->SetUniform("specularIntensity", specularIntensity);
+	shader->SetUniform("ambientIntensity", ambientIntensity);
+	shader->SetUniform("diffuseIntensity", diffuseIntensity);
+	shader->SetUniform("attenuation", vec3(attenConst, attenLinear, attenExp));
+	shader->SetUniform("specularPower", specularPower);
+	shader->SetUniform("specularIntensity", specularIntensity);
 
 //	shader->SetUniform("depthTex", game->renderer->frameBuffer->GetTexture("depthTex"));
-	shader->SetUniform("diffuseTex", game->renderer->frameBuffer->GetTexture("diffuseTex"));
-	shader->SetUniform("normalTex", game->renderer->frameBuffer->GetTexture("normalTex"));
-	shader->SetUniform("positionTex", game->renderer->frameBuffer->GetTexture("positionTex"));
+	shader->SetUniform("diffuseTex", GetGame()->renderer->frameBuffer->GetTexture("diffuseTex"));
+	shader->SetUniform("normalTex", GetGame()->renderer->frameBuffer->GetTexture("normalTex"));
+	shader->SetUniform("positionTex", GetGame()->renderer->frameBuffer->GetTexture("positionTex"));
+
+	InternalRender();
+
+	shader->Unbind();
+}
+
+void PointLight::RenderStencil()
+{
+	if(!stencilShader)
+	{
+		return;
+	}
+
+	stencilShader->Bind();
+
+	shader->SetUniform("VP", GetGame()->scene->mainCamera->GetProjection() * GetGame()->scene->mainCamera->GetView() * owner->transform->GetMatrix());
+
+	InternalRender();
+
+	stencilShader->Unbind();
+}
+
+void PointLight::InternalRender()
+{
+//	Update();
+//	GetGame()->Log("Rendering point light");
+
+	glActiveTexture(GL_TEXTURE0+2);
 
 	glEnableVertexAttribArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, posBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, posBuffer.id);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
-	glEnableVertexAttribArray(1);
-	glBindBuffer(GL_ARRAY_BUFFER, uvBuffer);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+//	glEnableVertexAttribArray(1);
+//	glBindBuffer(GL_ARRAY_BUFFER, uvBuffer.id);
+//	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer.id);
 	glDrawElements(GL_TRIANGLES, indexBuffer.size(), GL_UNSIGNED_INT, (void*)0);
 //	glDrawArrays(GL_TRIANGLES, 0, posBuffer.size());
 
@@ -181,14 +229,12 @@ void PointLight::Render()
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	shader->Unbind();
 }
 
-void PointLight::EndRender()
+void PointLight::Deinit()
 {
-	Light::EndRender();
-	shader->Destroy();
+	Light::Deinit();
+//	shader->Destroy();
 }
 
 }

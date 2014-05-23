@@ -42,13 +42,21 @@ string Demangle(string type)
 	return final;
 }
 
+
 string Descope(string type, int amount)
 {
 	if(amount == 0) return type;
 	if(amount == -1)
 	{
-		deque<string> result = Split(type, ":");
-		return result[result.size()-1];
+		std::size_t pos = type.find_last_of(':');
+		if(pos == string::npos)
+		{
+			return type;
+		}
+		else
+		{
+			return type.substr(pos+1);
+		}
 	}
 
 	for(uint i = 0; i < type.size(); ++i)
@@ -76,11 +84,17 @@ string Descope(string type, string nspace)
 				type.erase(type.begin(), type.begin()+i+2);
 				break;
 			}
-			start = i+2; ++i;
+			start = i+2;
+			++i;
 		}
 	}
 	return type;
 
+}
+
+string Descope(string type)
+{
+	return Descope(type, "lfant");
 }
 
 }

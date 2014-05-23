@@ -23,7 +23,7 @@ void Input::OnKeyPress(GLFWwindow* win, int key, int scancode, int action, int m
 {
 }
 
-void Input::OnCharPress(GLFWwindow* win, uint32_t key)
+void Input::OnCharPress(uint key)
 {
 	game->input->TriggerEvent("CharPress", (char)key);
 }
@@ -45,17 +45,17 @@ float Input::GetAxis(string name) const
 	return 0.0f;
 }
 
-int8_t Input::GetButton(string name) const
+int8 Input::GetButton(string name) const
 {
 	return 0;
 }
 
-int8_t Input::GetButtonDown(string name) const
+int8 Input::GetButtonDown(string name) const
 {
 	return 0;
 }
 
-int8_t Input::GetButtonUp(string name) const
+int8 Input::GetButtonUp(string name) const
 {
 	return 0;
 }
@@ -65,12 +65,12 @@ deque<Input::Touch>& Input::GetTouches()
 	return touches;
 }
 
-Input::Touch& Input::GetTouch(uint32_t idx)
+Input::Touch& Input::GetTouch(uint32 idx)
 {
 	return touches[idx];
 }
 
-void Input::OnTouch(uint32_t idx, int action, Input::Touch data)
+void Input::OnTouch(uint32 idx, int action, Input::Touch data)
 {
 	switch(action)
 	{

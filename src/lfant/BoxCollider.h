@@ -40,7 +40,7 @@ public:
 protected:
 	btCollisionShape* GetShape();
 
-	btBoxShape* shape = nullptr;
+	ptr<btBoxShape> shape = nullptr;
 };
 
 /** @} */

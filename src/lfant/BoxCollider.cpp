@@ -23,7 +23,8 @@ IMPLEMENT_SUBTYPE(Component, BoxCollider, Collider)
 
 void BoxCollider::Init()
 {
-	shape = new btBoxShape(/*vec3_cast<btVector3>(size)*/btVector3(0.5f, 0.5f, 0.5f));
+	float f = 1.0f;
+	shape = new btBoxShape(/*vec3_cast<btVector3>(size)*/btVector3(f,f,f));
 	Collider::Init();
 }
 
@@ -35,8 +36,8 @@ btCollisionShape *BoxCollider::GetShape()
 void BoxCollider::SetSize(vec3 size)
 {
 	lfant::Collider::SetSize(size);
-	
-	Log("BoxCollider::SetSize(): final dimensions ", vec3_cast<vec3>(shape->getImplicitShapeDimensions()));
+
+	GetGame()->Log("BoxCollider::SetSize(): final dimensions ", vec3_cast<vec3>(shape->getImplicitShapeDimensions()));
 }
 
 }

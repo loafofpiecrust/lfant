@@ -2,7 +2,7 @@
 #include <editor/Editor.h>
 
 // External
-#include <wx/app.h>
+//#include <wx/app.h>
 
 // Internal
 #include <lfant/Scene.h>
@@ -17,15 +17,13 @@
 #include <lfant/Network.h>
 #include <lfant/UserInterface.h>
 
-#include <editor/gui/App.h>
-
 namespace lfant {
 namespace editor {
 
 void Launch()
 {
 	printf("YOOO");
-	game = new Editor;
+	Game* game = new Editor;
 	game->Init();
 	game->Update();
 	game->Destroy();
@@ -107,11 +105,11 @@ void Editor::Deinit()
 void Editor::LoadProject(string dir)
 {
 	Deinit();
-	fileSystem->gameFolder = dir;
-	fileSystem->programFolder = dir+"/bin/x64/linux";
+	gameFolder = dir;
+	programFolder = dir+"/bin/x64/linux";
 
 	LoadFile("settings/game.prop");
-	fileSystem->Init();
+//	fileSystem->Init();
 	scene->Init();
 }
 

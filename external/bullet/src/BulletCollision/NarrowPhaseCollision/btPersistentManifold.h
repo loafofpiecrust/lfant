@@ -33,6 +33,11 @@ typedef bool (*ContactProcessedCallback)(btManifoldPoint& cp,void* body0,void* b
 extern ContactDestroyedCallback	gContactDestroyedCallback;
 extern ContactProcessedCallback gContactProcessedCallback;
 
+typedef void (*CollisionStartedCallback)(class btPersistentManifold* manifold);
+typedef void (*CollisionEndedCallback)(class btPersistentManifold* manifold);
+extern CollisionStartedCallback gCollisionStartedCallback;
+extern CollisionEndedCallback gCollisionEndedCallback;
+
 //the enum starts at 1024 to avoid type conflicts with btTypedConstraint
 enum btContactManifoldTypes
 {
@@ -171,6 +176,11 @@ public:
 
 		btAssert(m_pointCache[lastUsedIndex].m_userPersistentData==0);
 		m_cachedPoints--;
+		
+		if(gCollisionEndedCallback && m_cachedPoints == 0)
+		{
+			gCollisionEndedCallback(this);
+		}
 	}
 	void replaceContactPoint(const btManifoldPoint& newPoint,int insertIndex)
 	{
@@ -225,6 +235,12 @@ public:
 		{
 			clearUserCache(m_pointCache[i]);
 		}
+
+		if(gCollisionEndedCallback && m_cachedPoints)
+      	{
+        	gCollisionEndedCallback(this);
+      	}
+
 		m_cachedPoints = 0;
 	}
 

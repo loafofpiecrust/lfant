@@ -44,8 +44,8 @@ public:
 	EGLDisplay display;
 	EGLSurface surface;
 	EGLContext context;
-	int32_t width;
-	int32_t height;
+	int32 width;
+	int32 height;
 	saved_state state;
 };
 
@@ -145,7 +145,7 @@ void AppEngine::Tear()
 	surface = EGL_NO_SURFACE;
 }
 
-static int32_t OnInput(android_app* app, AInputEvent* event)
+static int32 OnInput(android_app* app, AInputEvent* event)
 {
 	AppEngine* engine = (AppEngine*)app->userData;
 	switch(AInputEvent_getType(event))
@@ -153,9 +153,9 @@ static int32_t OnInput(android_app* app, AInputEvent* event)
 	case AINPUT_EVENT_TYPE_MOTION:
 	{
 		engine->animating = 1;
-		uint32_t count = AMotionEvent_getPointerCount(event);
-		int32_t action = AMotionEvent_getAction(event);
-		for(uint32_t i = 0; i < count; ++i)
+		uint32 count = AMotionEvent_getPointerCount(event);
+		int32 action = AMotionEvent_getAction(event);
+		for(uint32 i = 0; i < count; ++i)
 		{
 			vec2 pos = vec2(AMotionEvent_getX(event, i), AMotionEvent_getY(event, i));
 			game->input->OnTouch(i, action, {pos});
@@ -166,7 +166,7 @@ static int32_t OnInput(android_app* app, AInputEvent* event)
 	return 0;
 }
 
-static void OnMain(struct android_app* app, int32_t cmd)
+static void OnMain(struct android_app* app, int32 cmd)
 {
 	AppEngine* engine = (AppEngine*)app->userData;
 	switch (cmd)

@@ -1,8 +1,5 @@
 //========================================================================
-// GLFW - An OpenGL library
-// Platform:    NSOpenGL
-// API Version: 3.0
-// WWW:         http://www.glfw.org/
+// GLFW 3.1 OS X - www.glfw.org
 //------------------------------------------------------------------------
 // Copyright (c) 2009-2010 Camilla Berglund <elmindreda@elmindreda.org>
 //
@@ -63,5 +60,16 @@ typedef struct _GLFWlibraryNSGL
 
 } _GLFWlibraryNSGL;
 
+
+//========================================================================
+// Prototypes for platform specific internal functions
+//========================================================================
+
+int _glfwInitContextAPI(void);
+void _glfwTerminateContextAPI(void);
+int _glfwCreateContext(_GLFWwindow* window,
+                       const _GLFWctxconfig* ctxconfig,
+                       const _GLFWfbconfig* fbconfig);
+void _glfwDestroyContext(_GLFWwindow* window);
 
 #endif // _nsgl_platform_h_

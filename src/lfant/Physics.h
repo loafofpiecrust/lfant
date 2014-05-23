@@ -24,6 +24,7 @@ class btBroadphaseInterface;
 class btCollisionDispatcher;
 class btConstraintSolver;
 class btDefaultCollisionConfiguration;
+class btPersistentManifold;
 
 namespace lfant {
 
@@ -58,13 +59,8 @@ struct GravPoint
 
 struct ContactPoint
 {
-	vec3 point;
+	vec3 pos;
 	vec3 normal;
-
-	ContactPoint(vec3 point, vec3 normal) :
-		point(point), normal(normal)
-	{
-	}
 };
 
 struct Collision
@@ -90,7 +86,7 @@ public:
 		Entity* entity;
 	};
 
-	Physics();
+	Physics(Game* game);
 	virtual ~Physics();
 
 	virtual void Save(Properties* prop) const;
@@ -98,6 +94,7 @@ public:
 
 	virtual void Init();
 	virtual void Update();
+	virtual void Render();
 	virtual void Deinit();
 
 	//void AddConstraint(ConstraintType ct, Entity *p1, Entity *p2);
@@ -105,7 +102,7 @@ public:
 	void RemoveJoint(Joint* joint);
 
 	void AddRigidbody(Rigidbody* ent);
-	void RemoveRigidbody(Rigidbody* ent, bool destroy = false);
+	void RemoveRigidbody(Rigidbody* ent);
 
 	vec3 GetGravity() const;
 	void SetGravity(vec3 grav);
@@ -151,15 +148,18 @@ protected:
 	}
 
 private:
-	static bool OnCollide(string func, btManifoldPoint& cp, const btCollisionObjectWrapper* colObj0, int partId0, int index0,
-						  const btCollisionObjectWrapper* colObj1, int partId1, int index1);
+//	static bool OnCollide(string func, btManifoldPoint& cp, const btCollisionObjectWrapper* colObj0, int partId0, int index0,
+//						  const btCollisionObjectWrapper* colObj1, int partId1, int index1);
+	static void OnCollide(string func, btPersistentManifold* manifold);
 
-	static bool OnCollideEnter(btManifoldPoint& cp, const btCollisionObjectWrapper* colObj0, int partId0, int index0,
-							   const btCollisionObjectWrapper* colObj1, int partId1, int index1);
+//	static bool OnCollideEnter(btManifoldPoint& cp, const btCollisionObjectWrapper* colObj0, int partId0, int index0,
+//							   const btCollisionObjectWrapper* colObj1, int partId1, int index1);
+	static void OnCollideEnter(btPersistentManifold* manifold);
 
 	static bool OnCollideStay(btManifoldPoint& cp, void* body0, void* body1);
 
-	static bool OnCollideExit(void* userPersistentData);
+//	static bool OnCollideExit(void* userPersistentData);
+	static void OnCollideExit(btPersistentManifold* manifold);
 
 	static void OnTick(btDynamicsWorld* world, float delta);
 
@@ -170,7 +170,7 @@ private:
 	ptr<btDefaultCollisionConfiguration> collisionConfig;
 
 	std::deque<Rigidbody*> bodies;
-//	ptr<physics::DebugRenderer> debugRenderer;
+	ptr<physics::DebugRenderer> debugRenderer;
 
 	std::deque<GravPoint> gravityPoints;
 //	vec3 initGravity = vec3(0, -9.81, 0);

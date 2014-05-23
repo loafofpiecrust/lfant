@@ -31,7 +31,7 @@ class Scene : public Subsystem
 	friend class Entity;
 
 public:
-	Scene();
+	Scene(Game* game);
 	virtual ~Scene();
 
 	virtual void Init();
@@ -75,11 +75,11 @@ protected:
 	 */
 	void RemoveEntity(Entity* ent, bool destroy = true);
 
-	uint32_t GenerateEntityId();
+	uint32 GenerateEntityId();
 
 	ptr<Entity> root;
 //	deque< ptr<Entity> > entities;
-	uint32_t currentId = 0;
+	uint32 currentId = 0;
 
 private:
 

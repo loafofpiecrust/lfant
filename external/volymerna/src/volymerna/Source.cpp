@@ -56,6 +56,7 @@ File* Source::GetSound(string name)
 			return snd;
 		}
 	}
+	return nullptr;
 }
 
 }

@@ -49,10 +49,10 @@ public:
 	struct Processor
 	{
 		string name;
-		uint16_t cores;
+		uint16 cores;
 	};
 
-	SystemInfo();
+	SystemInfo(Game* game);
 	virtual ~SystemInfo();
 
 	virtual void Init();
@@ -66,7 +66,7 @@ public:
 	string gpu;
 	string username;
 	Monitor monitor;
-	Range<uint16_t> glVersion = { 0, 0 };
+	Range<uint16> glVersion = { 0, 0 };
 
 protected:
 

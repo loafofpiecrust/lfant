@@ -20,11 +20,15 @@ namespace projectName {
 extern "C" void Launch()
 {
 	// Called from the launcher
-	game = new projectTitle();
+	projectTitle* game = new projectTitle();
 	game->standAlone = true;
 	game->Init();
-	game->Update();
-	delete game;
+	while(!game->IsExited())
+	{
+		game->Update();
+	}
+	game->Destroy();
+//	delete game;
 }
 
 projectTitle::projectTitle()
@@ -44,17 +48,11 @@ void projectTitle::Init()
 
 void projectTitle::Update()
 {
-	// Allows for custom loop setups
-	while(!IsExited())
-	{
-		Game::Update();
-		// Add more systems here.
-	}
-	Game::Destroy();
-	// Code here is equivalent to OnDestroy()
+	Game::Update();
+	// Add more systems here.
 }
 
-void projectTitle::OnDestroy()
+void projectTitle::Deinit()
 {
 	// Called at the end of Destroy()
 }

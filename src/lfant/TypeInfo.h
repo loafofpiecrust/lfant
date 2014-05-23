@@ -54,7 +54,8 @@ using std::is_pointer;
 string Name();
 
 string Demangle(string type);
-string Descope(string type, int amount = -1);
+string Descope(string type);
+string Descope(string type, int amount);
 string Descope(string type, string nspace);
 
 template<typename T>

@@ -23,6 +23,7 @@
 #include <lfant/Time.h>
 #include <lfant/Console.h>
 #include <lfant/ScriptSystem.h>
+#include <lfant/FileSystem.h>
 
 // External
 #include <sqrat/sqratObject.h>
@@ -31,7 +32,8 @@
 namespace lfant
 {
 
-std::deque<ptr<Object::EventBase>> Object::events;
+//decltype(Object::events) Object::events;
+
 
 Object::Object()
 {
@@ -39,11 +41,31 @@ Object::Object()
 
 Object::~Object()
 {
+/*	for(auto i = events.begin(); i != events.end(); ++i)
+	{
+		if((*i)->sender == this)
+		{
+			events.erase(i);
+			--i;
+		}
+	}*/
+/*	for(int i = 0; i < events.size(); ++i)
+	{
+		if(events[i]->sender == this)
+		{
+			events.erase(events.begin()+i);
+			--i;
+		}
+	}*/
+	for(auto& con : eventConnections)
+	{
+		con.disconnect();
+	}
 }
 
-uint32_t Object::GetEventCount()
+uint32 Object::GetEventCount()
 {
-	return Object::events.size();
+	return events.size();
 }
 
 void Object::Init()
@@ -52,20 +74,6 @@ void Object::Init()
 
 void Object::Update()
 {
-	for(uint i = 0; i < timers.size(); ++i)
-	{
-	//	Log("Timer '", timers[i]->name, "' updated at ", timers[i]->time);
-		if(timers[i].time <= 0.0f)
-		{
-			string name = timers[i].name;
-			timers.erase(timers.begin()+i);
-			--i;
-		//	Log("Timer triggered");
-			TriggerEvent(name);
-			continue;
-		}
-		timers[i].time -= game->time->deltaTime;
-	}
 }
 
 void Object::Render()
@@ -81,14 +89,6 @@ void Object::Destroy()
 {
 	Deinit();
 
-	for(uint i = 0; i < Object::events.size(); ++i)
-	{
-		if(events[i]->sender == this)
-		{
-			events[i].reset();
-			events.erase(events.begin()+i);
-		}
-	}
 
 	// @todo Keep?
 //	delete this;
@@ -100,19 +100,21 @@ void Object::Deinit()
 
 void Object::LoadFile(string path)
 {
-	Log(type::Name(this), " loading file '", path, "'.");
+	if(path.empty()) return;
+
+//	GetGame()->Log(type::Name(this), " loading file '", path, "'.");
 	Properties prop;
-	prop.LoadFile(path);
+	prop.LoadFile(GetGame()->GetAssetPath(path).string());
 
 //	string type = type::Descope(type::Name(this));
 //	to_lower(type);
-	Log("Checking for first child");
+//	GetGame()->Log("Checking for first child");
 	if(Properties* pc = prop.GetFirstChild())
 	{
-		Log("Loading first child");
+	//	GetGame()->Log("Loading first child");
 		Load(pc);
 	}
-	Log("Done loading file");
+//	GetGame()->Log("Done loading file");
 }
 
 void Object::Load(Properties *prop)
@@ -135,101 +137,45 @@ void Object::Save(Properties *prop) const
 
 void Object::ScriptBind()
 {
-	Script::BaseClass<Object> inst;
-	
+	Script::ClassBase<Object, Sqrat::Class<Object, Sqrat::NoCopy<Object>>> inst;
+//	Script::BaseClass<Object> inst;
+
 	inst.Func("Init", &Object::Init);
 	inst.Func("Update", &Object::Update);
 	inst.Func("Destroy", &Object::Destroy);
 	inst.Func("Deinit", &Object::Deinit);
 	inst.Func("ConnectEvent", &Object::ConnectScriptEvent);
-	inst.Func("SetTimer", &Object::SetTimer);
-	inst.Func("CancelTimer", &Object::CancelTimer);
-	inst.Func("GetTimer", &Object::GetTimer);
+	inst.Func("TriggerEvent", (void (Object::*)(string))&Object::TriggerEvent);
+//	inst.Func("SetTimer", &Object::SetTimer);
+//	inst.Func("CancelTimer", &Object::CancelTimer);
+//	inst.Func("GetTimer", &Object::GetTimer);
 	inst.Func("Load", &Object::Load);
 	inst.Func("Save", &Object::Save);
 	inst.Func("LoadFile", &Object::LoadFile);
 	inst.Func("SaveFile", &Object::SaveFile);
-	
+
 	inst.Bind();
 }
 
-void Object::ConnectScriptEvent(Object* sender, string name, Sqrat::Object* receiver, Sqrat::Function* func)
+void Object::ConnectScriptEvent(Object* sender, string name, Sqrat::Object receiver, string funcName)
 {
-	boost::algorithm::erase_all(name, " ");
-	name = type::Name(sender) + "::" + name + "()";
+	Sqrat::Function func (receiver, funcName.c_str());
+
+	erase_all(name, " ");
+//	name = type::Name(sender) + "::" + name;
 	EventScript* con = nullptr;
-	for(auto& event : sender->events)
+	for(auto& evt : sender->events)
 	{
-		if(event->name == name)
+		if(evt.first == name && typeid(*evt.second) == typeid(EventScript))
 		{
-			con = dynamic_cast<EventScript*>(event.get());
-			if(con)
-			{
-				con->func = func;
-				con->obj = receiver;
-				return;
-			}
-		}
-	}
-	con = new EventScript(name, func, receiver);
-	sender->events.push_back(con);
-}
-
-bool Object::EventConnected(string name)
-{
-//	erase_all(name, " ");
-	name = type::Name(this) + "::" + name;
-	for(auto& event : events)
-	{
-		if(event->name == name)
-		{
-			return true;
-		}
-	}
-	return false;
-}
-
-void Object::SetTimer(string name, float time)
-{
-//	erase_all(name, " ");
-//	name = type::Name(this) + "::" + name + "()";
-	for(auto& t : timers)
-	{
-		if(t.name == name)
-		{
-			t.time = time;
+			con = static_cast<EventScript*>(evt.second.get());
+			con->Register(func);
 			return;
 		}
 	}
-	timers.emplace_back(name, time);
-}
-
-void Object::CancelTimer(string name)
-{
-//	erase_all(name, " ");
-//	name = type::Name(this) + "::" + name + "()";
-	for(uint i = 0; i < timers.size(); ++i)
-	{
-		if(timers[i].name == name)
-		{
-			timers.erase(timers.begin()+i);
-			return;
-		}
-	}
-}
-
-float* Object::GetTimer(string name)
-{
-//	erase_all(name, " ");
-//	name = type::Name(this) + "::" + name + "()";
-	for(auto& t : timers)
-	{
-		if(t.name == name)
-		{
-			return &(t.time);
-		}
-	}
-	return nullptr;
+	con = new EventScript();
+	con->Register(func);
+	sender->events[name] = con;
 }
 
 }

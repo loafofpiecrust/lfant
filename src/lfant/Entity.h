@@ -14,6 +14,7 @@
 //#include <boost/uuid/uuid.hpp>
 //#include <boost/uuid/uuid_generators.hpp>
 #include <forward_list>
+#include <boost/ptr_container/ptr_deque.hpp>
 
 // Internal
 #include <lfant/Object.h>
@@ -39,8 +40,6 @@ class Item;
 class Transform;
 class Entity;
 
-bool EntityActive(Entity* ent);
-
 /** @addtogroup Game
  *	@{
  */
@@ -59,7 +58,7 @@ bool EntityActive(Entity* ent);
  *	@todo
  *		Organize...
  */
-class Entity final : public Object
+class Entity : public Object
 {
 	friend class lfant::editor::gui::Inspector;
 	friend class lfant::editor::gui::EntityTree;
@@ -124,23 +123,15 @@ public:
 	void Clone(Entity* ent, string name = "", Entity* parent = nullptr) const;
 
 	template<typename C>
-	C* GetComponent()
+	C* GetComponent() const
 	{
 	//	string type = type::Name<C>();
 		C* result = nullptr;
-		for(ptr<Component>& comp : components)
+		for(auto& comp : components)
 		{
-			if(!comp.get())
-			{
-				std::cout << "Wartf comp doesnt exist\n";
-			}
-			
-			std::cout << "(" << this << ")::GetComponent() curr = " << type::Name(comp.get()) << "\n";
-			
 			result = dynamic_cast<C*>(comp.get());
 			if(result)
 			{
-				std::cout << "Successful GetComponent() " << result << "\n";
 				return result;
 			}
 		}
@@ -149,48 +140,20 @@ public:
 
 	Component* GetComponent(string name) const;
 
-	template<typename C>
-	std::deque<C*> GetComponents() const
-	{
-		std::deque<C*> comps;
-		for(auto& comp : components)
-		{
-			if(type::Name(comp) == type::Name<C>())
-			{
-				comps.push_back(dynamic_cast<C*>(comp.get()));
-			}
-		}
-		return comps;
-	}
-
 	Entity* GetChild(string name, bool recursive = false) const;
+	Entity* GetChildById(uint32 id) const;
 
-	template<typename C>
-	std::deque<C*> GetChildrenWithComponent(bool recursive = false) const
-	{
-		C* temp = nullptr;
-		std::deque<C*> result;
-		for(auto& child : children)
-		{
-			temp = child->GetComponent<C>();
-			if(temp)
-			{
-				result.push_back(temp);
-			}
-		}
-		return result;
-	}
-	
-	const std::deque<ptr<Entity>>& GetChildren() const;
+	const boost::ptr_deque<Component>& GetComponents() const;
+	const std::deque<ptr<Entity> >& GetChildren() const;
 
 //	Entity* SpawnChild();
 
 	bool HasTag(string tag) const;
 
-	uint32_t GetId() const { return id; }
+	uint32 GetId() const { return id; }
 
-	uint32_t GetLayer() const;
-	void SetLayer(uint32_t layer);
+	uint32 GetLayer() const;
+	void SetLayer(uint32 layer);
 
 	Entity* GetParent() const;
 	Entity* GetParent(uint height) const;
@@ -199,16 +162,19 @@ public:
 	string GetName() const;
 	void Rename(string name);
 
+	void Enable(bool on);
+	bool IsEnabled() const;
+
+	virtual Game* GetGame() const;
+
 	Transform* transform;
 
-	bool active = true;
+	bool enabled = true;
 	float lifetime = 0.0f;
-	std::deque<string> tags;
-	
-	std::deque<ptr<Entity>> children;
+	std::vector<string> tags;
 
 private:
-	Entity();
+	Entity(Scene* scene);
 
 	virtual void Init();
 	virtual void Update();
@@ -229,7 +195,7 @@ private:
 		TriggerEvent(name, args...);
 		for(auto& c : children)
 		{
-			if(!EntityActive(c)) continue;
+			if(!c->IsEnabled()) continue;
 			c->TriggerEventWithChildren(name, args...);
 		}
 	}
@@ -238,24 +204,27 @@ private:
 	void TriggerEventWithParent(string name, P... args)
 	{
 		TriggerEvent(name, args...);
-		if(parent && EntityActive(parent))
+		if(parent && parent->enabled)
 		{
 			parent->TriggerEvent(name, args...);
 		}
 	}
 
-
+//	boost::ptr_deque<Component> components;
+//	boost::ptr_deque<Entity> children;
 	std::deque<ptr<Component>> components;
+	std::deque<ptr<Entity>> children;
 
 	string name = "root";
 
 	/// Scene-unique identifier.
-	uint32_t id = 0;
+	uint32 id = 0;
 
 	/// The layer of this entity for primarily display filtering
-	uint32_t layer = 0;
+	uint32 layer = 0;
 
 	Entity* parent = nullptr;
+	Scene* scene = nullptr;
 
 	bool useLifeTime = false;
 };

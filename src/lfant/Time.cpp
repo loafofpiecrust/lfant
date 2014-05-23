@@ -15,11 +15,13 @@
 
 // Internal
 #include <lfant/Console.h>
+#include <lfant/Game.h>
 
 namespace lfant
 {
 
-Time::Time() :
+Time::Time(Game* game) :
+	Subsystem(game),
 	timeScale(1.0f),
 	dateTime(boost::posix_time::second_clock::local_time())
 {
@@ -44,10 +46,10 @@ boost::posix_time::ptime& Time::GetDate()
 void Time::ResetTime()
 {
 	// Figure something out?
-//	Log("Time::ResetTime: Started");
+//	GetGame()->Log("Time::ResetTime: Started");
 	startTime = hclock::now();
 //	glfwSetTime(0.0);
-//	Log("Time::ResetTime: Finished");
+//	GetGame()->Log("Time::ResetTime: Finished");
 }
 
 void Time::UpdateTimes()
@@ -62,8 +64,8 @@ void Time::Init()
 {
 	Subsystem::Init();
 
-	Log("\n"+boost::lexical_cast<string>(GetDate()));
-	
+	GetGame()->Log("\n"+boost::lexical_cast<string>(GetDate()));
+
 	ResetTime();
 	UpdateTimes();
 }
@@ -71,6 +73,66 @@ void Time::Init()
 void Time::Update()
 {
 	UpdateTimes();
+
+	for(auto i = timers.begin(); i != timers.end(); ++i)
+	{
+	//	GetGame()->Log("Timer '", timers[i]->name, "' updated at ", timers[i]->time);
+		auto& t = *i;
+		if(t.time <= 0.0f)
+		{
+			string name = t.name;
+			timers.erase(i);
+			--i;
+		//	GetGame()->Log("Timer triggered");
+			TriggerEvent(name);
+			continue;
+		}
+		t.time -= deltaTime;
+	}
 }
+
+void Time::SetTimer(string name, float time)
+{
+//	erase_all(name, " ");
+//	name = type::Name(this) + "::" + name + "()";
+	for(auto& t : timers)
+	{
+		if(t.name == name)
+		{
+			t.time = time;
+			return;
+		}
+	}
+	timers.emplace_back(name, time);
+}
+
+void Time::CancelTimer(string name)
+{
+//	erase_all(name, " ");
+//	name = type::Name(this) + "::" + name + "()";
+	for(uint i = 0; i < timers.size(); ++i)
+	{
+		if(timers[i].name == name)
+		{
+			timers.erase(timers.begin()+i);
+			return;
+		}
+	}
+}
+
+float* Time::GetTimer(string name)
+{
+//	erase_all(name, " ");
+//	name = type::Name(this) + "::" + name + "()";
+	for(auto& t : timers)
+	{
+		if(t.name == name)
+		{
+			return &(t.time);
+		}
+	}
+	return nullptr;
+}
+
 
 }

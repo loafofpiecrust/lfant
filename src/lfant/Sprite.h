@@ -57,12 +57,11 @@ public:
 			Default = Loop
 		};
 
-		string name = "Animation";
-		Material material;
-		uint16_t rows = 5;
-		uint16_t columns = 10;
+	//	string name = "Animation";
+		uint32 start = 0;
+		uint32 end = 1;
 		Mode mode = Mode::Default;
-		uint16_t frameRate = 5;
+		uint16 frameRate = 5;
 	};
 
 	Sprite();
@@ -77,11 +76,11 @@ public:
 	virtual void Load(Properties *props);
 
 	/// The sprite animations to be used.
-	std::deque<Animation> animations;
+	std::map<string, Animation> animations;
 
 protected:
 
-	void SetUV(uint32_t idx, vec2 value);
+	void SetUV(uint32 idx, vec2 value);
 
 	/// The currently playing animation.
 	Animation* currentAnim = nullptr;

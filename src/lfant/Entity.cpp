@@ -8,7 +8,7 @@
 *		http://www.apache.org/licenses/LICENSE-2.0
 */
 
-#include <lfant/Entity.h>
+#include "./Entity.h"
 
 // Internal
 #include <lfant/Time.h>
@@ -25,6 +25,8 @@
 #include <lfant/ScriptSystem.h>
 #include <lfant/Camera.h>
 #include <lfant/Random.h>
+#include "ScriptComp.h"
+#include "FileSystem.h"
 
 // External
 #include <stdarg.h>
@@ -33,10 +35,11 @@ namespace lfant {
 
 bool EntityActive(Entity* ent)
 {
-	return ent->active;
+	return ent->enabled;
 }
 
-Entity::Entity()
+Entity::Entity(Scene* scene) :
+	scene(scene)
 {
 	transform = AddComponent<Transform>();
 }
@@ -58,7 +61,7 @@ Entity& Entity::operator=(const Entity& other)
 
 Entity* Entity::Clone(string name, Entity* parent) const
 {
-	Entity* ent = new Entity;
+	Entity* ent = new Entity(scene);
 	Clone(ent, name, parent);
 	return ent;
 }
@@ -70,7 +73,7 @@ void Entity::Clone(Entity* ent, string name, Entity* parent) const
 
 	ent->name = name;
 	ent->parent = parent;
-	game->scene->GetRoot()->AddChild(ent);
+	scene->GetRoot()->AddChild(ent);
 
 	for(auto& c : components)
 	{
@@ -82,10 +85,6 @@ void Entity::Clone(Entity* ent, string name, Entity* parent) const
 	}
 }
 
-uint32_t GenerateId()
-{
-}
-
 /*******************************************************************************
 *
 *		Generic Entity functions
@@ -94,7 +93,7 @@ uint32_t GenerateId()
 
 void Entity::Init()
 {
-	Log("Entity::Init: Touch.");
+	GetGame()->Log("Entity::Init: Touch.");
 	Object::Init();
 
 //	if(!transform)
@@ -110,7 +109,7 @@ void Entity::Init()
 	if(id == 0)
 	{
 		// Generate new id?
-		id = game->scene->GenerateEntityId();
+		id = scene->GenerateEntityId();
 	}
 }
 
@@ -118,11 +117,7 @@ void Entity::Update()
 {
 	if(lifetime > 0.0f)
 	{
-		useLifeTime = true;
-	}
-	if(useLifeTime)
-	{
-		lifetime -= game->time->deltaTime;
+		lifetime -= GetGame()->time->deltaTime;
 		if(lifetime <= 0.0f)
 		{
 			Destroy();
@@ -136,17 +131,10 @@ void Entity::Update()
 			comp->Update();
 		}
 	}
-	for(auto& comp : components)
-	{
-		if(comp->IsEnabled())
-		{
-			comp->PostUpdate();
-		}
-	}
 
 	for(auto& child : children)
 	{
-		if(child->active)
+		if(child->IsEnabled())
 		{
 			child->Update();
 		}
@@ -157,7 +145,7 @@ void Entity::Render()
 {
 	for(auto& comp : components)
 	{
-		if(comp->IsEnabled())
+		if(comp->IsRendered() && comp->IsEnabled())
 		{
 			comp->Render();
 		}
@@ -165,7 +153,7 @@ void Entity::Render()
 
 	for(auto& child : children)
 	{
-		if(child->active)
+		if(child->IsEnabled())
 		{
 			child->Render();
 		}
@@ -183,7 +171,7 @@ void Entity::FixedUpdate()
 	}
 	for(auto& child : children)
 	{
-		if(child->active)
+		if(child->IsEnabled())
 		{
 			child->FixedUpdate();
 		}
@@ -194,14 +182,16 @@ void Entity::AddChild(Entity* ent)
 {
 	children.push_back(ent);
 	ent->parent = this;
+	std::cout << name << " adding child " << ent << " to " << scene << "\n";
+	ent->scene = this->scene;
 }
 
 Entity* Entity::AddChild(string name)
 {
-	Entity* ent = new Entity;
+	Entity* ent = new Entity(scene);
 	ent->name = name;
 	AddChild(ent);
-	game->scene->TriggerEvent("AddEntity", ent);
+	scene->TriggerEvent("AddEntity", ent);
 	return ent;
 }
 
@@ -213,12 +203,12 @@ void Entity::RemoveChild(Entity* ent)
 void Entity::RemoveChild(Entity* ent, bool destroy)
 {
 	//	children.remove(ptr<Entity>(ent));
-	for(uint i = 0; i < children.size(); ++i)
+	for(auto i = children.begin(); i != children.end(); ++i)
 	{
-		if(children[i] == ent)
+		if(*i == ent)
 		{
-			if(!destroy) children[i].release();
-			children.erase(children.begin()+i);
+			if(!destroy) (*i).release();
+			children.erase(i);
 			break;
 		}
 	}
@@ -227,18 +217,20 @@ void Entity::RemoveChild(Entity* ent, bool destroy)
 
 void Entity::AddComponent(Component* comp)
 {
+	if(!comp) return;
+
 	// @note Needed to call comp->Deinit() here?
 	if(comp->GetOwner())
 	{
 		comp->GetOwner()->RemoveComponent(comp);
 	}
-	
-	Log("Entity::AddComponent(", comp, ")");
+
+	GetGame()->Log("Entity::AddComponent(", comp, ")");
 	components.push_back(comp);
 	comp->owner = this;
 	comp->Init();
 //	TriggerEvent("AddComponent", comp);
-	Log("Entity::AddComponent: Calling ", "OnSetComponent"+type::Descope(type::Name(comp)));
+	GetGame()->Log("Entity::AddComponent: Calling ", "OnSetComponent"+type::Descope(type::Name(comp)));
 	TriggerEvent("OnSetComponent"+type::Descope(type::Name(comp)), comp);
 	TriggerEvent("AddComponent", comp);
 }
@@ -247,49 +239,62 @@ void Entity::Deinit()
 {
 	Object::Deinit();
 
-	Log("Entity::Destroy: Destroying ", children.size()," children.");
+	GetGame()->Log("Entity::Destroy: Destroying ", children.size()," children.");
 	for(auto& child : children)
 	{
 		child->Deinit();
 	}
-	
-	Log("Entity::Destroy: Destroying ", components.size()," components.");
+	children.clear();
+
+	GetGame()->Log("Entity::Destroy: Destroying ", components.size()," components.");
 	for(auto& compo : components)
 	{
-		compo->Deinit();
+		if(compo) compo->Deinit();
 	}
-//	components.clear();
+	components.clear();
 }
 
 void Entity::Destroy()
 {
-	Log("Entity::Destroy: Touch.");
+	GetGame()->Log("Entity::Destroy: Touch.");
 	Object::Destroy();
-	Log("Entity::Destroy: super called.");
+	GetGame()->Log("Entity::Destroy: super called.");
 
-	Log("Entity::Destroy: Removing from parent.");
-	parent->RemoveChild(this);
+	GetGame()->Log("Entity::Destroy: Removing from parent.");
+	if(parent) parent->RemoveChild(this);
 }
 
 Component* Entity::GetComponent(string name) const
 {
+	auto reg = Component::typeRegistry.Get(name);
+//	std::cout << "getting from typeRegistry took " << hclock::now()-start << "\n";
+	if(!reg)
+	{
+		GetGame()->Log("Component type not registered");
+		return nullptr;
+	}
+
+	string ctype = "";
 	for(auto& comp : components)
 	{
-		string type = type::Name(comp);
-		if(type::Descope(type, "lfant") == name || type::Descope(type) == name || type == name)
+		const std::type_info& ti = typeid(*comp);
+
+	//	ctype = type::Name(comp);
+	//	auto reg2 = Component::typeRegistry.Get(typeid(comp));
+	//	if(!reg2) continue; // Very rare, but provide for it just in case
+
+	//	start = hclock::now();
+	//	std::cout << "checking comp '" << typeid(*comp).name() << "'\n";
+		if(reg->typeInfo == ti || reg->Inherits(ti))
 		{
 			return comp;
 		}
-		auto reg = Component::typeRegistry.Get(name);
-		if(reg && reg->Inherits(type))
-		{
-			return comp;
-		}
+	//	std::cout << "two typeid comparisons took " << hclock::now()-start << "\n";
 	}
 	return nullptr;
 }
 
-uint32_t Entity::GetLayer() const
+uint32 Entity::GetLayer() const
 {
 	if(layer == -1 && parent)
 	{
@@ -301,7 +306,7 @@ uint32_t Entity::GetLayer() const
 	}
 }
 
-void Entity::SetLayer(uint32_t layer)
+void Entity::SetLayer(uint32 layer)
 {
 	this->layer = layer;
 }
@@ -315,49 +320,50 @@ void Entity::SetLayer(uint32_t layer)
 
 void Entity::RemoveComponent(Component* comp)
 {
-	Log("About to remove comp '", comp, "'.");
-	for(uint i = 0; i < components.size(); ++i)
+	GetGame()->Log("About to remove comp '", comp, "'.");
+	for(auto i = components.begin(); i != components.end(); ++i)
 	{
-		if(components[i] == comp)
+		if(*i == comp)
 		{
 			TriggerEvent("RemoveComponent", comp);
 			TriggerEvent("OnSetComponent"+type::Descope(type::Name(comp)), comp);
-			components.erase(components.begin()+i);
+			components.erase(i);
 			break;
 		}
 	}
-	Log("Removed component");
+	GetGame()->Log("Removed component");
 }
 
 template<typename C>
 void Entity::RemoveComponent()
 {
-	uint i = 0;
-	for(auto& comp : components)
+	for(auto i = components.begin(); i != components.end(); ++i)
 	{
-		if(type::Name<C>() == type::Name(comp))
+		Component* comp = (*i).get();
+		if(typeid(C) == typeid(*comp))
 		{
-			TriggerEvent("RemoveComponent", comp.get());
+			TriggerEvent("RemoveComponent", comp);
 			comp->Destroy();
-			components.erase(components.begin()+i);
+			components.erase(i);
 			TriggerEvent("OnSetComponent"+type::Descope(type::Name<C>()), nullptr);
 		}
-		++i;
 	}
 }
 
 void Entity::RemoveComponent(string type)
 {
-	for(uint i = 0; i < components.size(); ++i)
+	auto reg = Component::typeRegistry.Get(type);
+	if(!reg) return;
+
+	for(auto i = components.begin(); i != components.end(); ++i)
 	{
-		Component* comp = components[i];
-		string t = type::Name(comp);
-		if(t == type || type::Descope(t) == type)
+		Component* comp = i->get();
+		if(reg->Is(typeid(*comp)))
 		{
 			TriggerEvent("RemoveComponent", comp);
 			comp->Destroy();
-			components.erase(components.begin()+i);
-			TriggerEvent("OnSetComponent"+type::Descope(t), nullptr);
+			components.erase(i);
+			TriggerEvent("OnSetComponent"+type, nullptr);
 		}
 	}
 }
@@ -394,17 +400,33 @@ void Entity::Rename(string name)
 {
 	this->name = name;
 	/// @todo do other stuff here?
-//	TriggerEvent("Rename", name);
+	//	TriggerEvent("Rename", name);
+}
+
+void Entity::Enable(bool on)
+{
+	enabled = on;
+}
+
+bool Entity::IsEnabled() const
+{
+	return enabled;
+}
+
+Game* Entity::GetGame() const
+{
+//	std::cout << name << " checking " << scene << "\n";
+	return scene->GetGame();
 }
 
 void Entity::Reparent(Entity* ent)
 {
-	Log("Reparenting from ", GetParent());
+	GetGame()->Log("Reparenting from ", GetParent());
 	GetParent()->RemoveChild(this, false);
 	if(ent)
 		ent->AddChild(this);
 	else
-		game->scene->GetRoot()->AddChild(this);
+		scene->GetRoot()->AddChild(this);
 }
 
 Entity* Entity::GetChild(string name, bool recursive) const
@@ -496,8 +518,9 @@ void Entity::ScriptBind()
 {
 	Script::Class<Entity, Object> inst;
 //	inst.Var("layer", &Entity::layer);
-	inst.Var("active", &Entity::active);
+	inst.Var("active", &Entity::enabled);
 	inst.Var("lifetime", &Entity::lifetime);
+	inst.Var("transform", &Entity::transform);
 
 	inst.Func("Init", &Entity::Init);
 	inst.Func("Update", &Entity::Update);
@@ -509,10 +532,10 @@ void Entity::ScriptBind()
 	inst.Func("GetChild", &Entity::GetChild);
 
 	inst.Prop("name", &Entity::GetName, &Entity::Rename);
-	inst.Prop<uint32_t>("layer", &Entity::GetLayer, &Entity::SetLayer);
-	inst.Prop<uint32_t>("id", &Entity::GetId);
+	inst.Prop<uint32>("layer", &Entity::GetLayer, &Entity::SetLayer);
+	inst.Prop<uint32>("id", &Entity::GetId);
 	inst.Prop<Entity*>("parent", &Entity::GetParent, &Entity::Reparent);
-	
+
 	inst.Bind();
 }
 
@@ -525,21 +548,23 @@ void Entity::ScriptBind()
 
 void Entity::Save(Properties* prop) const
 {
-	Log("Saving entity to ", prop);
-	prop->type = "Entity";
+	std::cout << "scne: " << scene << "\n";
+	std::cout << "gami: " << GetGame() << "\n";
+//	GetGame()->Log("Saving entity to ", prop);
+	prop->SetType("Entity");
 	prop->name = name;
 //	prop->Set("name", name);
 
 	prop->Set("id", id);
 	prop->Set("tags", tags);
 	prop->Set("layer", layer);
-	prop->Set("active", active);
+	prop->Set("active", enabled);
 	prop->Set("lifetime", lifetime);
 
 	for(auto& comp : components)
 	{
-		auto cp = prop->AddChild();
-		Log("Saving comp: ", type::Name(comp), " to ", cp);
+		auto cp = prop->AddChild("Component");
+		GetGame()->Log("Saving comp: ", type::Name(comp), " to ", cp);
 		comp->Save(cp);
 	}
 
@@ -554,18 +579,18 @@ void Entity::Load(Properties* prop)
 //	prop->Get("name", name);
 	if(!prop->name.empty()) name = prop->name;
 	prop->Get("id", id);
-//	prop->Get("tags", tags);
+	prop->Get("tags", tags);
 	prop->Get("layer", layer);
-	prop->Get("active", active);
+	prop->Get("active", enabled);
 	prop->Get("lifetime", lifetime);
 
-	Log("Entity::Load: Loaded basic properties.");
+	GetGame()->Log("Entity::Load: Loaded basic properties.");
 
 	std::deque<string> files;
 	prop->Get("files", files);
 	for(auto& file : files)
 	{
-		Log("Loading entity from file path");
+		GetGame()->Log("Loading entity from file path");
 		Properties fp;
 		fp.LoadFile(file);
 		if(Properties* pc = fp.GetFirstChild())
@@ -596,9 +621,16 @@ void Entity::Load(Properties* prop)
 	{
 		if(child->IsType("Component"))
 		{
-			if(child->name != "Transform")
+			if(child->IsNamed("Script"))
 			{
-				Log("Entity::Load: Component type '"+child->name+"'");
+				string file = "";
+				child->Get("file", file);
+				component = ScriptComp::LoadScript(GetGame(), GetGame()->GetAssetPath(file).string());
+				AddComponent(component);
+			}
+			else if(child->name != "Transform")
+			{
+				GetGame()->Log("Entity::Load: Component type '"+child->name+"'");
 				if((component = GetComponent(child->name)))
 				{
 					component->Load(child);
@@ -606,9 +638,9 @@ void Entity::Load(Properties* prop)
 				else
 				{
 					component = AddComponent(child->name);
-					component->Load(child);
+					if(component) component->Load(child);
 				}
-				Log("Entity::Load: Added component, ", component, " to ", component->GetOwner());
+				if(component) GetGame()->Log("Entity::Load: Added component, ", component, " to ", component->GetOwner());
 			}
 			else
 			{
@@ -624,7 +656,7 @@ void Entity::Load(Properties* prop)
 			}
 		}
 	}
-	
+
 	Init();
 }
 

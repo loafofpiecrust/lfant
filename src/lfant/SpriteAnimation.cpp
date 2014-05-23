@@ -54,7 +54,7 @@ void SpriteAnimation::Update()
 			sprite->SetUV(4, vec2(currentFrame.x + x, currentFrame.y + y));
 			sprite->SetUV(5, vec2(currentFrame.x + x, currentFrame.y));
 
-			currentTime += game->time->deltaTime;
+			currentTime += GetGame()->time->deltaTime;
 			if(currentTime >= currentAnim->frameRate)
 			{
 				currentTime = 0.0f;

@@ -34,7 +34,8 @@
 namespace lfant
 {
 
-Scene::Scene()
+Scene::Scene(Game* game) :
+	Subsystem(game)
 {
 }
 
@@ -46,10 +47,10 @@ void Scene::Init()
 {
 	Subsystem::Init();
 
-	root = new Entity();
+	root = new Entity(this);
 	if(game->defaultScene != "")
 	{
-		Log("About to load '"+game->defaultScene+"' as default.");
+		GetGame()->Log("About to load '"+game->defaultScene+"' as default.");
 		LoadFile(game->defaultScene);
 	}
 }
@@ -74,15 +75,15 @@ void Scene::FixedUpdate()
 void Scene::Deinit()
 {
 	Subsystem::Deinit();
-	Clear();
+	root->Deinit();
+	root.reset();
 }
 
 void Scene::Clear()
 {
-//	root->ClearChildren();
 }
 
-uint32_t Scene::GenerateEntityId()
+uint32 Scene::GenerateEntityId()
 {
 	return ++currentId;
 }
@@ -94,14 +95,14 @@ void Scene::Save(Properties* prop) const
 //	prop->Set("file", name);
 
 	root->Save(prop->AddChild());
-	Log("Saving scene took ", game->time->GetTime() - t, " seconds");
+	GetGame()->Log("Saving scene took ", game->time->GetTime() - t, " seconds");
 }
 
 void Scene::Load(Properties *prop)
 {
 	double t = game->time->GetTime();
 	currentId = 0;
-	Log("Scene::Load: Loading scene node");
+	GetGame()->Log("Scene::Load: Loading scene node");
 //	Properties* systems = prop->GetChild("systems");
 	for(Properties* p : prop->children)
 	{
@@ -109,7 +110,7 @@ void Scene::Load(Properties *prop)
 		{
 			if(p->name == "Physics")
 			{
-				Log("Loading physics from scene");
+				GetGame()->Log("Loading physics from scene");
 				game->physics->Load(p);
 			}
 			else if(p->name == "Network")
@@ -125,7 +126,7 @@ void Scene::Load(Properties *prop)
 
 	GetRoot()->Load(prop);
 
-	Log("Loading scene took ", game->time->GetTime() - t, " seconds");
+	GetGame()->Log("Loading scene took ", game->time->GetTime() - t, " seconds");
 }
 
 void Scene::LoadFile(string path)
@@ -141,10 +142,9 @@ std::deque<Entity*> Scene::GetEntities(string tag) const
 	{
 		if(ent->HasTag(tag))
 		{
-			result.push_back(ent);
+			result.push_back(ent.get());
 		}
 	}
 	return result;
 }
-
 }

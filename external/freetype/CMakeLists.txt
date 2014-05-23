@@ -1,12 +1,7 @@
 project(freetype)
 
 file(GLOB SRC_FILES
-	"src/base/ftbase.c"
-	"src/base/ftinit.c"
-	"src/base/ftstream.c"
-	"src/base/ftdebug.c"
-	"src/base/ftsystem.c"
-	"src/base/ftmm.c"
+	"src/base/*.c"
 	"src/bzip2/ftbzip2.c"
 	"src/gzip/ftgzip.c"
 	"src/bdf/bdf.c"
@@ -32,8 +27,12 @@ file(GLOB HEADER_FILES
 	"include/*.h"
 	)
 
-#list(REMOVE_ITEM SRC_FILES
-#	)
+if(NOT PLATFORM STREQUAL "macosx")
+list(REMOVE_ITEM SRC_FILES
+	${PROJECT_SOURCE_DIR}/src/base/ftbase.c
+	${PROJECT_SOURCE_DIR}/src/base/ftmac.c
+	)
+endif()
 
 add_library(${PROJECT_NAME} STATIC ${SRC_FILES} ${HEADER_FILES})
 

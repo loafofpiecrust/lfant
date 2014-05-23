@@ -14,7 +14,7 @@
 #include <lfant/Texture.h>
 #include <lfant/Rect.h>
 #include <lfant/Shader.h>
-#include <lfant/Mesh.h>
+#include <lfant/Geometry.h>
 
 // External
 
@@ -23,15 +23,17 @@ namespace lfant {
 class FrameBuffer : public Object
 {
 public:
-	FrameBuffer();
+	FrameBuffer(Game* game);
 	~FrameBuffer();
 
 	virtual void Init();
 	virtual void Deinit();
 
+	virtual Game* GetGame() const;
+
 	void DrawBuffers();
 
-	static void Clear();
+	void Clear();
 
 	void Bind();
 	static void Unbind();
@@ -41,7 +43,7 @@ public:
 
 	static FrameBuffer* GetCurrent();
 
-	uint32_t GetAttachment(uint32_t idx);
+	uint32 GetAttachment(uint32 idx);
 
 	void ResizeViewport();
 	void SetRect(URect r) { rect = r; }
@@ -52,7 +54,7 @@ public:
 	void GetTextures(Shader* sh) const;
 	Texture* GetTexture(string name) const;
 
-	void SetCurrentTexture(string name);
+	void BindTextures(Shader* sh = nullptr);
 
 	virtual void BeginRender();
 	virtual void Render();
@@ -60,26 +62,29 @@ public:
 
 	URect rect {0,0,0,0};
 	bool hasDepth = false;
-	uint32_t startIndex = 0;
+	uint32 startIndex = 0;
 //	ptr<Shader> shader;
 
+	void DrawBuffer(int idx);
 protected:
-	uint32_t id = 0;
+	uint32 id = 0;
 
-	std::deque<string> textureNames;
-	std::deque<Texture*> textures;
-	Texture* currentTex = nullptr;
-	Texture* depthTexture = nullptr;
-	string depthTexName = "";
+//	std::deque<string> textureNames;
+	std::deque<ptr<Texture>> textures;
+	ptr<Texture> depthTexture;
+//	Texture* currentTex = nullptr;
+//	string depthTexName = "";
 
 	Buffer<vec2> posBuffer;
 //	Mesh::Buffer<vec2> uvBuffer = 0;
-	ptr<Shader> shader;
+	std::shared_ptr<Shader> shader;
 
-	std::vector<uint32_t> drawBuffers;
-	uint32_t depthBuffer = 0;
+	std::vector<uint32> drawBuffers;
+	uint32 depthBuffer = 0;
 
 	static FrameBuffer* current;
+
+	Game* game = nullptr;
 
 private:
 };

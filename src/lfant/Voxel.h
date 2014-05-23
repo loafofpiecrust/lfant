@@ -10,7 +10,7 @@
 #pragma once
 
 // internal
-#include <lfant/Mesh.h>
+#include <lfant/Geometry.h>
 
 // external
 

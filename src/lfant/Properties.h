@@ -23,6 +23,7 @@
 namespace lfant {
 
 class Entity;
+class Scene;
 
 /** @addtogroup Game
  *	 @{
@@ -59,10 +60,34 @@ class Properties
 //	friend class lfant::editor::gui::Window;
 public:
 
+	class Value
+	{
+	public:
+		string str = "";
+		const std::type_info* type = &typeid(string);
+
+		Value() {}
+		Value(string str) : str(str) {}
+		Value(string str, const std::type_info& type) : str(str), type(&type) {}
+
+		operator string()
+		{
+			return str;
+		}
+
+		Value& operator=(const string& str)
+		{
+			this->str = str;
+			return *this;
+		}
+	};
+
 	Properties();
 	Properties(string path);
 	Properties(Properties* parent, string type = "", string name = "");
 	~Properties();
+	
+	static void ScriptBind();
 
 	Iterator begin();
 	Iterator end();
@@ -82,7 +107,7 @@ public:
 	template<typename T>
 	void Set(string name, const T& value)
 	{
-		SetString(name, lexical_cast<string>(value));
+		SetString(name, Value(lexical_cast<string>(value), typeid(T)));
 	}
 
 	template<typename T>
@@ -95,7 +120,7 @@ public:
 		}
 	}
 
-	void Get(string name, Entity*& ref);
+	void Get(string name, Entity*& ref, Scene* scene);
 	void Set(string name, Entity* const& value);
 
 	template<typename T = string>
@@ -109,13 +134,16 @@ public:
 //	Properties* AddArray(string name);
 	Properties* AddChild(string name = "");
 
+	void SetType(string type);
+	void Rename(string name);
+
 	bool IsType(string type);
 	bool IsNamed(string name);
 
 	string type = "";
 	string name = "";
 
-	std::map<string, string> values;
+	std::map<string, Value> values;
 	std::deque<ptr<Properties>> children;
 protected:
 
@@ -123,7 +151,7 @@ private:
 	Properties* GetTopParent();
 
 	string GetString(string name);
-	void SetString(string name, string value);
+	void SetString(string name, Value value);
 
 //	qumap<string, string> enums;
 	Properties* parent = nullptr;

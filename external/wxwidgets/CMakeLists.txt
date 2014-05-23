@@ -8,13 +8,7 @@ file(GLOB SRC_FILES
 	"src/generic/*.cpp"
 	"src/html/*.cpp"
 	"src/propgrid/*.cpp"
-#	"src/regex/*.c"
 	"src/ribbon/*.cpp"
-#	src/xml/*.cpp
-#	"src/richtext/*.cpp"
-#	"src/stc/*.cpp"
-#	"src/univ/*.cpp"
-#	src/unix/utilsx11.cpp
 	)
 
 if(PLATFORM STREQUAL "linux")

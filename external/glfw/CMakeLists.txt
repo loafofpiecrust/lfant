@@ -60,11 +60,25 @@ add_definitions(
 
 #set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -lXext -lX11")
 
+if(NOT ANDROID)
+	add_definitions(
+		-D_GLFW_USE_OPENGL
+	)
+else()
+	add_definitions(
+		-D_GLFW_USE_GLESV2
+	)
+endif()
+
 target_link_libraries(${PROJECT_NAME}
 	m
 	)
 
 if(PLATFORM STREQUAL "linux")
+	add_definitions(
+		-D_GLFW_X11
+		-D_GLFW_GLX
+	)
 	target_link_libraries(${PROJECT_NAME}
 		GL
 		GLU
@@ -78,6 +92,10 @@ if(PLATFORM STREQUAL "linux")
 	)
 endif()
 if(PLATFORM STREQUAL "windows")
+	add_definitions(
+		-D_GLFW_WIN32
+		-D_GLFW_WGL
+	)
 	target_link_libraries(${PROJECT_NAME}
 		opengl32
 		glu32

@@ -23,7 +23,7 @@ namespace thread {
  *	 @{
  */
 
-void Sleep(uint32_t milli);
+void Sleep(uint32 milli);
 
 /** @} */
 /** @} */

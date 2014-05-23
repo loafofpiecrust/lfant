@@ -20,13 +20,14 @@
 #include <lfant/FileSystem.h>
 #include <lfant/Console.h>
 #include <lfant/Thread.h>
+#include <lfant/Game.h>
 
 using namespace std;
 
 namespace lfant
 {
 
-deque<Texture*> Texture::textures;
+deque<std::weak_ptr<Texture>> Texture::textureCache;
 Texture* Texture::current;
 
 unsigned int unitFromIndex(unsigned int index)
@@ -51,18 +52,24 @@ Texture::Texture() :
 {
 }
 
-void Texture::Load(Properties* prop)
+Texture::~Texture()
 {
-	prop->Get("file", path);
-	Log("Tex path: '"+path+"'.");
-	prop->Get("anisoLevel", anisoLevel);
+	glDeleteTextures(1, &id);
+}
 
-	LoadFile();
+std::shared_ptr<Texture> Texture::Load(lfant::Properties* prop)
+{
+	string path = "";
+	prop->Get("file", path);
+//	GetGame()->Log("Tex path: '"+path+"'.");
+//	prop->Get("anisoLevel", anisoLevel);
+
+	return LoadFile(path);
 }
 
 void Texture::Save(Properties* prop) const
 {
-	Object::Save(prop);
+//	Object::Save(prop);
 
 	prop->Set("file", path);
 	prop->Set("anisoLevel", anisoLevel);
@@ -73,14 +80,19 @@ uint32 Texture::GetId()
 	return id;
 }
 
-uint32 Texture::GetMode()
+int Texture::GetMode()
 {
 	return mode;
 }
 
-uint32 Texture::GetIndex()
+int Texture::GetIndex()
 {
 	return index;
+}
+
+uvec2 Texture::GetSize()
+{
+	return size;
 }
 
 void Texture::SetFormat(Texture::Format input, Texture::Format output)
@@ -89,94 +101,123 @@ void Texture::SetFormat(Texture::Format input, Texture::Format output)
 	format = output;
 }
 
-void Texture::InitData(byte* data)
+void Texture::LoadFromImage(gui::Image* image)
 {
-	Log("Texture::InitData(): {");
-	if(id == -1)
+	size = image->GetSize();
+	internalFormat = Format::RGBA;
+	format = Format::RGBA;
+	dataType = DataType::Byte;
+//	GetGame()->Log("about to load img data siz", image->GetSize());
+	InitData(reinterpret_cast<uint8*>(&(image->data[0])));
+}
+
+void Texture::InitData(const uint8* data)
+{
+//	GetGame()->Log("Texture::InitData(): {");
+//	if(id == 0)
 	{
 		glGenTextures(1, &id);
-		Log("Generating tex id, ", id);
+//		GetGame()->Log("Generating tex id, ", id);
 	}
 	Bind();
 
-	Log("glTexImage2D");
-	glTexImage2D(mode, 0, (uint)internalFormat, size.x, size.y, 0, (uint)format, (uint)dataType, data);
+//	GetGame()->Log(glGetError());
 
-	Log("glTexParameteri");
+//	GetGame()->Log("glTexImage2D");
+	if(mode == GL_TEXTURE_2D_MULTISAMPLE)
+	{
+		glTexImage2DMultisample(mode, msaa, (uint)internalFormat, size.x, size.y, false);
+	}
+	else
+	{
+		glTexImage2D(mode, 0, (uint)internalFormat, size.x, size.y, 0, (uint)format, (uint)dataType, data);
+	}
+
+//	GetGame()->Log("glTexParameteri");
 	glTexParameteri(mode, GL_TEXTURE_MAG_FILTER, (uint)scaleFilter);
 	glTexParameteri(mode, GL_TEXTURE_MIN_FILTER, (uint)scaleFilter);
 
-	if(wrapMode != WrapMode::Repeat)
-	{
-		glTexParameteri(mode, GL_TEXTURE_WRAP_S, (uint)wrapMode);
-		glTexParameteri(mode, GL_TEXTURE_WRAP_T, (uint)wrapMode);
-	}
+	glTexParameteri(mode, GL_TEXTURE_WRAP_S, (uint)wrapMode);
+	glTexParameteri(mode, GL_TEXTURE_WRAP_T, (uint)wrapMode);
 
 	Unbind();
-	Log("}");
+//	GetGame()->Log("}");
+
+//	GetGame()->Log(glGetError());
 }
 
-void Texture::Deinit()
+void Texture::InitData(const byte* data, ivec2 offset)
 {
-	for(uint i = 0; i < textures.size(); ++i)
-	{
-		if(textures[i] == this)
-		{
-			textures.erase(textures.begin()+i);
-		}
-	}
-	glDeleteTextures(1, &id);
+//	glGenTextures(1, &id);
+	Bind();
+
+	glTexSubImage2D(mode, 0, offset.x, offset.y, size.x, size.y, (uint)format, (uint)dataType, data);
+
+	Unbind();
 }
 
-void Texture::SetIndex(uint32_t idx)
+void Texture::Destroy()
+{
+}
+
+Texture* Texture::GetCurrent()
+{
+	return current;
+}
+
+void Texture::SetIndex(int idx)
 {
 	index = idx;
 }
 
 void Texture::Bind()
 {
-	glActiveTexture(GL_TEXTURE0 + index);
-	glBindTexture(mode, id);
+	if(current != this)
+	{
+		glActiveTexture(GL_TEXTURE0 + index);
+		glBindTexture(mode, id);
+		current = this;
+	}
 }
 
 void Texture::Unbind()
 {
-	glActiveTexture(GL_TEXTURE0 + index);
-	glBindTexture(mode, 0);
+	if(current != nullptr)
+	{
+		glActiveTexture(GL_TEXTURE0 + index);
+		glBindTexture(mode, 0);
+		current = nullptr;
+	}
 }
 
-void Texture::LoadFile(string path, int mode)
+std::shared_ptr<Texture> Texture::LoadFile(string path, int mode)
 {
-	if(path == "")
+	if(path.empty()) return nullptr;
+
+	for(uint i = 0; i < textureCache.size(); ++i)
 	{
-		path = this->path;
+		auto tex = textureCache[i].lock();
+		if(!tex)
+		{
+			textureCache.erase(textureCache.begin()+i);
+			continue;
+		}
+		if(tex->path == path && tex->mode == mode)
+		{
+			return tex;
+		}
 	}
+
+	std::shared_ptr<Texture> tex {new Texture};
+	textureCache.push_back(tex);
 
 	if(mode != -1)
 	{
-		this->mode = mode;
+		tex->mode = mode;
 	}
-
-	path = game->fileSystem->GetGamePath(path).string();
-
-	for(auto& tex : textures)
-	{
-		if(!tex)
-		{
-			break;
-		}
-		if(tex->path == this->path && tex->mode == mode)
-		{
-			id = tex->id;
-			size = tex->size;
-			return;
-		}
-	}
-//	data.clear();
-//	data.resize(0);
-//	cimg_library::CImg<byte> img(this->path.c_str());
-	LoadPNG(path);
-	textures.push_back(this);
+//	GetGame()->Log("bouts to load a png at ", game->GetAssetPath(path).string());
+	tex->LoadPNG(path);
+	return tex;
 }
 
 void Texture::LoadPNG(string path)
@@ -185,11 +226,11 @@ void Texture::LoadPNG(string path)
 	uint error = lodepng::decode(data, size.x, size.y, path);
 	if(error != 0)
 	{
-		Log("LoadPNG: Error, ", lodepng_error_text(error));
+//		GetGame()->Log("LoadPNG: Error, ", lodepng_error_text(error));
 		return;
 	}
 	InitData(&data[0]);
-	Log("Texture::LoadPNG: Image size: (", size.x, ", ", size.y, ").");
+//	GetGame()->Log("Texture::LoadPNG: Image size: (", size.x, ", ", size.y, ").");
 }
 
 void Texture::LoadJPEG(string path)
@@ -208,13 +249,13 @@ void Texture::LoadBMP(string path)
 	FILE* file = fopen(path.c_str(), "rb");
 	if (!file)
 	{
-		Log("Image " + path + " could not be loaded");
+//		GetGame()->Log("Image " + path + " could not be loaded");
 		return;
 	}
 
 	if (fread(header, 1, 54, file) != 54 || (header[0] != 'B' || header[1] != 'M'))
 	{
-		Log("Image " + path + " is not a correct BMP file");
+//		GetGame()->Log("Image " + path + " is not a correct BMP file");
 		return;
 	}
 
@@ -224,7 +265,7 @@ void Texture::LoadBMP(string path)
 	size.x = *(int*)&(header[0x12]);
 	size.y = *(int*)&(header[0x16]);
 
-	Log("Read image header");
+//	GetGame()->Log("Read image header");
 
 	// Make up any missing header data
 	if (imageSize == 0) imageSize = size.x * size.y * 3;
@@ -237,7 +278,7 @@ void Texture::LoadBMP(string path)
 	// Close file
 	fclose(file);
 
-	Log("Read data and closed file");
+//	GetGame()->Log("Read data and closed file");
 	if(id == 0)
 	{
 		glGenTextures(1, &this->id);
@@ -294,7 +335,7 @@ void Texture::LoadDDS(string path)
 	/* close the file pointer */
 	fclose(fp);
 
-	unsigned int components  = (fourCC == FOURCC_DXT1) ? 3 : 4;
+//	unsigned int components  = (fourCC == FOURCC_DXT1) ? 3 : 4;
 	unsigned int format;
 	switch(fourCC)
 	{
@@ -336,7 +377,7 @@ void Texture::LoadDDS(string path)
 
 	free(buffer);
 	id = textureID;
-	Log("Finished loading DDS texture");
+//	GetGame()->Log("Finished loading DDS texture");
 }
 
 }

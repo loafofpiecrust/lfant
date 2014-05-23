@@ -8,11 +8,11 @@
 */
 #pragma once
 
-#include <lfant/stdafx.h>
+//#include <lfant/stdafx.h>
 
 // Internal
-#include <lfant/util/qumap.h>
 #include <lfant/Object.h>
+#include <lfant/util/qumap.h>
 #include <lfant/Entity.h>
 #include <lfant/TypeRegistry.h>
 
@@ -40,7 +40,6 @@ namespace lfant {
  */
 class Component : public Object
 {
-//	friend class lfant::editor::gui::Window;
 	friend class Entity;
 public:
 	DECLARE_REGISTRY(Component)
@@ -48,8 +47,6 @@ public:
 	Component();
 	Component(const Component& other);
 	virtual ~Component();
-
-//	virtual Component& operator=(const Component& other);
 
 	/// @todo Remove or fix Clone()
 	virtual Component* Clone(Entity* owner) const;
@@ -63,18 +60,18 @@ public:
 	/// @todo Rename Bind() to something clearer
 	static void ScriptBind();
 
-	/**
-	 *	Returns whether this component is enabled.
-	 */
+	/** Returns whether this component is enabled. */
 	bool IsEnabled();
 
-	/**
-	 *	Enables or disables this component.
-	 */
-	virtual void Enable(bool enable = true);
+	/** Enables or disables this component. */
+	virtual void Enable(bool enable);
+
+	bool IsRendered();
 
 	void SetOwner(Entity* ent);
 	Entity* GetOwner() const;
+
+	virtual Game* GetGame() const;
 
 	/// The owner of this Component.
 	Entity* owner = nullptr;
@@ -82,14 +79,7 @@ public:
 protected:
 
 	// Loop Function Overwrites
-	virtual void Init();
-	virtual void Update();
-	virtual void PostUpdate();
 	virtual void Render();
-	virtual void Deinit(); // Rename to OnDestroy()?
-
-//	virtual void OnEnable();
-//	virtual void OnDisable();
 
 	virtual void TriggerEvent(string name) final;
 
@@ -109,28 +99,31 @@ protected:
 	}
 
 	template<typename T>
-	void ConnectComponent(T*& val, bool required = false)
+	void ConnectComponent(T*& val)
 	{
 		ConnectEvent(owner, "SetComponent"+type::Descope(type::Name<T>()), (Component**)&val);
 		val = owner->GetComponent<T>();
-		if(!val && required)
+	}
+
+	template<typename T>
+	void ConnectComponent(string type, T*& val)
+	{
+		ConnectEvent(owner, "SetComponent"+type, (Component**)&val);
+		val = dynamic_cast<T*>(owner->GetComponent(type));
+	}
+
+	template<typename T>
+	void RequireComponent(T*& val)
+	{
+		ConnectComponent(val);
+		if(!val)
 		{
-			val = new T;
+			val = new T();
 			owner->AddComponent(val);
 		}
 	}
 
-	template<typename T>
-	void ConnectComponent(string type, T*& val, bool required = false)
-	{
-		ConnectEvent(owner, "SetComponent"+type, (Component**)&val);
-		val = dynamic_cast<T*>(owner->GetComponent(type));
-		if(!val && required)
-		{
-			val = dynamic_cast<T*>(Component::NewFromString(type));
-			owner->AddComponent(val);
-		}
-	}
+	bool render = false;
 
 private:
 	/// Whether this component should Update or not.

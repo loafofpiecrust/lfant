@@ -28,12 +28,19 @@ namespace lfant
 class Subsystem : public Object
 {
 public:
+	Game* GetGame() const;
 	virtual void Destroy();
 protected:
-	Subsystem();
+	Subsystem(Game* game);
 	virtual ~Subsystem();
 
 	virtual void Init();
+
+	Game* game = nullptr;
+
+private:
+	friend class Game;
+	Subsystem();
 };
 
 /// @}

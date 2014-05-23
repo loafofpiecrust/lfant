@@ -32,6 +32,7 @@ class Rigidbody;
 class Collider : public Component
 {
 	friend class Rigidbody;
+	friend class CharacterController;
 public:
 	bool trigger;
 	//SurfaceMaterial* material;
@@ -51,7 +52,7 @@ protected:
 	virtual void Init();
 	virtual void OnSetScale(vec3 scale);
 
-	virtual btCollisionShape* GetShape() = 0;
+	virtual btCollisionShape* GetShape() {};
 
 	vec3 GetSize() const;
 	virtual void SetSize(vec3 size);

@@ -7,6 +7,10 @@
 #include <lfant/FileSystem.h>
 #include <lfant/Time.h>
 #include <lfant/Random.h>
+#include "Entity.h"
+#include "Component.h"
+#include "Transform.h"
+#include "ScriptComp.h"
 
 // External
 #include <sqrat.h>
@@ -16,18 +20,44 @@
 namespace lfant
 {
 
-Script::Script()
+std::deque<Script> Script::scripts;
+
+Script::Script(string p) :
+	path(p)
 {
+	std::cout << "compiling " << path << "\n";
+	string err = "";
+	inst.CompileFile(path.c_str(), err);
+	std::cout << "compile error? " << err << "\n";
 }
 
-void Script::LoadFile(string path)
+Script::~Script()
 {
-	inst.CompileFile(game->fileSystem->GetGamePath(path).string().c_str());
+	inst.Release();
+}
+
+Script* Script::LoadFile(boost::filesystem::path path)
+{
+	if(boost::filesystem::exists(path))
+	{
+		for(auto& s : scripts)
+		{
+			if(s.path == path)
+			{
+				return &s;
+			}
+		}
+		scripts.push_back(Script(path.string()));
+		return &(scripts.back());
+	}
+	return nullptr;
 }
 
 void Script::Run()
 {
-	inst.Run();
+	string err = "";
+	inst.Run(err);
+	std::cout << "squirrel error? " << err << "\n";
 }
 
 void TestFunc()
@@ -38,22 +68,49 @@ void TestFunc()
 	k -= i;
 	i -= k;
 	k *= i;
-	Log("\t\ti = ", i);
-//	Log("k = ", k);
+//	GetGame()->Log("\t\ti = ", i);
+//	GetGame()->Log("k = ", k);
 }
 
 
 int myint = 2;
+
+ScriptSystem::ScriptSystem(Game* game) :
+	Subsystem(game)
+{
+
+}
+
+void printyli(int i)
+{
+}
+
+void createShiz(ScriptComp* comp)
+{
+	std::cout << comp->counter << " thingy\n";
+}
+
+void printVec3(vec3 v)
+{
+	std::cout << lexical_cast<string>(v) << "\n";
+}
 
 void ScriptSystem::Init()
 {
 	Subsystem::Init();
 
 	Sqrat::DefaultVM::Set(vm.GetVM());
+
+	Object::ScriptBind();
+	Entity::ScriptBind();
+	Component::ScriptBind();
+	Transform::ScriptBind();
+	ScriptComp::ScriptBind();
 }
 
 void ScriptSystem::Deinit()
 {
+	Script::scripts.clear();
 }
 
 void ScriptSystem::CallFunction(string module, string call)

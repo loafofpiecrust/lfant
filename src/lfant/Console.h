@@ -21,7 +21,6 @@
 // Internal
 
 #include <lfant/Subsystem.h>
-#include <lfant/Game.h>
 
 namespace lfant
 {
@@ -94,7 +93,7 @@ public:
 		}
 	};
 
-	Console();
+	Console(Game* game);
 	virtual ~Console();
 
 	virtual void Init();
@@ -170,24 +169,13 @@ public:
 protected:
 
 private:
-	std::deque<Command*> commands;
+	std::deque<ptr<Command>> commands;
 
 	string logName = "lfant.log";
 	std::ofstream logFile;
 };
 
-template<typename T = const char*>
-void Log(T msg)
-{
-	game->console->Print(msg);
-}
 
-template<typename T, typename P, typename ... A>
-void Log(T msg, P msg2, A ... args)
-{
-	game->console->LinePrint(msg);
-	Log(msg2, args...);
-}
 
 /// @}
 /// @}

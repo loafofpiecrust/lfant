@@ -19,6 +19,7 @@
 #include <lfant/util/Math.h>
 
 #include <lfant/Console.h>
+#include "ScriptSystem.h"
 
 namespace lfant
 {
@@ -36,6 +37,8 @@ void Transform::Init()
 {
 	Component::Init();
 
+	SetMatrix();
+
 //	if(owner->GetParent())
 	{
 //		ConnectEvent(SENDER(owner->GetParent()->transform, SetPosition), RECEIVER(this, OnSetWorldPos));
@@ -48,7 +51,7 @@ void Transform::Save(Properties *prop) const
 {
 	Component::Save(prop);
 
-	Log("Saving transform attr");
+	GetGame()->Log("Saving transform attr");
 
 	prop->Set("position", position);
 	prop->Set("rotation", rotation);
@@ -57,26 +60,50 @@ void Transform::Save(Properties *prop) const
 
 void Transform::Load(Properties *prop)
 {
-//	Log("Loading transform from type '"+prop->type+"', id '"+prop->id+"'.");
+//	GetGame()->Log("Loading transform from type '"+prop->type+"', id '"+prop->id+"'.");
 	Component::Load(prop);
 
 	prop->Get("position", position);
 	prop->Get("rotation", rotation);
 	prop->Get("scale", scale);
-	
+
 	// Do this to ensure the callbacks are called
 	SetPosition(position);
 	SetRotation(rotation);
 	SetScale(scale);
 
-	Log("Loaded position: "+lexical_cast<string>(position));
+	SetMatrix();
+
+	GetGame()->Log("Loaded position: "+lexical_cast<string>(position));
+}
+
+void Transform::ScriptBind()
+{
+	{
+		Script::BaseClass<vec3> inst;
+		inst.Var("x", &vec3::x);
+		inst.Var("y", &vec3::y);
+		inst.Var("z", &vec3::z);
+		inst.Bind("vec3");
+	}
+
+	{
+		Script::BaseClass<quat> inst;
+		inst.Bind("quat");
+	}
+
+	{
+		Script::Class<Transform, Component> inst;
+		inst.Func("Translate", &Transform::Translate);
+		inst.Bind("Transform");
+	}
 }
 
 void Transform::OnSetWorldPos()
 {
 	TriggerEvent("SetPosition");
 
-	updateMatrix = true;
+//	updateMatrix = true;
 }
 
 vec3 Transform::GetPosition()
@@ -123,7 +150,7 @@ void Transform::SetRotation(vec3 rot)
 
 	rotation = rot;
 	rotationQuat = quat(radians(rotation));
-//	Log("Setting rotation to ", lexical_cast<string>(rotation));
+//	GetGame()->Log("Setting rotation to ", lexical_cast<string>(rotation));
 
 	TriggerEvent("SetRotation", rot);
 	TriggerEvent("SetRotation", rotationQuat);
@@ -243,7 +270,7 @@ void Transform::SetWorldScale(vec3 scl)
 
 void Transform::Update()
 {
-//	Log("Transform updating");
+//	GetGame()->Log("Transform updating");
 //	if(updateMatrix)
 	{
 		SetMatrix();
@@ -353,7 +380,7 @@ void Transform::SetDirection()
 
 void Transform::Translate(vec3 pos)
 {
-//	Log("Translating by ", lexical_cast<string>(vec3(-pos.x, pos.y, pos.z)));
+//	GetGame()->Log("Translating by ", lexical_cast<string>(vec3(-pos.x, pos.y, pos.z)));
 	SetPosition(GetPosition() + pos);
 }
 

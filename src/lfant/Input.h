@@ -14,10 +14,9 @@
 #include <lfant/util/qumap.h>
 
 // External
+//#include <boost/bimap.hpp>
 #include <unordered_map>
 #include <bitset>
-
-struct GLFWwindow;
 
 namespace lfant
 {
@@ -28,105 +27,24 @@ namespace lfant
  *	 @{
  */
 
-//extern map<string, uint16_t> Key;
+//extern map<string, uint16> Key;
 
-class Key_Initializer
+class KeyMap
 {
 public:
-	Key_Initializer();
-	uint16_t operator[](string in);
+	KeyMap();
+	uint16 operator[](string in);
+	string operator[](uint16 c);
 private:
-	std::unordered_map<string, uint16_t> _key;
+	void insert(string key, uint16 val);
+
+//	typedef boost::bimap<string, uint16> value_type;
+	typedef std::unordered_map<string, uint16> value_type;
+	value_type _key;
+//	std::unordered_map<string, uint16> _key;
 };
 
-extern Key_Initializer Key;
-
-/*
-enum class Key : uint16_t
-{
-	Q = 'Q',
-	W = 'W',
-	E = 'E',
-	R = 'R',
-	T = 'T',
-	Y = 'Y',
-	U = 'U',
-	I = 'I',
-	O = 'O',
-	P = 'P',
-	A = 'A',
-	S = 'S',
-	D = 'D',
-	F = 'F',
-	G = 'G',
-	H = 'H',
-	J = 'J',
-	K = 'K',
-	L = 'L',
-	Z = 'Z',
-	X = 'X',
-	C = 'C',
-	V = 'V',
-	B = 'B',
-	N = 'N',
-	M = 'M',
-	F1 = GLFW_KEY_F1,
-	F2 = GLFW_KEY_F2,
-	F3 = GLFW_KEY_F3,
-	F4 = GLFW_KEY_F4,
-	F5 = GLFW_KEY_F5,
-	F6 = GLFW_KEY_F6,
-	F7 = GLFW_KEY_F7,
-	F8 = GLFW_KEY_F8,
-	F9 = GLFW_KEY_F9,
-	F10 = GLFW_KEY_F10,
-	F11 = GLFW_KEY_F11,
-	F12 = GLFW_KEY_F12,
-	Comma = ',',
-	Dot = '.',
-	Slash = '/',
-	Exc = '!',
-	Null = '\0',
-	NewLine = '\n',
-	Zero = '0',
-	One = '1',
-	Two = '2',
-	Three = '3',
-	Four = '4',
-	Five = '5',
-	Six = '6',
-	Seven = '7',
-	Eight = '8',
-	Nine = '9',
-	Space = GLFW_KEY_SPACE,
-	Esc = GLFW_KEY_ESC,
-	Tab = GLFW_KEY_TAB,
-	Enter = GLFW_KEY_ENTER,
-	Backspace = GLFW_KEY_BACKSPACE,
-	Delete = GLFW_KEY_DEL,
-	Insert = GLFW_KEY_INSERT,
-	Home = GLFW_KEY_HOME,
-	End = GLFW_KEY_END,
-	PageUp = GLFW_KEY_PAGEUP,
-	PageDown = GLFW_KEY_PAGEDOWN,
-	Up = GLFW_KEY_UP,
-	Down = GLFW_KEY_DOWN,
-	Right = GLFW_KEY_RIGHT,
-	Left = GLFW_KEY_LEFT,
-	LShift = GLFW_KEY_LSHIFT,
-	RShift = GLFW_KEY_RSHIFT,
-	RCtrl = GLFW_KEY_RCTRL,
-	LCtrl = GLFW_KEY_LCTRL,
-	LAlt = GLFW_KEY_LALT,
-	RAlt = GLFW_KEY_RALT,
-	LSuper = GLFW_KEY_LSUPER,
-	RSuper = GLFW_KEY_RSUPER,
-	NumEnter = GLFW_KEY_KP_ENTER,
-	MouseLeft = GLFW_MOUSE_BUTTON_LEFT,
-	MouseRight = GLFW_MOUSE_BUTTON_RIGHT,
-	MouseMiddle = GLFW_MOUSE_BUTTON_MIDDLE
-};
-*/
+extern KeyMap Key;
 
 /**	This class controls the input system.
  *		Receives input from GLFW and manages it, allowing the
@@ -137,17 +55,17 @@ enum class Key : uint16_t
 class Input : public Subsystem
 {
 	friend class Game;
-
+public:
 	class Axis
 	{
 		friend class Input;
 	public:
-		string name = "NewAxis";
-		uint16_t positive = '\0';
-		uint16_t negative = '\0';
-		float sensitivity = 3.0f;
-		float dead = 0.001f;
-		bool snap = true;
+		string name;
+		uint16 positive;
+		uint16 negative;
+		float sensitivity;
+		float dead;
+		bool snap;
 		/// @todo Joystick axis
 
 		/// Number of the controller to use. 0 means all.
@@ -159,19 +77,13 @@ class Input : public Subsystem
 			return value;
 		}
 
-		Axis(string name) :
-			name(name)
-		{
-		}
-
-		Axis(string name, uint16_t positive, uint16_t negative) :
-			name(name), positive(positive), negative(negative)
-		{
-		}
-
-		Axis(string name, uint16_t positive, uint16_t negative, float sens, float dead, bool snap) :
-			name(name), positive(positive), negative(negative),
-			sensitivity(sens), dead(dead), snap(snap)
+		Axis(string name="",
+			 uint16 positive='\0',
+			 uint16 negative='\0',
+			 float sens=3.0f,
+			 float dead=0.001f,
+			 bool snap=true) :
+			name(name), positive(positive), negative(negative), sensitivity(sens), dead(dead), snap(snap)
 		{
 		}
 
@@ -201,7 +113,7 @@ class Input : public Subsystem
 	};
 
 public:
-	Input();
+	Input(Game* game);
 	~Input();
 
 	virtual void Init();
@@ -210,22 +122,25 @@ public:
 	virtual void Load(Properties* prop);
 	virtual void Save(Properties* prop) const;
 
-	void OnKeyPress(int key, int scancode, int action, int mods);
-	void OnCharPress(uint32_t key);
+	void OnKeyPress(int key, int action, int mods);
+	void OnCharPress(uint key);
 	void OnMouseMove(vec2 pos);
 	void OnMouseButton(int btn, int action, int mods);
 
 	/// example:
-	/// AddAxis({"Forward", 'w', 's'});
+	/// AddAxis({"Horizontal", 'w', 's'});
 	void AddAxis(Axis axis);
 
 	// Axes
 	Axis* GetAxis(string name) const;
 
 	// Buttons: Positive side of the given axis
-	int8_t GetButton(string name) const;
-	int8_t GetButtonDown(string name) const;
-	int8_t GetButtonUp(string name) const;
+	int8 GetButton(string name) const;
+	int8 GetButtonDown(string name) const;
+	int8 GetButtonUp(string name) const;
+	
+	int8 GetKeyDown(uint16 key) const;
+	
 
 #if !ANDROID
 	ivec2 GetMousePos() const;
@@ -233,11 +148,13 @@ public:
 	void SetMousePos(int32 x, int32 y);
 #else
 	deque<Touch>& GetTouches();
-	Touch& GetTouch(uint32_t idx);
-	void OnTouch(uint32_t idx, int action, Touch data);
+	Touch& GetTouch(uint32 idx);
+	void OnTouch(uint32 idx, int action, Touch data);
 #endif
 
 	void GetJoystickAxes();
+	void OnCursorEnter(bool entered);
+	void OnScroll(vec2 offset);
 
 	bool lockMouse = false;
 	float mouseSpeed = 1.0f;
@@ -256,15 +173,6 @@ protected:
 	//bitset<sizeof(byte)> keysHeld;
 
 private:
-
-	/** Called when any key is pressed or released.
-	 *	@param key The key that was used.
-	 *	@param mode The way the key was used. 0 = Release; 1 = Press;
-	 */
-	static void OnKeyPress(GLFWwindow* win, int key, int scancode, int action, int mods);
-	static void OnCharPress(GLFWwindow* win, uint32_t key);
-	static void OnMouseMove(GLFWwindow* win, double x, double y);
-	static void OnMouseButton(GLFWwindow* win, int btn, int action, int mods);
 };
 
 /** @} */

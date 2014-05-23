@@ -1,19 +1,27 @@
-/*
-*	Copyright (C) 2013-2014, by loafofpiecrust
+/******************************************************************************
+*
+*	LFANT Source
+*	Copyright (C) 2012-2013 by LazyFox Studios
 *	Created: 2012-08-02 by Taylor Snead
 *
 *	Licensed under the Apache License, Version 2.0 (the "License");
 *	you may not use this file except in compliance with the License.
-*	You may obtain a copy of the License in the accompanying LICENSE file or at
-*		http://www.apache.org/licenses/LICENSE-2.0
-*/
-#include <GL/glew.h>
+*	You may obtain a copy of the License at
+*
+*	http://www.apache.org/licenses/LICENSE-2.0
+*
+*	Unless required by applicable law or agreed to in writing, software
+*	distributed under the License is distributed on an "AS IS" BASIS,
+*	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+*	See the License for the specific language governing permissions and
+*	limitations under the License.
+*
+******************************************************************************/
 
-#define BOOST_COMPUTE_HAVE_GL
 #include <lfant/ParticleSystem.h>
 
 // Internal
-//#include <lfant/Particle.h>
+#include <lfant/Particle.h>
 #include <lfant/Random.h>
 #include <lfant/Console.h>
 #include <lfant/Game.h>
@@ -23,19 +31,18 @@
 #include <lfant/Camera.h>
 #include <lfant/Thread.h>
 #include <lfant/Input.h>
-#include <lfant/Transform.h>
+#include <lfant/Window.h>
 
 // External
-
-namespace compute = boost::compute;
+#include <GL/glew.h>
 
 namespace lfant {
 
 IMPLEMENT_TYPE(Component, ParticleSystem)
 
-ParticleSystem::ParticleSystem() :
-	material(new Material)
+ParticleSystem::ParticleSystem()
 {
+	render = true;
 }
 
 ParticleSystem::~ParticleSystem()
@@ -45,7 +52,6 @@ ParticleSystem::~ParticleSystem()
 void ParticleSystem::Init()
 {
 	BeginRender();
-//	updateKernel->Get()->set_arg(9, gravity);
 }
 
 void ParticleSystem::Update()
@@ -55,13 +61,45 @@ void ParticleSystem::Update()
 		return;
 	}
 
-	if(rate > 0.0f && GetCount() < maxParticles)
+	if(rate > 0.0f)
 	{
-		toEmit += rate * game->time->deltaTime;
+		toEmit += rate * GetGame()->time->deltaTime;
+	//	Log("ParticleSystem updating, toEmit = ", toEmit);
 		if(toEmit >= 1.0f)
 		{
 			Emit(floor(toEmit));
 			toEmit -= floor(toEmit);
+		}
+	}
+
+	for(uint i = 0; i < particles.size(); ++i)
+	{
+		if(!&particles[i])
+		{
+			particles.erase(particles.begin()+i);
+			--i;
+			continue;
+		}
+		if(particles[i].active)
+		{
+			particles[i].Update(GetGame()->time->deltaTime);
+
+			if(particles[i].lifetime <= 0.0f)
+			{
+				Recycle(&particles[i]);
+			}
+
+		//	vertexBuffer[i] = particles[i]->position;
+		//	colorBuffer[i] = particles[i]->GetColor();
+		//	sizeBuffer[i] = particles[i]->GetSize();
+			particleBuffer[i].position = particles[i].position;
+			particleBuffer[i].color = (u8vec4)round(particles[i].GetColor()*255.0f);
+			particleBuffer[i].size = particles[i].GetSize();
+
+			if(gravity != vec3(0))
+			{
+				particles[i].ApplyForce(gravity, GetGame()->time->deltaTime);
+			}
 		}
 	}
 
@@ -72,12 +110,12 @@ void ParticleSystem::Update()
 			Emit(bursts[i].particles);
 			bursts[i].current = bursts[i].time;
 		}
-		bursts[i].current -= game->time->deltaTime;
+		bursts[i].current -= GetGame()->time->deltaTime;
 	}
 
-	if(game->input->GetButtonDown("ShowFPS"))
+	if(GetGame()->input->GetButtonDown("ShowFPS"))
 	{
-		Log("Current particle count: ", GetCount());
+		GetGame()->Log("Current particle count: ", GetCount());
 	}
 
 }
@@ -87,26 +125,38 @@ void ParticleSystem::PostUpdate()
 	Render();
 }
 
-void ParticleSystem::Deinit()
+void ParticleSystem::OnDestroy()
 {
 	EndRender();
 }
 
 void ParticleSystem::UpdatePosition(Particle* pt)
 {
+	for(uint i = 0; i < particles.size(); ++i)
+	{
+	//	if(particles[i] == pt)
+		{
+		//	vertexBuffer[i] = pt->position;
+		//	colorBuffer[i] = pt->color.start;
+		//	sizeBuffer[i] = pt->GetSize();
+		}
+	}
 }
 
 void ParticleSystem::Load(Properties *prop)
 {
 	Component::Load(prop);
 
-	for(auto& pb : prop->GetChildren("burst"))
+	for(auto& pb : prop->children)
 	{
-		bursts.emplace_front();
-		Burst& burst = bursts[0];
-		pb->Get("time", burst.time);
-		pb->Get("particles", burst.particles);
-		burst.current = burst.time;
+		if(pb->IsType("burst"))
+		{
+			bursts.emplace_front();
+			Burst& burst = bursts[0];
+			pb->Get("time", burst.time);
+			pb->Get("particles", burst.particles);
+			burst.current = burst.time;
+		}
 	}
 
 	prop->Get("lifetime", lifetime);
@@ -114,7 +164,8 @@ void ParticleSystem::Load(Properties *prop)
 	prop->Get("size", size);
 	prop->Get("velocity", velocity);
 
-	Log("Loaded velocity: ", lexical_cast<string>(velocity));
+	GetGame()->Log("Loaded velocity: ", lexical_cast<string>(velocity));
+	GetGame()->Log("Loaded lifetime: ", lexical_cast<string>(lifetime));
 //	thread::Sleep(1500);
 
 	prop->Get("radius", radius);
@@ -131,7 +182,7 @@ void ParticleSystem::Load(Properties *prop)
 
 	emitterType = (EmitterType)prop->Get<byte>("type");
 
-	material->LoadFile(prop->Get("material"));
+//	material.LoadFile(prop->Get("material"));
 }
 
 void ParticleSystem::Save(Properties *prop) const
@@ -153,125 +204,144 @@ void ParticleSystem::Save(Properties *prop) const
 	prop->Set("pausable", pausable);
 	prop->Set("paused", paused);
 	prop->Set("looping", looping);
-	//	prop->Set("material", material->path);
+	//	prop->Set("material", material.path);
 	*/
+}
+
+void ParticleSystem::Emit(uint32 amount)
+{
+//	Log("Emitting ", amount, " particles");
+	for(uint32 i = 0; i < amount; ++i)
+	{
+		Emit();
+	}
+}
+
+void ParticleSystem::Emit(Particle* pt)
+{
+	if(!pt)
+	{
+		if(recycle.size() > 0)
+		{
+		//	Log("Recycling old particle");
+			pt = recycle[0];
+			recycle.pop_front();
+		}
+		else
+		{
+			if(GetCount() >= maxParticles)
+			{
+				return;
+			}
+		//	Log("Creating new particle");
+		//	particles.push_back(pt = new Particle);
+			particles.emplace_back();
+			pt = &particles[particles.size()-1];
+		//	vertexBuffer.push_back(vec3(0));
+		//	colorBuffer.push_back(vec4(1));
+		//	sizeBuffer.push_back(1);
+			particleBuffer.push_back({vec3(0), vec4(1), 1.0f});
+			rewriteBuffer = true;
+		}
+	}
+
+//	pt->system = this;
+	pt->size = random::Range(size.start.min, size.start.max);
+//	pt->SetGravity(gravity);
+	pt->color = random::Range(color.start.min, color.start.max);
+	pt->lifetime = random::Range(lifetime.start, lifetime.end);
+	pt->Activate(true);
+	GenerateVelocity(pt);
+	pt->Init();
 }
 
 void ParticleSystem::Recycle(Particle* pt)
 {
+	/*
+	if(recycle.size() > glm::ceil(maxParticles/10))
+	{
+		delete pt;
+		vertexBuffer.pop_back();
+		colorBuffer.pop_back();
+		sizeBuffer.pop_back();
+		return;
+	}
+	*/
 	recycle.push_back(pt);
+	pt->active = false;
+	pt->position = vec3(0);
 }
 
-void ParticleSystem::Emit(uint32_t count)
+void ParticleSystem::GenerateVelocity(Particle* pt)
 {
-	for(uint i = 0; i < count; ++i)
+//	float speed = random::Range(this->speed.start.min, this->speed.start.max);
+	vec3 dir;
+	vec3 pos;
+
+//	GetGame()->Log("PS emitter is ", (int)emitterType);
+
+	switch(emitterType)
 	{
-	//	float speed = random::Range(this->speed.start.min, this->speed.start.max);
-		vec3 dir;
-		vec3 pos;
-
-		switch(emitterType)
-		{
-		case EmitterType::Cone:
-		{
-			// Cone emitter
-		//	pos = vec3(random::Range(-radius, radius), 0.0f, random::Range(-radius, radius));
-			pos = vec3(0);
-			dir = vec3(random::Range(-angle / 90, angle / 90), random::Range(-0.1f, 1.0f), random::Range(-angle / 90, angle / 90));
-			while(dir == vec3(0.0f))
-			{
-				// This is to prevent ever getting a 0 direction and generating an empty velocity.
-				dir = vec3(random::Range(-angle / 90, angle / 90), random::Range(-0.1f, 1.0f), random::Range(-angle / 90, angle / 90));
-			}
-			break;
-		}
-		case EmitterType::Sphere:
-		{
-			// Sphere emitter
-			dir = vec3(random::Range(-1.0f, 1.0f), random::Range(-1.0f, 1.0f), random::Range(-1.0f, 1.0f));
-			pos = dir * random::Range(0.0f, radius);
-			break;
-		}
-		case EmitterType::Box:
-		{
-			// Straight direction emitter
-			// Cube volume, radius being half the side length
-			pos = vec3(random::Range(-radius, radius), random::Range(-radius, radius), random::Range(-radius, radius));
-			dir = vec3(0, 1, 0);
-			break;
-		}
-		case EmitterType::Point:
-		{
-			// Point emitter
-			pos = vec3(0);
-			dir = owner->transform->GetDirection();
-			break;
-		}
-		}
-
-		if(!inheritTransform)
-		{
-			pos += owner->transform->GetWorldPosition();
-		}
-
-		glFinish();
-		emitKernel->Get()->set_arg(8, GetCount());
-
-		Particle particle;
-
-		particle.pos = vec4(pos.x, pos.y, pos.z, 1.0f);
-		particle.vel = vec4(dir * random::Range(velocity.start.min, velocity.start.max), 1.0f);
-		particle.size = random::Range(size.start.min, size.start.max);
-		particle.color = random::Range(color.start.min, color.start.max);
-		particle.life = random::Range(lifetime.start, lifetime.end);
-
-		particle.velChange = (vec4(dir * random::Range(velocity.end.min, velocity.end.max), 1.0f) - particle.vel) / particle.life;
-		particle.colorChange = (random::Range(color.end.min, color.end.max) - particle.color) / particle.life;
-		particle.sizeChange = (random::Range(size.end.min, size.end.max) - particle.size) / particle.life;
-
-		printf("\n[Cpu]\n");
-		printf("Position: %s\n", lexical_cast<string>(particle.pos).c_str());
-		printf("Size: %f\n", particle.size);
-		printf("Velocity: %s\n", lexical_cast<string>(particle.vel).c_str());
-		printf("Color: %s\n", lexical_cast<string>(particle.color).c_str());
-
-		printf("VelChange: %s\n", lexical_cast<string>(particle.velChange).c_str());
-		printf("ColorChange: %s\n", lexical_cast<string>(particle.colorChange).c_str());
-		printf("SizeChange: %f\n", particle.sizeChange);
-
-		compute::buffer pb(game->openCL->context, sizeof(Particle), CL_MEM_READ_ONLY);
-		game->openCL->queue.enqueue_write_buffer(pb, &particle);
-		game->openCL->queue.finish();
-		emitKernel->Get()->set_arg(9, pb);
-		emitKernel->Get()->set_arg(10, GetCount()+1);
-
-		{
-			game->openCL->queue.enqueue_acquire_gl_buffer(clbuffers[0]);
-			game->openCL->queue.enqueue_acquire_gl_buffer(clbuffers[1]);
-			game->openCL->queue.enqueue_acquire_gl_buffer(clbuffers[2]);
-		//	game->openCL->queue.enqueue_acquire_gl_objects(3, &clbuffers[0].get());
-		//	game->openCL->queue.finish();
-
-			game->openCL->queue.enqueue_1d_range_kernel(*emitKernel->Get(), 0, 1);
-			game->openCL->queue.finish();
-
-			game->openCL->queue.enqueue_release_gl_buffer(clbuffers[0]);
-			game->openCL->queue.enqueue_release_gl_buffer(clbuffers[1]);
-			game->openCL->queue.enqueue_release_gl_buffer(clbuffers[2]);
-		//	game->openCL->queue.enqueue_release_gl_objects(3, &clbuffers[0].get());
-			game->openCL->queue.finish();
-		}
-
-		++particleCount;
-		Log("Added particle to system, count: ", GetCount());
+	case EmitterType::Cone:
+	{
+		// Cone emitter
+	//	pos = vec3(random::Range(-radius, radius), 0.0f, random::Range(-radius, radius));
+		pos = vec3(0);
+		float ad = angle/180.0f;
+		dir = owner->transform->GetDirection() + vec3(random::Range(-ad, ad), 1.0f, random::Range(-ad, ad));
+		break;
+	}
+	case EmitterType::Sphere:
+	{
+		// Sphere emitter
+		dir = vec3(random::Range(-1.0f, 1.0f), random::Range(-1.0f, 1.0f), random::Range(-1.0f, 1.0f));
+		pos = dir * random::Range(0.0f, radius);
+		break;
+	}
+	case EmitterType::Box:
+	{
+		// Straight direction emitter
+		// Cube volume, radius being half the side length
+		pos = vec3(random::Range(-radius, radius), random::Range(-radius, radius), random::Range(-radius, radius));
+		dir = owner->transform->GetDirection();
+		break;
+	}
+	case EmitterType::Point:
+	{
+		// Point emitter
+		pos = vec3(0);
+		dir = owner->transform->GetDirection();
+		break;
+	}
 	}
 
+	// Square area
+//	pt->transform->SetPosition(vec3(random::Range(-radius, radius), 0.0f, random::Range(-radius, radius)));
 
+	if(!inheritTransform)
+	{
+		pos += owner->transform->GetWorldPosition();
+	}
+//	Log("Particle position: ", lexical_cast<string>(pos));
+	pt->SetPosition(pos);
+//	pt->velocity = dir * speed;
+
+	// Beginning and ending velocity range, for an interpolating velocity.
+//	pt->velRange.start = random::Range(velocity.start.min, velocity.start.max);
+//	pt->velRange.end = random::Range(velocity.end.min, velocity.end.max);
+
+	vec3 vrandstart = random::Range(velocity.start.min, velocity.start.max);
+	vec3 vrandend = random::Range(velocity.end.min, velocity.end.max);
+
+//	GetGame()->Log("vrandstart", vrandstart, ", vrandend", vrandend);
+
+	pt->velocity = dir * vrandstart;
+	pt->SetParamDiffs(dir * vrandend, random::Range(color.end.min, color.end.max), random::Range(size.end.min, size.end.max));
 }
 
-uint32_t ParticleSystem::GetCount()
+uint32 ParticleSystem::GetCount()
 {
-	return particleCount;
+	return particles.size();
 }
 
 
@@ -282,168 +352,130 @@ void ParticleSystem::BeginRender()
 		EndRender();
 	}
 
-	material->texture->LoadFile("textures/Particle.png");
+	material.texture = Texture::LoadFile("textures/Particle.png");
 
-	glGenVertexArrays(1, &vertexArray);
-	glBindVertexArray(vertexArray);
+//	glGenVertexArrays(1, &vertexArray);
+//	glBindVertexArray(vertexArray);
 
-//	if(!material->shader->GetId())
+//	if(!material.shader->GetId())
 	{
-		material->shader->LoadFile("shaders/particles/Diffuse.vert", "shaders/particles/Diffuse.frag", "shaders/particles/Diffuse.geom");
+		material.shader = Shader::LoadFile("shaders/particles/Diffuse.vert", "shaders/particles/Diffuse.frag", "shaders/particles/Diffuse.geom");
 	}
 
-//	if(!material->texture->GetId())
+//	if(!material.texture->GetId())
 	{
 //		Log("Manually loading texture.");
-//		material->texture->LoadFile();
+//		material.texture->LoadFile();
 	}
 
-	if(material->shader->GetId())
+	if(material.shader->GetId())
 	{
-		Log("Adding uniforms..");
-		material->shader->AddUniform("mvp");
-		material->shader->AddUniform("view");
-		material->shader->AddUniform("projection");
-		material->shader->AddUniform("viewportWidth");
-		material->shader->AddUniform("cameraPosition");
-		material->shader->AddUniform("systemPosition");
-		material->shader->AddUniform("textureSampler");
+		GetGame()->Log("Adding uniforms..");
+		material.shader->AddUniform("model");
+		material.shader->AddUniform("view");
+		material.shader->AddUniform("projection");
+		material.shader->AddUniform("viewportWidth");
+		material.shader->AddUniform("cameraPosition");
+		material.shader->AddUniform("systemPosition");
+		material.shader->AddUniform("textureSampler");
 	}
 
 //	CreateBuffer(vertexBuffer, GL_ARRAY_BUFFER, GL_DYNAMIC_DRAW);
 //	CreateBuffer(colorBuffer, GL_ARRAY_BUFFER, GL_DYNAMIC_DRAW);
 //	CreateBuffer(sizeBuffer, GL_ARRAY_BUFFER, GL_DYNAMIC_DRAW);
-//	CreateBuffer(particleBuffer, GL_ARRAY_BUFFER, GL_STREAM_DRAW);
+	Geometry::CreateBuffer(particleBuffer, GL_ARRAY_BUFFER, GL_STREAM_DRAW);
 //	CreateBuffer(particles, GL_ARRAY_BUFFER, GL_STREAM_DRAW);
-
-	glGenBuffers(1, &posBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, posBuffer);
-	glBufferData(GL_ARRAY_BUFFER, maxParticles*sizeof(vec4), 0, GL_STREAM_DRAW);
-
-	glGenBuffers(1, &colorBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, colorBuffer);
-	glBufferData(GL_ARRAY_BUFFER, maxParticles*sizeof(vec4), 0, GL_STREAM_DRAW);
-
-	glGenBuffers(1, &sizeBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, sizeBuffer);
-	glBufferData(GL_ARRAY_BUFFER, maxParticles*sizeof(float), 0, GL_STREAM_DRAW);
-
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	glFinish();
-	updateKernel = game->openCL->LoadFile("kernels/particleSystem.cl", "Update");
-	emitKernel = game->openCL->LoadFile("kernels/particleSystem.cl", "Emit");
-	clbuffers.clear();
-//	clbuffers.resize(8);
-	clbuffers.emplace_back(compute::buffer::from_gl_buffer(game->openCL->context, posBuffer, CL_MEM_WRITE_ONLY));
-	clbuffers.emplace_back(compute::buffer::from_gl_buffer(game->openCL->context, colorBuffer, CL_MEM_READ_WRITE));
-	clbuffers.emplace_back(compute::buffer::from_gl_buffer(game->openCL->context, sizeBuffer, CL_MEM_READ_WRITE));
-
-	clbuffers.emplace_back(game->openCL->context, maxParticles*sizeof(vec4));
-	clbuffers.emplace_back(game->openCL->context, maxParticles*sizeof(vec4));
-	clbuffers.emplace_back(game->openCL->context, maxParticles*sizeof(vec4));
-	clbuffers.emplace_back(game->openCL->context, maxParticles*sizeof(float));
-	clbuffers.emplace_back(game->openCL->context, maxParticles*sizeof(float));
-//	clbuffers.resize(7);
-
-	for(uint i = 0; i < clbuffers.size(); ++i)
-	{
-		emitKernel->Get()->set_arg(i, clbuffers[i]);
-		updateKernel->Get()->set_arg(i, clbuffers[i]);
-	}
 
 	loaded = true;
 }
 
-static uint renderSleep = 150;
-
 void ParticleSystem::Render()
 {
-	if(GetCount() <= 0)
+	if(!material.shader->GetId() || !material.texture->GetId())
 	{
 		return;
 	}
-	if(!material->shader->GetId() || !material->texture->GetId())
-	{
-		return;
-	}
-//	Log("Rendering ParticleSystem");
-//	thread::Sleep(renderSleep);
 //	glDisable(GL_DEPTH_TEST);
 
 //	glEnable(GL_POINT_SPRITE);
 //	glEnable(GL_PROGRAM_POINT_SIZE);
 //	glEnable(GL_GEOMETRY_PROGRAM_POINT_SIZE);
-	
-	{
-		game->openCL->queue.enqueue_acquire_gl_buffer(clbuffers[0]);
-		game->openCL->queue.enqueue_acquire_gl_buffer(clbuffers[1]);
-		game->openCL->queue.enqueue_acquire_gl_buffer(clbuffers[2]);
-	//	game->openCL->queue.enqueue_acquire_gl_objects(3, &clbuffers[0].get());
-	//	game->openCL->queue.finish();
-	//
-		updateKernel->Get()->set_arg(8, game->time->deltaTime);
-		game->openCL->queue.enqueue_1d_range_kernel(*updateKernel->Get(), 0, GetCount());
-		game->openCL->queue.finish();
 
-		game->openCL->queue.enqueue_release_gl_buffer(clbuffers[0]);
-		game->openCL->queue.enqueue_release_gl_buffer(clbuffers[1]);
-		game->openCL->queue.enqueue_release_gl_buffer(clbuffers[2]);
-	//	game->openCL->queue.enqueue_release_gl_objects(3, &clbuffers[0].get());
-		game->openCL->queue.finish();
-	}
+//	glBindVertexArray(vertexArray);
 
-	glBindVertexArray(vertexArray);
+	glUseProgram(material.shader->GetId());
 
-	glUseProgram(material->shader->GetId());
+	material.shader->SetUniform("model", owner->transform->GetMatrix());
 
-//	mat4 mvp = game->scene->mainCamera->GetProjection() * game->scene->mainCamera->GetView() /* owner->transform->GetMatrix()*/;
-//	material->shader->SetUniform("mvp", mvp);
-	material->shader->SetUniform("projection", game->scene->mainCamera->GetProjection());
-	material->shader->SetUniform("view", game->scene->mainCamera->GetView());
-	material->shader->SetUniform("cameraPosition", game->scene->mainCamera->owner->transform->GetWorldPosition());
+//	GetGame()->Log("ps model: ", owner->transform->GetMatrix());
+
+	material.shader->SetUniform("projection", GetGame()->scene->mainCamera->GetProjection());
+	material.shader->SetUniform("view", GetGame()->scene->mainCamera->GetView());
+	material.shader->SetUniform("cameraPosition", GetGame()->scene->mainCamera->owner->transform->GetWorldPosition());
+	material.shader->SetUniform("viewportWidth", GetGame()->window->GetSize().x);
 
 	if(inheritTransform)
 	{
-		material->shader->SetUniform("systemPosition", owner->transform->GetWorldPosition());
+	//	GetGame()->Log("sending pos ", owner->transform->GetWorldPosition());
+		material.shader->SetUniform("systemPosition", owner->transform->GetWorldPosition());
 	}
 	else
 	{
 	//	Log("Rendering particle independent from system.");
-		material->shader->SetUniform("systemPosition", vec3(0));
+		material.shader->SetUniform("systemPosition", vec3(0));
 	}
 
-	material->texture->Bind();
+	material.texture->Bind();
 	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-	material->shader->SetUniform("textureSampler", material->texture);
+	material.shader->SetUniform("textureSampler", material.texture.get());
+
+	glBindBuffer(GL_ARRAY_BUFFER, particleBuffer.id);
+	if(rewriteBuffer)
+	{
+	//	Log("BufferData called.");
+		glBufferData(GL_ARRAY_BUFFER, sizeof(ParticleVertex) * particleBuffer.size(), &particleBuffer[0], GL_STREAM_DRAW);
+	//	glBufferData(GL_ARRAY_BUFFER, sizeof(Particle) * particles.size(), &particles[0], GL_STREAM_DRAW);
+		rewriteBuffer = false;
+	}
+	else
+	{
+	//	Log("BufferSubData called.");
+		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(ParticleVertex) * particleBuffer.size(), &particleBuffer[0]);
+	//	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Particle) * particles.size(), &particles[0]);
+	}
 
 	glEnableVertexAttribArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, posBuffer);
-	glVertexAttribPointer(0, 4, GL_FLOAT, false, 0, (void*)0);
-	
+//	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+//	glBufferData(GL_ARRAY_BUFFER, sizeof(vec3) * vertexBuffer.size(), &vertexBuffer[0], GL_DYNAMIC_DRAW);
+//	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, false, sizeof(ParticleVertex), (void*)offsetof(ParticleVertex, position));
+//	glVertexAttribPointer(0, 3, GL_FLOAT, false, sizeof(Particle), (void*)offsetof(Particle, position));
+
 	glEnableVertexAttribArray(1);
-	glBindBuffer(GL_ARRAY_BUFFER, colorBuffer);
-	glVertexAttribPointer(1, 4, GL_FLOAT, false, 0, (void*)0);
+//	glBindBuffer(GL_ARRAY_BUFFER, colorBuffer);
+//	glBufferData(GL_ARRAY_BUFFER, sizeof(vec4) * colorBuffer.size(), &colorBuffer[0], GL_DYNAMIC_DRAW);
+//	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, (void*)0);
+	glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, true, sizeof(ParticleVertex), (void*)offsetof(ParticleVertex, color));
+//	glVertexAttribPointer(1, 4, GL_FLOAT, false, sizeof(Particle), (void*)offsetof(Particle, color));
 
 	glEnableVertexAttribArray(2);
-	glBindBuffer(GL_ARRAY_BUFFER, sizeBuffer);
-	glVertexAttribPointer(2, 1, GL_FLOAT, false, 0, (void*)0);
-	
-//	Log("Rendering");
-//	thread::Sleep(renderSleep);
-//	double t = game->time->GetTime();
-	glDrawArrays(GL_POINTS, 0, GetCount());
-//	Log("Rendering took ", game->time->GetTime() - t, " seconds");
+//	glBindBuffer(GL_ARRAY_BUFFER, sizeBuffer);
+//	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * sizeBuffer.size(), &sizeBuffer[0], GL_DYNAMIC_DRAW);
+//	glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, 0, (void*)0);
+	glVertexAttribPointer(2, 1, GL_FLOAT, false, sizeof(ParticleVertex), (void*)offsetof(ParticleVertex, size));
+//	glVertexAttribPointer(2, 1, GL_FLOAT, false, sizeof(Particle), (void*)offsetof(Particle, size));
+
+	glDrawArrays(GL_POINTS, 0, particleBuffer.size());
+
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	glDisableVertexAttribArray(0);
 
-	material->texture->Unbind();
+	material.texture->Unbind();
 
 	glBindVertexArray(0);
 
 	glUseProgram(0);
-
 
 //	glDisable(GL_POINT_SPRITE);
 //	glDisable(GL_PROGRAM_POINT_SIZE);
@@ -456,8 +488,9 @@ void ParticleSystem::EndRender()
 //	uvBuffer.Destroy();
 //	normalBuffer.Destroy();
 //	indexBuffer.Destroy();
-	material->texture->Destroy();
-	glDeleteVertexArrays(1, &vertexArray);
+	material.texture->Destroy();
+//	glDeleteVertexArrays(1, &vertexArray);
+	particleBuffer.Destroy();
 	loaded = false;
 }
 

@@ -21,7 +21,8 @@
 namespace lfant
 {
 
-Network::Network()
+Network::Network(Game* game) :
+	Subsystem(game)
 {
 	//Init();
 }
@@ -32,16 +33,27 @@ Network::~Network()
 
 void Network::Init()
 {
-	Log("Network::Init: Touch.");
+	GetGame()->Log("Network::Init: Touch.");
 
 	Subsystem::Init();
 }
 
 void Network::Update()
 {
+	//std::cout << "net update\n";
 	for(auto& usr : users)
 	{
 		usr->Update();
+	}
+}
+
+void Network::RunLoop()
+{
+	while(!GetGame()->IsExited())
+	{
+	//	mutex.lock();
+		Update();
+	//	mutex.unlock();
 	}
 }
 

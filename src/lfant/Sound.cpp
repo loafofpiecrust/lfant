@@ -28,7 +28,7 @@ Sound::~Sound()
 */
 void Sound::LoadBuffer(string path)
 {
-	path = game->fileSystem->GetGamePath(path).string();
+//	path = GetGame()->GetAssetPath(path).string();
 	Sound::Buffer* res = new Sound::Buffer();
 
 	alGenBuffers(1, &res->id);
@@ -39,7 +39,7 @@ void Sound::LoadBuffer(string path)
 
 void Sound::LoadStream(string path)
 {
-	path = game->fileSystem->GetGamePath(path).string();
+//	path = game->GetAssetPath(path).string();
 	Sound::Stream* res = new Sound::Stream(id, path);
 	res->Init();
 
@@ -93,9 +93,9 @@ void Sound::SetPosition(vec3 pos)
 //	Sound::Stream
 ///////
 
-Sound::Stream::Stream(uint32_t& source, string path) :
-	source(source),
-	stream(path, std::ios::in|std::ios::binary)
+Sound::Stream::Stream(uint32& source, string path) :
+	stream(path, std::ios::in|std::ios::binary),
+	source(source)
 {
 }
 
@@ -104,7 +104,7 @@ void Sound::Stream::Init()
 	buffers.resize(bufferCount);
 	alGenBuffers(buffers.size(), &buffers[0]);
 
-	uint8_t data[8];
+	uint8 data[8];
 	stream.seekg(12, std::ios::cur);
 
 	stream.read((char*)data, 8);
@@ -132,7 +132,7 @@ void Sound::Stream::Init()
 	stream.seekg(6, std::ios::cur);
 
 	// bit depth?
-	int32_t bits = 0;
+	int32 bits = 0;
 	stream.read((char*)&bits, sizeof(bits));
 
 	if(bits == 8)
@@ -185,8 +185,8 @@ bool Sound::Stream::Update()
 		return false;
 	}
 
-	uint32_t buffer = 0;
-	int32_t val = 0;
+	uint32 buffer = 0;
+	int32 val = 0;
 	int ret = 0;
 
 	alGetSourcei(source, AL_BUFFERS_PROCESSED, &val);
@@ -207,6 +207,8 @@ bool Sound::Stream::Update()
 	alGetSourcei(source, AL_SOURCE_STATE, &val);
 	if(val != AL_PLAYING)
 		alSourcePlay(source);
+
+	return true;
 }
 
 void Sound::Stream::Seek(float time)

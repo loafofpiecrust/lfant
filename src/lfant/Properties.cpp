@@ -26,6 +26,7 @@
 #include <lfant/Entity.h>
 #include <lfant/Scene.h>
 #include <lfant/Game.h>
+#include "ScriptSystem.h"
 
 // External
 
@@ -44,9 +45,9 @@ Properties::Properties(string path)
 }
 
 Properties::Properties(Properties* parent, string type, string name) :
-	parent(parent),
 	type(type),
-	name(name)
+	name(name),
+	parent(parent)
 {
 	parent->AddChild(this);
 }
@@ -66,7 +67,7 @@ Properties::Iterator Properties::end()
 	return Iterator(this, children.size());
 }
 
-void Properties::Get(string name, Entity*& ref)
+void Properties::Get(string name, Entity*& ref, Scene* scene)
 {
 	int id = 0;
 	string entname = "";
@@ -76,7 +77,8 @@ void Properties::Get(string name, Entity*& ref)
 		Get(name, entname);
 		if(entname != "")
 		{
-			ref = game->scene->GetRoot()->GetChild(entname, true);
+			/// @todo implement this
+			ref = scene->GetRoot()->GetChild(entname, true);
 		}
 	}
 	else
@@ -92,7 +94,7 @@ void Properties::Set(string name, Entity* const& value)
 
 void Properties::LoadFile(string path)
 {
-	ifstream stream(game->fileSystem->GetGamePath(path).string());
+	ifstream stream(path);
 	LoadStream(stream);
 }
 
@@ -270,7 +272,7 @@ void Properties::SaveStream(ostream &stream)
 
 	for(auto& i : values)
 	{
-		stream << ind+"\t" << i.first << " = " << i.second << "\n";
+		stream << ind+"\t" << i.first << " = " << i.second.str << "\n";
 	}
 
 	for(auto& child : children)
@@ -297,7 +299,7 @@ Properties* Properties::GetFirstChild()
 
 void Properties::SaveFile(string path)
 {
-	ofstream out {game->fileSystem->GetGamePath(path).string()};
+	ofstream out {path};
 	SaveStream(out);
 	out.close();
 }
@@ -309,7 +311,7 @@ Properties* Properties::GetChild(string type, string name)
 	{
 		if(child->type == type && (name.empty() || child->name == name))
 		{
-			Log("Properties::GetChild: Got child namespace '"+child->type+"'.");
+//			GetGame()->Log("Properties::GetChild: Got child namespace '"+child->type+"'.");
 			return child;
 		}
 	}
@@ -361,11 +363,23 @@ bool Properties::IsNamed(string name)
 	return this->name == name;
 }
 
+void Properties::Rename(string name)
+{
+	this->name = name;
+}
+
+void Properties::SetType(string type)
+{
+	to_lower(type);
+	this->type = type;
+}
+
+
 void Properties::Clear()
 {
 	type.clear();
 	name.clear();
-	
+
 	values.clear();
 	children.clear();
 }
@@ -391,7 +405,7 @@ string Properties::TrimSpace(const string& str, bool onlyIndent)
 {
 	std::size_t firstLetter = str.find_first_not_of(" \t\n");
 	std::size_t lastLetter = str.find_last_not_of(" \t\n");
-	
+
 	if(firstLetter == string::npos)
 	{
 		return "";
@@ -435,7 +449,7 @@ string Properties::GetString(string name)
 	return values[name];
 }
 
-void Properties::SetString(string name, string value)
+void Properties::SetString(string name, Value value)
 {
 	values[name] = value;
 }
@@ -454,6 +468,18 @@ const Properties::Iterator& Properties::Iterator::operator++()
 {
 	++pos;
 	return *this;
+}
+
+
+void Properties::ScriptBind()
+{
+	Script::ClassBase<Properties, Sqrat::Class<Properties, Sqrat::NoCopy<Properties>>> inst;
+	inst.Func("GetString", (string (Properties::*)(string))&Properties::Get<string>);
+	inst.Func("GetInt", (int (Properties::*)(string))&Properties::Get<int>);
+	inst.Func("GetFloat", (float (Properties::*)(string))&Properties::Get<float>);
+	inst.Func("GetVec3", (vec3 (Properties::*)(string))&Properties::Get<vec3>);
+	inst.Func("GetVec2", (vec2 (Properties::*)(string))&Properties::Get<vec2>);
+	inst.Bind("Properties");
 }
 
 }

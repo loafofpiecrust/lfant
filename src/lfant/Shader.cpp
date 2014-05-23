@@ -19,21 +19,25 @@ using namespace std;
 namespace lfant
 {
 
-deque<Shader*> Shader::shaders;
+deque<std::weak_ptr<Shader>> Shader::shaderCache;
 Shader* Shader::current;
 
-void Shader::Destroy()
+Shader::Shader()
 {
-	Object::Destroy();
-//	delete this;
 }
 
-void Shader::Load(Properties *prop)
+Shader::~Shader()
 {
+	glDeleteProgram(id);
+}
+
+std::shared_ptr<Shader> Shader::Load(Properties *prop)
+{
+	string vertex="", fragment="", geometry="";
 	prop->Get("vertex", vertex);
 	prop->Get("fragment", fragment);
 	prop->Get("geometry", geometry);
-	LoadFile(vertex, fragment, geometry);
+	return LoadFile(vertex, fragment, geometry);
 }
 
 void Shader::Save(Properties *prop) const
@@ -43,94 +47,61 @@ void Shader::Save(Properties *prop) const
 	prop->Set("geometry", geometry);
 }
 
-void Shader::LoadFile(string file)
+std::shared_ptr<Shader> Shader::LoadFile(string vert, string frag, string geom, string comp)
 {
-	if(file == "")
+	for(auto& sh_weak : shaderCache)
 	{
-		return;
+		auto sh = sh_weak.lock();
+		if(sh->vertex == vert && sh->fragment == frag)
+		{
+			return sh;
+		}
 	}
 
-	Log("Shader::LoadFile: Touch '"+file+"'.");
-	string ext = Extension(file);
-	if(ext == "vert")
-	{
-		vertex = file;
-	}
-	else if(ext == "frag")
-	{
-		fragment = file;
-	}
-	else if(ext == "geom")
-	{
-		geometry = file;
-	}
-	else if(ext == "comp")
-	{
-		compute = file;
-	}
-	else
-	{
-		Log("Shader file type unknown, not loading. '", file, "'.");
-	}
-}
+	std::shared_ptr<Shader> sh {new Shader};
+	shaderCache.push_back(sh);
 
-void Shader::LoadFile(string vert, string frag, string geom, string comp)
-{
-	Log("Loading shader files");
-	LoadFile(vert);
-	LoadFile(frag);
-	LoadFile(geom);
-	LoadFile(comp);
+	sh->vertex = vert;
+	sh->fragment = frag;
+	sh->geometry = geom;
+	sh->compute = comp;
 
-	Compile();
+	sh->Compile();
+
+	return sh;
 }
 
 void Shader::Compile()
 {
-	Log("Shader::Compile: Touch.");
-	if(vertex == "" || fragment == "")
+	if(vertex.empty() || fragment.empty())
 	{
-		Log("Shader link failed: missing vertex or fragment stage.");
 		return;
-	}
-
-	for(auto& sh : shaders)
-	{
-		if(vertex == sh->vertex && fragment == sh->fragment && geometry == sh->geometry && compute == sh->compute && sh->id != -1)
-		{
-			Log("Shader::LoadFile: Found previous shader that's compatible for '", vertex, "'.");
-			id = sh->id;
-			return;
-		}
 	}
 
 	uint32 vert = -1;
 	uint32 frag = -1;
 	id = glCreateProgram();
 
-	if(vertex != "")
+	if(!vertex.empty())
 	{
-		Log("Compiling vertex");
 		vert = Compile(GL_VERTEX_SHADER, vertex);
-		Log("Attaching vertex");
 		glAttachShader(id, vert);
 	}
-	if(fragment != "")
+	if(!fragment.empty())
 	{
-		Log("Compiling fragment");
 		frag = Compile(GL_FRAGMENT_SHADER, fragment);
-		Log("Attaching fragment");
 		glAttachShader(id, frag);
 	}
+
 #if !LFANT_GLES
 	uint32 geom = -1;
 	uint32 comp = -1;
-	if(geometry != "")
+	if(!geometry.empty())
 	{
 		geom = Compile(GL_GEOMETRY_SHADER, geometry);
 		glAttachShader(id, geom);
 	}
-	if(compute != "")
+	if(!compute.empty())
 	{
 		comp = Compile(GL_COMPUTE_SHADER, compute);
 		glAttachShader(id, comp);
@@ -147,8 +118,9 @@ void Shader::Compile()
 	if(comp != -1) glDeleteShader(comp);
 #endif
 
-	shaders.push_back(this);
 	Unbind();
+
+//	GetGame()->Log(glGetError());
 }
 
 uint32 Shader::GetUniform(string name)
@@ -159,26 +131,34 @@ uint32 Shader::GetUniform(string name)
 void Shader::AddUniform(string name)
 {
 	uniforms[name] = glGetUniformLocation(id, name.c_str());
-//	Log("Adding uniform '"+name+"' as ", uniforms[name]);
 }
 
 void Shader::Bind()
 {
-	glUseProgram(id);
-	Shader::current = this;
-//	Log("Shader, binding ", id);
+	if(GetCurrent() != this)
+	{
+		glUseProgram(id);
+		SetCurrent(this);
+	}
 }
 
 void Shader::Unbind()
 {
-	glUseProgram(0);
-	Shader::current = nullptr;
-//	Log("Shader, unbinding ", id);
+	if(GetCurrent() != nullptr)
+	{
+		glUseProgram(0);
+		SetCurrent(nullptr);
+	}
 }
 
 Shader* Shader::GetCurrent()
 {
 	return Shader::current;
+}
+
+void Shader::SetCurrent(Shader *sh)
+{
+	Shader::current = sh;
 }
 
 uint32 Shader::GetId()
@@ -188,13 +168,11 @@ uint32 Shader::GetId()
 
 uint32 Shader::Compile(uint32 type, const string &path)
 {
-	Log("Shader::Compile() {");
-	ifstream stream(game->fileSystem->GetGamePath(path).string());
+	ifstream stream(path);
 	string line = "";
 	string source = "";
 
 	deque<string> str;
-	Log("Reading the file");
 	while(stream.good())
 	{
 		getline(stream, line);
@@ -204,8 +182,10 @@ uint32 Shader::Compile(uint32 type, const string &path)
 			str = Split(line, "\t <>\"");
 			if(str[0] == "#include")
 			{
-				Log("including in shader '"+str[1]+"'.");
-				ifstream stream2(game->fileSystem->GetGamePath(str[1]).string());
+//				GetGame()->Log("including in shader '"+str[1]+"'.");
+				boost::filesystem::path p {path};
+				p = {p.remove_filename().string()+"/"+str[1]};
+				ifstream stream2(p.string());
 				string line = "";
 				while(stream2.good())
 				{
@@ -220,27 +200,22 @@ uint32 Shader::Compile(uint32 type, const string &path)
 	}
 	stream.close();
 
-	Log("glCreateShader");
 	uint32 shader = glCreateShader(type);
 	const char* csource = (source+"\0").c_str();
-	Log("glShaderSource");
 	glShaderSource(shader, 1, &csource, 0);
-	Log("glCompileShader");
 	glCompileShader(shader);
 
 	int32 logLength = 0;
 	int32 result = 0;
-	Log("Getting shader output values");
 	glGetShaderiv(shader, GL_COMPILE_STATUS, &result);
 	glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &logLength);
 	char error[logLength];
 	glGetShaderInfoLog(shader, logLength, 0, &error[0]);
 	if (logLength > 0)
 	{
-		Log(error);
+		std::cout << error << "\n";
 	}
 
-	Log("}");
 	return shader;
 }
 
@@ -254,7 +229,7 @@ void Shader::CheckErrors()
 	glGetProgramInfoLog(id, logLength, 0, &ProgramErrorMessage[0]);
 	if (logLength > 0)
 	{
-		Log(ProgramErrorMessage);
+		std::cout << ProgramErrorMessage << "\n";
 	}
 }
 

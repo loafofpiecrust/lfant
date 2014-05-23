@@ -14,13 +14,14 @@
 // Internal
 #include <lfant/Subsystem.h>
 
-struct ALCdevice_struct;
-struct ALCcontext_struct;
+namespace irrklang
+{
+class ISoundEngine;
+}
 
+namespace lfant
+{
 
-namespace lfant {
-
-class Halves;
 class Sound;
 
 /**	@addtogroup Game
@@ -36,19 +37,16 @@ class Sound;
 class Audio : public Subsystem
 {
 	friend class AudioSource;
+	friend class AudioListener;
 public:
-	Audio();
+	Audio(Game* game);
 	virtual ~Audio();
 
 	virtual void Init();
 
-	/**
-	 *	Plays a 2D sound at global volume.
-	 *	@param file The audio file to load and play.
-	 */
-//	 PlaySound(string file, bool loop = false);
+	void PlaySound(string file, bool loop = false);
 
-	uint8_t maxChannels = 10;
+	uint8 maxChannels = 10;
 
 protected:
 	virtual void Update();
@@ -56,9 +54,7 @@ protected:
 
 private:
 	std::deque<std::shared_ptr<Sound>> sounds;
-
-	ALCdevice_struct* device;
-	ALCcontext_struct* context;
+	irrklang::ISoundEngine* engine = nullptr;
 };
 
 }

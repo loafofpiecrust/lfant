@@ -17,6 +17,7 @@
 #include <lfant/Console.h>
 #include <lfant/Entity.h>
 #include <lfant/ScriptSystem.h>
+#include <lfant/Scene.h>
 
 namespace lfant {
 
@@ -53,8 +54,9 @@ void Component::Clone(Component* comp, Entity* owner) const
 
 Component* Component::Clone(Entity* owner) const
 {
-	Component* comp = Component::NewFromString(type::Descope(type::Name(this), "lfant"));
+	Component* comp = Component::NewFromString(type::Descope(type::Name(this)));
 	owner->AddComponent(comp);
+	return comp;
 }
 
 void Component::Load(Properties* prop)
@@ -66,27 +68,13 @@ void Component::Save(Properties *prop) const
 {
 	/// @todo Implement Properties::SetName()
 //	prop->SetName("component");
-	prop->type = "component";
+	prop->SetType("Component");
+	/// @todo fix this
 	prop->name = type::Descope(type::Name(this));
 	prop->Set("enabled", enabled);
-	
+
 //	prop->LoadFile("suckit");
-	
-}
 
-void Component::Init()
-{
-	Object::Init();
-	Log("Component::Init: owner = ", owner);
-}
-
-void Component::Update()
-{
-	Object::Update();
-}
-
-void Component::PostUpdate()
-{
 }
 
 void Component::Render()
@@ -99,19 +87,6 @@ void Component::Destroy()
 	owner->RemoveComponent(this);
 }
 
-void Component::Deinit()
-{
-	Object::Deinit();
-}
-/*
-void Component::OnEnable()
-{
-}
-
-void Component::OnDisable()
-{
-}
-*/
 void Component::TriggerEvent(string name)
 {
 	owner->TriggerEvent(name);
@@ -133,9 +108,19 @@ Entity* Component::GetOwner() const
 	return owner;
 }
 
+Game* Component::GetGame() const
+{
+	return owner->scene->GetGame();
+}
+
 void Component::Enable(bool enable)
 {
 	enabled = enable;
+}
+
+bool Component::IsRendered()
+{
+	return render;
 }
 
 
@@ -156,7 +141,7 @@ void Component::ScriptBind()
 	inst.Func("Destroy", &Component::Destroy);
 	inst.Func("IsEnabled", &Component::IsEnabled);
 	inst.Func("Enable", &Component::Enable);
-	
+
 	inst.Bind("ComponentBase");
 }
 

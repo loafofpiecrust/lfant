@@ -17,6 +17,7 @@
 // External
 #include <unordered_map>
 #include <forward_list>
+#include <memory>
 
 namespace lfant {
 
@@ -32,27 +33,16 @@ class Texture;
 /**
  *
  */
-class Shader : public Object
+class Shader //: public Object
 {
 public:
+	Shader();
+	virtual ~Shader();
 
-	struct Uniform
-	{
-		string name = "";
-		uint32 id = 0;
-	};
-
-	Shader()
-	{
-	}
-
-	virtual void Destroy();
-
-	virtual void Load(Properties *prop);
+	static std::shared_ptr<Shader> Load(Properties *prop);
 	virtual void Save(Properties* prop) const;
 //	void LoadFile(string file = "");
-	virtual void LoadFile(string file);
-	void LoadFile(string vert, string frag, string geom = "", string comp = "");
+	static std::shared_ptr<Shader> LoadFile(string vert, string frag, string geom = "", string comp = "");
 	void Compile();
 
 	void Bind();
@@ -78,15 +68,16 @@ protected:
 
 	static uint32 Compile(uint32 type, const string& path);
 	void CheckErrors();
+	static void SetCurrent(Shader* sh);
 
 	string vertex = "shaders/simple/Diffuse.vert";
 	string fragment = "shaders/simple/Diffuse.frag";
-	string geometry = "";
-	string compute = "";
+	string geometry;
+	string compute;
 	uint32 id = -1;
-	std::unordered_map<string, uint32> uniforms;
+	std::map<string, uint32> uniforms;
 
-	static std::deque<Shader*> shaders;
+	static std::deque<std::weak_ptr<Shader>> shaderCache;
 	static Shader* current;
 };
 

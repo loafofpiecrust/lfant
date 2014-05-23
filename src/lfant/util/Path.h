@@ -15,11 +15,11 @@
 // External
 #include <boost/filesystem.hpp>
 
-using namespace boost::filesystem;
+namespace fs = boost::filesystem;
 
 namespace lfant {
 
-path operator+(path const& p, string s);
+boost::filesystem::path operator+(boost::filesystem::path const& p, string s);
 //path operator+(path& p, string s);
 
 //operator string(const path& p);

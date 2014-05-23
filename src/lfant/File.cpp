@@ -19,7 +19,7 @@ File::File(string path)
 
 bool File::Load(string f)
 {
-	path = game->fileSystem->GetGamePath(f);
+	path = {f};
 	return boost::filesystem::is_regular_file(path);
 }
 

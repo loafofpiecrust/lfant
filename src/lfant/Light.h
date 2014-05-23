@@ -38,13 +38,12 @@ public:
 	virtual void Init();
 	virtual void Update();
 
-	virtual void BeginRender() {};
 	virtual void Render();
-	virtual void EndRender() {};
+	virtual void RenderStencil() {};
 
 protected:
 	vec3 color = vec3(1);
-	ptr<Shader> shader = new Shader;
+	std::shared_ptr<Shader> shader = nullptr;
 
 private:
 

@@ -18,26 +18,25 @@
 
 // External
 #include <boost/algorithm/string.hpp>
-#include <boost/signals2.hpp>
 #include <boost/bind.hpp>
 #include <boost/bind/placeholders.hpp>
 #include <boost/function.hpp>
+#include <boost/signals2.hpp>
+#include <tuple>
 #include <typeinfo>
 #include <forward_list>
 #include <iostream>
 
+#include <sqrat/sqratFunction.h>
+
 #define SENDER(obj, sig) obj, #sig
-#define RECEIVER(obj, slot) obj, &remove_ref<decltype(*obj)>::type::slot
+#define RECEIVER(obj, slot) obj, &lfant::remove_ref<decltype(*obj)>::type::slot
 
-namespace Sqrat {
-
-class Object;
-class Function;
-
-}
 
 namespace lfant
 {
+
+class Game;
 
 /** @addtogroup Game
  *	@{
@@ -59,23 +58,14 @@ class Object
 	class EventBase
 	{
 	public:
-		string name = "";
-		Object* sender = nullptr;
-
-		virtual void Clear() {}
-
 		EventBase()
 		{
 		}
-
-		EventBase(string name, Object* sender = nullptr) :
-			name(name), sender(sender)
-		{
-		}
-
 		virtual ~EventBase()
 		{
 		}
+
+		virtual void Clear() {}
 	};
 
 /*	class Event0 : public Event
@@ -90,90 +80,29 @@ class Object
 		}
 	};*/
 
-	class Event0 : public EventBase
-	{
-		typedef boost::function<void()> funcType;
-		std::deque<funcType> functions;
-
-		Event0(string name, Object* sender) :
-			EventBase(name, sender)
-		{
-		}
-
-		virtual ~Event0() {}
-
-		void Register(funcType func)
-		{
-			functions.push_back(func);
-		}
-
-		bool IsRegistered(funcType func)
-		{
-			for(funcType f : functions)
-			{
-//				if(f == func)
-				{
-	//				return true;
-				}
-			}
-			return false;
-		}
-
-		void Clear()
-		{
-			functions.clear();
-		}
-
-		void Trigger()
-		{
-			for(auto& func : functions)
-			{
-				func();
-			}
-		}
-	};
-
 	template<typename ... P>
 	class Event : public EventBase
 	{
 	public:
-		typedef boost::function<void(P...)> funcType;
-		std::deque<funcType> functions;
+		typedef boost::signals2::signal<void(P...)> sigType;
+		sigType sig;
 
-		Event(string name, Object* sender) :
-			EventBase(name, sender)
+		virtual ~Event()
 		{
 		}
 
-		virtual ~Event() {}
-
-		void Register(funcType func)
+		boost::signals2::connection Register(typename sigType::slot_type func)
 		{
-			functions.push_back(func);
-		}
-
-		bool IsRegistered(funcType func)
-		{
-			for(auto& f : functions)
-			{
-				if(f == func)
-				{
-					return true;
-				}
-			}
+			return sig.connect(func);
 		}
 
 		void Clear()
 		{
-			functions.clear();
 		}
 
 		void Trigger(P... args)
 		{
-			for(auto& func : functions)
-			{
-				func(args...);
-			}
+			sig(args...);
 		}
 	};
 
@@ -183,8 +112,8 @@ class Object
 	public:
 		T* var;
 
-		EventVar(string name, T* var) :
-			EventBase(name), var(var)
+		EventVar(T* var) :
+			var(var)
 		{
 		}
 	};
@@ -192,27 +121,33 @@ class Object
 	class EventScript : public EventBase
 	{
 	public:
-		Sqrat::Function* func;
-		Sqrat::Object* obj;
+		std::vector<Sqrat::Function> funcs;
+	//	Sqrat::Object obj;
 
-		EventScript(string name, Sqrat::Function* func, Sqrat::Object* obj) :
-			EventBase(name), func(func), obj(obj)
+		void Register(Sqrat::Function func)
 		{
+			funcs.push_back(func);
+		}
+
+		template<typename... P>
+		void Trigger(P... args)
+		{
+			for(auto& f : funcs)
+			{
+				f.Execute(args...);
+			}
 		}
 	};
 
-	class Timer
+	class EventScriptVar : public EventBase
 	{
 	public:
-		string name;
-		float time;
+		Sqrat::Object var;
 
-		Timer(string name, float time) :
-			name(name), time(time)
+		EventScriptVar(Sqrat::Object var) :
+			var(var)
 		{
 		}
-
-		~Timer() {}
 	};
 
 public:
@@ -248,150 +183,186 @@ public:
 	template<typename C>
 	static void RegisterEventFunc(Event<>* evt, C* receiver, void (C::*func)())
 	{
-		evt->Register(boost::bind(func, receiver));
+		receiver->eventConnections.push_back(evt->Register(boost::bind(func, receiver)));
 	}
 
 	template<typename C, typename P1>
 	static void RegisterEventFunc(Event<P1>* evt, C* receiver, void (C::*func)(P1))
 	{
-		evt->Register(boost::bind(func, receiver, _1));
+		receiver->eventConnections.push_back(evt->Register(boost::bind(func, receiver, _1)));
 	}
 
 	template<typename C, typename P1, typename P2>
 	static void RegisterEventFunc(Event<P1,P2>* evt, C* receiver, void (C::*func)(P1,P2))
 	{
-		evt->Register(boost::bind(func, receiver, _1, _2));
+		receiver->eventConnections.push_back(evt->Register(boost::bind(func, receiver, _1, _2)));
 	}
 
 	template<typename C, typename P1, typename P2, typename P3>
 	static void RegisterEventFunc(Event<P1,P2,P3>* evt, C* receiver, void (C::*func)(P1,P2,P3))
 	{
-		evt->Register(boost::bind(func, receiver, _1, _2, _3));
+		receiver->eventConnections.push_back(evt->Register(boost::bind(func, receiver, _1, _2, _3)));
 	}
 
 	template<typename C, typename P1, typename P2, typename P3, typename P4>
 	static void RegisterEventFunc(Event<P1,P2,P3,P4>* evt, C* receiver, void (C::*func)(P1,P2,P3,P4))
 	{
-		evt->Register(boost::bind(func, receiver, _1, _2, _3, _4));
+		receiver->eventConnections.push_back(evt->Register(boost::bind(func, receiver, _1, _2, _3, _4)));
 	}
 
 	template<typename R>
-	static void ConnectEvent(Object* sender, string name, R* receiver, void (R::*func)(), bool dis = false)
+	static void ConnectEvent(Object* sender, string name, R* receiver, void (R::*func)())
 	{
-		boost::algorithm::erase_all(name, " ");
+		erase_all(name, " ");
 		name.append("()");
-		for(auto& evt : Object::events)
+		ptr<EventBase>& evt = sender->events[name];
+		if(evt && typeid(*evt) == typeid(Event<>))
 		{
-			if(evt->name == name && evt->sender == sender)
-			{
-				Event<>* evtp = dynamic_cast<Event<>*>(evt.get());
-				RegisterEventFunc<R>(evtp, receiver, func);
-				return;
-			}
+			Event<>* evtp = static_cast<Event<>*>(evt.get());
+			RegisterEventFunc(evtp, receiver, func);
 		}
-		if(!dis)
+		else
 		{
-			Event<>* evt = new Event<>(name, sender);
-			Object::events.push_back(evt);
-			RegisterEventFunc<R>(new Event<>(name, sender), receiver, func);
+			Event<>* evtp = new Event<>();
+			RegisterEventFunc(evtp, receiver, func);
+			evt = evtp;
 		}
 	}
 
 	template<typename R, typename P1, typename... P>
-	static void ConnectEvent(Object* sender, string name, R* receiver, void (R::*func)(P1, P...), bool dis = false)
+	static void ConnectEvent(Object* sender, string name, R* receiver, void (R::*func)(P1, P...))
 	{
-	//	erase_all(name, " ");
+		erase_all(name, " ");
 		name.append("(" + type::Name<P1, P...>() + ")");
-		for(auto& evt : Object::events)
+
+		auto& evt = sender->events[name];
+		Event<P1, P...>* evtp = nullptr;
+		if(evt && typeid(*evt) == typeid(Event<P1, P...>))
 		{
-			if(evt->name == name && evt->sender == sender)
-			{
-				Event<P1, P...>* evtp = dynamic_cast<Event<P1, P...>*>(evt.get());
-				RegisterEventFunc<R, P1, P...>(evtp, receiver, func);
-				return;
-			}
+			 evtp = static_cast<Event<P1, P...>*>(evt.get());
 		}
-		if(!dis)
+		else
 		{
-			Event<P1, P...>* evt = new Event<P1, P...>(name, sender);
-			Object::events.push_back(evt);
-			RegisterEventFunc<R, P1, P...>(evt, receiver, func);
+			evtp = new Event<P1, P...>();
+		}
+
+		if(evtp)
+		{
+			evt = evtp;
+			RegisterEventFunc(evtp, receiver, func);
 		}
 	}
 
-	template<typename C>
-	static void ClearEvent(string name)
+	void ClearEvent(string name)
 	{
-		for(auto& evt : events)
+		auto& evt = events[name];
+		if(evt)
 		{
-			if(evt->name == name)
-			{
-				evt->Clear();
-			}
+			evt->Clear();
 		}
 	}
 
 	template<typename T>
 	static void ConnectEvent(Object* sender, string name, T* var)
 	{
-	//	erase_all(name, " ");
-		name.append("(" + type::Name<T>() + ")");
+		erase_all(name, " ");
+		name.append("()");
+
+		auto& evt = sender->events[name];
 		EventVar<T>* con = nullptr;
-		for(auto& evt : Object::events)
+		if(evt && typeid(*evt) == typeid(EventVar<T>))
 		{
-			if(evt->name == name)
-			{
-				con = dynamic_cast<EventVar<T>*>(evt.get());
-				if(con)
-				{
-					con->var = var;
-					return;
-				}
-			}
+			con = static_cast<EventVar<T>*>(evt.get());
+			con->var = var;
 		}
-		con = new EventVar<T>(name, var);
-		Object::events.push_back(con);
+		else
+		{
+			con = new EventVar<T>(var);
+		}
+
+		if(con)
+		{
+			evt = con;
+		}
+	}
+
+	static void ConnectEvent(Object* sender, string name, Sqrat::Object var)
+	{
+	//	name.append("()");
+	//	name = type::Name(sender) + "::" + name;
+		auto& evt = sender->events[name];
+		EventScriptVar* evtp = nullptr;
+		if(evt && typeid(*evt) == typeid(EventScriptVar))
+		{
+			evtp = static_cast<EventScriptVar*>(evt.get());
+		}
+		else
+		{
+			evtp = new EventScriptVar(var);
+		}
+
+		if(evtp)
+		{
+			evtp->var = var;
+			evt = evtp;
+		}
 	}
 
 	void TriggerEvent(string name)
 	{
-	//	erase_all(name, " ");
 		name.append("()");
-		for(auto& evt : Object::events)
+
+		auto& evt = events[name];
+		if(evt)
 		{
-			if(evt->sender == this && evt->name == name)
+			if(typeid(*evt) == typeid(Event<>))
 			{
-				Event<>* con = dynamic_cast<Event<>*>(evt.get());
+				Event<>* con = static_cast<Event<>*>(evt.get());
 				con->Trigger();
-				return;
+			}
+			else if(typeid(*evt) == typeid(EventScript))
+			{
+				EventScript* con = static_cast<EventScript*>(evt.get());
+				con->Trigger();
 			}
 		}
-
 	}
 
 	template<typename P1>
 	void TriggerEvent(string name, P1 arg)
 	{
-	//	erase_all(name, " ");
-		name.append("(" + type::Name<P1>() + ")");
-		for(auto& evt : Object::events)
+		name.append("("+type::Name(arg)+")");
+
+		std::map<string, ptr<EventBase>>::const_iterator iter = events.find(name);
+		if(iter != events.end())
 		{
-			if(evt->sender == this && evt->name == name)
+			auto& evt = iter->second;
+			auto& ti = typeid(*evt);
+			if(ti == typeid(Event<P1>))
 			{
-				Event<P1>* con = dynamic_cast<Event<P1>*>(evt.get());
-				if(con)
+				Event<P1>* con = static_cast<Event<P1>*>(evt.get());
+				con->Trigger(arg);
+			}
+			else if(ti == typeid(EventVar<P1>))
+			{
+				EventVar<P1>* conv = static_cast<EventVar<P1>*>(evt.get());
+				if(conv)
 				{
-					con->Trigger(arg);
+					*conv->var = arg;
 				}
-				else
+			}
+			else if(ti == typeid(EventScriptVar))
+			{
+				EventScriptVar* conv = static_cast<EventScriptVar*>(evt.get());
+				if(conv)
 				{
-					EventVar<P1>* conv = dynamic_cast<EventVar<P1>*>(evt.get());
-					if(conv)
-					{
-						*conv->var = arg;
-					}
+					/// @todo implement this
 				}
-				return;
+			}
+			else if(ti == typeid(EventScript))
+			{
+				EventScript* con = static_cast<EventScript*>(evt.get());
+				con->Trigger(arg);
 			}
 		}
 	}
@@ -400,66 +371,25 @@ public:
 	template<typename P1, typename... P>
 	void TriggerEvent(string name, P1 arg1, P... args)
 	{
-	//	erase_all(name, " ");
 		name.append("(" + type::Name<P1, P...>() + ")");
-		for(auto& evt : Object::events)
+
+		std::map<string, ptr<EventBase>>::const_iterator iter = events.find(name);
+		if(iter != events.end())
 		{
-			if(evt->sender == this && evt->name == name)
+			auto& evt = iter->second;
+			if(typeid(*evt) == typeid(Event<P1,P...>))
 			{
-				Event<P1, P...>* con = dynamic_cast<Event<P1, P...>*>(evt.get());
-				if(con)
-				{
-					con->Trigger(arg1, args...);
-				}
-				return;
+				Event<P1, P...>* con = static_cast<Event<P1, P...>*>(evt.get());
+				con->Trigger(arg1, args...);
 			}
-		}
-	}
-/*
-	template<typename P1, typename PL>
-	virtual void TriggerEvent(string name, P1 arg1, PL argLast)
-	{
-		erase_all(name, " ");
-		name = type::Name(this) + "::" + name + "(" + type::Name<P1, PL>() + ")";
-		for(auto& evt : Object::events)
-		{
-			if(evt->sender == this && evt->name == name)
+			else if(typeid(*evt) == typeid(EventScript))
 			{
-				Event<P1, PL>* con = dynamic_cast<Event<P1, PL>*>(evt);
-				if(con)
-				{
-					con->Trigger(arg1, argLast);
-				}
-				return;
+				EventScript* con = static_cast<EventScript*>(evt.get());
+				con->Trigger(arg1, args...);
 			}
 		}
 	}
 
-	template<typename P1, typename PL, typename... P>
-	virtual void TriggerEvent(string name, P1 arg1, P... args, PL argLast)
-	{
-		erase_all(name, " ");
-		name = type::Name(this) + "::" + name + "(" + type::Name<P1, P...>() + ")";
-		for(auto& evt : Object::events)
-		{
-			if(evt->sender == this && evt->name == name)
-			{
-				Event<P1, P...>* con = dynamic_cast<Event<P1, P...>*>(evt);
-				if(con)
-				{
-					con->Trigger(arg1, args..., argLast);
-				}
-				return;
-			}
-		}
-	}
-*/
-
-	bool EventConnected(string name);
-
-	void SetTimer(string name, float time);
-	void CancelTimer(string name);
-	float* GetTimer(string name);
 
 	/**
 	 *	Called when the object is initialised. Used instead of
@@ -481,6 +411,8 @@ public:
 	 */
 	virtual void Destroy();
 
+	virtual Game* GetGame() const { return nullptr; }
+
 protected:
 	struct Delete
 	{
@@ -496,16 +428,15 @@ protected:
 	 */
 	virtual void Deinit();
 
-	static uint32_t GetEventCount();
+	uint32 GetEventCount();
 
-	bool initBeforeLoad = false;
 
 private:
 	// For scripts
-	void ConnectScriptEvent(Object* sender, string name, Sqrat::Object* receiver, Sqrat::Function* func);
+	void ConnectScriptEvent(Object* sender, string name, Sqrat::Object receiver, string funcName);
 
-	static std::deque<ptr<EventBase>> events;
-	std::vector<Timer> timers;
+	std::map<string, ptr<EventBase>> events;
+	std::vector<boost::signals2::connection> eventConnections;
 };
 
 /// @}

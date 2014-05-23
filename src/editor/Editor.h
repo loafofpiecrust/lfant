@@ -32,7 +32,6 @@ public:
 
 
 protected:
-	ptr<gui::App> app;
 	bool playing = false;
 
 private:

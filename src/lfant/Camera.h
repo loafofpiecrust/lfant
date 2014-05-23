@@ -51,8 +51,8 @@ public:
 	 */
 	void UpdateProjection();
 
-	mat4 GetProjection();
-	mat4 GetView();
+	const mat4& GetProjection();
+	const mat4& GetView();
 
 	void UpdateView();
 	void OnViewChange(vec3 change)
@@ -91,18 +91,23 @@ public:
 
 	// Include film size for DoF and part of FoV?
 //	float filmSize = 35.0f;
+
+	bool autoFocus = false;
+	vec2 focusPoint;
+
 	float focalLength = 35.0f;
 	float focalDepth = 6.6f;
 	float aperture = 4.0f;
 	float focus = 0.9f;
+	bool useDof = false;
 
 protected:
 
 	/// Matrix for specific projection.
-	mat4 projection = mat4(1);
+	mat4 projection;
 
 	/// Matrix for transformations.
-	mat4 view = mat4(1);
+	mat4 view;
 
 	/// Field of view, eg. 40.0f
 	float fov = 66.0f;
@@ -117,7 +122,8 @@ protected:
 
 	float shutterSpeed = 0.003f;
 
-	uint16_t iso = 300;
+	uint16 iso = 300;
+
 
 private:
 

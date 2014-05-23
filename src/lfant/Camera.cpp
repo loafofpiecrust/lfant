@@ -65,6 +65,7 @@ void Camera::Save(Properties* prop) const
 	prop->Set("aperture", aperture);
 	prop->Set("focalLength", focalLength);
 	prop->Set("focalDepth", focalDepth);
+	prop->Set("useDof", useDof);
 //	prop->Set("mode", (short)mode);
 }
 
@@ -78,7 +79,8 @@ void Camera::Load(Properties* prop)
 	prop->Get("aperture", aperture);
 	prop->Get("focalLength", focalLength);
 	prop->Get("focalDepth", focalDepth);
-//	mode = (Mode)prop->Get<short>("mode");
+	prop->Get("useDof", useDof);
+	mode = (Mode)prop->Get<short>("mode");
 
 	UpdateProjection();
 }
@@ -91,12 +93,12 @@ void Camera::Load(Properties* prop)
 
 void Camera::Init()
 {
-	Log("Updated projection");
+	GetGame()->Log("Updated projection");
 	UpdateProjection();
 
-	if(!game->scene->mainCamera)
+	if(!GetGame()->scene->mainCamera)
 	{
-		game->scene->mainCamera = this;
+		GetGame()->scene->mainCamera = this;
 	}
 }
 
@@ -105,19 +107,19 @@ void Camera::Update()
 	UpdateView();
 //	UpdateProjection();
 
-	focalLength += game->time->deltaTime * game->input->GetAxis("SetFocalLength")->GetValue();
-	focalDepth += game->time->deltaTime * game->input->GetAxis("SetFocalDepth")->GetValue();
-	aperture += game->time->deltaTime * game->input->GetAxis("SetFstop")->GetValue();
+	focalLength += GetGame()->time->deltaTime * GetGame()->input->GetAxis("SetFocalLength")->GetValue();
+	focalDepth += GetGame()->time->deltaTime * GetGame()->input->GetAxis("SetFocalDepth")->GetValue();
+	aperture += GetGame()->time->deltaTime * GetGame()->input->GetAxis("SetFstop")->GetValue();
 
-	if(game->input->GetButtonDown("ShowDof"))
+	if(GetGame()->input->GetButtonDown("ShowDof"))
 	{
-		Log("focalLength: ", focalLength, ", focalDepth: ", focalDepth, ", aperture: ", aperture);
+		GetGame()->Log("focalLength: ", focalLength, ", focalDepth: ", focalDepth, ", aperture: ", aperture);
 	}
 }
 
 void Camera::Deinit()
 {
-	Log("mainCamera = ", game->scene->mainCamera);
+	GetGame()->Log("mainCamera = ", GetGame()->scene->mainCamera);
 }
 
 /*******************************************************************************
@@ -134,23 +136,25 @@ void Camera::UpdateProjection()
 		{
 			projection = glm::perspective(fov/aperture, aspectRatio, viewRange.min, viewRange.max);
 		//	projection[10] = -projection[10];
-			Log("projection: ", projection);
+			GetGame()->Log("projection: ", projection);
 			break;
 		}
 		case Mode::Orthographic:
 		{
-			projection = glm::ortho(0.0f, fov * aspectRatio, 0.0f, fov / aspectRatio, viewRange.min, viewRange.max);
+			float w = (fov/aperture * aspectRatio)*0.5f;
+			float h = (fov/aperture / aspectRatio)*0.5f;
+			projection = glm::ortho(w, -w, h, -h, viewRange.min, viewRange.max);
 			break;
 		}
 	}
 }
 
-mat4 Camera::GetProjection()
+const mat4& Camera::GetProjection()
 {
 	return projection;
 }
 
-mat4 Camera::GetView()
+const mat4& Camera::GetView()
 {
 	return view;
 }

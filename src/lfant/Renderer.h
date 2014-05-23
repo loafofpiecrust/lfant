@@ -19,11 +19,15 @@
 
 #include <lfant/Subsystem.h>
 
-struct GLFWwindow;
+//struct GLFWwindow;
 
-namespace lfant
-{
-class Mesh;
+namespace sf {
+class Window;
+}
+
+namespace lfant {
+
+class Geometry;
 class Sprite;
 class Light;
 class ParticleSystem;
@@ -51,63 +55,28 @@ class Renderer : public Subsystem
 	friend class Game;
 	friend class Light;
 public:
-	Renderer();
+	Renderer(Game* game);
 	~Renderer();
 
 	virtual void Load(Properties* prop);
 	virtual void Save(Properties* prop) const;
 
 	virtual void Init();
-	virtual void PreUpdate();
 	virtual void Update();
 	virtual void Deinit();
 
-	/**
-	 *	Opens a new window, using member settings.
-	 *	@param close Whether or not to close the current window. Leave at true unless you really know what you're doing.
-	 */
-	bool OpenWindow();
-
-	// Static callbacks
-	static void OnCloseWindow(GLFWwindow* win);
-	static void OnSetResolution(GLFWwindow* win, int x, int y);
-//	static void OnError(uint source, uint type, uint id, uint severity, int length, const char* message, void* user);
-	static void OnError(int error, const char* msg);
-
-	/// Sets the version property
-	void SetVersion(byte major, byte minor);
-	void SetVersion(Range<int> ver);
-
 	void SetRendering(bool render);
 
+	void Resize(ivec2 size);
 
 	// Shaders
 	Shader* GetShader(string name);
 	void AddShader(Shader* shader);
 
-	/**
-	 *	Hides, shows, or toggles the mouse cursor.
-	 */
-	void HideMouse(bool hide = true);
-
 	void AddLight(Light* light);
 	void RemoveLight(Light* light);
 
-	void IndexArray(std::vector<vec3>& arr, std::vector<uint32_t>& idx);
-
-	void SetResolution(ivec2 res);
-	ivec2 GetResolution();
-
-	void SetWindowTitle(string title);
-	void SetWindowPos(ivec2 pos);
-
-	GLFWwindow* GetWindowHandle() { return window; }
-
-	/// The multiplier for anti-aliasing. 2, 4, 8.
-	int fsaa = 4;
-
-	/// Determines whether this OpenGL context is full-screen or not.
-	bool fullscreen = false;
+	void IndexArray(std::vector<vec3>& arr, std::vector<uint32>& idx);
 
 	/// Whether or not the frame-rate should try to sync with the monitor refresh rate (60 hz/fps)
 	bool vsync = true;
@@ -118,9 +87,6 @@ public:
 	/// Whether or not to render.
 	bool render = true;
 
-	/// The OpenGL version to use, 0 is Primary, 1 is Secondary (eg. {4, 3} = OpenGL 4.3).
-	Range<int> version = { 3, 2 };
-
 	float gamma = 2.2f;
 
 	int motionBlur = 5;
@@ -130,22 +96,12 @@ public:
 
 protected:
 
-	/// Whether or not to hide the mouse cursor.
-	bool hideMouse = false;
-	bool windowResizable = false;
+	void OnMouseMove(ivec2 pos);
+	void OnMouseButton(uint16 button, int action);
 
 	std::deque<ptr<Shader>> shaders;
 
-	GLFWwindow* window;
-
 	std::deque<Light*> lights;
-
-public:
-
-private:
-	ivec2 resolution = ivec2(1280, 720);
-	ivec2 windowPos = ivec2(0);
-	string windowTitle = "lfant";
 };
 
 /// @}

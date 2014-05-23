@@ -17,7 +17,7 @@ Stream::Stream(std::string path, Source* src) :
 	file.open(path);
 
 	std::shared_ptr<File> f {(File*)this};
-	for(auto& l : System::Get()->listeners)
+	for(uint i = 0; i < System::Get()->listeners.size(); ++i)
 	{
 		f->sounds.push_back(new Sound(f));
 	}
@@ -34,10 +34,10 @@ void Stream::PlayChunk()
 		return;
 	}
 
-	uint32_t buffer = 0;
-	int32_t val = 0;
-	int ret = 0;
-	
+//	uint32_t buffer = 0;
+//	int32_t val = 0;
+//	int ret = 0;
+
 	/// @todo Implement file streaming
 	/*
 	alGetSourcei(source, AL_BUFFERS_PROCESSED, &val);
