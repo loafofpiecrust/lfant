@@ -154,11 +154,7 @@ public:
 	Object();
 	virtual ~Object();
 
-	/**
-	 *	Loads the object's data from a Properties structure.
-	 *	@param prop The Properties namespace to load from.
-	 */
-	virtual void Load(Properties* prop);
+	virtual void Serialize(Properties* prop);
 
 	/**
 	 *	Loads a Properties structure from a file, then calling Load().
@@ -167,16 +163,10 @@ public:
 	virtual void LoadFile(string path);
 
 	/**
-	 *	Saves Object data to a Properties structure.
-	 *	@param prop Namespace to save to.
-	 */
-	virtual void Save(Properties* prop) const;
-
-	/**
 	 *	Creates a file and calls Save(), outputting to the file.
 	 *	@param path File to save to.
 	 */
-	virtual void SaveFile(string path) const;
+	virtual void SaveFile(string path);
 
 	static void ScriptBind();
 

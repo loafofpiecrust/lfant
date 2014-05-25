@@ -20,11 +20,14 @@ public:
 
 public slots:
 	void setPointerValue(double val);
-	void update();
+	void paintEvent(QPaintEvent* event);
 
 private:
-	float* float_ptr;
-	double* value_ptr;
+	union
+	{
+		float* float_ptr;
+		double* value_ptr;
+	};
 };
 
 } // namespace gui

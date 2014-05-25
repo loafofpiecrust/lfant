@@ -19,7 +19,7 @@ public:
 
 	void LoadFile(string file);
 
-	void Load(Properties* prop);
+	void Serialize(Properties* prop);
 
 	void Init();
 	void Update();

@@ -3,45 +3,29 @@
 
 namespace lfant {
 
-void Animation::Clip::Save(Properties* prop) const
-{
-//	prop->type = "Clip";
-	prop->Set("name", name);
-	prop->Set("start", start);
-	prop->Set("end", end);
-	prop->Set("frameRate", frameRate);
-}
-
-void Animation::Clip::Load(Properties* prop)
+void Animation::Clip::Serialize(Properties* prop)
 {
 //	name = prop->id;
-	prop->Get("name", name);
-	prop->Get("start", start);
-	prop->Get("end", end);
-	prop->Get("frameRate", frameRate);
+	prop->Value("name", &name);
+	prop->Value("start", &start);
+	prop->Value("end", &end);
+	prop->Value("frameRate", &frameRate);
 }
 
-void Animation::Save(Properties* prop) const
+void Animation::Serialize(Properties* prop)
 {
-	Component::Save(prop);
-
-//	Properties* arr = prop->AddChild("clips");
-	for(auto& clip : clips)
+	prop->ValueArray<Clip*>("Clip", clips, [](Clip*& clip, Properties* prop)
 	{
-		clip->Save(new Properties(prop, "Clip"));
-	}
-}
-
-void Animation::Load(Properties* prop)
-{
-	for(auto& child : prop->children)
+		clip->Serialize(prop);
+	});
+/*	for(auto& child : prop->children)
 	{
 		if(child->type != "Clip") continue;
 
 		Clip* clip = new Clip();
 		clip->Load(child);
 		clips.push_back(clip);
-	}
+	}*/
 }
 
 void Animation::AddClip(Clip* clip)

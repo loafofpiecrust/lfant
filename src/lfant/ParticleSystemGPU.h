@@ -116,7 +116,7 @@ public:
 	void EndRender();
 
 	void Save(Properties* prop) const;
-	void Load(Properties *prop);
+	void Serialize(Properties *prop);
 
 	/**
 	 *	Emits a specific amount of particles

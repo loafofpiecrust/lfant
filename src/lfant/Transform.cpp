@@ -47,34 +47,25 @@ void Transform::Init()
 	}
 }
 
-void Transform::Save(Properties *prop) const
-{
-	Component::Save(prop);
-
-	GetGame()->Log("Saving transform attr");
-
-	prop->Set("position", position);
-	prop->Set("rotation", rotation);
-	prop->Set("scale", scale);
-}
-
-void Transform::Load(Properties *prop)
+void Transform::Serialize(Properties *prop)
 {
 //	GetGame()->Log("Loading transform from type '"+prop->type+"', id '"+prop->id+"'.");
-	Component::Load(prop);
+	Component::Serialize(prop);
 
-	prop->Get("position", position);
-	prop->Get("rotation", rotation);
-	prop->Get("scale", scale);
+	prop->Value("position", &position);
+	prop->Value("rotation", &rotation);
+	prop->Value("scale", &scale);
 
 	// Do this to ensure the callbacks are called
-	SetPosition(position);
-	SetRotation(rotation);
-	SetScale(scale);
+	if(prop->mode == Properties::Mode::Input)
+	{
+		SetPosition(position);
+		SetRotation(rotation);
+		SetScale(scale);
 
-	SetMatrix();
-
-	GetGame()->Log("Loaded position: "+lexical_cast<string>(position));
+		SetMatrix();
+		GetGame()->Log("Loaded position: "+lexical_cast<string>(position));
+	}
 }
 
 void Transform::ScriptBind()

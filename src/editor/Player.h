@@ -14,13 +14,11 @@ class Player : public Component
 {
 public:
 
-	virtual void Load(Properties* prop);
-	virtual void Save(Properties* prop);
+	virtual void Serialize(Properties* prop);
 
 	virtual void Init();
 	virtual void Update();
 	virtual void Deinit();
-
 protected:
 
 private:

@@ -43,8 +43,8 @@ public:
 	virtual void Update();
 	virtual void Deinit();
 
-	virtual void Save(Properties* prop) const;
-	virtual void Load(Properties* prop);
+	
+	virtual void Serialize(Properties* prop);
 
 	/**
 	 *	Updates the projection to use the current settings

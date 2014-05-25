@@ -59,8 +59,15 @@ public:
 	class Axis
 	{
 		friend class Input;
+	private:
+		float value = 0.0f;
+
+		bool posHeld = false;
+		bool negHeld = false;
+		bool down = false;
+		bool up = false;
+
 	public:
-		string name;
 		uint16 positive;
 		uint16 negative;
 		float sensitivity;
@@ -70,6 +77,8 @@ public:
 
 		/// Number of the controller to use. 0 means all.
 		byte joyNum = 0;
+
+		string name;
 
 
 		float GetValue() const
@@ -91,20 +100,12 @@ public:
 		{
 		}
 
-	private:
-
-		float value = 0.0f;
-
-		bool posHeld = false;
-		bool negHeld = false;
-		bool down = false;
-		bool up = false;
 	};
 
 	struct Joystick
 	{
-		const float* values;
 		int count;
+		const float* values;
 	};
 
 	struct Touch
@@ -119,8 +120,8 @@ public:
 	virtual void Init();
 	virtual void Update();
 
-	virtual void Load(Properties* prop);
-	virtual void Save(Properties* prop) const;
+	virtual void Serialize(Properties* prop);
+
 
 	void OnKeyPress(int key, int action, int mods);
 	void OnCharPress(uint key);
@@ -138,9 +139,9 @@ public:
 	int8 GetButton(string name) const;
 	int8 GetButtonDown(string name) const;
 	int8 GetButtonUp(string name) const;
-	
+
 	int8 GetKeyDown(uint16 key) const;
-	
+
 
 #if !ANDROID
 	ivec2 GetMousePos() const;
@@ -160,19 +161,15 @@ public:
 	float mouseSpeed = 1.0f;
 
 protected:
+	ivec2 mousePos;
+	/// The string of input this frame.
+	string inputString;
+
 	std::deque<Axis> axes;
 	std::deque<Joystick> joysticks;
 #if ANDROID
 	std::deque<Touch> touches;
 #endif
-
-	/// The string of input this frame.
-	string inputString;
-	ivec2 mousePos;
-
-	//bitset<sizeof(byte)> keysHeld;
-
-private:
 };
 
 /** @} */

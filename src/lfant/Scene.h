@@ -49,17 +49,8 @@ public:
 	std::deque<Entity*> GetEntities(string tag) const;
 	std::deque<Entity*> GetLayer(string layer) const;
 
-	/** Saves the scene to a file.
-	 *	@param file File to save to, without extension.
-	 */
-	virtual void Save(Properties *prop) const;
-
-	/** Loads the scene from a file.
-	 *	@param file File to load from, without extension.
-	 */
-	virtual void Load(Properties* prop);
-
 	virtual void LoadFile(string path);
+	virtual void Serialize(Properties* prop);
 
 	void Clear();
 

@@ -11,15 +11,29 @@ namespace gui {
 class ValueCheckBox : public QCheckBox
 {
 	Q_OBJECT
-	ValueWidget(QCheckBox, bool)
 public:
 	explicit ValueCheckBox(QWidget *parent = 0);
 
-signals:
+	void setPointer(bool* ptr)
+	{
+		value_ptr = ptr;
+	}
 
 public slots:
+	void setPointerValue(bool value)
+	{
+		if(value_ptr) *value_ptr = value;
+	}
+
+	void paintEvent(QPaintEvent *event)
+	{
+		setInternalValue();
+		QCheckBox::paintEvent(event);
+	}
 
 private:
+	bool* value_ptr;
+
 	void setInternalValue();
 
 };

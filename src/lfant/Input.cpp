@@ -117,39 +117,56 @@ void Input::Update()
 	}
 }
 
-void Input::Load(Properties* prop)
+void Input::Serialize(Properties* prop)
 {
-	Subsystem::Load(prop);
+	Subsystem::Serialize(prop);
 
 	GetGame()->Log("Loading input props...");
 //	deque<Properties*> binds = prop->GetChildren("axis");
 //	Properties* binds = prop->GetChild("axes");
-	for(auto& b : prop->children)
+
+	auto addAxisFunc = [](Axis& axis, Properties* b)
 	{
-		if(!b->IsType("axis") || b->name.empty()) continue;
+		if(b->GetMode() == Properties::Mode::Input)
+		{
+			string pos = "", neg = "";
+			b->Value("positive", &pos);
+			b->Value("negative", &neg);
+			axis.positive = Key[pos];
+			axis.negative = Key[neg];
+			std::cout << "axis positive " << pos << " to " << axis.positive << "\n";
+		}
+		else
+		{
+		//	b->SetString("positive", Key[axis.positive]);
+		//	b->SetString("negative", Key[axis.negative]);
+		}
+		b->Value("sensitivity", &axis.sensitivity);
+		b->Value("dead", &axis.dead);
+		b->Value("snap", &axis.snap);
+		b->Value("joyNum", &axis.joyNum);
+	};
 
-		Axis axis {b->name};
+	if(prop->GetMode() == Properties::Mode::Input)
+	{
+		std::cout << "\ninput mode\n";
+		for(auto& b : prop->children)
+		{
+		//	if(!b->IsType("axis") || b->name.empty()) continue;
 
-		GetGame()->Log("Adding axis '"+axis.name+"' mapped to ", (char)Key[b->Get("positive")]);
-
-		axis.positive = Key[b->Get("positive")];
-		axis.negative = Key[b->Get("negative")];
-	//	axis.positiveAlt = Key[i->Get<string>("positiveAlt")];
-	//	axis.positiveAlt = Key[i->Get<string>("negativeAlt")];
-
-	//	axis.sensitivity = .asFloat();
-		b->Get("sensitivity", axis.sensitivity);
-		b->Get("dead", axis.dead);
-		b->Get("snap", axis.snap);
-		b->Get("joyNum", axis.joyNum);
-
-		axes.push_back(axis);
+			Axis axis {b->name};
+			std::cout << "adding axis " << b->name << " yowza\n";
+			addAxisFunc(axis, b);
+			axes.push_back(axis);
+		}
 	}
-}
-
-void Input::Save(Properties* prop) const
-{
-	Subsystem::Save(prop);
+	else
+	{
+		for(auto& axis : axes)
+		{
+			addAxisFunc(axis, prop->Child("axis", axis.name));
+		}
+	}
 }
 
 

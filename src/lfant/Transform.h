@@ -23,8 +23,8 @@ public:
 	Transform();
 	virtual ~Transform();
 
-	virtual void Save(Properties* prop) const;
-	virtual void Load(Properties* prop);
+	
+	virtual void Serialize(Properties* prop);
 	
 	static void ScriptBind();
 

@@ -138,7 +138,7 @@ void UserInterface::Save(Properties *prop) const
 
 }
 
-void UserInterface::Load(Properties *prop)
+void UserInterface::Serialize(Properties *prop)
 {
 
 }
@@ -215,7 +215,7 @@ void UserInterface::OnWindowResize(uint width, uint height)
 	}
 }
 
-UserInterface::Movie *UserInterface::LoadMovie(string name, string path)
+UserInterface::Movie *UserInterface::SerializeMovie(string name, string path)
 {
 	Movie* m = new Movie(name, player->load_file(path.c_str()));
 	movies.push_back(m);
@@ -260,7 +260,7 @@ void UserInterface::Movie::Pause()
 /*
 void UserInterface::CreateWindow(Properties* prop, CEGUI::Window* parent)
 {
-	CEGUI::Window* win = windowManager->createWindow(prop->Get("type"), prop->name);
+	CEGUI::Window* win = windowManager->createWindow(prop->Value("type"), prop->name);
 
 	string type = type::Descope(type::Name(win));
 	if(type == "PushButton")
@@ -298,20 +298,20 @@ void UserInterface::CreateWindow(Properties* prop, CEGUI::Window* parent)
 
 }
 
-void UserInterface::Load(Properties *prop)
+void UserInterface::Serialize(Properties *prop)
 {
 	if(!prop) return;
-	Subsystem::Load(prop);
-	GetGame()->Log("UserInterface::Load: Touch.");
+	Subsystem::Serialize(prop);
+	GetGame()->Log("UserInterface::Serialize: Touch.");
 	deque<string> schemes;
 	string pfont = "";
 	string pcursor = "";
 	string file = "";
-	prop->Get("schemes", schemes);
-	prop->Get("font", pfont);
-	prop->Get("cursor", pcursor);
-	prop->Get("file", file);
-	prop->Get("rootFolder", rootResFolder);
+	prop->Value("schemes", schemes);
+	prop->Value("font", pfont);
+	prop->Value("cursor", pcursor);
+	prop->Value("file", file);
+	prop->Value("rootFolder", rootResFolder);
 
 	GetGame()->Log("UserInterface, file to load: '"+file+"'.");
 	if(file != "")
@@ -576,7 +576,7 @@ bool UserInterface::OnCloseWindow(const CEGUI::EventArgs &evt)
 // generic
 void UserInterface::Init()
 {
-	Subsystem::Init();
+	LoadFile("settings/userInterface.prop");
 }
 
 void UserInterface::Update()
@@ -596,7 +596,7 @@ void UserInterface::CreateWindow(Properties* prop, CEGUI::Window* parent)
 {
 }
 
-void UserInterface::Load(Properties *prop)
+void UserInterface::Serialize(Properties *prop)
 {
 }
 

@@ -102,8 +102,7 @@ public:
 
 	bool usingCamera = true;
 	bool fboQuad = false;
-
-//protected:
+	bool loaded = false;
 
 	string file = "";
 
@@ -113,16 +112,14 @@ public:
 //	bool castShadows = true;
 //	bool receiveShadows = true;
 
-	bool loaded = false;
-
-	Buffer<vec3> vertexBuffer;
 	Buffer<vec2> uvBuffer;
+	Buffer<vec3> vertexBuffer;
 	Buffer<vec3> normalBuffer;
 	Buffer<uint32> indexBuffer;
 
 private:
 
-	void LoadOBJ(string path);
+	void SerializeOBJ(string path);
 
 	const aiScene* scene = nullptr;
 

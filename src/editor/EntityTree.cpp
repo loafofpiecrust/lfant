@@ -27,9 +27,9 @@ void EntityTree::ItemChanged(QTreeWidgetItem* selected, QTreeWidgetItem* deselec
 {
 	if(!game) return;
 	qDebug() << "EntityTree::ItemChanged()";
-	void* dat = selected->data(0, Qt::UserRole).data();
-	Entity** datEnt = reinterpret_cast<Entity**>(dat);
-	qDebug() << dat << " and " << *datEnt;
+	void* dat = selected->data(1, Qt::UserRole).value<void*>();
+	Entity* datEnt = reinterpret_cast<Entity*>(dat);
+	qDebug() << dat << " and " << datEnt << "\n";
 	EntityChanged(reinterpret_cast<Entity*>(dat));
 }
 
@@ -47,7 +47,7 @@ void EntityTree::AddEntity(Entity *ent, QTreeWidgetItem* parent)
 	qDebug() << "add ent " << (void*)ent;
 	auto item = new QTreeWidgetItem();
 	item->setData(0, Qt::DisplayRole, QString::fromStdString(ent->GetName()));
-	item->setData(0, Qt::UserRole, QVariant(QVariant::UserType, (void*)ent));
+	item->setData(1, Qt::UserRole, qVariantFromValue((void*)ent));
 	parent->addChild(item);
 
 	for(auto& child : ent->GetChildren())
@@ -63,7 +63,7 @@ void EntityTree::EntityAdded(Entity* ent)
 		auto items = findItems(QString::fromStdString(ent->GetParent()->GetName()), Qt::MatchRecursive|Qt::MatchFixedString);
 		for(auto& item : items)
 		{
-			QVariant dat = item->data(0, Qt::UserRole);
+			QVariant dat = item->data(1, Qt::UserRole);
 			if(dat.data() == (void*)(ent->GetParent()))
 			{
 				// found it

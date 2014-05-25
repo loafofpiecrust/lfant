@@ -21,18 +21,11 @@
 namespace lfant
 {
 
-void Collider::Save(Properties* prop) const
+void Collider::Serialize(Properties* prop)
 {
-	Component::Save(prop);
+	Component::Serialize(prop);
 
-	prop->Set("size", GetSize());
-}
-
-void Collider::Load(Properties* prop)
-{
-	Component::Load(prop);
-
-	prop->Get("size", size);
+	prop->Value("size", &size);
 }
 
 void Collider::Init()
@@ -55,7 +48,7 @@ vec3 Collider::GetSize() const
 	return size;
 }
 
-void Collider::SetSize(vec3 size) 
+void Collider::SetSize(vec3 size)
 {
 	GetGame()->Log("Collider::SetSize(", GetOwner()->GetName(), ")");
 	GetGame()->Log("transform scale: ", owner->transform->GetWorldScale());
@@ -63,7 +56,7 @@ void Collider::SetSize(vec3 size)
 	btVector3 newSize = vec3_cast<btVector3>(owner->transform->GetWorldScale()*size);
 	GetShape()->setLocalScaling(newSize);
 	GetGame()->Log("Final shape scaling: ", vec3_cast<vec3>(GetShape()->getLocalScaling()), ")");
-	
+
 	this->size = size;
 }
 

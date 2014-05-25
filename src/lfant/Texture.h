@@ -118,7 +118,8 @@ public:
 
 	static std::shared_ptr<Texture> LoadFile(string path, int mode = -1);
 	static std::shared_ptr<Texture> Load(Properties* prop);
-	virtual void Save(Properties* prop) const;
+
+	void Serialize(Properties* prop);
 
 	void LoadFromImage(gui::Image* image);
 

@@ -36,50 +36,46 @@ Rigidbody::~Rigidbody()
 {
 }
 
-void Rigidbody::Save(Properties* prop) const
+void Rigidbody::Serialize(Properties* prop)
 {
-	Component::Save(prop);
+	Component::Serialize(prop);
 
-	prop->Set("mass", mass);
-	prop->Set("velocity", GetVelocity());
-	prop->Set("maxSpeed", maxSpeed);
-	prop->Set("isTrigger", IsTrigger());
-	prop->Set("friction", body->getFriction());
-	prop->Set("restitution", body->getRestitution());
+	prop->Value("mass", &mass);
+	prop->Value("maxSpeed", &maxSpeed);
+	prop->Value("lockPosition", &lockPosition);
+	prop->Value("lockRotation", &lockRotation);
 
-	prop->Set("lockPosition", lockPosition);
-	prop->Set("lockRotation", lockRotation);
-}
-
-void Rigidbody::Load(Properties* prop)
-{
-	Component::Load(prop);
-
-	float friction = 0.0f, restitution = 1.0f, mass = 1.0f;
-	vec3 vel(0);
-
-	prop->Get("mass", mass);
-	prop->Get("velocity", vel);
-	prop->Get("maxSpeed", maxSpeed);
-	prop->Get("isTrigger", isTrigger);
-	prop->Get("friction", friction);
-	prop->Get("restitution", restitution);
-
-	prop->Get("lockPosition", lockPosition);
-	prop->Get("lockRotation", lockRotation);
-
-	GetGame()->Log("Rb loaded, restitution: ", restitution);
-
-	if(body)
+	if(prop->mode == Properties::Mode::Input)
 	{
-		body->setFriction(friction);
-		body->setRestitution(restitution);
-		SetMass(mass);
-		body->setLinearVelocity(vec3_cast<btVector3>(vel));
-		SetTrigger(isTrigger);
-	}
+		float friction = 0.0f, restitution = 1.0f;
+		vec3 vel(0);
 
-	GetGame()->Log("Locked position: ", lexical_cast<string>(lockPosition));
+		prop->Value("velocity", &vel);
+		prop->Value("isTrigger", &isTrigger);
+		prop->Value("friction", &friction);
+		prop->Value("restitution", &restitution);
+
+
+		GetGame()->Log("Rb loaded, restitution: ", restitution);
+
+		if(body)
+		{
+			body->setFriction(friction);
+			body->setRestitution(restitution);
+			SetMass(mass);
+			body->setLinearVelocity(vec3_cast<btVector3>(vel));
+			SetTrigger(isTrigger);
+		}
+
+		GetGame()->Log("Locked position: ", lexical_cast<string>(lockPosition));
+	}
+	else
+	{
+		prop->Value("velocity", GetVelocity());
+		prop->Value("isTrigger", IsTrigger());
+		prop->Value("friction", body->getFriction());
+		prop->Value("restitution", body->getRestitution());
+	}
 }
 
 /*******************************************************************************

@@ -58,18 +58,11 @@ void Console::Deinit()
 	logFile.close();
 }
 
-void Console::Load(Properties *prop)
+void Console::Serialize(Properties *prop)
 {
-	Subsystem::Load(prop);
+	Subsystem::Serialize(prop);
 
-	prop->Get("logFile", logName);
-}
-
-void Console::Save(Properties* prop) const
-{
-	Subsystem::Save(prop);
-
-	prop->Set("logFile", logName);
+	prop->Value("logFile", &logName);
 }
 
 void Console::CmdGetVar(deque<string> args)

@@ -236,7 +236,7 @@
 // Define 'cimg_use_opencv' to enable OpenCV support.
 //
 // OpenCV library may be used to access images from cameras
-// (see method 'CImg<T>::load_camera()').
+// (see method 'CImg<T>::serialize_camera()').
 #ifdef cimg_use_opencv
 #ifdef True
 #undef True
@@ -311,7 +311,7 @@ extern "C" {
 //
 // Avcodec and Avformat libraries from FFMPEG may be used
 // to get a native support of various video file formats.
-// (see methods 'CImg[List]<T>::load_ffmpeg()').
+// (see methods 'CImg[List]<T>::serialize_ffmpeg()').
 #ifdef cimg_use_ffmpeg
 #if (defined(_STDINT_H) || defined(_STDINT_H_)) && !defined(UINT64_C)
 #warning "__STDC_CONSTANT_MACROS has to be defined before including <stdint.h>, this file will probably not compile."
@@ -5465,9 +5465,9 @@ namespace cimg_library_suffixed {
     **/
     inline char *load_network_external(const char *const filename, char *const filename_local) {
       if (!filename)
-        throw CImgArgumentException("cimg::load_network_external(): Specified filename is (null).");
+        throw CImgArgumentException("cimg::serialize_network_external(): Specified filename is (null).");
       if (!filename_local)
-        throw CImgArgumentException("cimg::load_network_external(): Specified destination string is (null).");
+        throw CImgArgumentException("cimg::serialize_network_external(): Specified destination string is (null).");
       const char *const _ext = cimg::split_filename(filename), *const ext = (*_ext && _ext>filename)?_ext-1:_ext;
       char command[1024] = { 0 };
       std::FILE *file = 0;
@@ -5488,7 +5488,7 @@ namespace cimg_library_suffixed {
                       cimg::wget_path(),filename_local,filename);
         cimg::system(command);
         if (!(file = std::fopen(filename_local,"rb")))
-          throw CImgIOException("cimg::load_network_external(): Failed to load file '%s' with external tools 'wget' or 'curl'.",filename);
+          throw CImgIOException("cimg::serialize_network_external(): Failed to load file '%s' with external tools 'wget' or 'curl'.",filename);
         cimg::fclose(file);
 
         // Try gunzip it.
@@ -5506,7 +5506,7 @@ namespace cimg_library_suffixed {
       }
       std::fseek(file,0,SEEK_END); // Check if file size is 0.
       if (std::ftell(file)<=0)
-        throw CImgIOException("cimg::load_network_external(): Failed to load file '%s' with external commands 'wget' or 'curl'.",filename);
+        throw CImgIOException("cimg::serialize_network_external(): Failed to load file '%s' with external commands 'wget' or 'curl'.",filename);
       cimg::fclose(file);
       return filename_local;
     }
@@ -34846,7 +34846,7 @@ namespace cimg_library_suffixed {
 
       if (!cimg::strncasecmp(filename,"http://",7) || !cimg::strncasecmp(filename,"https://",8)) {
         char filename_local[1024] = { 0 };
-        load(cimg::load_network_external(filename,filename_local));
+        load(cimg::serialize_network_external(filename,filename_local));
         std::remove(filename_local);
         return *this;
       }
@@ -34955,7 +34955,7 @@ namespace cimg_library_suffixed {
                  !cimg::strcasecmp(ext,"wmv") ||
                  !cimg::strcasecmp(ext,"xvid") ||
                  !cimg::strcasecmp(ext,"mpeg")) load_ffmpeg(filename);
-        else throw CImgIOException("CImg<%s>::load()",
+        else throw CImgIOException("CImg<%s>::serialize()",
                                    pixel_type());
       } catch (CImgIOException&) {
         std::FILE *file = 0;
@@ -34981,7 +34981,7 @@ namespace cimg_library_suffixed {
           else if (!cimg::strcasecmp(f_type,"tif")) load_tiff(filename);
           else if (!cimg::strcasecmp(f_type,"inr")) load_inr(filename);
           else if (!cimg::strcasecmp(f_type,"dcm")) load_medcon_external(filename);
-          else throw CImgIOException("CImg<%s>::load()",
+          else throw CImgIOException("CImg<%s>::serialize()",
                                      pixel_type());
         } catch (CImgIOException&) {
           try {
@@ -36405,7 +36405,7 @@ namespace cimg_library_suffixed {
         rdr.setup_read_double();
       else
         rdr.setup_read_float();
-      minc::load_standard_volume(rdr, this->_data);
+      minc::serialize_standard_volume(rdr, this->_data);
       return *this;
 #endif
     }
@@ -36676,7 +36676,7 @@ namespace cimg_library_suffixed {
       out[0] = std::fscanf(file,"%63s",item);
       out[0] = out[1] = out[2] = out[3] = out[5] = 1; out[4] = out[6] = out[7] = -1;
       if(cimg::strncasecmp(item,"#INRIMAGE-4#{",13)!=0)
-        throw CImgIOException("CImg<%s>::load_inr(): INRIMAGE-4 header not found.",
+        throw CImgIOException("CImg<%s>::serialize_inr(): INRIMAGE-4 header not found.",
                               pixel_type());
 
       while (std::fscanf(file," %63[^\n]%*c",item)!=EOF && std::strncmp(item,"##}",3)) {
@@ -36700,23 +36700,23 @@ namespace cimg_library_suffixed {
           if (!cimg::strncasecmp(tmp1,"packed",6))                                       out[4] = 2;
           if (out[4]>=0) break;
         default :
-          throw CImgIOException("CImg<%s>::load_inr(): Invalid pixel type '%s' defined in header.",
+          throw CImgIOException("CImg<%s>::serialize_inr(): Invalid pixel type '%s' defined in header.",
                                 pixel_type(),
                                 tmp2);
         }
       }
       if(out[0]<0 || out[1]<0 || out[2]<0 || out[3]<0)
-        throw CImgIOException("CImg<%s>::load_inr(): Invalid dimensions (%d,%d,%d,%d) defined in header.",
+        throw CImgIOException("CImg<%s>::serialize_inr(): Invalid dimensions (%d,%d,%d,%d) defined in header.",
                               pixel_type(),
                               out[0],out[1],out[2],out[3]);
       if(out[4]<0 || out[5]<0)
-        throw CImgIOException("CImg<%s>::load_inr(): Incomplete pixel type defined in header.",
+        throw CImgIOException("CImg<%s>::serialize_inr(): Incomplete pixel type defined in header.",
                               pixel_type());
       if(out[6]<0)
-        throw CImgIOException("CImg<%s>::load_inr(): Incomplete PIXSIZE field defined in header.",
+        throw CImgIOException("CImg<%s>::serialize_inr(): Incomplete PIXSIZE field defined in header.",
                               pixel_type());
       if(out[7]<0)
-        throw CImgIOException("CImg<%s>::load_inr(): Big/Little Endian coding type undefined in header.",
+        throw CImgIOException("CImg<%s>::serialize_inr(): Big/Little Endian coding type undefined in header.",
                               pixel_type());
     }
 
@@ -43528,7 +43528,7 @@ namespace cimg_library_suffixed {
 
       if (!cimg::strncasecmp(filename,"http://",7) || !cimg::strncasecmp(filename,"https://",8)) {
         char filename_local[1024] = { 0 };
-        load(cimg::load_network_external(filename,filename_local));
+        load(cimg::serialize_network_external(filename,filename_local));
         std::remove(filename_local);
         return *this;
       }
@@ -43594,7 +43594,7 @@ namespace cimg_library_suffixed {
                  !cimg::strcasecmp(ext,"xvid") ||
                  !cimg::strcasecmp(ext,"mpeg")) load_ffmpeg(filename);
         else if (!cimg::strcasecmp(ext,"gz")) load_gzip_external(filename);
-        else throw CImgIOException("CImgList<%s>::load()",
+        else throw CImgIOException("CImgList<%s>::serialize()",
                                    pixel_type());
       } catch (CImgIOException&) {
         try {

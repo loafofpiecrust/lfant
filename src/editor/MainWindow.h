@@ -19,8 +19,9 @@ public:
 	explicit MainWindow(QWidget *parent = 0);
 	~MainWindow();
 
-	Ui::MainWindow *ui;
+	ptr<Ui::MainWindow> ui;
 	ptr<lfant::Game> game = nullptr;
+	bool closed = false;
 
 private slots:
 	// File
@@ -41,10 +42,14 @@ private slots:
 	void RefreshEntity();
 	void AddComponent(QString typeName);
 
+	void Shutdown();
+
 signals:
 	void SetGame(lfant::Game*);
 
 private:
+	void closeEvent(QCloseEvent* event);
+
 	string projectPath = "";
 };
 

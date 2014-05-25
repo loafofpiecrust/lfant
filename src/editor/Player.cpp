@@ -17,14 +17,9 @@ namespace editor {
 
 IMPLEMENT_TYPE(Component, editor::Player)
 
-void Player::Load(Properties* prop)
+void Player::Serialize(Properties* prop)
 {
-	Component::Load(prop);
-}
-
-void Player::Save(Properties* prop)
-{
-	Component::Save(prop);
+	Component::Serialize(prop);
 }
 
 void Player::Init()

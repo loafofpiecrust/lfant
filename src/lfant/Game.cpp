@@ -124,7 +124,6 @@ void Game::Init()
 	Log("Initing time");
 	time->Init();
 
-	LoadFile("settings/game.prop");
 #if WINDOWS
 	userFolder = string(getenv("USERPROFILE")) + "/Documents/My Games/" + orgName + "/" + gameName;
 #elif UNIX
@@ -138,6 +137,7 @@ void Game::Init()
 #else
 	chdir((gameFolder+"/assets/").c_str());
 #endif
+	LoadFile("settings/game.prop");
 
 //	settings->Init();
 	Log("Initing systeminfo");
@@ -193,20 +193,27 @@ void Game::Update()
 *
 *******************************************************************************/
 
-void Game::Load(Properties* prop)
+void Game::Serialize(Properties* prop)
 {
-	prop->Get("orgName", orgName);
-	prop->Get("gameName", gameName);
-	prop->Get("defaultScene", defaultScene);
+	GetGame()->Log("mode: ", (int)prop->mode, ", smode: ", (int)prop->saveMode);
+	for(auto& val : prop->values)
+	{
+		GetGame()->Log("value: ", val.first, " of type '", boost::any_cast<string>(val.second), "'");
+		if(val.first == "orgName")
+		{
+			GetGame()->Log("this is orgname");
+		}
+	}
+	auto iter = prop->values.find("orgName");
+	if(iter != prop->values.end())
+	{
+		GetGame()->Log("we fund it");
+	}
+	prop->Value<string>("orgName", &orgName);
+	prop->Value("gameName", &gameName);
+	prop->Value("defaultScene", &defaultScene);
 	GetGame()->Log("Game name: "+gameName);
 	GetGame()->Log("Game loading, default scene is '"+defaultScene+"'.");
-}
-
-void Game::Save(Properties* prop) const
-{
-	prop->Set("orgName", orgName);
-	prop->Set("gameName", gameName);
-	prop->Set("defaultScene", defaultScene);
 }
 
 void Game::ScriptBind()
@@ -249,7 +256,7 @@ void Game::Destroy()
 //	fileSystem->Destroy();
 	time->Destroy();
 	console->Destroy();
-	delete this;
+//	delete this;
 }
 
 void Game::Exit()

@@ -68,17 +68,16 @@ public:
 	/// Converts the velocity vector into a speed float.
 	float GetSpeed();
 
-	vec3 position = vec3(0);
 	vec4 color;
-	float size;
-	vec3 velocity;
-
-	float sizeDiff;
-	vec3 velocityDiff;
 	vec4 colorDiff;
+	vec3 velocity;
+	vec3 velocityDiff;
+	vec3 position;
 
-//	vec3 gravity;
+	float size;
+	float sizeDiff;
 	float lifetime = 1.0f;
+
 	bool active = true;
 
 //	float size = 1;

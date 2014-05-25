@@ -12,14 +12,14 @@ ValueDoubleSpinBox::ValueDoubleSpinBox(QWidget *parent) :
 
 void ValueDoubleSpinBox::setPointer(double* ptr)
 {
-	value_ptr = ptr;
 	float_ptr = nullptr;
+	value_ptr = ptr;
 }
 
 void ValueDoubleSpinBox::setPointer(float* ptr)
 {
-	float_ptr = ptr;
 	value_ptr = nullptr;
+	float_ptr = ptr;
 }
 
 void ValueDoubleSpinBox::setPointerValue(double val)
@@ -34,7 +34,7 @@ void ValueDoubleSpinBox::setPointerValue(double val)
 	}
 }
 
-void ValueDoubleSpinBox::update()
+void ValueDoubleSpinBox::paintEvent(QPaintEvent *event)
 {
 	if(value_ptr)
 	{
@@ -44,7 +44,7 @@ void ValueDoubleSpinBox::update()
 	{
 		setValue((double)*float_ptr);
 	}
-	QDoubleSpinBox::update();
+	QDoubleSpinBox::paintEvent(event);
 }
 
 } // namespace gui

@@ -14,7 +14,6 @@
 //#include <boost/uuid/uuid.hpp>
 //#include <boost/uuid/uuid_generators.hpp>
 #include <forward_list>
-#include <boost/ptr_container/ptr_deque.hpp>
 
 // Internal
 #include <lfant/Object.h>
@@ -75,10 +74,10 @@ public:
 
 	virtual void Destroy();
 
-	virtual void Save(Properties* prop) const;
-	virtual void Load(Properties* prop);
 
-	void Load(Properties* prop, bool init);
+	virtual void Serialize(Properties* prop);
+
+	void Serialize(Properties* prop, bool init);
 
 	static void ScriptBind();
 
@@ -138,12 +137,12 @@ public:
 		return nullptr;
 	}
 
-	Component* GetComponent(string name) const;
+	Component* GetComponent(string name);
 
 	Entity* GetChild(string name, bool recursive = false) const;
 	Entity* GetChildById(uint32 id) const;
 
-	const boost::ptr_deque<Component>& GetComponents() const;
+	const std::deque<ptr<Component>>& GetComponents() const;
 	const std::deque<ptr<Entity> >& GetChildren() const;
 
 //	Entity* SpawnChild();
@@ -170,8 +169,8 @@ public:
 	Transform* transform;
 
 	bool enabled = true;
-	float lifetime = 0.0f;
 	std::vector<string> tags;
+	float lifetime = 0.0f;
 
 private:
 	Entity(Scene* scene);
@@ -181,6 +180,8 @@ private:
 	virtual void FixedUpdate();
 	virtual void Render();
 	virtual void Deinit();
+
+	void DestroyDeadChildren();
 
 	/// @todo Make public?
 	void AddChild(Entity* ent);
@@ -217,6 +218,8 @@ private:
 
 	string name = "root";
 
+	bool wantsToDie = false;
+
 	/// Scene-unique identifier.
 	uint32 id = 0;
 
@@ -225,8 +228,6 @@ private:
 
 	Entity* parent = nullptr;
 	Scene* scene = nullptr;
-
-	bool useLifeTime = false;
 };
 
 /** @} */

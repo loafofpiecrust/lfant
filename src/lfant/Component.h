@@ -52,8 +52,8 @@ public:
 	virtual Component* Clone(Entity* owner) const;
 	void Clone(Component* comp, Entity* owner) const;
 
-	virtual void Load(Properties* prop);
-	virtual void Save(Properties* prop) const;
+	virtual void Serialize(Properties* prop);
+
 
 	virtual void Destroy() final;
 

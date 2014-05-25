@@ -27,6 +27,7 @@ IMPLEMENT_REGISTRY(Component)
 
 Component::Component()
 {
+	std::cout << "constructing component\n";
 }
 
 Component::Component(const Component& other)
@@ -47,8 +48,13 @@ Component& Component::operator=(const Component& other)
 void Component::Clone(Component* comp, Entity* owner) const
 {
 	Properties prop;
-	Save(&prop);
-	comp->Load(&prop);
+
+	prop.SetMode(Properties::Mode::Output);
+//	Serialize(&prop);
+
+	prop.SetMode(Properties::Mode::Input);
+	comp->Serialize(&prop);
+
 	if(owner) owner->AddComponent(comp);
 }
 
@@ -59,22 +65,10 @@ Component* Component::Clone(Entity* owner) const
 	return comp;
 }
 
-void Component::Load(Properties* prop)
+void Component::Serialize(Properties* prop)
 {
-	prop->Get("enabled", enabled);
-}
-
-void Component::Save(Properties *prop) const
-{
-	/// @todo Implement Properties::SetName()
-//	prop->SetName("component");
-	prop->SetType("Component");
-	/// @todo fix this
 	prop->name = type::Descope(type::Name(this));
-	prop->Set("enabled", enabled);
-
-//	prop->LoadFile("suckit");
-
+	prop->Value("enabled", &enabled);
 }
 
 void Component::Render()

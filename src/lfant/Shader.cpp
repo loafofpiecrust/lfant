@@ -34,17 +34,17 @@ Shader::~Shader()
 std::shared_ptr<Shader> Shader::Load(Properties *prop)
 {
 	string vertex="", fragment="", geometry="";
-	prop->Get("vertex", vertex);
-	prop->Get("fragment", fragment);
-	prop->Get("geometry", geometry);
+	prop->Value("vertex", &vertex);
+	prop->Value("fragment", &fragment);
+	prop->Value("geometry", &geometry);
 	return LoadFile(vertex, fragment, geometry);
 }
 
-void Shader::Save(Properties *prop) const
+void Shader::Serialize(Properties *prop)
 {
-	prop->Set("vertex", vertex);
-	prop->Set("fragment", fragment);
-	prop->Set("geometry", geometry);
+	prop->Value("vertex", vertex);
+	prop->Value("fragment", fragment);
+	prop->Value("geometry", geometry);
 }
 
 std::shared_ptr<Shader> Shader::LoadFile(string vert, string frag, string geom, string comp)

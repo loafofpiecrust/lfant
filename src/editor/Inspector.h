@@ -15,8 +15,8 @@ class Inspector : public QWidget
 public:
 	explicit Inspector(QWidget* parent = nullptr);
 
-	QWidget* CreateInput(const Properties::Value& val, QWidget* parent);
-	void AddChild(Properties* prop, QWidget* parent);
+	QWidget* CreateInput(boost::any& val, QWidget* parent);
+	void AddChild(Properties* prop, QWidget* parent, QFormLayout* form);
 
 signals:
 
@@ -31,6 +31,7 @@ private:
 	lfant::Game* game = nullptr;
 	lfant::Entity* currentEnt = nullptr;
 	lfant::Properties* currentProp = nullptr;
+	QFormLayout* form = nullptr;
 };
 
 } // namespace editor

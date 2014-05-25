@@ -27,33 +27,33 @@ Material::Material() :
 {
 }
 
-void Material::Load(Properties* prop)
+void Material::Serialize(Properties* prop)
 {
-	Object::Load(prop);
+	Object::Serialize(prop);
 
-	string file = prop->Get("texture");
-	if(Properties* tex = prop->GetChild("texture"))
+	if(prop->mode == Properties::Mode::Input)
 	{
-		texture = Texture::Load(tex);
+		string file = "";
+		prop->Value("texture", &file);
+		if(Properties* tex = prop->Child("texture", ""))
+		{
+			texture = Texture::Load(tex);
+		}
+		else if(!file.empty())
+		{
+			texture = Texture::LoadFile(file);
+		}
+
+		if(Properties* sh = prop->Child("shader", ""))
+		{
+			shader = Shader::Load(sh);
+		}
 	}
-	else if(!file.empty())
+	else
 	{
-		texture = Texture::LoadFile(file);
+		texture->Serialize(prop->Child("texture", ""));
+		shader->Serialize(prop->Child("shader", ""));
 	}
-
-	if(Properties* sh = prop->GetChild("shader"))
-	{
-		shader = Shader::Load(sh);
-	}
-
-//	loaded = true;
-}
-
-void Material::Save(Properties *prop) const
-{
-	Object::Save(prop);
-	texture->Save(prop->AddChild("texture"));
-	shader->Save(prop->AddChild("shader"));
 }
 
 }

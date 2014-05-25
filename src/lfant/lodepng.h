@@ -830,7 +830,7 @@ unsigned encode(std::vector<unsigned char>& out,
    Load a file from disk into an std::vector. If the vector is empty, then either
    the file doesn't exist or is an empty file.
  */
-void load_file(std::vector<unsigned char>& buffer, const std::string& filename);
+void serialize_file(std::vector<unsigned char>& buffer, const std::string& filename);
 
 /*
    Save the binary data in an std::vector to a file on disk. The file is overwritten

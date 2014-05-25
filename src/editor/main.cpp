@@ -7,10 +7,11 @@ int main(int argc, char *argv[])
 	lfant::editor::MainWindow w;
 	w.show();
 
-	while(!a.closingDown())
+	while(!a.closingDown() && !w.closed)
 	{
 		a.processEvents();
 		if(w.game)
 			w.game->Update();
 	}
+	return 0;
 }

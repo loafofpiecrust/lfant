@@ -73,7 +73,7 @@ public:
 	virtual void Render();
 	virtual void Deinit();
 
-	virtual void Load(Properties *props);
+	virtual void Serialize(Properties *props);
 
 	/// The sprite animations to be used.
 	std::map<string, Animation> animations;

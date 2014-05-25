@@ -59,6 +59,7 @@ void Scene::Update()
 {
 	Subsystem::Update();
 	GetRoot()->Update();
+	GetRoot()->DestroyDeadChildren();
 }
 
 void Scene::Render()
@@ -88,45 +89,38 @@ uint32 Scene::GenerateEntityId()
 	return ++currentId;
 }
 
-void Scene::Save(Properties* prop) const
-{
-	double t = game->time->GetTime();
-//	prop->Set("name", "scene");
-//	prop->Set("file", name);
-
-	root->Save(prop->AddChild());
-	GetGame()->Log("Saving scene took ", game->time->GetTime() - t, " seconds");
-}
-
-void Scene::Load(Properties *prop)
+void Scene::Serialize(Properties *prop)
 {
 	double t = game->time->GetTime();
 	currentId = 0;
-	GetGame()->Log("Scene::Load: Loading scene node");
-//	Properties* systems = prop->GetChild("systems");
-	for(Properties* p : prop->children)
+	GetGame()->Log("Scene::Serialize: Loading scene node");
+	if(prop->GetMode() == Properties::Mode::Input)
 	{
-		if(p->IsType("System"))
+		for(uint32 i = 0; i < prop->GetChildCount(); ++i)
 		{
-			if(p->name == "Physics")
+			Properties* p = prop->GetChild(i);
+			if(p->IsType("System"))
 			{
-				GetGame()->Log("Loading physics from scene");
-				game->physics->Load(p);
+				if(p->name == "Physics")
+				{
+					GetGame()->Log("Loading physics from scene");
+					game->physics->Serialize(p);
+				}
+				else if(p->name == "Network")
+				{
+					game->network->Serialize(p);
+				}
+			/*	else if(i->id == "Renderer")
+				{
+					game->renderer->Load(i);
+				}*/
 			}
-			else if(p->name == "Network")
-			{
-				game->network->Load(p);
-			}
-		/*	else if(i->id == "Renderer")
-			{
-				game->renderer->Load(i);
-			}*/
 		}
 	}
 
-	GetRoot()->Load(prop);
+	GetRoot()->Serialize(prop);
 
-	GetGame()->Log("Loading scene took ", game->time->GetTime() - t, " seconds");
+	GetGame()->Log("Serializing scene took ", game->time->GetTime() - t, " seconds");
 }
 
 void Scene::LoadFile(string path)

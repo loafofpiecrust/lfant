@@ -89,8 +89,8 @@ public:
 	Physics(Game* game);
 	virtual ~Physics();
 
-	virtual void Save(Properties* prop) const;
-	virtual void Load(Properties* prop);
+
+	virtual void Serialize(Properties* prop);
 
 	virtual void Init();
 	virtual void Update();
@@ -169,9 +169,9 @@ private:
 	ptr<btConstraintSolver> solver;
 	ptr<btDefaultCollisionConfiguration> collisionConfig;
 
-	std::deque<Rigidbody*> bodies;
 	ptr<physics::DebugRenderer> debugRenderer;
 
+	std::deque<Rigidbody*> bodies;
 	std::deque<GravPoint> gravityPoints;
 //	vec3 initGravity = vec3(0, -9.81, 0);
 };

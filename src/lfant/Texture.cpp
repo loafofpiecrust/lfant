@@ -60,19 +60,19 @@ Texture::~Texture()
 std::shared_ptr<Texture> Texture::Load(lfant::Properties* prop)
 {
 	string path = "";
-	prop->Get("file", path);
+	prop->Value("file", &path);
 //	GetGame()->Log("Tex path: '"+path+"'.");
-//	prop->Get("anisoLevel", anisoLevel);
+//	prop->Value("anisoLevel", anisoLevel);
 
 	return LoadFile(path);
 }
 
-void Texture::Save(Properties* prop) const
+void Texture::Serialize(Properties* prop)
 {
 //	Object::Save(prop);
 
-	prop->Set("file", path);
-	prop->Set("anisoLevel", anisoLevel);
+	prop->Value("file", &path);
+//	prop->Value("anisoLevel", anisoLevel);
 }
 
 uint32 Texture::GetId()
@@ -230,7 +230,7 @@ void Texture::LoadPNG(string path)
 		return;
 	}
 	InitData(&data[0]);
-//	GetGame()->Log("Texture::LoadPNG: Image size: (", size.x, ", ", size.y, ").");
+//	GetGame()->Log("Texture::SerializePNG: Image size: (", size.x, ", ", size.y, ").");
 }
 
 void Texture::LoadJPEG(string path)

@@ -62,12 +62,12 @@ void Network::Save(Properties *prop) const
 //	Properties* arr = prop->AddChild("users");
 	for(auto& usr : users)
 	{
-	//	usr->Save(prop->AddChild("user"));
-		usr->Save(new Properties(prop, "User"));
+		usr->Serialize(prop->Child("user", ""));
+	//	usr->Save(new ValueProperties(prop, "User"));
 	}
 }
 
-void Network::Load(Properties *prop)
+void Network::Serialize(Properties *prop)
 {
 //	deque<Properties*> cons = prop->GetChildren("user");
 //	for(auto& pcon : cons)

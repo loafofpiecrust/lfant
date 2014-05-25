@@ -43,8 +43,7 @@ public:
 	Movement();
 	~Movement();
 
-	virtual void Save(lfant::Properties* prop) const;
-	virtual void Load(lfant::Properties* prop);
+	virtual void Serialize(lfant::Properties* prop);
 
 	virtual void Init();
 	virtual void Update();

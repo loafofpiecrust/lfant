@@ -64,24 +64,16 @@ Renderer::~Renderer()
 {
 }
 
-void Renderer::Load(Properties* prop)
+void Renderer::Serialize(Properties* prop)
 {
-	Subsystem::Load(prop);
-//	GetGame()->Log("Renderer::Load: Got root child, '", prop->Get(""), "'.");
+	Subsystem::Serialize(prop);
+//	GetGame()->Log("Renderer::Serialize: Got root child, '", prop->Value(""), "'.");
 
-	prop->Get("vsync", vsync);
-	prop->Get("motionBlur", motionBlur);
+	prop->Value("vsync", &vsync);
+	prop->Value("motionBlur", &motionBlur);
 
 //	GetGame()->Log("Window title: '"+windowTitle+"'.");
 //	GetGame()->Log("OpenGL Version loaded: ", lexical_cast<string>(version));
-}
-
-void Renderer::Save(Properties *prop) const
-{
-	Subsystem::Save(prop);
-
-	prop->Set("vsync", vsync);
-	prop->Set("motionBlur", motionBlur);
 }
 
 /*******************************************************************************
@@ -93,7 +85,7 @@ void Renderer::Save(Properties *prop) const
 ivec2 res;
 void Renderer::Init()
 {
-	Subsystem::Init();
+	LoadFile("settings/renderer.prop");
 
 //	GetGame()->Log("Renderer::Init: About to start GLFW");
 
@@ -253,31 +245,35 @@ void Renderer::Update()
 	frameBuffer->Unbind();
 	frameBuffer->Render();
 
-	if(!bar)
+	if(GetGame()->scene->mainCamera)
 	{
-		ConnectEvent(SENDER(GetGame()->input.get(), MouseMove), RECEIVER(this, OnMouseMove));
-		ConnectEvent(SENDER(GetGame()->input.get(), MouseButton), RECEIVER(this, OnMouseButton));
+		if(!bar)
+		{
+			ConnectEvent(SENDER(GetGame()->input.get(), MouseMove), RECEIVER(this, OnMouseMove));
+			ConnectEvent(SENDER(GetGame()->input.get(), MouseButton), RECEIVER(this, OnMouseButton));
 
-		TwInit(TW_OPENGL, nullptr);
-		auto size = GetGame()->window->GetSize();
-		TwWindowSize(size.x, size.y);
+			TwInit(TW_OPENGL, nullptr);
+			auto size = GetGame()->window->GetSize();
+			TwWindowSize(size.x, size.y);
 
-		bar = TwNewBar("Camera DoF Settings");
-		TwAddVarRW(bar, "dof", TW_TYPE_BOOLCPP, &GetGame()->scene->mainCamera->useDof, "");
-		TwAddVarRW(bar, "autoFocus", TW_TYPE_BOOLCPP, &GetGame()->scene->mainCamera->autoFocus, "");
-		TwAddVarRW(bar, "focalLength", TW_TYPE_FLOAT, &GetGame()->scene->mainCamera->focalLength, "");
-		TwAddVarRW(bar, "focalDepth", TW_TYPE_FLOAT, &GetGame()->scene->mainCamera->focalDepth, "");
-		TwAddVarRW(bar, "aperture", TW_TYPE_FLOAT, &GetGame()->scene->mainCamera->aperture, "");
-		TwAddVarRW(bar, "focus", TW_TYPE_FLOAT, &GetGame()->scene->mainCamera->focus, "");
-	}
-	else
-	{
-		TwDraw();
+			bar = TwNewBar("Camera DoF Settings");
+			TwAddVarRW(bar, "dof", TW_TYPE_BOOLCPP, &GetGame()->scene->mainCamera->useDof, "");
+			TwAddVarRW(bar, "autoFocus", TW_TYPE_BOOLCPP, &GetGame()->scene->mainCamera->autoFocus, "");
+			TwAddVarRW(bar, "focalLength", TW_TYPE_FLOAT, &GetGame()->scene->mainCamera->focalLength, "");
+			TwAddVarRW(bar, "focalDepth", TW_TYPE_FLOAT, &GetGame()->scene->mainCamera->focalDepth, "");
+			TwAddVarRW(bar, "aperture", TW_TYPE_FLOAT, &GetGame()->scene->mainCamera->aperture, "");
+			TwAddVarRW(bar, "focus", TW_TYPE_FLOAT, &GetGame()->scene->mainCamera->focus, "");
+		}
+		else
+		{
+			TwDraw();
+		}
 	}
 }
 
 void Renderer::Deinit()
 {
+	TwTerminate();
 	frameBuffer->Deinit();
 //	Texture::textureCache.clear();
 	GetGame()->Log("Renderer::Deinit(): Touch");

@@ -16,22 +16,13 @@ namespace editor {
 
 IMPLEMENT_TYPE(Component, editor::Movement)
 
-void Movement::Load(Properties* prop)
+void Movement::Serialize(Properties* prop)
 {
-	Component::Load(prop);
+	Component::Serialize(prop);
 
-	prop->Get("movementSpeed", movementSpeed);
-	prop->Get("jumpHeight", jumpHeight);
-	prop->Get("usePhysics", usePhysics);
-}
-
-void Movement::Save(Properties* prop)
-{
-	Component::Save(prop);
-
-	prop->Set("movementSpeed", movementSpeed);
-	prop->Set("jumpHeight", jumpHeight);
-	prop->Set("usePhysics", usePhysics);
+	prop->Value("movementSpeed", &movementSpeed);
+	prop->Value("jumpHeight", &jumpHeight);
+	prop->Value("usePhysics", &usePhysics);
 }
 
 void Movement::Init()

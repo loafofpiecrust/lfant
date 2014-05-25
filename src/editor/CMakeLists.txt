@@ -60,6 +60,7 @@ target_link_libraries(${PROJECT_NAME}
 	boost
 	dl
 	png
+	jpeg
 
 	Qt5::Core
 	Qt5::Widgets

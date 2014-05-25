@@ -24,7 +24,7 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
 	CloseGame();
-	delete ui;
+//	delete ui;
 }
 
 void MainWindow::OpenProjectDialog()
@@ -36,7 +36,6 @@ void MainWindow::OpenProjectDialog()
 
 void MainWindow::NewProject(QString path, QString title)
 {
-
 }
 
 void MainWindow::LoadProject(QString path)
@@ -60,7 +59,6 @@ void MainWindow::OpenGame()
 		std::cout << "Loading game...\n";
 		game = func();
 	//	game->standAlone = false;
-
 		boost::filesystem::path p(projectPath);
 		game->gameFolder = p.remove_filename().string()+"/../../..";
 		game->programFolder = p.remove_filename().string();
@@ -80,12 +78,11 @@ void MainWindow::OpenGame()
 void MainWindow::CloseGame()
 {
 	game->Destroy();
-	game = nullptr;
+	game.reset();
 }
 
 void MainWindow::SaveProject()
 {
-
 }
 
 void MainWindow::Exit()
@@ -106,6 +103,20 @@ void MainWindow::RefreshEntity()
 void MainWindow::AddComponent(QString typeName)
 {
 
+}
+
+void MainWindow::Shutdown()
+{
+	closed = true;
+}
+
+void MainWindow::closeEvent(QCloseEvent* event)
+{
+	if(game)
+	{
+		CloseGame();
+	}
+	closed = true;
 }
 
 }

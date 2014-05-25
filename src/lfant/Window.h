@@ -24,8 +24,8 @@ public:
 	Window(Game* game);
 	virtual ~Window();
 
-	virtual void Save(Properties* prop) const;
-	virtual void Load(Properties* prop);
+	
+	virtual void Serialize(Properties* prop);
 
 	virtual void Init();
 	virtual void Update();

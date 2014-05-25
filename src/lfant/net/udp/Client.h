@@ -26,7 +26,7 @@ public:
 	virtual ~Client();
 
 //	void Save(Properties* prop);
-//	void Load(Properties* prop);
+//	void Serialize(Properties* prop);
 
 	// Main Loop Functions
 	virtual void Init();

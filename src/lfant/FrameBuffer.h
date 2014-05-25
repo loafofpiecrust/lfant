@@ -61,31 +61,26 @@ public:
 	virtual void EndRender();
 
 	URect rect {0,0,0,0};
-	bool hasDepth = false;
-	uint32 startIndex = 0;
 //	ptr<Shader> shader;
 
 	void DrawBuffer(int idx);
 protected:
-	uint32 id = 0;
 
-//	std::deque<string> textureNames;
-	std::deque<ptr<Texture>> textures;
 	ptr<Texture> depthTexture;
-//	Texture* currentTex = nullptr;
-//	string depthTexName = "";
-
-	Buffer<vec2> posBuffer;
-//	Mesh::Buffer<vec2> uvBuffer = 0;
 	std::shared_ptr<Shader> shader;
-
-	std::vector<uint32> drawBuffers;
+	uint32 id = 0;
+	uint32 startIndex = 0;
 	uint32 depthBuffer = 0;
+	bool hasDepth = false;
 
-	static FrameBuffer* current;
+	std::deque<ptr<Texture>> textures;
+	std::vector<uint32> drawBuffers;
+	Buffer<vec2> posBuffer;
 
 	Game* game = nullptr;
 
+
+	static FrameBuffer* current;
 private:
 };
 

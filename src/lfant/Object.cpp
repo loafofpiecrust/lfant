@@ -103,36 +103,37 @@ void Object::LoadFile(string path)
 	if(path.empty()) return;
 
 //	GetGame()->Log(type::Name(this), " loading file '", path, "'.");
+	auto rp = GetGame()->GetAssetPath(path);
+	if(!fs::exists(rp)) return;
+
 	Properties prop;
-	prop.LoadFile(GetGame()->GetAssetPath(path).string());
+	prop.LoadFile(rp.string());
+	prop.SetMode(Properties::Mode::Input);
+
+	std::cout << "\nchildren we have " << prop.GetChildCount() << " in " << &prop << "\n";
 
 //	string type = type::Descope(type::Name(this));
 //	to_lower(type);
 //	GetGame()->Log("Checking for first child");
-	if(Properties* pc = prop.GetFirstChild())
+	if(Properties* pc = prop.GetChild(0))
 	{
 	//	GetGame()->Log("Loading first child");
-		Load(pc);
+		std::cout << "\nMOAR CHILDS: " << pc << " " << pc->GetChildCount() << "\n";
+		Serialize(pc);
 	}
 //	GetGame()->Log("Done loading file");
 }
 
-void Object::Load(Properties *prop)
+void Object::Serialize(Properties *prop)
 {
 }
 
-void Object::SaveFile(string path) const
+void Object::SaveFile(string path)
 {
 	Properties prop;
-	Save(&prop);
+	prop.SetMode(Properties::Mode::Output);
+	Serialize(&prop);
 	prop.SaveFile(path);
-}
-
-void Object::Save(Properties *prop) const
-{
-/*	string type = type::Descope(type::Name(this));
-	to_lower(type);
-	prop->SetName(type);*/
 }
 
 void Object::ScriptBind()
@@ -149,8 +150,8 @@ void Object::ScriptBind()
 //	inst.Func("SetTimer", &Object::SetTimer);
 //	inst.Func("CancelTimer", &Object::CancelTimer);
 //	inst.Func("GetTimer", &Object::GetTimer);
-	inst.Func("Load", &Object::Load);
-	inst.Func("Save", &Object::Save);
+	inst.Func("Serialize", &Object::Serialize);
+//	inst.Func("Save", &Object::Save);
 	inst.Func("LoadFile", &Object::LoadFile);
 	inst.Func("SaveFile", &Object::SaveFile);
 

@@ -63,8 +63,8 @@ public:
 	Rigidbody();
 	virtual ~Rigidbody();
 
-	virtual void Load(Properties* prop);
-	virtual void Save(Properties* prop) const;
+	virtual void Serialize(Properties* prop);
+	
 
 	virtual void Enable(bool on);
 

@@ -50,7 +50,7 @@ public:
 	virtual void Update();
 
 	virtual void Save(Properties *prop) const;
-	virtual void Load(Properties *prop);
+	virtual void Serialize(Properties *prop);
 
 	template<typename C>
 	C* AddUser()
@@ -64,13 +64,9 @@ public:
 
 	net::User* GetUser(string name) const;
 
-protected:
-//	byte GetPacketId(RakNet::Packet* p);
-
-public:
-	std::deque<ptr<net::User>> users;
-
 	std::mutex mutex;
+	std::deque<ptr<net::User>> users;
+protected:
 
 private:
 

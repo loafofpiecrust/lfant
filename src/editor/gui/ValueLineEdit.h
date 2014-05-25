@@ -11,9 +11,28 @@ namespace gui {
 class ValueLineEdit : public QLineEdit
 {
 	Q_OBJECT
-	ValueWidget(QLineEdit, std::string)
 public:
 	explicit ValueLineEdit(QWidget *parent = 0);
+
+	void setPointer(std::string* ptr)
+	{
+		value_ptr = ptr;
+	}
+
+public slots:
+	void setPointerValue(std::string value)
+	{
+		if(value_ptr) *value_ptr = value;
+	}
+
+	void paintEvent(QPaintEvent *event)
+	{
+		setInternalValue();
+		QLineEdit::paintEvent(event);
+	}
+
+private:
+	std::string* value_ptr;
 
 private:
 	void setInternalValue();

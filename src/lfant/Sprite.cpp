@@ -110,35 +110,28 @@ void Sprite::Update()
 	Mesh::Update();
 }
 
-void Sprite::Load(Properties *props)
+void Sprite::Serialize(Properties *props)
 {
 	GetGame()->Log("Loading a sprite from props");
-//	Mesh::Load(props);
-	string mat = "materials/Diffuse.mat";
-	props->Get("material", mat);
-//	material->texture->mode = GL_TEXTURE_RECTANGLE;
-	material.LoadFile(mat);
-	// Register Animation::Mode enum
-/*
-	props->SetEnum("Mode::Loop", Animation::Mode::Loop);
-	props->SetEnum("Mode::Bounce", Animation::Mode::Bounce);
-	props->SetEnum("Mode::Once", Animation::Mode::Once);
-	props->SetEnum("Mode::Default", Animation::Mode::Default);
-*/
-
-//	deque<Properties*> panims = props->GetChildren("animation");
-	for(Properties* pa : *props->GetChild("animations"))
+//	Mesh::Serialize(props);
+	if(props->mode == Properties::Mode::Input)
 	{
-		string name = "";
-		Animation anim;
-		pa->Get("name", name);
-		pa->Get("frameRate", anim.frameRate);
-
-		if(!name.empty())
-		{
-			animations.insert({name, anim});
-		}
+		string mat = "materials/Diffuse.mat";
+		props->Value("material", &mat);
+	//	material->texture->mode = GL_TEXTURE_RECTANGLE;
+		material.LoadFile(mat);
+		// Register Animation::Mode enum
 	}
+	else
+	{
+		material.Serialize(props->Child("material", ""));
+	}
+
+	props->ValueMap<Animation, string>("animation", animations, [](string& name, Animation& anim, Properties* prop)
+	{
+		prop->Value("name", &name);
+		prop->Value("frameRate", &anim.frameRate);
+	});
 }
 
 void Sprite::Deinit()

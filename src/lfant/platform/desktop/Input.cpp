@@ -142,6 +142,7 @@ KeyMap::KeyMap()
 void Input::Init()
 {
 	Subsystem::Init();
+	LoadFile("settings/input.prop");
 }
 
 void Input::OnKeyPress(int key, int action, int mods)

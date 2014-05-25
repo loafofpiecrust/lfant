@@ -41,13 +41,6 @@ Subsystem::~Subsystem()
 void Subsystem::Init()
 {
 	Object::Init();
-	if(typeid(*this) != typeid(lfant::Scene))
-	{
-		printf("About to load file for subsystem\n");
-		string type = type::Descope(type::Name(this), -1);
-		type[0] = tolower(type[0]);
-		LoadFile("settings/"+type+".prop");
-	}
 }
 
 Game* Subsystem::GetGame() const

@@ -101,16 +101,22 @@ void Entity::Init()
 	//	transform = AddComponent(new Transform);
 //	}
 
-	if(lifetime <= 0.0f)
-	{
-		useLifeTime = false;
-	}
-
 	if(id == 0)
 	{
 		// Generate new id?
 		id = scene->GenerateEntityId();
 	}
+
+	std::cout << "\n\n";
+	for(auto& comp : components)
+	{
+		std::cout << "comp " << comp << "\n";
+		if(comp)
+		{
+			std::cout << type::Name(comp) << "\n";
+		}
+	}
+	std::cout << "\n\n";
 }
 
 void Entity::Update()
@@ -120,7 +126,7 @@ void Entity::Update()
 		lifetime -= GetGame()->time->deltaTime;
 		if(lifetime <= 0.0f)
 		{
-			Destroy();
+			wantsToDie = true;
 		}
 	}
 
@@ -225,7 +231,7 @@ void Entity::AddComponent(Component* comp)
 		comp->GetOwner()->RemoveComponent(comp);
 	}
 
-	GetGame()->Log("Entity::AddComponent(", comp, ")");
+	GetGame()->Log("Entity::AddComponent(", comp, ") to ", this);
 	components.push_back(comp);
 	comp->owner = this;
 	comp->Init();
@@ -254,6 +260,24 @@ void Entity::Deinit()
 	components.clear();
 }
 
+void Entity::DestroyDeadChildren()
+{
+	for(uint32 i = 0; i < children.size(); ++i)
+	{
+		Entity* child = children[i];
+		if(child->wantsToDie)
+		{
+			child->Deinit();
+			children.erase(children.begin()+i);
+			--i;
+		}
+		else
+		{
+			child->DestroyDeadChildren();
+		}
+	}
+}
+
 void Entity::Destroy()
 {
 	GetGame()->Log("Entity::Destroy: Touch.");
@@ -264,7 +288,7 @@ void Entity::Destroy()
 	if(parent) parent->RemoveChild(this);
 }
 
-Component* Entity::GetComponent(string name) const
+Component* Entity::GetComponent(string name)
 {
 	auto reg = Component::typeRegistry.Get(name);
 //	std::cout << "getting from typeRegistry took " << hclock::now()-start << "\n";
@@ -275,9 +299,19 @@ Component* Entity::GetComponent(string name) const
 	}
 
 	string ctype = "";
-	for(auto& comp : components)
+	std::cout << "comparing " << reg->typeInfo.name() << "\n";
+	std::cout << "size " << components.size() << "\n";
+	for(uint32 i = 0; i < components.size(); ++i)
 	{
+		Component* comp = components[i];
+		if(!comp)
+		{
+			components.erase(components.begin()+i);
+			--i;
+			continue;
+		}
 		const std::type_info& ti = typeid(*comp);
+		std::cout << "checking comp " << ti.name() << this << "\n";
 
 	//	ctype = type::Name(comp);
 	//	auto reg2 = Component::typeRegistry.Get(typeid(comp));
@@ -526,7 +560,7 @@ void Entity::ScriptBind()
 	inst.Func("Update", &Entity::Update);
 	inst.Func("Destroy", &Entity::Destroy);
 	inst.Func("AddComponent", (Component*(Entity::*)(string))&Entity::AddComponent);
-	inst.Func("GetComponent", (Component*(Entity::*)(string) const)&Entity::GetComponent);
+	inst.Func("GetComponent", (Component*(Entity::*)(string))&Entity::GetComponent);
 	inst.Func("RemoveComponent", (void (Entity::*)(string))&Entity::RemoveComponent);
 //	inst.Func("Clone", &Entity::Clone);
 	inst.Func("GetChild", &Entity::GetChild);
@@ -546,123 +580,117 @@ void Entity::ScriptBind()
 *
 *******************************************************************************/
 
-void Entity::Save(Properties* prop) const
+void Entity::Serialize(Properties* prop)
 {
-	std::cout << "scne: " << scene << "\n";
-	std::cout << "gami: " << GetGame() << "\n";
-//	GetGame()->Log("Saving entity to ", prop);
-	prop->SetType("Entity");
-	prop->name = name;
-//	prop->Set("name", name);
-
-	prop->Set("id", id);
-	prop->Set("tags", tags);
-	prop->Set("layer", layer);
-	prop->Set("active", enabled);
-	prop->Set("lifetime", lifetime);
-
-	for(auto& comp : components)
-	{
-		auto cp = prop->AddChild("Component");
-		GetGame()->Log("Saving comp: ", type::Name(comp), " to ", cp);
-		comp->Save(cp);
-	}
-
-	for(auto& child : children)
-	{
-		child->Save(prop->AddChild());
-	}
-}
-
-void Entity::Load(Properties* prop)
-{
-//	prop->Get("name", name);
+//	prop->Value("name", name);
 	if(!prop->name.empty()) name = prop->name;
-	prop->Get("id", id);
-	prop->Get("tags", tags);
-	prop->Get("layer", layer);
-	prop->Get("active", enabled);
-	prop->Get("lifetime", lifetime);
+	prop->Value("id", &id);
+	prop->Value("tags", &tags);
+	prop->Value("layer", &layer);
+	prop->Value("active", &enabled);
+	prop->Value("lifetime", &lifetime);
 
-	GetGame()->Log("Entity::Load: Loaded basic properties.");
+	GetGame()->Log("Entity::Serialize: Loaded basic properties ", this);
 
-	std::deque<string> files;
-	prop->Get("files", files);
+	/// @todo Reimplement conversion from string to deque<string>
+/*	std::deque<string> files;
+	prop->Value("files", files);
 	for(auto& file : files)
 	{
 		GetGame()->Log("Loading entity from file path");
 		Properties fp;
 		fp.LoadFile(file);
-		if(Properties* pc = fp.GetFirstChild())
+		if(Properties* pc = fp.GetChild(0))
 		{
-			Load(pc);
+			Serialize(pc);
+		}
+	}*/
+
+//	prop->ValueArray<ptr<Entity>>("Entity", children, [&](ptr<Entity>& ent, Properties* prop)
+	for(auto& prop : prop->children)
+	{
+		if(!prop->IsType("Entity")) continue;
+
+		Entity* ent = nullptr;
+		if(prop->mode == Properties::Mode::Input)
+		{
+			 if((ent = GetChild(prop->name)))
+			 {
+				 ent->Serialize(prop);
+			 }
+			 else
+			 {
+				 ent = AddChild(prop->name);
+				 ent->Serialize(prop);
+			 }
+		}
+		else
+		{
+		//	ent->Serialize(prop->Child("Entity", ""));
 		}
 	}
 
-//	Properties* c = prop->GetChild("children");
-	Entity* ent = nullptr;
-	Component* component = nullptr;
-	for(auto& child : prop->children)
+//	prop->ValueArray<ptr<Component>>("Component", components, [&](ptr<Component>& component, Properties* child)
+	if(prop->mode == Properties::Mode::Input)
 	{
-		if(child->IsType("Entity"))
+		for(auto& child : prop->children)
 		{
-			if((ent = GetChild(child->name)))
-			{
-				ent->Load(child);
-			}
-			else
-			{
-				ent = AddChild(child->name);
-				ent->Load(child);
-			}
-		}
-	}
-	for(auto& child : prop->children)
-	{
-		if(child->IsType("Component"))
-		{
-			if(child->IsNamed("Script"))
+			if(!child->IsType("Component")) continue;
+
+			Component* component = nullptr;
+			if(child->name == "Script")
 			{
 				string file = "";
-				child->Get("file", file);
+				child->Value("file", file);
 				component = ScriptComp::LoadScript(GetGame(), GetGame()->GetAssetPath(file).string());
 				AddComponent(component);
 			}
-			else if(child->name != "Transform")
+			else if(child->name == "Transform")
 			{
-				GetGame()->Log("Entity::Load: Component type '"+child->name+"'");
-				if((component = GetComponent(child->name)))
+				if(transform)
 				{
-					component->Load(child);
+					transform->Serialize(child);
+				}
+				else
+				{
+					GetGame()->Log("Readding transform to ", this);
+					transform = AddComponent<Transform>();
+					transform->Serialize(child);
+				}
+			}
+			else
+			{
+				GetGame()->Log("Entity::Serialize: Component type '"+child->name+"' to ", this);
+				component = GetComponent(child->name);
+				if(component)
+				{
+					component->Serialize(child);
 				}
 				else
 				{
 					component = AddComponent(child->name);
-					if(component) component->Load(child);
+					if(component) component->Serialize(child);
 				}
-				if(component) GetGame()->Log("Entity::Load: Added component, ", component, " to ", component->GetOwner());
-			}
-			else
-			{
-				if(transform)
-				{
-					transform->Load(child);
-				}
-				else
-				{
-					transform = AddComponent<Transform>();
-					transform->Load(child);
-				}
+				if(component) GetGame()->Log("Entity::Serialize: Added component, ", component, " to ", component->GetOwner());
 			}
 		}
 	}
+	else
+	{
+		for(auto& comp : components)
+		{
+			Properties* pc = prop->Child("Component", "");
+			comp->Serialize(pc);
+		}
+	}
 
-	Init();
+	if(prop->mode == Properties::Mode::Input)
+		Init();
 }
 
-void Entity::Load(Properties* prop, bool init)
+void Entity::Serialize(Properties* prop, bool init)
 {
-	Load(prop);
+	Serialize(prop);
 	if(init)
 	{
 		Init();
@@ -671,6 +699,7 @@ void Entity::Load(Properties* prop, bool init)
 
 Component *Entity::AddComponent(string type)
 {
+	std::cout << "trying to add comp "+type+"\n";
 	Component* result = Component::NewFromString(type);
 	if(result)
 	{

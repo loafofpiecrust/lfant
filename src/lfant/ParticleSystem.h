@@ -72,7 +72,7 @@ public:
 	/**
 	 *	Supported emitter types.
 	 */
-	enum class EmitterType : byte
+	enum class EmitterType : uint8
 	{
 		Point = 0,
 		Box,
@@ -108,7 +108,7 @@ public:
 		Range<T> end;
 		CurveType curveType = CurveType::Linear;
 
-		void Load(Properties* prop);
+		void Serialize(Properties* prop);
 		void Save(Properties* prop) const;
 	};
 
@@ -125,7 +125,7 @@ public:
 	void EndRender();
 
 	void Save(Properties* prop) const;
-	void Load(Properties *prop);
+	void Serialize(Properties *prop);
 
 	/**
 	 *	Emits a specific amount of particles
@@ -145,7 +145,13 @@ public:
 //	Range<Range<float>> speed;
 	Range<Range<vec3>> velocity = {{vec3(1), vec3(5)}, {vec3(2), vec3(10)}};
 
+	Material material;
+
+	vec3 dimensions = vec3(1.0f);
+	vec3 gravity = vec3(0.0f, 0.0f, 0.0f);
+
 	// Emitter properties
+	uint32 maxParticles = 1500;
 	float radius = 1.0f;
 	float angle = 30.0f;
 	float startDelay;
@@ -153,9 +159,7 @@ public:
 	float duration;
 //	float timeScale = 1.0f;
 	float rate = 1.5f;
-	uint32 maxParticles = 1500;
-	vec3 dimensions = vec3(1.0f);
-	vec3 gravity = vec3(0.0f, 0.0f, 0.0f);
+
 	bool pausable = true;
 	bool paused = false;
 	bool looping = true;
@@ -168,7 +172,6 @@ public:
 	std::deque<Burst> bursts;
 	std::deque<Particle*> recycle;
 
-	Material material;
 
 protected:
 
@@ -178,10 +181,8 @@ protected:
 	float toEmit = 0.0f;
 
 private:
-//	Buffer<vec4> colorBuffer;
-//	Buffer<float> sizeBuffer;
-	Buffer<ParticleVertex> particleBuffer;
 	bool rewriteBuffer = false;
+	Buffer<ParticleVertex> particleBuffer;
 };
 
 /** @} */

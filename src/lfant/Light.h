@@ -32,8 +32,8 @@ public:
 	Light();
 	~Light();
 
-	virtual void Save(Properties* prop) const;
-	virtual void Load(Properties* prop);
+
+	virtual void Serialize(Properties* prop);
 
 	virtual void Init();
 	virtual void Update();
@@ -42,8 +42,8 @@ public:
 	virtual void RenderStencil() {};
 
 protected:
-	vec3 color = vec3(1);
 	std::shared_ptr<Shader> shader = nullptr;
+	vec3 color = vec3(1);
 
 private:
 

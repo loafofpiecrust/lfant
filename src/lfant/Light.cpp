@@ -29,18 +29,11 @@ Light::~Light()
 
 }
 
-void Light::Load(Properties* prop)
+void Light::Serialize(Properties* prop)
 {
-	Component::Load(prop);
+	Component::Serialize(prop);
 
-	prop->Get("color", color);
-}
-
-void Light::Save(Properties* prop) const
-{
-	Component::Save(prop);
-
-	prop->Set("color", color);
+	prop->Value("color", &color);
 }
 
 void Light::Init()

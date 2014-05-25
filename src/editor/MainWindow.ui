@@ -6,71 +6,119 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
+    <width>908</width>
     <height>600</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
-  <widget class="QWidget" name="centralwidget">
-   <widget class="QGroupBox" name="horizontalGroupBox">
-    <property name="geometry">
-     <rect>
-      <x>130</x>
-      <y>50</y>
-      <width>541</width>
-      <height>453</height>
-     </rect>
+  <widget class="QWidget" name="centralwidget"/>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>908</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
     </property>
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <widget class="QTabWidget" name="tabWidget_2">
-       <property name="currentIndex">
-        <number>1</number>
-       </property>
-       <widget class="QWidget" name="tab_3">
-        <attribute name="title">
-         <string>Tab 1</string>
-        </attribute>
-        <layout class="QHBoxLayout" name="horizontalLayout_3">
-         <item>
-          <widget class="QTableWidget" name="tableWidget"/>
-         </item>
-        </layout>
-       </widget>
-       <widget class="QWidget" name="tab_4">
-        <attribute name="title">
-         <string>Tab 2</string>
-        </attribute>
-        <layout class="QHBoxLayout" name="horizontalLayout_6">
-         <item>
-          <widget class="lfant::editor::EntityTree" name="entitytree">
-           <column>
-            <property name="text">
-             <string>Entity</string>
-            </property>
-           </column>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-      </widget>
-     </item>
+    <addaction name="actionNew_Project"/>
+    <addaction name="actionOpen_Project"/>
+    <addaction name="actionSave_Project"/>
+    <addaction name="separator"/>
+    <addaction name="actionOpenGame"/>
+    <addaction name="actionClose_Game"/>
+    <addaction name="actionExit"/>
+   </widget>
+   <widget class="QMenu" name="menuEdit">
+    <property name="title">
+     <string>Edit</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuScene">
+    <property name="title">
+     <string>Scene</string>
+    </property>
+    <addaction name="actionAdd_Child_Entity"/>
+   </widget>
+   <widget class="QMenu" name="menuEntity">
+    <property name="title">
+     <string>Entity</string>
+    </property>
+    <addaction name="actionRefresh"/>
+    <addaction name="actionAdd_Component"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuEdit"/>
+   <addaction name="menuScene"/>
+   <addaction name="menuEntity"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar">
+   <property name="toolTip">
+    <string>~ Welcome</string>
+   </property>
+  </widget>
+  <widget class="QDockWidget" name="dockWidget">
+   <property name="autoFillBackground">
+    <bool>false</bool>
+   </property>
+   <property name="floating">
+    <bool>false</bool>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>2</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents">
+    <layout class="QHBoxLayout" name="horizontalLayout_8">
+     <property name="spacing">
+      <number>6</number>
+     </property>
+     <property name="sizeConstraint">
+      <enum>QLayout::SetDefaultConstraint</enum>
+     </property>
+     <property name="leftMargin">
+      <number>2</number>
+     </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <property name="rightMargin">
+      <number>2</number>
+     </property>
+     <property name="bottomMargin">
+      <number>0</number>
+     </property>
      <item>
       <widget class="QTabWidget" name="tabWidget">
        <property name="currentIndex">
-        <number>1</number>
+        <number>0</number>
+       </property>
+       <property name="movable">
+        <bool>true</bool>
        </property>
        <widget class="QWidget" name="tab">
         <attribute name="title">
          <string>Tab 1</string>
         </attribute>
-        <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <layout class="QVBoxLayout" name="verticalLayout_2">
          <item>
           <layout class="QFormLayout" name="formLayout">
+           <property name="sizeConstraint">
+            <enum>QLayout::SetMinimumSize</enum>
+           </property>
            <property name="fieldGrowthPolicy">
             <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+           </property>
+           <property name="labelAlignment">
+            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+           </property>
+           <property name="formAlignment">
+            <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
            </property>
            <item row="0" column="0">
             <widget class="QLabel" name="nameLabel">
@@ -117,15 +165,25 @@
              <property name="text">
               <string>coembo</string>
              </property>
+             <property name="alignment">
+              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+             </property>
             </widget>
            </item>
            <item row="4" column="1">
-            <widget class="QComboBox" name="coemboComboBox"/>
+            <widget class="QComboBox" name="coemboComboBox">
+             <property name="sizeAdjustPolicy">
+              <enum>QComboBox::AdjustToContentsOnFirstShow</enum>
+             </property>
+            </widget>
            </item>
            <item row="5" column="0">
             <widget class="QLabel" name="quietLabel">
              <property name="text">
               <string>quiet</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
              </property>
             </widget>
            </item>
@@ -150,13 +208,53 @@
              <property name="text">
               <string>hai</string>
              </property>
+             <property name="alignment">
+              <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+             </property>
             </widget>
            </item>
            <item row="6" column="1">
             <widget class="QWidget" name="haiWidget" native="true">
-             <layout class="QHBoxLayout" name="horizontalLayout_5">
+             <property name="acceptDrops">
+              <bool>false</bool>
+             </property>
+             <property name="layoutDirection">
+              <enum>Qt::LeftToRight</enum>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout">
+              <item>
+               <widget class="QPushButton" name="pushButton">
+                <property name="layoutDirection">
+                 <enum>Qt::LeftToRight</enum>
+                </property>
+                <property name="text">
+                 <string>PushButton</string>
+                </property>
+                <property name="checkable">
+                 <bool>true</bool>
+                </property>
+                <property name="checked">
+                 <bool>false</bool>
+                </property>
+                <property name="autoDefault">
+                 <bool>false</bool>
+                </property>
+                <property name="default">
+                 <bool>false</bool>
+                </property>
+                <property name="flat">
+                 <bool>false</bool>
+                </property>
+               </widget>
+              </item>
               <item>
                <widget class="QScrollArea" name="scrollArea">
+                <property name="verticalScrollBarPolicy">
+                 <enum>Qt::ScrollBarAlwaysOn</enum>
+                </property>
+                <property name="horizontalScrollBarPolicy">
+                 <enum>Qt::ScrollBarAlwaysOn</enum>
+                </property>
                 <property name="widgetResizable">
                  <bool>true</bool>
                 </property>
@@ -165,32 +263,26 @@
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>135</width>
+                   <width>144</width>
                    <height>68</height>
                   </rect>
                  </property>
-                 <widget class="QWidget" name="formLayoutWidget">
-                  <property name="geometry">
-                   <rect>
-                    <x>20</x>
-                    <y>10</y>
-                    <width>135</width>
-                    <height>70</height>
-                   </rect>
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <layout class="QFormLayout" name="formLayout_3">
+                  <property name="fieldGrowthPolicy">
+                   <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
                   </property>
-                  <layout class="QFormLayout" name="formLayout_2">
-                   <item row="0" column="0">
-                    <widget class="QLabel" name="yoyozLabel">
-                     <property name="text">
-                      <string>yoyoz</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="0" column="1">
-                    <widget class="QLineEdit" name="yoyozLineEdit"/>
-                   </item>
-                  </layout>
-                 </widget>
+                 </layout>
+                 <zorder>yoyozLineEdit</zorder>
+                 <zorder>okoLabel</zorder>
+                 <zorder>okoLineEdit</zorder>
+                 <zorder>shittypolLabel</zorder>
+                 <zorder>shittypolLineEdit</zorder>
                 </widget>
                </widget>
               </item>
@@ -216,54 +308,62 @@
     </layout>
    </widget>
   </widget>
-  <widget class="QMenuBar" name="menubar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>800</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <widget class="QMenu" name="menuFile">
-    <property name="title">
-     <string>File</string>
-    </property>
-    <addaction name="actionNew_Project"/>
-    <addaction name="actionOpen_Project"/>
-    <addaction name="actionSave_Project"/>
-    <addaction name="separator"/>
-    <addaction name="actionOpenGame"/>
-    <addaction name="actionClose_Game"/>
-    <addaction name="actionExit"/>
+  <widget class="QDockWidget" name="dockWidget_2">
+   <attribute name="dockWidgetArea">
+    <number>1</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents_2">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <property name="leftMargin">
+      <number>2</number>
+     </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <property name="rightMargin">
+      <number>2</number>
+     </property>
+     <property name="bottomMargin">
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="QTabWidget" name="tabWidget_2">
+       <property name="layoutDirection">
+        <enum>Qt::LeftToRight</enum>
+       </property>
+       <property name="currentIndex">
+        <number>0</number>
+       </property>
+       <widget class="QWidget" name="tab_4">
+        <attribute name="title">
+         <string>Tab 2</string>
+        </attribute>
+        <layout class="QHBoxLayout" name="horizontalLayout_6">
+         <item>
+          <widget class="lfant::editor::EntityTree" name="entitytree">
+           <column>
+            <property name="text">
+             <string>Entity</string>
+            </property>
+           </column>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="tab_3">
+        <attribute name="title">
+         <string>Tab 1</string>
+        </attribute>
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <item>
+          <widget class="QTableWidget" name="tableWidget"/>
+         </item>
+        </layout>
+       </widget>
+      </widget>
+     </item>
+    </layout>
    </widget>
-   <widget class="QMenu" name="menuEdit">
-    <property name="title">
-     <string>Edit</string>
-    </property>
-   </widget>
-   <widget class="QMenu" name="menuScene">
-    <property name="title">
-     <string>Scene</string>
-    </property>
-    <addaction name="actionAdd_Child_Entity"/>
-   </widget>
-   <widget class="QMenu" name="menuEntity">
-    <property name="title">
-     <string>Entity</string>
-    </property>
-    <addaction name="actionRefresh"/>
-    <addaction name="actionAdd_Component"/>
-   </widget>
-   <addaction name="menuFile"/>
-   <addaction name="menuEdit"/>
-   <addaction name="menuScene"/>
-   <addaction name="menuEntity"/>
-  </widget>
-  <widget class="QStatusBar" name="statusbar">
-   <property name="toolTip">
-    <string>~ Welcome</string>
-   </property>
   </widget>
   <action name="actionNew_Project">
    <property name="text">
@@ -509,6 +609,22 @@
     <hint type="destinationlabel">
      <x>399</x>
      <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>scrollArea</receiver>
+   <slot>setHidden(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>804</x>
+     <y>368</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>804</x>
+     <y>427</y>
     </hint>
    </hints>
   </connection>

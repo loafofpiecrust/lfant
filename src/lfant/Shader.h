@@ -39,8 +39,9 @@ public:
 	Shader();
 	virtual ~Shader();
 
-	static std::shared_ptr<Shader> Load(Properties *prop);
-	virtual void Save(Properties* prop) const;
+	static std::shared_ptr<Shader> Load(Properties* prop);
+	void Serialize(Properties* prop);
+
 //	void LoadFile(string file = "");
 	static std::shared_ptr<Shader> LoadFile(string vert, string frag, string geom = "", string comp = "");
 	void Compile();

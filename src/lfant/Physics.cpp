@@ -38,40 +38,38 @@ Physics::~Physics()
 {
 }
 
-void Physics::Save(Properties* prop) const
+void Physics::Serialize(Properties* prop)
 {
-	Subsystem::Save(prop);
+	Subsystem::Serialize(prop);
 
-	prop->Set("gravity", GetGravity());
+	vec3 grav {0.0f};
 
-	for(auto& gpt : gravityPoints)
+	if(prop->mode == Properties::Mode::Output)
+		grav = GetGravity();
+
+	prop->Value("gravity", &grav);
+
+	if(prop->mode == Properties::Mode::Input)
+		SetGravity(grav);
+
+	auto add_pt_func = [](GravPoint& gp, Properties* prop)
 	{
-//		Properties* pgpt = prop->AddChild("gravityPoint");
-		Properties* pgpt = new Properties(prop, "GravityPoint");
-		pgpt->Set("name", gpt.name);
-		pgpt->Set("force", gpt.force);
-	}
-}
+		prop->Value("name", &gp.name);
+		prop->Value("force", &gp.force);
+	};
+	prop->ValueArray<GravPoint>("gravityPoint", gravityPoints, add_pt_func);
 
-void Physics::Load(Properties* prop)
-{
-	Subsystem::Load(prop);
-
-	vec3 grav = GetGravity();
-	prop->Get("gravity", grav);
-	SetGravity(grav);
-
-	Properties* gravPts = prop->GetChild("gravityPoints");
+/*	Properties* gravPts = prop->Child("gravityPoints", "");
 	if(gravPts)
 	{
 		for(auto& pgpt : gravPts->children)
 		{
 			GravPoint* gpt = new GravPoint;
-			pgpt->Get("name", gpt->name);
-			pgpt->Get("force", gpt->force);
+			pgpt->Value("name", gpt->name);
+			pgpt->Value("force", gpt->force);
 			gravityPoints.push_back(*gpt);
 		}
-	}
+	}*/
 }
 
 /*******************************************************************************
@@ -107,7 +105,7 @@ void Physics::Init()
 
 //	SetGravity(initGravity);
 
-	Subsystem::Init();
+	LoadFile("settings/physics.prop");
 }
 
 void Physics::Update()

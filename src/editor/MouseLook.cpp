@@ -16,18 +16,11 @@ namespace editor {
 
 IMPLEMENT_TYPE(Component, editor::MouseLook)
 
-void MouseLook::Save(Properties* prop)
+void MouseLook::Serialize(Properties* prop)
 {
-	Component::Save(prop);
+	Component::Serialize(prop);
 
-	prop->Set("lookSpeed", lookSpeed);
-}
-
-void MouseLook::Load(Properties* prop)
-{
-	Component::Load(prop);
-
-	prop->Get("lookSpeed", lookSpeed);
+	prop->Value("lookSpeed", &lookSpeed);
 }
 
 void MouseLook::Init()

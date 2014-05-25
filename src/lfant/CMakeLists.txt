@@ -39,7 +39,7 @@ endif()
 list(REMOVE_ITEM SRC_FILES
 #	${PROJECT_SOURCE_DIR}/ParticleSystem.cpp
 	${PROJECT_SOURCE_DIR}/net/udp/*.cpp
-#	${PROJECT_SOURCE_DIR}/gui/Font.cpp
+	${PROJECT_SOURCE_DIR}/gui/gwen/SFML2.cpp
 	)
 
 set(INCLUDES "")
@@ -96,7 +96,7 @@ target_link_libraries(${PROJECT_NAME} ${LIBS}
 	squirrel
 	jpeg
 	freetype
-	sfml
+#	sfml
 	IrrKlang
 #	openal
 	${GUI}

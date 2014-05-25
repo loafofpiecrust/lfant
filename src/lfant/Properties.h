@@ -18,6 +18,8 @@
 // External
 #include <map>
 #include <iostream>
+#include <functional>
+#include <boost/any.hpp>
 //#include <json/value.h>
 
 namespace lfant {
@@ -40,129 +42,160 @@ class Scene;
  */
 class Properties
 {
-	class Iterator
+public:
+	enum class Mode : uint8
 	{
-	public:
-		Iterator(Properties* prop, uint pos) :
-			pos(pos), prop(prop)
-		{
-		}
-
-		Properties* operator*();
-		bool operator!=(const Iterator& other) const;
-		const Iterator& operator++();
-
-	private:
-		uint pos;
-		Properties* prop;
+		Input,
+		Output
 	};
 
-//	friend class lfant::editor::gui::Window;
-public:
-
-	class Value
+	enum class SaveMode : uint8
 	{
-	public:
-		string str = "";
-		const std::type_info* type = &typeid(string);
-
-		Value() {}
-		Value(string str) : str(str) {}
-		Value(string str, const std::type_info& type) : str(str), type(&type) {}
-
-		operator string()
-		{
-			return str;
-		}
-
-		Value& operator=(const string& str)
-		{
-			this->str = str;
-			return *this;
-		}
+		Value,
+		Pointer
 	};
 
 	Properties();
 	Properties(string path);
-	Properties(Properties* parent, string type = "", string name = "");
-	~Properties();
-	
+	Properties(Properties* parent, string type, string name);
+
+	virtual ~Properties();
+
 	static void ScriptBind();
 
-	Iterator begin();
-	Iterator end();
-
-	void LoadFile(string path);
 	void SaveFile(string path);
+	void LoadFile(string path);
 
 	void LoadStream(std::istream& stream);
 	void SaveStream(std::ostream& stream);
 
-	Properties* GetFirstChild();
-	Properties* GetChild(string type, string name = "");
-	Properties* GetChild(uint idx);
-
-	void Clear();
+	string GetString(string name);
 
 	template<typename T>
-	void Set(string name, const T& value)
+	void Value(string name, T* value)
 	{
-		SetString(name, Value(lexical_cast<string>(value), typeid(T)));
-	}
-
-	template<typename T>
-	void Get(string name, T& ref)
-	{
-		string value = GetString(name);
-		if(!value.empty())
+		std::cout << "momo1\n";
+		if(mode == Mode::Output)
 		{
-			ref = lexical_cast<T>(value);
+			std::cout << "saving " << name << "\n";
+			if(saveMode == SaveMode::Value) values[name] = *value;
+			else values[name] = value;
+		}
+		else
+		{
+			std::cout << "momo2\n";
+			auto iter = values.find(name);
+			if(iter != values.end())
+			{
+				std::cout << "here we are\n";
+				boost::any& ref = iter->second;
+				std::cout << "type of cast: " << ref.type().name() << "\n";
+				if(ref.type() == typeid(std::string))
+				{
+					*value = lexical_cast<T>(boost::any_cast<std::string>(ref));
+				}
+				else
+				{
+					if(saveMode == SaveMode::Value) { *value = boost::any_cast<T>(ref); }
+					else { *value = *(boost::any_cast<T*>(ref)); }
+				}
+			}
 		}
 	}
 
-	void Get(string name, Entity*& ref, Scene* scene);
-	void Set(string name, Entity* const& value);
-
-	template<typename T = string>
-	T Get(string name)
+	template<typename T>
+	void Value(string name, const T& value)
 	{
-		return lexical_cast<T>(GetString(name));
+		std::cout << "value value\n";
+		if(mode == Mode::Output)
+		{
+			values[name] = value;
+		}
 	}
 
-	string GetName();
+	template<typename T, typename _Key>
+	void ValueMap(string type, std::map<_Key, T>& cont, std::function<void(_Key&, T&, Properties*)> each_func)
+	{
+		if(mode == Mode::Input)
+		{
+			for(auto& prop : children)
+			{
+				if(prop->IsType(type))
+				{
+					_Key k;
+					T t;
+					each_func(k, t, prop);
+					cont.insert(typename std::map<_Key, T>::value_type(std::move(k), std::move(t)));
+				}
+			}
+		}
+		else
+		{
+			for(auto& elem : cont)
+			{
+				Properties* prop = Child(type, "");
+				each_func(const_cast<_Key&>(elem.first), elem.second, prop);
+			}
+		}
+	}
 
-//	Properties* AddArray(string name);
-	Properties* AddChild(string name = "");
+	void Value(string name, Entity*& ent, Scene* scene);
+
+	Properties* GetParent();
+	Properties* GetTopParent();
+	Properties* Child(string type, string name);
+//	virtual Properties* GetChild(uint32 idx) = 0;
+	uint32 GetChildCount();
+	Properties* GetChild(uint32 idx);
+
+	virtual void Clear();
 
 	void SetType(string type);
-	void Rename(string name);
-
 	bool IsType(string type);
-	bool IsNamed(string name);
 
-	string type = "";
+	Mode GetMode() { return mode; }
+	void SetMode(Mode mode);
+
+	SaveMode GetSaveMode() { return saveMode; }
+	void SetSaveMode(SaveMode mode);
+
 	string name = "";
-
-	std::map<string, Value> values;
+	string type = "";
+	Mode mode = Mode::Output;
+	SaveMode saveMode = SaveMode::Value;
+	std::map<string, boost::any> values;
 	std::deque<ptr<Properties>> children;
+
+
+	template<typename T, typename _Con>
+	auto ValueArray(string type, _Con& cont, std::function<void(T&, Properties*)> each_func) -> typename std::enable_if<boost::is_same<_Con, std::vector<T>>::value || boost::is_same<_Con, std::deque<T>>::value, void>::type
+	{
+		if(mode == Mode::Input)
+		{
+			for(auto& prop : children)
+			{
+				if(prop->IsType(type))
+				{
+					typename _Con::value_type v = typename _Con::value_type();
+					each_func(v, prop);
+					cont.push_back(std::move(v));
+				}
+			}
+		}
+		else
+		{
+			for(auto& elem : cont)
+			{
+				Properties* prop = Child(type, "");
+				each_func(elem, prop);
+			}
+		}
+	}
+
 protected:
 
-private:
-	Properties* GetTopParent();
-
-	string GetString(string name);
-	void SetString(string name, Value value);
-
-//	qumap<string, string> enums;
 	Properties* parent = nullptr;
-//	bool getFirstLine = true;
-//	bool isArray = false;
 
-	string Expand(string value);
-	static string TrimSpace(const string& str, bool onlyIndent);
-	void SkipSpace(std::istream& stream);
-	Properties* AddChild(Properties* prop);
-	string GetIndent();
 };
 
 /** @} */

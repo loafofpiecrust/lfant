@@ -33,8 +33,7 @@ class Material : public Object
 public:
 	Material();
 
-	virtual void Load(Properties *prop);
-	virtual void Save(Properties *prop) const;
+	virtual void Serialize(Properties *prop);
 
 	// Path and name for the texture file.
 	std::shared_ptr<Texture> texture;

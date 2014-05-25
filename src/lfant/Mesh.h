@@ -14,8 +14,7 @@ class Mesh : public Renderable
 public:
 	Mesh();
 
-	virtual void Load(Properties *prop);
-	virtual void Save(Properties *prop) const;
+	virtual void Serialize(Properties *prop);
 
 	virtual void Init();
 	virtual void Render();

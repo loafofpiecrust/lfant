@@ -57,8 +57,7 @@ public:
 	Game(const Game& other);
 	virtual ~Game();
 
-	virtual void Load(Properties *prop);
-	virtual void Save(Properties *prop) const;
+	virtual void Serialize(Properties *prop);
 
 	static void ScriptBind();
 
@@ -113,7 +112,6 @@ public:
 
 	string GetProgramDir();
 
-	bool standAlone = true;
 
 	string orgName = "lazyfox";
 	string gameName = "lfant";
@@ -139,19 +137,13 @@ public:
 #if !ANDROID
 	ptr<OpenCL> openCL;
 #endif
-
 	ptr<Scene> scene;
 
-
-	//boost::scoped_ptr<AISystem>			aiSystem;
-	//boost::scoped_ptr<FGSystem>			flowgraph;
-
-
-protected:
+	bool standAlone = true;
 
 private:
-	std::deque<std::thread> threads;
 	bool destroy = false;
+	std::deque<std::thread> threads;
 
 };
 

@@ -83,8 +83,8 @@ public:
 	struct Variable
 	{
 		string name;
-		float value;
 		string help;
+		float value;
 		bool readOnly;
 
 		Variable(string name, float val, string help = "", bool readOnly = false) :
@@ -100,8 +100,8 @@ public:
 	virtual void Update();
 	virtual void Deinit();
 
-	virtual void Load(Properties* prop);
-	virtual void Save(Properties* prop) const;
+	virtual void Serialize(Properties* prop);
+
 
 	void Input(string line);
 

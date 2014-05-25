@@ -77,32 +77,18 @@ void PointLight::LoadFile(string path)
 	aiReleaseImport(scene);
 }
 
-void PointLight::Load(Properties* prop)
+void PointLight::Serialize(Properties* prop)
 {
-	Light::Load(prop);
+	Light::Serialize(prop);
 
-	prop->Get("radius", radius);
-	prop->Get("ambientIntensity", ambientIntensity);
-	prop->Get("diffuseIntensity", diffuseIntensity);
-	prop->Get("attenConst", attenConst);
-	prop->Get("attenLinear", attenLinear);
-	prop->Get("attenExp", attenExp);
-	prop->Get("specularPower", specularPower);
-	prop->Get("specularIntensity", specularIntensity);
-}
-
-void PointLight::Save(Properties* prop) const
-{
-	Light::Save(prop);
-
-	prop->Set("radius", radius);
-	prop->Set("ambientIntensity", ambientIntensity);
-	prop->Set("diffuseIntensity", diffuseIntensity);
-	prop->Set("attenConst", attenConst);
-	prop->Set("attenLinear", attenLinear);
-	prop->Set("attenExp", attenExp);
-	prop->Set("specularPower", specularPower);
-	prop->Set("specularIntensity", specularIntensity);
+	prop->Value("radius", &radius);
+	prop->Value("ambientIntensity", &ambientIntensity);
+	prop->Value("diffuseIntensity", &diffuseIntensity);
+	prop->Value("attenConst", &attenConst);
+	prop->Value("attenLinear", &attenLinear);
+	prop->Value("attenExp", &attenExp);
+	prop->Value("specularPower", &specularPower);
+	prop->Value("specularIntensity", &specularIntensity);
 }
 
 void PointLight::Init()

@@ -103,68 +103,40 @@ void ParticleSystemGPU::UpdatePosition(Particle* pt)
 {
 }
 
-void ParticleSystemGPU::Load(Properties *prop)
+void ParticleSystemGPU::Serialize(Properties *prop)
 {
-	Component::Load(prop);
+	Component::Serialize(prop);
 
-	for(auto& pb : prop->children)
+	prop->ValueArray<Burst>("burst", bursts, [](Burst& burst,Properties* prop)
 	{
-		if(pb->IsType("burst"))
-		{
-			bursts.emplace_front();
-			Burst& burst = bursts[0];
-			pb->Get("time", burst.time);
-			pb->Get("particles", burst.particles);
-			burst.current = burst.time;
-		}
-	}
+		prop->Value("time", &burst.time);
+		prop->Value("particles", &burst.particles);
+		burst.current = burst.time;
+	});
 
-	prop->Get("lifetime", lifetime);
-	prop->Get("color", color);
-	prop->Get("size", size);
-	prop->Get("velocity", velocity);
+	prop->Value("lifetime", &lifetime);
+	prop->Value("color", &color);
+	prop->Value("size", &size);
+	prop->Value("velocity", &velocity);
 
 	GetGame()->Log("Loaded velocity: ", lexical_cast<string>(velocity));
+	GetGame()->Log("Loaded lifetime: ", lexical_cast<string>(lifetime));
 //	thread::Sleep(1500);
 
-	prop->Get("radius", radius);
-	prop->Get("angle", angle);
-//	prop->Get("timeScale", timeScale);
-	prop->Get("rate", rate);
-	prop->Get("maxParticles", maxParticles);
-	prop->Get("dimensions", dimensions);
-	prop->Get("gravity", gravity);
-	prop->Get("pausable", pausable);
-	prop->Get("paused", paused);
-	prop->Get("looping", looping);
-	prop->Get("inheritTransform", inheritTransform);
+	prop->Value("radius", &radius);
+	prop->Value("angle", &angle);
+//	prop->Value("timeScale", timeScale);
+	prop->Value("rate", &rate);
+	prop->Value("maxParticles", &maxParticles);
+	prop->Value("dimensions", &dimensions);
+	prop->Value("gravity", &gravity);
+	prop->Value("pausable", &pausable);
+	prop->Value("paused", &paused);
+	prop->Value("looping", &looping);
+	prop->Value("inheritTransform", &inheritTransform);
+//	prop->Value("type", &emitterType);
 
-	emitterType = (EmitterType)prop->Get<byte>("type");
-
-	material.LoadFile(prop->Get("material"));
-}
-
-void ParticleSystemGPU::Save(Properties *prop) const
-{
-	Component::Save(prop);
-
-	/*
-	prop->Set("lifetime", lifetime);
-	prop->Set("color", color);
-	prop->Set("size", size);
-	prop->Set("velocity", velocity);
-
-	prop->Set("radius", radius);
-	prop->Set("timeScale", timeScale);
-	prop->Set("rate", rate);
-	prop->Set("maxParticles", maxParticles);
-	prop->Set("dimensions", dimensions);
-	prop->Set("gravity", gravity);
-	prop->Set("pausable", pausable);
-	prop->Set("paused", paused);
-	prop->Set("looping", looping);
-	//	prop->Set("material", material.path);
-	*/
+	material.LoadFile(prop->GetString("material"));
 }
 
 void ParticleSystemGPU::Recycle(Particle* pt)

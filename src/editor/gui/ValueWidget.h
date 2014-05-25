@@ -18,10 +18,10 @@ public slots:\
 	{\
 		if(value_ptr) *value_ptr = value;\
 	}\
-	void update()\
+	void paintEvent(QPaintEvent *event)\
 	{\
 		setInternalValue();\
-		_Parent::update();\
+		_Parent::paintEvent(event);\
 	}\
 private:\
 	_ValType* value_ptr;

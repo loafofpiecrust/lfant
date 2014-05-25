@@ -58,8 +58,8 @@ public:
 	Renderer(Game* game);
 	~Renderer();
 
-	virtual void Load(Properties* prop);
-	virtual void Save(Properties* prop) const;
+	virtual void Serialize(Properties* prop);
+	
 
 	virtual void Init();
 	virtual void Update();

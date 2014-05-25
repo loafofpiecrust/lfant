@@ -18,17 +18,18 @@ void AudioSource::LoadFile(string file)
 	snd->setVolume(volume);
 }
 
-void AudioSource::Load(Properties* prop)
+void AudioSource::Serialize(Properties* prop)
 {
-	lfant::Component::Load(prop);
-	std::vector<string> files;
-	prop->Get("files", files);
+	lfant::Component::Serialize(prop);
+	/// @fixme
+/*	std::vector<string> files;
+	prop->Value("files", files);
 	for(auto& f : files)
 	{
 		LoadFile(f);
-	}
+	}*/
 }
-	
+
 void AudioSource::Init()
 {
 	ConnectEvent(SENDER(owner->transform, SetPosition), RECEIVER(this, OnSetPosition));
@@ -80,5 +81,5 @@ void AudioSource::SetVolume(float vol)
 	}
 }
 
-	
+
 }

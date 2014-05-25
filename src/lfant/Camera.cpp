@@ -55,32 +55,19 @@ Component* Camera::Clone(Entity* owner) const
 	return inst;
 }
 
-void Camera::Save(Properties* prop) const
+void Camera::Serialize(Properties* prop)
 {
-	Component::Save(prop);
+	Component::Serialize(prop);
 
-	prop->Set("fov", fov);
-	prop->Set("aspectRatio", aspectRatio);
-	prop->Set("viewRange", viewRange);
-	prop->Set("aperture", aperture);
-	prop->Set("focalLength", focalLength);
-	prop->Set("focalDepth", focalDepth);
-	prop->Set("useDof", useDof);
-//	prop->Set("mode", (short)mode);
-}
-
-void Camera::Load(Properties* prop)
-{
-	Component::Load(prop);
-
-	prop->Get("fov", fov);
-	prop->Get("aspectRatio", aspectRatio);
-	prop->Get("viewRange", viewRange);
-	prop->Get("aperture", aperture);
-	prop->Get("focalLength", focalLength);
-	prop->Get("focalDepth", focalDepth);
-	prop->Get("useDof", useDof);
-	mode = (Mode)prop->Get<short>("mode");
+	prop->Value("fov", &fov);
+	prop->Value("aspectRatio", &aspectRatio);
+	prop->Value("viewRange", &viewRange);
+	prop->Value("aperture", &aperture);
+	prop->Value("focalLength", &focalLength);
+	prop->Value("focalDepth", &focalDepth);
+	prop->Value("useDof", &useDof);
+//	prop->Value("mode", &mode);
+//	mode = (Mode)prop->Get<short>("mode");
 
 	UpdateProjection();
 }

@@ -20,33 +20,37 @@ Mesh::Mesh()
 	render = true;
 }
 
-void Mesh::Load(Properties *prop)
+void Mesh::Serialize(Properties *prop)
 {
-	Renderable::Load(prop);
+	Renderable::Serialize(prop);
 
-	string meshFile = prop->Get("file");
-	if(!meshFile.empty())
+	if(prop->mode == Properties::Mode::Input)
 	{
-		GetGame()->Log("Loading mesh fillet");
-		mesh = Geometry::LoadFile(GetGame()->GetAssetPath(meshFile).string());
-	}
+		string meshFile = "";
+		prop->Value("file", &meshFile);
 
-	if(Properties* child = prop->GetChild("material"))
-	{
-		material.Load(child);
+		if(!meshFile.empty())
+		{
+			GetGame()->Log("Loading mesh fillet");
+			mesh = Geometry::LoadFile(GetGame()->GetAssetPath(meshFile).string());
+		}
+
+		if(Properties* child = prop->Child("material", ""))
+		{
+			material.Serialize(child);
+		}
+		else
+		{
+			string matFile = prop->GetString("material");
+			if(!matFile.empty()) material.LoadFile(matFile);
+		}
+
+		Init();
 	}
 	else
 	{
-		string matFile = prop->Get("material");
-		if(!matFile.empty()) material.LoadFile(matFile);
+
 	}
-
-	Init();
-}
-
-void Mesh::Save(Properties *prop) const
-{
-	Renderable::Save(prop);
 }
 
 void Mesh::Init()

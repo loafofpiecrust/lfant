@@ -42,20 +42,12 @@ Movement::~Movement()
 {
 }
 
-void Movement::Save(Properties* prop) const
+void Movement::Serialize(Properties* prop)
 {
-	Component::Save(prop);
+	Component::Serialize(prop);
 
-	prop->Set("movementSpeed", movementSpeed);
-	prop->Set("usePhysics", usePhysics);
-}
-
-void Movement::Load(Properties* prop)
-{
-	Component::Load(prop);
-
-	prop->Get("movementSpeed", movementSpeed);
-	prop->Get("usePhysics", usePhysics);
+	prop->Value("movementSpeed", &movementSpeed);
+	prop->Value("usePhysics", &usePhysics);
 }
 
 void Movement::Init()
@@ -78,7 +70,7 @@ void Movement::FixedUpdate()
 }
 
 void Movement::Move(vec3 velocity)
-{	
+{
 //	GetGame()->Log("Movement::Move(", velocity, "): final(", velocity*movementSpeed);
 	if(rigidbody && usePhysics)
 	{

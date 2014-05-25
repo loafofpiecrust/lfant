@@ -36,34 +36,30 @@ GLFWwindow* Window::GetHandle()
 	return handle;
 }
 
-void Window::Save(Properties* prop) const
+void Window::Serialize(Properties* prop)
 {
-	Subsystem::Save(prop);
-}
+	Subsystem::Serialize(prop);
 
-void Window::Load(Properties* prop)
-{
-	Subsystem::Load(prop);
+	prop->Value("fsaa", &fsaa);
+	prop->Value("version", &version);
+	prop->Value("resolution", &resolution);
+	prop->Value("title", &title);
 
-	prop->Get("fsaa", fsaa);
-	prop->Get("version", version);
-
-	ivec2 res {800,600};
-	prop->Get("resolution", res);
-
-	if(!IsOpen())
+	if(prop->mode == Properties::Mode::Input)
 	{
-		Open(res);
+		if(!IsOpen())
+		{
+			Open(resolution);
+		}
+		SetTitle(title);
 	}
-
-	string title = "";
-	prop->Get("title", title);
-	SetTitle(title);
 
 }
 
 void Window::Init()
 {
+	LoadFile("settings/window.prop");
+
 	if(!glfwInit())
 	{
 		// glfw failed to init
