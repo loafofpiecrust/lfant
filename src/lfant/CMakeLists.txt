@@ -111,7 +111,7 @@ target_link_libraries(${PROJECT_NAME}
 	glfw
 #	OpenCL
 	glew
-	AntTweakBar
+#	AntTweakBar
 	)
 
 else()
