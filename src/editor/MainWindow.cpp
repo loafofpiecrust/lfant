@@ -23,7 +23,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
-	CloseGame();
+	if(game) CloseGame();
 //	delete ui;
 }
 
@@ -112,10 +112,6 @@ void MainWindow::Shutdown()
 
 void MainWindow::closeEvent(QCloseEvent* event)
 {
-	if(game)
-	{
-		CloseGame();
-	}
 	closed = true;
 }
 

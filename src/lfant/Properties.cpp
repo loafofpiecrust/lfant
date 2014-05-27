@@ -403,7 +403,7 @@ void Properties::Value(string name, Entity*& ent, Scene* scene)
 		}
 		else
 		{
-		//	ref = game->scene->GetRoot()->GetChildbyId(id);
+		//	ref = game->scene->GetChildbyId(id);
 		}
 	}
 	else

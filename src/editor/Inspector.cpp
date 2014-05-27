@@ -5,6 +5,7 @@
 #include <editor/gui/ValueSlider.h>
 #include <editor/gui/ValueLineEdit.h>
 #include "editor/gui/ValueCheckBox.h"
+#include "editor/gui/ValueVectorEdit.h"
 
 #include <lfant/Scene.h>
 #include <lfant/Entity.h>
@@ -85,6 +86,10 @@ QWidget* Inspector::CreateInput(boost::any& val, QWidget* parent)
 		auto vle = new gui::ValueLineEdit(parent);
 		vle->setPointer(boost::any_cast<string*>(val));
 		in = vle;
+	}
+	else if(type == typeid(vec2*) || type == typeid(vec3*) || type == typeid(vec4*))
+	{
+		in = new gui::ValueVectorEdit(parent, val);
 	}
 	else
 	{
@@ -169,10 +174,15 @@ void Inspector::Refresh()
 
 	// resets the layout
 //	QFormLayout* form = (QFormLayout*)layout();
-/*	for(int i = 0; i < children().size(); ++i)
+	for(int i = 0; i < children().size(); ++i)
 	{
-		if(children()[i]) delete children()[i];
-	}*/
+		QWidget* const child = dynamic_cast<QWidget* const>(children()[i]);
+		if(child)
+		{
+			form->removeWidget(child);
+			delete child;
+		}
+	}
 
 	currentProp->Clear();
 	currentProp->SetMode(Properties::Mode::Output);

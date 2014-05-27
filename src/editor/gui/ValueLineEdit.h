@@ -20,9 +20,9 @@ public:
 	}
 
 public slots:
-	void setPointerValue(std::string value)
+	void setPointerValue(QString value)
 	{
-		if(value_ptr) *value_ptr = value;
+		if(value_ptr) *value_ptr = value.toStdString();
 	}
 
 	void paintEvent(QPaintEvent *event)

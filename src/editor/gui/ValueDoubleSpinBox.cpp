@@ -8,6 +8,7 @@ ValueDoubleSpinBox::ValueDoubleSpinBox(QWidget *parent) :
 	QDoubleSpinBox(parent)
 {
 	connect(this, SIGNAL(valueChanged(double)), this, SLOT(setPointerValue(double)));
+	setValue(0.0);
 }
 
 void ValueDoubleSpinBox::setPointer(double* ptr)
@@ -36,11 +37,11 @@ void ValueDoubleSpinBox::setPointerValue(double val)
 
 void ValueDoubleSpinBox::paintEvent(QPaintEvent *event)
 {
-	if(value_ptr)
+	if(value_ptr && value() != *value_ptr)
 	{
 		setValue(*value_ptr);
 	}
-	else if(float_ptr)
+	else if(float_ptr && value() != (double)*float_ptr)
 	{
 		setValue((double)*float_ptr);
 	}

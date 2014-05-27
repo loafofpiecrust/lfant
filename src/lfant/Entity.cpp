@@ -468,32 +468,33 @@ Entity* Entity::GetChild(string name, bool recursive) const
 	if(name.find("/") != -1)
 	{
 		// We're given a path to the entity
-		std::deque<string> toks = Split(name, "", "/");
+		std::deque<string> toks = Split(name, "/", "");
 		Entity* result = nullptr;
+		if(name[0] == '/')
+		{
+			result = GetGame()->scene->GetRoot();
+		}
 		for(uint i = 0; i < toks.size(); ++i)
 		{
-			if(toks[i] == "/")
-			{
-				if(!result)
-				{
-					++i;
-					result = GetChild(toks[i], false);
-				}
-				continue;
-			}
-			else if(toks[i] == "..")
-			{
-				if(result) result = result->GetParent();
-			}
-			else if(toks[i] == ".")
+			if(toks[i] == ".")
 			{
 				continue;
 			}
 			else
 			{
-				if(result)
+				if(toks[i] == "..")
+				{
+					if(result) result = result->GetParent();
+				}
+				else
 				{
 					result = result->GetChild(toks[i], false);
+				}
+
+				if(!result)
+				{
+					GetGame()->Log("Entity '"+name+"' not found in "+GetName());
+					return nullptr;
 				}
 			}
 		}

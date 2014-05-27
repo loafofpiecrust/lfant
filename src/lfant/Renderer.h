@@ -59,7 +59,7 @@ public:
 	~Renderer();
 
 	virtual void Serialize(Properties* prop);
-	
+
 
 	virtual void Init();
 	virtual void Update();
@@ -96,11 +96,7 @@ public:
 
 protected:
 
-	void OnMouseMove(ivec2 pos);
-	void OnMouseButton(uint16 button, int action);
-
 	std::deque<ptr<Shader>> shaders;
-
 	std::deque<Light*> lights;
 };
 

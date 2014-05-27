@@ -85,7 +85,7 @@ if(NOT ANDROID)
 	set(BASE_FLAGS "${BASE_FLAGS} -m${ARCH_OPTION}")
 endif()
 if(NOT WIN32)
-        set(BASE_FLAGS "${BASE_FLAGS} -fPIC")
+		set(BASE_FLAGS "${BASE_FLAGS} -fPIC")
 endif()
 
 if(DEBUG)

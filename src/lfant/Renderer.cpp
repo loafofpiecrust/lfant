@@ -51,8 +51,6 @@
 #include <lfant/Thread.h>
 #include <lfant/Light.h>
 
-#include <AntTweakBar.h>
-
 namespace lfant {
 
 Renderer::Renderer(Game* game) :
@@ -142,8 +140,6 @@ void Renderer::Init()
 
 
 }
-
-TwBar* bar = nullptr;
 
 void Renderer::Update()
 {
@@ -244,36 +240,10 @@ void Renderer::Update()
 	//
 	frameBuffer->Unbind();
 	frameBuffer->Render();
-
-	if(GetGame()->scene->mainCamera)
-	{
-		if(!bar)
-		{
-			ConnectEvent(SENDER(GetGame()->input.get(), MouseMove), RECEIVER(this, OnMouseMove));
-			ConnectEvent(SENDER(GetGame()->input.get(), MouseButton), RECEIVER(this, OnMouseButton));
-
-			TwInit(TW_OPENGL, nullptr);
-			auto size = GetGame()->window->GetSize();
-			TwWindowSize(size.x, size.y);
-
-			bar = TwNewBar("Camera DoF Settings");
-			TwAddVarRW(bar, "dof", TW_TYPE_BOOLCPP, &GetGame()->scene->mainCamera->useDof, "");
-			TwAddVarRW(bar, "autoFocus", TW_TYPE_BOOLCPP, &GetGame()->scene->mainCamera->autoFocus, "");
-			TwAddVarRW(bar, "focalLength", TW_TYPE_FLOAT, &GetGame()->scene->mainCamera->focalLength, "");
-			TwAddVarRW(bar, "focalDepth", TW_TYPE_FLOAT, &GetGame()->scene->mainCamera->focalDepth, "");
-			TwAddVarRW(bar, "aperture", TW_TYPE_FLOAT, &GetGame()->scene->mainCamera->aperture, "");
-			TwAddVarRW(bar, "focus", TW_TYPE_FLOAT, &GetGame()->scene->mainCamera->focus, "");
-		}
-		else
-		{
-			TwDraw();
-		}
-	}
 }
 
 void Renderer::Deinit()
 {
-	TwTerminate();
 	frameBuffer->Deinit();
 //	Texture::textureCache.clear();
 	GetGame()->Log("Renderer::Deinit(): Touch");
@@ -335,17 +305,6 @@ void Renderer::RemoveLight(Light* light)
 			lights.erase(lights.begin()+i);
 		}
 	}
-}
-
-void Renderer::OnMouseMove(ivec2 pos)
-{
-	TwEventMousePosGLFW(pos.x, pos.y);
-}
-
-void Renderer::OnMouseButton(uint16 button, int action)
-{
-	std::cout << "mussolinni\n";
-	TwEventMouseButtonGLFW((int)button, action);
 }
 
 }

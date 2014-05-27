@@ -23,7 +23,8 @@ public:
 
 public slots:
 	void setPointerValue(int val);
-	void paintEvent(QPaintEvent* event);
+
+	void paintEvent(QPaintEvent *event);
 
 private:
 	union

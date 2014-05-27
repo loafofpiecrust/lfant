@@ -23,6 +23,7 @@ void ValueSlider::setPointer(boost::any& val)
 		val_uint32 = boost::any_cast<uint32*>(val);
 }
 
+
 void ValueSlider::setPointerValue(int val)
 {
 	if(val_int16)
