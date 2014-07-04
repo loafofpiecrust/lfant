@@ -28,7 +28,6 @@ DebugRenderer::DebugRenderer() :
 	}
 	if(material->shader)
 	{
-	//	GetGame()->Log("Adding uniforms..");
 		material->shader->AddUniform("matrix");
 		material->shader->AddUniform("color");
 	}
@@ -52,21 +51,21 @@ void DebugRenderer::drawLine(const btVector3& from, const btVector3& to, const b
 	colors.push_back(color);
 
 /*	float tmp[ 6 ] = { from.getX(), from.getY(), from.getZ(),
-                    to.getX(), to.getY(), to.getZ() };
-      
-      glPushMatrix();
-      {         
-         glColor4f(color.getX(), color.getY(), color.getZ(), 1.0f);         
-         glVertexPointer( 3,
-                     GL_FLOAT,
-                     0,
-                     &tmp );
-         
-         glPointSize( 5.0f );
-         glDrawArrays( GL_POINTS, 0, 2 );
-         glDrawArrays( GL_LINES, 0, 2 );
-      }
-      glPopMatrix();*/
+					to.getX(), to.getY(), to.getZ() };
+
+	  glPushMatrix();
+	  {
+		 glColor4f(color.getX(), color.getY(), color.getZ(), 1.0f);
+		 glVertexPointer( 3,
+					 GL_FLOAT,
+					 0,
+					 &tmp );
+
+		 glPointSize( 5.0f );
+		 glDrawArrays( GL_POINTS, 0, 2 );
+		 glDrawArrays( GL_LINES, 0, 2 );
+	  }
+	  glPopMatrix();*/
 }
 
 void DebugRenderer::drawContactPoint(const btVector3& PointOnB, const btVector3& normalOnB, btScalar distance, int lifeTime, const btVector3& color)
@@ -98,7 +97,7 @@ void DebugRenderer::Render(Game* game)
 {
 	glBindBuffer(GL_ARRAY_BUFFER, pointBuffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(btVector3)*points.size(), &points[0], GL_STREAM_DRAW);
-	
+
 	glBindBuffer(GL_ARRAY_BUFFER, colorBuffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(btVector3)*colors.size(), &colors[0], GL_STREAM_DRAW);
 
@@ -112,7 +111,7 @@ void DebugRenderer::Render(Game* game)
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, pointBuffer);
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, (void*)0);
-	
+
 	glEnableVertexAttribArray(1);
 	glBindBuffer(GL_ARRAY_BUFFER, colorBuffer);
 	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, (void*)0);

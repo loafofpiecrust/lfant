@@ -36,9 +36,6 @@ void Console::Init()
 {
 	Subsystem::Init();
 
-	logFile.open(game->GetProgramDir()+"/"+logName);
-	logFile.clear();
-
 	// Default commands
 	RegisterCommand(&Console::CmdExit, "quit", "Quit the game");
 	RegisterCommand(&Console::CmdGetVar, "get");
@@ -55,14 +52,11 @@ void Console::Update()
 
 void Console::Deinit()
 {
-	logFile.close();
 }
 
 void Console::Serialize(Properties *prop)
 {
 	Subsystem::Serialize(prop);
-
-	prop->Value("logFile", &logName);
 }
 
 void Console::CmdGetVar(deque<string> args)
@@ -128,7 +122,7 @@ void Console::Input(string line)
 			}
 			else
 			{
-				Print("Console::Input: Unknown command \'"+output[i]+"\'");
+			//	Print("Console::Input: Unknown command \'"+output[i]+"\'");
 			}
 			/*
 			   // Or if we want help

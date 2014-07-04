@@ -11,8 +11,8 @@
 #include <GL/glew.h>
 
 #include <GLFW/glfw3.h>
-#include <SFML/Window.hpp>
-#include <SFML/Graphics/RenderWindow.hpp>
+//#include <SFML/Window.hpp>
+//#include <SFML/Graphics/RenderWindow.hpp>
 //#include <Gwen/Input/SFML.h>
 //#include <../src/SFML/Graphics/GLCheck.hpp>
 
@@ -43,6 +43,7 @@ void Window::Serialize(Properties* prop)
 	prop->Value("fsaa", &fsaa);
 	prop->Value("version", &version);
 	prop->Value("resolution", &resolution);
+	prop->Value("position", &position);
 	prop->Value("title", &title);
 
 	if(prop->mode == Properties::Mode::Input)
@@ -140,7 +141,6 @@ void Window::Update()
 void Window::Render()
 {
 	glfwSwapBuffers(handle);
-//	GetGame()->Log(glGetError());
 //	window->display();
 //	window->clear();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -164,7 +164,7 @@ void Window::Open(ivec2 res)
 {
 	if(!GetGame()->standAlone) return;
 
-	GetGame()->Log("opening window");
+	GetGame()->Log("Opening window...");
 
 	resolution = res;
 
@@ -178,19 +178,19 @@ void Window::Open(ivec2 res)
 
 	handle = glfwCreateWindow(res.x, res.y, "", nullptr, nullptr);
 
+	glfwSetWindowPos(handle, position.x, position.y);
+
 	if(!handle)
 	{
-		GetGame()->Log("Window failed to open, terminating");
+		GetGame()->Log("Window failed to open, terminating.");
 		// ...
 		glfwTerminate(); // ?
 		return;
 	}
-	GetGame()->Log(glGetError());
 
 	glfwSetWindowUserPointer(handle, this);
 	SetCurrent();
-	GetGame()->Log(glGetError());
-//	SetVsync(1);
+	SetVsync(1);
 
 	if(needsInit)
 	{
@@ -199,7 +199,7 @@ void Window::Open(ivec2 res)
 		needsInit = false;
 	}
 
-	GetGame()->Log("Window opened, gl version ", glfwGetWindowAttrib(handle, GLFW_CONTEXT_VERSION_MAJOR), ".", glfwGetWindowAttrib(handle, GLFW_CONTEXT_VERSION_MINOR));
+	GetGame()->Log("Window opened, OpenGL version ", glfwGetWindowAttrib(handle, GLFW_CONTEXT_VERSION_MAJOR), ".", glfwGetWindowAttrib(handle, GLFW_CONTEXT_VERSION_MINOR));
 
 	glfwSetWindowSizeCallback(handle, &OnWindowResize);
 	glfwSetWindowPosCallback(handle, &OnWindowMove);

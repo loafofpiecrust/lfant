@@ -225,7 +225,6 @@ void SystemInfo::Init()
 	deque<string> line;
 	while(fgets(result, sizeof(result) - 1, cmd) != 0)
 	{
-		GetGame()->Log("Count: ", cnt);
 		if(cnt == 0)
 		{
 			++cnt;

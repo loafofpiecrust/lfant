@@ -63,8 +63,10 @@ public:
 	Rigidbody();
 	virtual ~Rigidbody();
 
+	static void ScriptBind();
+
 	virtual void Serialize(Properties* prop);
-	
+
 
 	virtual void Enable(bool on);
 
@@ -110,6 +112,7 @@ public:
 	 *	Sets the velocity of this object directly.
 	 */
 	void SetVelocity(vec3 vel);
+	void SetAngularVelocity(vec3 vel);
 
 	/**
 	 *	Returns the average of the three components of this object's velocity.
@@ -160,9 +163,6 @@ protected:
 	ptr<btMotionState> motionState;
 	Collider* collider = nullptr;
 	vec3 inertia = vec3(0);
-
-	bvec3 lockPosition = bvec3(false);
-	bvec3 lockRotation = bvec3(false);
 };
 
 /** @} */

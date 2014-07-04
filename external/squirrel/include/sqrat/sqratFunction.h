@@ -84,7 +84,8 @@ public:
         sq_addref(vm, &obj);
 #if !defined (SCRAT_NO_ERROR_CHECKING)
         SQObjectType value_type = so.GetType();
-        if (value_type != OT_CLOSURE && value_type != OT_NATIVECLOSURE) {
+        if (value_type != OT_CLOSURE && value_type != OT_NATIVECLOSURE && value_type != OT_CLASS) {
+            // Note that classes can also be considered functions in Squirrel
             Error::Instance().Throw(vm, _SC("function not found in slot"));
         }
 #endif
@@ -2566,48 +2567,13 @@ struct Var<Function> {
 /// Used to get and push Function instances to and from the stack as references (functions are always references in Squirrel)
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<>
-struct Var<Function&> {
+struct Var<Function&> : Var<Function> {Var(HSQUIRRELVM vm, SQInteger idx) : Var<Function>(vm, idx) {}};
 
-    Function value; ///< The actual value of get operations
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// Attempts to get the value off the stack at idx as a Function
-    ///
-    /// \param vm  Target VM
-    /// \param idx Index trying to be read
-    ///
-    /// \remarks
-    /// Assumes the Function environment is at index 1.
-    ///
-    /// \remarks
-    /// This function MUST have its Error handled if it occurred.
-    ///
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    Var(HSQUIRRELVM vm, SQInteger idx) {
-        HSQOBJECT sqEnv;
-        HSQOBJECT sqValue;
-        sq_getstackobj(vm, 1, &sqEnv);
-        sq_getstackobj(vm, idx, &sqValue);
-        value = Function(vm, sqEnv, sqValue);
-#if !defined (SCRAT_NO_ERROR_CHECKING)
-        SQObjectType value_type = sq_gettype(vm, idx);
-        if (value_type != OT_CLOSURE && value_type != OT_NATIVECLOSURE) {
-            Error::Instance().Throw(vm, Sqrat::Error::FormatTypeError(vm, idx, _SC("closure")));
-        }
-#endif
-    }
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// Called by Sqrat::PushVarR to put a Function on the stack
-    ///
-    /// \param vm    Target VM
-    /// \param value Value to push on to the VM's stack
-    ///
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    static void push(HSQUIRRELVM vm, Function& value) {
-        sq_pushobject(vm, value.GetFunc());
-    }
-};
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// Used to get and push Function instances to and from the stack as references (functions are always references in Squirrel)
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+template<>
+struct Var<const Function&> : Var<Function> {Var(HSQUIRRELVM vm, SQInteger idx) : Var<Function>(vm, idx) {}};
 
 }
 

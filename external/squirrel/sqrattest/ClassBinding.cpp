@@ -44,7 +44,7 @@ public:
     float f;
     string s2;
 
-    C()
+    C() // default constructor in code
     {
         default_values();
 #ifndef  SQUNICODE
@@ -142,6 +142,7 @@ TEST_F(SqratTest, Constructors)
     .Var(_SC("s"), &C::s)
     .Var(_SC("f"), &C::f)
     .Var(_SC("s2"), &C::s2)
+    .Ctor()
     .Ctor<int>()
     .Ctor<int, const SQChar * >()
     //Ctor<const SQChar *, float >("make")
@@ -149,17 +150,18 @@ TEST_F(SqratTest, Constructors)
     .Ctor<int, const SQChar *, float, const SQChar * >();
 
     RootTable().Bind(_SC("C"), c_class);
-    
+
     Class<C1> c1_class;
     RootTable().Bind(_SC("C1"), c1_class);
-     
-    Class<C2> c2_class;   
+
+    Class<C2> c2_class;
+    c2_class.Ctor();
     RootTable().Bind(_SC("C2"), c2_class);
-    
+
     Class<C3> c3_class;
     c3_class.Ctor<int, int, char>();
     RootTable().Bind(_SC("C3"), c3_class);
-    
+
     Class<C3, Sqrat::NoCopy<C3> > c3_class2;
     c3_class2.Ctor<int, int, char>();
     c3_class2.Var(_SC("x"), &C3::x)

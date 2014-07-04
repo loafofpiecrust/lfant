@@ -33,8 +33,6 @@ Network::~Network()
 
 void Network::Init()
 {
-	GetGame()->Log("Network::Init: Touch.");
-
 	Subsystem::Init();
 }
 

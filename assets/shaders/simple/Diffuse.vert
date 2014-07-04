@@ -20,11 +20,11 @@ out vec3 vertNormal;
 
 void main()
 {
-	vec4 pos = V * M * vec4(position, 1);
+	vec4 pos = M * vec4(position, 1);
 //	pos.x = -pos.x;
 	// Sets the final position of the vertex.
 	vertPos = pos.xyz;
-	gl_Position = P * pos;
+	gl_Position = P * V * pos;
 //	gl_Position.z = -gl_Position.z;
 
 	// Sets fragment UV to vertex UV

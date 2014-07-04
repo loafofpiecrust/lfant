@@ -56,24 +56,21 @@ void Geometry::Init()
 {
 	if(vertexBuffer.size() == 0)
 	{
-//		GetGame()->Log("Mesh init rejected (no data)");
+	//	GetGame()->Log("Mesh init rejected (no data)");
 		return;
 	}
 
 	if(loaded)
 	{
-//		GetGame()->Log("Mesh init rejected (loaded)");
+	//	GetGame()->Log("Mesh init rejected (previously loaded)");
 		return;
 	}
 
 	FrameBuffer* fbo = FrameBuffer::GetCurrent();
 	if(fbo && !fboQuad)
 	{
-//		GetGame()->Log("Unbinding fbo for mesh init.");
 		fbo->Unbind();
 	}
-
-//	GetGame()->Log("Mesh init proceeding");
 
 	glGenVertexArrays(1, &vertexArray);
 	glBindVertexArray(vertexArray);
@@ -112,7 +109,6 @@ void Geometry::Init()
 
 	if(fbo && !fboQuad)
 	{
-//		GetGame()->Log("Rebinding fbo after mesh init.");
 		fbo->Bind();
 	}
 
@@ -125,7 +121,6 @@ void Geometry::Init()
 
 void Geometry::Deinit()
 {
-//	GetGame()->Log("Deiniting mesh");
 	vertexBuffer.Destroy();
 	uvBuffer.Destroy();
 	normalBuffer.Destroy();
@@ -143,11 +138,8 @@ void Geometry::Render()
 {
 	if(!loaded)
 	{
-//		GetGame()->Log("Mesh render rejected (!loaded)");
 		return;
 	}
-
-//	GetGame()->Log("Mesh::Render()");
 
 	glBindVertexArray(vertexArray);
 	glDrawElements(GL_TRIANGLES, indexBuffer.size(), GL_UNSIGNED_INT, (void*)0);

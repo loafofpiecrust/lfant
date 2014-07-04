@@ -159,8 +159,6 @@ void ParticleSystem::Serialize(Properties *prop)
 	prop->Value("size", &size);
 	prop->Value("velocity", &velocity);
 
-	GetGame()->Log("Loaded velocity: ", lexical_cast<string>(velocity));
-	GetGame()->Log("Loaded lifetime: ", lexical_cast<string>(lifetime));
 //	thread::Sleep(1500);
 
 	prop->Value("radius", &radius);
@@ -251,8 +249,6 @@ void ParticleSystem::GenerateVelocity(Particle* pt)
 	vec3 dir;
 	vec3 pos;
 
-//	GetGame()->Log("PS emitter is ", (int)emitterType);
-
 	switch(emitterType)
 	{
 	case EmitterType::Cone:
@@ -306,8 +302,6 @@ void ParticleSystem::GenerateVelocity(Particle* pt)
 	vec3 vrandstart = random::Range(velocity.start.min, velocity.start.max);
 	vec3 vrandend = random::Range(velocity.end.min, velocity.end.max);
 
-//	GetGame()->Log("vrandstart", vrandstart, ", vrandend", vrandend);
-
 	pt->velocity = dir * vrandstart;
 	pt->SetParamDiffs(dir * vrandend, random::Range(color.end.min, color.end.max), random::Range(size.end.min, size.end.max));
 }
@@ -337,13 +331,11 @@ void ParticleSystem::BeginRender()
 
 //	if(!material.texture->GetId())
 	{
-//		Log("Manually loading texture.");
 //		material.texture->LoadFile();
 	}
 
 	if(material.shader->GetId())
 	{
-		GetGame()->Log("Adding uniforms..");
 		material.shader->AddUniform("model");
 		material.shader->AddUniform("view");
 		material.shader->AddUniform("projection");
@@ -380,21 +372,18 @@ void ParticleSystem::Render()
 
 	material.shader->SetUniform("model", owner->transform->GetMatrix());
 
-//	GetGame()->Log("ps model: ", owner->transform->GetMatrix());
 
 	material.shader->SetUniform("projection", GetGame()->scene->mainCamera->GetProjection());
 	material.shader->SetUniform("view", GetGame()->scene->mainCamera->GetView());
-	material.shader->SetUniform("cameraPosition", GetGame()->scene->mainCamera->owner->transform->GetWorldPosition());
+	material.shader->SetUniform("cameraPosition", GetGame()->scene->mainCamera->owner->transform->GetRelativeWorldPosition());
 	material.shader->SetUniform("viewportWidth", GetGame()->window->GetSize().x);
 
 	if(inheritTransform)
 	{
-	//	GetGame()->Log("sending pos ", owner->transform->GetWorldPosition());
-		material.shader->SetUniform("systemPosition", owner->transform->GetWorldPosition());
+		material.shader->SetUniform("systemPosition", owner->transform->GetRelativeWorldPosition());
 	}
 	else
 	{
-	//	Log("Rendering particle independent from system.");
 		material.shader->SetUniform("systemPosition", vec3(0));
 	}
 
@@ -405,14 +394,12 @@ void ParticleSystem::Render()
 	glBindBuffer(GL_ARRAY_BUFFER, particleBuffer.id);
 	if(rewriteBuffer)
 	{
-	//	Log("BufferData called.");
 		glBufferData(GL_ARRAY_BUFFER, sizeof(ParticleVertex) * particleBuffer.size(), &particleBuffer[0], GL_STREAM_DRAW);
 	//	glBufferData(GL_ARRAY_BUFFER, sizeof(Particle) * particles.size(), &particles[0], GL_STREAM_DRAW);
 		rewriteBuffer = false;
 	}
 	else
 	{
-	//	Log("BufferSubData called.");
 		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(ParticleVertex) * particleBuffer.size(), &particleBuffer[0]);
 	//	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Particle) * particles.size(), &particles[0]);
 	}

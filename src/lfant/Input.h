@@ -59,15 +59,8 @@ public:
 	class Axis
 	{
 		friend class Input;
-	private:
-		float value = 0.0f;
-
-		bool posHeld = false;
-		bool negHeld = false;
-		bool down = false;
-		bool up = false;
-
 	public:
+		string name;
 		uint16 positive;
 		uint16 negative;
 		float sensitivity;
@@ -77,8 +70,6 @@ public:
 
 		/// Number of the controller to use. 0 means all.
 		byte joyNum = 0;
-
-		string name;
 
 
 		float GetValue() const
@@ -100,6 +91,13 @@ public:
 		{
 		}
 
+	private:
+		float value = 0.0f;
+
+		bool posHeld = false;
+		bool negHeld = false;
+		bool down = false;
+		bool up = false;
 	};
 
 	struct Joystick
@@ -157,6 +155,8 @@ public:
 	void OnCursorEnter(bool entered);
 	void OnScroll(vec2 offset);
 
+	static void ScriptBind();
+
 	bool lockMouse = false;
 	float mouseSpeed = 1.0f;
 
@@ -165,8 +165,8 @@ protected:
 	/// The string of input this frame.
 	string inputString;
 
-	std::deque<Axis> axes;
-	std::deque<Joystick> joysticks;
+	std::vector<Axis> axes;
+	std::vector<Joystick> joysticks;
 #if ANDROID
 	std::deque<Touch> touches;
 #endif

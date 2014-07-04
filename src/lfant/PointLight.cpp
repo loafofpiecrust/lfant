@@ -46,7 +46,6 @@ PointLight::~PointLight()
 
 void PointLight::LoadFile(string path)
 {
-	GetGame()->Log("Loading mesh file '"+path+"'.");
 	path = GetGame()->GetAssetPath(path).string();
 
 	const aiScene* scene = aiImportFile(path.c_str(), aiProcessPreset_TargetRealtime_MaxQuality);
@@ -96,8 +95,6 @@ void PointLight::Init()
 	Light::Init();
 
 	LoadFile("meshes/sphere.obj");
-
-	GetGame()->Log("PointLight::BeginRender()");
 
 	shader = Shader::LoadFile("shaders/light/Point.vert", "shaders/light/Point.frag");
 
@@ -154,8 +151,8 @@ void PointLight::Render()
 
 	shader->SetUniform("VP", GetGame()->scene->mainCamera->GetProjection() * GetGame()->scene->mainCamera->GetView());
 	shader->SetUniform("M", glm::scale(owner->transform->GetMatrix(), vec3(radius)));
-	shader->SetUniform("lightPosition", owner->transform->GetWorldPosition());
-	shader->SetUniform("cameraPosition", GetGame()->scene->mainCamera->owner->transform->GetWorldPosition());
+	shader->SetUniform("lightPosition", owner->transform->GetRelativeWorldPosition());
+	shader->SetUniform("cameraPosition", GetGame()->scene->mainCamera->owner->transform->GetRelativeWorldPosition());
 	shader->SetUniform("screenSize", (vec2)GetGame()->window->GetSize());
 	shader->SetUniform("lightColor", color);
 	shader->SetUniform("radius", radius);
@@ -194,7 +191,6 @@ void PointLight::RenderStencil()
 void PointLight::InternalRender()
 {
 //	Update();
-//	GetGame()->Log("Rendering point light");
 
 	glActiveTexture(GL_TEXTURE0+2);
 

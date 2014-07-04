@@ -16,6 +16,7 @@
 // Internal
 #include <lfant/Console.h>
 #include <lfant/Game.h>
+#include <lfant/ScriptSystem.h>
 
 namespace lfant
 {
@@ -46,10 +47,8 @@ boost::posix_time::ptime& Time::GetDate()
 void Time::ResetTime()
 {
 	// Figure something out?
-//	GetGame()->Log("Time::ResetTime: Started");
 	startTime = hclock::now();
 //	glfwSetTime(0.0);
-//	GetGame()->Log("Time::ResetTime: Finished");
 }
 
 void Time::UpdateTimes()
@@ -76,15 +75,14 @@ void Time::Update()
 
 	for(auto i = timers.begin(); i != timers.end(); ++i)
 	{
-	//	GetGame()->Log("Timer '", timers[i]->name, "' updated at ", timers[i]->time);
 		auto& t = *i;
 		if(t.time <= 0.0f)
 		{
 			string name = t.name;
 			timers.erase(i);
 			--i;
-		//	GetGame()->Log("Timer triggered");
 			TriggerEvent(name);
+			GetGame()->Log("timer up '"+name+"'");
 			continue;
 		}
 		t.time -= deltaTime;
@@ -132,6 +130,19 @@ float* Time::GetTimer(string name)
 		}
 	}
 	return nullptr;
+}
+
+void Time::ScriptBind()
+{
+	Script::Class<Time, Subsystem, Sqrat::NoCopy<Time>> inst;
+
+	inst.Var("deltaTime", &Time::deltaTime);
+	inst.Var("frameRate", &Time::frameRate);
+	inst.Var("timeScale", &Time::timeScale);
+
+	inst.Func("SetTimer", &Time::SetTimer);
+
+	inst.Bind();
 }
 
 

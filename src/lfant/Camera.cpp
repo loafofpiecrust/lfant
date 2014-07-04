@@ -66,6 +66,9 @@ void Camera::Serialize(Properties* prop)
 	prop->Value("focalLength", &focalLength);
 	prop->Value("focalDepth", &focalDepth);
 	prop->Value("useDof", &useDof);
+	short mode = 0;
+	prop->Value("mode", &mode);
+	if(prop->mode == Properties::Mode::Input) this->mode = (Mode)mode;
 //	prop->Value("mode", &mode);
 //	mode = (Mode)prop->Get<short>("mode");
 
@@ -80,7 +83,6 @@ void Camera::Serialize(Properties* prop)
 
 void Camera::Init()
 {
-	GetGame()->Log("Updated projection");
 	UpdateProjection();
 
 	if(!GetGame()->scene->mainCamera)
@@ -106,7 +108,6 @@ void Camera::Update()
 
 void Camera::Deinit()
 {
-	GetGame()->Log("mainCamera = ", GetGame()->scene->mainCamera);
 }
 
 /*******************************************************************************
@@ -122,8 +123,7 @@ void Camera::UpdateProjection()
 		case Mode::Perspective:
 		{
 			projection = glm::perspective(fov/aperture, aspectRatio, viewRange.min, viewRange.max);
-		//	projection[10] = -projection[10];
-			GetGame()->Log("projection: ", projection);
+		//	GetGame()->Log("projection: ", projection);
 			break;
 		}
 		case Mode::Orthographic:
@@ -148,7 +148,7 @@ const mat4& Camera::GetView()
 
 void Camera::UpdateView()
 {
-	vec3 pos = owner->transform->GetWorldPosition();
+	vec3 pos = owner->transform->GetRelativeWorldPosition();
 	view = glm::lookAt(
 				pos,
 				pos + owner->transform->GetDirection(),

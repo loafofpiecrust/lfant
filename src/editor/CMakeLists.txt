@@ -59,8 +59,8 @@ target_link_libraries(${PROJECT_NAME}
 	lfant
 	boost
 	dl
-	png
-	jpeg
+#	png
+#	jpeg
 
 	Qt5::Core
 	Qt5::Widgets

@@ -36,8 +36,6 @@ btCollisionShape *BoxCollider::GetShape()
 void BoxCollider::SetSize(vec3 size)
 {
 	lfant::Collider::SetSize(size);
-
-	GetGame()->Log("BoxCollider::SetSize(): final dimensions ", vec3_cast<vec3>(shape->getImplicitShapeDimensions()));
 }
 
 }

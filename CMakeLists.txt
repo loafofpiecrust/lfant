@@ -8,10 +8,12 @@ set(CMAKE_MODULE_PATH "${ROOT}/cmake")
 include(Config)
 include(cotire)
 
+SET(CMAKE_D_SOURCE_FILE_EXTENSIONS d)
+
 set(EDITOR ON CACHE BOOL "Build the editor?")
 option(BUILD_EXAMPLES "Should the examples be built?" ON)
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.0)
 project(lfroot)
 
 message("C++ flags: '${CMAKE_CXX_FLAGS}'")

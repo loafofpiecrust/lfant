@@ -28,6 +28,40 @@
 
 using namespace Sqrat;
 
+class EmployeeName {
+public:
+    const SQChar * firstName;
+    const SQChar * lastName;
+};
+
+TEST_F(SqratTest, CharPtrBindingtoString) {
+    
+    DefaultVM::Set(vm);
+    Class<EmployeeName> name;
+    name.Var(_SC("firstName"), &EmployeeName::firstName)
+    .Var(_SC("lastName"), &EmployeeName::lastName);
+
+    RootTable().Bind(_SC("EmployeeName"), name);
+
+    Script script;
+    script.CompileString(_SC(" \
+        steve <- EmployeeName(); \
+        steve.lastName = \"Jones\"; \
+        \
+        gTest.EXPECT_STR_EQ(steve.lastName, \"Jones\"); \
+        "));
+    if (Sqrat::Error::Instance().Occurred(vm)) {
+        FAIL() << _SC("Compile Failed: ") << Sqrat::Error::Instance().Message(vm);
+    }
+
+    script.Run();
+    if (Sqrat::Error::Instance().Occurred(vm)) {
+        FAIL() << _SC("Run Failed: ") << Sqrat::Error::Instance().Message(vm);
+    }
+    
+}
+
+
 class Employee {
 public:
     Employee() : supervisor(NULL) {}
@@ -137,6 +171,7 @@ TEST_F(SqratTest, ClassInstances) {
         //::print(\"===========\\n\"); \
         //::print(bob); \
         "));
+        
     if (Sqrat::Error::Instance().Occurred(vm)) {
         FAIL() << _SC("Compile Failed: ") << Sqrat::Error::Instance().Message(vm);
     }

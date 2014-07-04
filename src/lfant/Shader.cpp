@@ -182,7 +182,6 @@ uint32 Shader::Compile(uint32 type, const string &path)
 			str = Split(line, "\t <>\"");
 			if(str[0] == "#include")
 			{
-//				GetGame()->Log("including in shader '"+str[1]+"'.");
 				boost::filesystem::path p {path};
 				p = {p.remove_filename().string()+"/"+str[1]};
 				ifstream stream2(p.string());

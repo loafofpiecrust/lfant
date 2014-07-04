@@ -53,7 +53,8 @@ public:
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// Sets up the Script using a string containing a Squirrel script
     ///
-    /// \param script String containing a Squirrel script
+    /// \param script String containing a file path to a Squirrel script
+    /// \param name   Optional string containing the script's name (for errors)
     ///
     /// \remarks
     /// This function MUST have its Error handled if it occurred.
@@ -81,8 +82,9 @@ public:
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// Sets up the Script using a string containing a Squirrel script
     ///
-    /// \param script String containing a Squirrel script
+    /// \param script String containing a file path to a Squirrel script
     /// \param errMsg String that is filled with any errors that may occur
+    /// \param name   Optional string containing the script's name (for errors)
     ///
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     bool CompileString(const string& script, string& errMsg, const string& name = _SC("")) {

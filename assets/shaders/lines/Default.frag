@@ -1,10 +1,10 @@
 #version 330 core
 
 // uniforms
-//uniform sampler2D textureSampler;
+uniform vec3 color;
 
 // inputs
-uniform vec3 color;
+in vec4 vertColor;
 
 // outputs
 out vec4 finalColor;
@@ -13,5 +13,5 @@ void main()
 {
 	// Modify color here.
 //	color = texture2D( textureSampler, UV ).rgba;
-	finalColor = vec4(color, 1);
+	finalColor = vec4(vertColor.rgb, 1);
 }

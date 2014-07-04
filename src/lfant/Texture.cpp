@@ -61,7 +61,6 @@ std::shared_ptr<Texture> Texture::Load(lfant::Properties* prop)
 {
 	string path = "";
 	prop->Value("file", &path);
-//	GetGame()->Log("Tex path: '"+path+"'.");
 //	prop->Value("anisoLevel", anisoLevel);
 
 	return LoadFile(path);
@@ -107,23 +106,17 @@ void Texture::LoadFromImage(gui::Image* image)
 	internalFormat = Format::RGBA;
 	format = Format::RGBA;
 	dataType = DataType::Byte;
-//	GetGame()->Log("about to load img data siz", image->GetSize());
 	InitData(reinterpret_cast<uint8*>(&(image->data[0])));
 }
 
 void Texture::InitData(const uint8* data)
 {
-//	GetGame()->Log("Texture::InitData(): {");
 //	if(id == 0)
 	{
 		glGenTextures(1, &id);
-//		GetGame()->Log("Generating tex id, ", id);
 	}
 	Bind();
 
-//	GetGame()->Log(glGetError());
-
-//	GetGame()->Log("glTexImage2D");
 	if(mode == GL_TEXTURE_2D_MULTISAMPLE)
 	{
 		glTexImage2DMultisample(mode, msaa, (uint)internalFormat, size.x, size.y, false);
@@ -133,7 +126,6 @@ void Texture::InitData(const uint8* data)
 		glTexImage2D(mode, 0, (uint)internalFormat, size.x, size.y, 0, (uint)format, (uint)dataType, data);
 	}
 
-//	GetGame()->Log("glTexParameteri");
 	glTexParameteri(mode, GL_TEXTURE_MAG_FILTER, (uint)scaleFilter);
 	glTexParameteri(mode, GL_TEXTURE_MIN_FILTER, (uint)scaleFilter);
 
@@ -141,9 +133,6 @@ void Texture::InitData(const uint8* data)
 	glTexParameteri(mode, GL_TEXTURE_WRAP_T, (uint)wrapMode);
 
 	Unbind();
-//	GetGame()->Log("}");
-
-//	GetGame()->Log(glGetError());
 }
 
 void Texture::InitData(const byte* data, ivec2 offset)
@@ -215,7 +204,6 @@ std::shared_ptr<Texture> Texture::LoadFile(string path, int mode)
 	{
 		tex->mode = mode;
 	}
-//	GetGame()->Log("bouts to load a png at ", game->GetAssetPath(path).string());
 	tex->LoadPNG(path);
 	return tex;
 }
@@ -226,11 +214,9 @@ void Texture::LoadPNG(string path)
 	uint error = lodepng::decode(data, size.x, size.y, path);
 	if(error != 0)
 	{
-//		GetGame()->Log("LoadPNG: Error, ", lodepng_error_text(error));
 		return;
 	}
 	InitData(&data[0]);
-//	GetGame()->Log("Texture::SerializePNG: Image size: (", size.x, ", ", size.y, ").");
 }
 
 void Texture::LoadJPEG(string path)
@@ -249,13 +235,12 @@ void Texture::LoadBMP(string path)
 	FILE* file = fopen(path.c_str(), "rb");
 	if (!file)
 	{
-//		GetGame()->Log("Image " + path + " could not be loaded");
 		return;
 	}
 
 	if (fread(header, 1, 54, file) != 54 || (header[0] != 'B' || header[1] != 'M'))
 	{
-//		GetGame()->Log("Image " + path + " is not a correct BMP file");
+		fclose(file);
 		return;
 	}
 
@@ -264,8 +249,6 @@ void Texture::LoadBMP(string path)
 	imageSize = *(int*)&(header[0x22]);
 	size.x = *(int*)&(header[0x12]);
 	size.y = *(int*)&(header[0x16]);
-
-//	GetGame()->Log("Read image header");
 
 	// Make up any missing header data
 	if (imageSize == 0) imageSize = size.x * size.y * 3;
@@ -278,7 +261,6 @@ void Texture::LoadBMP(string path)
 	// Close file
 	fclose(file);
 
-//	GetGame()->Log("Read data and closed file");
 	if(id == 0)
 	{
 		glGenTextures(1, &this->id);
@@ -377,7 +359,6 @@ void Texture::LoadDDS(string path)
 
 	free(buffer);
 	id = textureID;
-//	GetGame()->Log("Finished loading DDS texture");
 }
 
 }

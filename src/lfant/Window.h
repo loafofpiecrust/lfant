@@ -4,19 +4,14 @@
 
 struct GLFWwindow;
 
-namespace sf {
-class Window;
-class RenderWindow;
-}
-
 namespace lfant {
-	
+
 namespace editor {
 namespace gui {
-	class GLCanvas; 
+	class GLCanvas;
 }
 }
-	
+
 class Window : public Subsystem
 {
 	friend class editor::gui::GLCanvas;
@@ -24,7 +19,7 @@ public:
 	Window(Game* game);
 	virtual ~Window();
 
-	
+
 	virtual void Serialize(Properties* prop);
 
 	virtual void Init();
@@ -52,9 +47,9 @@ public:
 	void Close();
 
 	bool IsOpen();
-	
+
 	bool SetVsync(int enable);
-	
+
 	// Multi-window functions. Currently only partially supported
 	void SetCurrent();
 
@@ -74,7 +69,7 @@ private:
 	static void OnKey(GLFWwindow* window, int key, int scancode, int action, int mods);
 	static void OnChar(GLFWwindow* window, uint letter);
 
-	ptr<sf::RenderWindow> window;
+//	ptr<sf::RenderWindow> window;
 	GLFWwindow* handle = nullptr;
 
 	ivec2 resolution {800,600};

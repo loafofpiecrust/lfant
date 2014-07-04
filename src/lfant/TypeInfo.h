@@ -71,19 +71,19 @@ auto Name()->typename enable_if<is_ptr<T>::value, string>::type
 }
 
 template<typename T>
-auto Name(T p1)->typename enable_if<!is_ptr<T>::value && !is_pointer<T>::value, string>::type
+auto Name(const T& p1)->typename enable_if<!is_ptr<T>::value && !is_pointer<T>::value, string>::type
 {
 	return type::Demangle(typeid(p1).name());
 }
 
 template<typename T>
-auto Name(T& p1)->typename enable_if<is_ptr<T>::value, string>::type
+auto Name(const T& p1)->typename enable_if<is_ptr<T>::value, string>::type
 {
 	return type::Demangle(typeid(*p1).name());
 }
 
 template<typename T>
-auto Name(T p1) -> typename enable_if<is_pointer<T>::value, string>::type
+auto Name(const T& p1) -> typename enable_if<is_pointer<T>::value, string>::type
 {
 	return type::Demangle(typeid(*p1).name());
 }
@@ -103,13 +103,13 @@ string Name()
 }
 
 template<typename T2, typename T1>
-bool Compare(T1 p1, T2 p2)
+bool Compare(const T1& p1, const T2& p2)
 {
 	return type::Name(p1) == type::Name(p2);
 }
 
 template<typename T2, typename T1>
-bool Compare(T1 p1)
+bool Compare(const T1& p1)
 {
 	return type::Name(p1) == type::Name<T2>();
 }

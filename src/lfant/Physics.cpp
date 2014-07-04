@@ -23,7 +23,7 @@
 #include <lfant/Console.h>
 #include "Window.h"
 
-#include <SFML/Graphics.hpp>
+//#include <SFML/Graphics.hpp>
 
 
 namespace lfant
@@ -81,14 +81,11 @@ void Physics::Serialize(Properties* prop)
 void Physics::Init()
 {
 	collisionConfig = new btDefaultCollisionConfiguration();
-	GetGame()->Log("Physics::Init: Collision config created.");
 	dispatcher = new btCollisionDispatcher(collisionConfig);
-	GetGame()->Log("Physics::Init: Collision dispatcher created.");
 	broadphase = new btDbvtBroadphase();
-	GetGame()->Log("Physics::Init: Broadphase created.");
 	solver = new btSequentialImpulseConstraintSolver();
-	GetGame()->Log("Physics::Init: Constraint solver created.");
 	world = new btDiscreteDynamicsWorld( dispatcher, broadphase, solver, collisionConfig );
+	GetGame()->Log("Physics::Init: Physics world created.");
 
 	world->setInternalTickCallback(&Physics::OnTick);
 
@@ -101,8 +98,6 @@ void Physics::Init()
 //	gContactDestroyedCallback = &Physics::OnCollideExit;
 	gCollisionEndedCallback = &Physics::OnCollideExit;
 
-	GetGame()->Log("Physics::Init: Contact callbacks set.");
-
 //	SetGravity(initGravity);
 
 	LoadFile("settings/physics.prop");
@@ -112,7 +107,7 @@ void Physics::Update()
 {
 //	if(world)
 	{
-		world->stepSimulation(GetGame()->time->deltaTime, 1);
+		world->stepSimulation(GetGame()->time->deltaTime, 10);
 	//	world->stepSimulation(GetGame()->time->deltaTime, 0);
 	//	world->stepSimulation(1.0f/100.0f, 1);
 	}
@@ -150,7 +145,6 @@ vec3 Physics::GetGravity() const
 
 void Physics::SetGravity(vec3 grav)
 {
-	GetGame()->Log("Physics::SetGravity(", grav, ")");
 	world->setGravity(vec3_cast<btVector3>(grav));
 }
 
@@ -222,43 +216,42 @@ void Physics::OnCollide(string func, btPersistentManifold* manifold)
 		}
 	}*/
 
-//	GetGame()->Log("Collision called, OnCollide", func, ", on entity ", body1->owner->GetName()+" and "+body0->owner->GetName());
+	std::cout << "Collision called, OnCollide" <<func<< ", on entity "<< body1->owner->GetName()+" and "+body0->owner->GetName()+"\n";
 
 	Collision col;
 	col.contacts.push_back({vec3_cast<vec3>(manifold->getContactPoint(0).getPositionWorldOnA()), vec3_cast<vec3>(manifold->getContactPoint(0).getPositionWorldOnB())});
 
 	col.first = body1;
 	col.second = body0;
-	body1->TriggerEvent("Collide"+func, &col);
+	body1->owner->TriggerEvent("CollideEnter", (lfant::Collision*)&col);
 
 	col.first = body0;
 	col.second = body1;
-	body0->TriggerEvent("Collide"+func, &col);
+	body0->owner->TriggerEvent("CollideEnter", (lfant::Collision*)&col);
 
 //	return true;
 }
 
 void Physics::OnCollideEnter(btPersistentManifold* manifold)
 {
-//	GetGame()->Log("Collision enter");
 	OnCollide("Enter", manifold);
 }
 
 bool Physics::OnCollideStay(btManifoldPoint& cp, void* body0, void* body1)
 {
-	std::cout << ("Collision stay");
+//	std::cout << ("Collision stay");
 	//	return OnCollide( "Stay", cp, colObj0, partId0, index0, colObj1, partId1, index1 );
 	return false;
 }
 
 void Physics::OnCollideExit(btPersistentManifold* manifold)
 {
-	std::cout << ("Collision exit\n");
+//	std::cout << ("Collision exit\n");
 	//	return OnCollide( "Exit", cp, colObj0, partId0, index0, colObj1, partId1, index1 );
 //	return false;
 }
 
-void Physics::OnTick(btDynamicsWorld* world, float delta)
+void Physics::OnTick(btDynamicsWorld* world, double delta)
 {
 //	game->scene->FixedUpdate();
 }

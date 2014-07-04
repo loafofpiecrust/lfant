@@ -425,11 +425,11 @@ void ParticleSystemGPU::Render()
 //	material.shader->SetUniform("mvp", mvp);
 	material.shader->SetUniform("projection", GetGame()->scene->mainCamera->GetProjection());
 	material.shader->SetUniform("view", GetGame()->scene->mainCamera->GetView());
-	material.shader->SetUniform("cameraPosition", GetGame()->scene->mainCamera->owner->transform->GetWorldPosition());
+	material.shader->SetUniform("cameraPosition", GetGame()->scene->mainCamera->owner->transform->GetRelativeWorldPosition());
 
 	if(inheritTransform)
 	{
-		material.shader->SetUniform("systemPosition", owner->transform->GetWorldPosition());
+		material.shader->SetUniform("systemPosition", owner->transform->GetRelativeWorldPosition());
 	}
 	else
 	{

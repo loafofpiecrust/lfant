@@ -1,8 +1,6 @@
-// General game settings
-game
 {
-	orgName = lazyfox
-	gameName = galaga
+	orgName = piecrust
+	gameName = loaf
 
-	defaultScene = scenes/fps.scene
+//	defaultScene = scenes/main.prop
 }

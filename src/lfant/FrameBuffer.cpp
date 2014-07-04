@@ -45,7 +45,6 @@ FrameBuffer::~FrameBuffer()
 
 void FrameBuffer::Clear()
 {
-	GetGame()->Log("Clearing framebuffer");
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
@@ -54,7 +53,7 @@ void FrameBuffer::Init()
 	glGenFramebuffers(1, &id);
 	glBindFramebuffer(GL_FRAMEBUFFER, id);
 
-	GetGame()->Log(glGetError());
+//	GetGame()->Log(glGetError());
 
 	drawBuffers.clear();
 	Texture* tex = nullptr;
@@ -84,9 +83,7 @@ void FrameBuffer::Init()
 	{
 	/*	glGenRenderbuffers(1, &depthBuffer);
 		glBindRenderbuffer(GL_RENDERBUFFER, depthBuffer);
-		GetGame()->Log("stuff lel ", depthBuffer);
 		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, rect.width, rect.height);
-		GetGame()->Log(glGetError());
 		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, depthBuffer);
 	*/
 		if(depthTexture)
@@ -204,20 +201,17 @@ void FrameBuffer::BindTextures(Shader* sh)
 
 FrameBuffer* FrameBuffer::GetCurrent()
 {
-//	GetGame()->Log("Getting current fbo, ", FrameBuffer::current);
 	return FrameBuffer::current;
 }
 
 void FrameBuffer::Bind()
 {
-//	GetGame()->Log("Binding FBO ", id);
 	glBindFramebuffer(GL_FRAMEBUFFER, id);
 	FrameBuffer::current = this;
 }
 
 void FrameBuffer::Unbind()
 {
-//	GetGame()->Log("Unbinding FBO");
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	FrameBuffer::current = nullptr;
 }
@@ -282,12 +276,9 @@ void FrameBuffer::BeginRender()
 //	glGenVertexArrays(1, &VertexArrayID);
 //	glBindVertexArray(VertexArrayID);
 
-	GetGame()->Log("FrameBuffer::BeginRender() {");
 //	shader = new Shader;
-	GetGame()->Log("Shader::LoadFile()");
 //	shader->LoadFile("shaders/FrameBuffer.vert", "shaders/FrameBuffer.frag");
 	shader = Shader::LoadFile("shaders/FrameBuffer.vert", "shaders/FrameBuffer.frag");
-	GetGame()->Log(glGetError());
 
 	for(uint i = 0; i < textures.size(); ++i)
 	{
@@ -297,9 +288,7 @@ void FrameBuffer::BeginRender()
 	{
 		shader->AddUniform(depthTexture->path);
 	}
-	GetGame()->Log(glGetError());
 
-	GetGame()->Log("Add uniforms to shader");
 	shader->AddUniform("cameraRange");
 	shader->AddUniform("focalDepth");
 	shader->AddUniform("focalLength");
@@ -307,9 +296,7 @@ void FrameBuffer::BeginRender()
 	shader->AddUniform("focus");
 	shader->AddUniform("textureSize");
 	shader->AddUniform("useDof");
-
-
-	GetGame()->Log("Make buffers");
+	shader->AddUniform("ambientLight");
 
 	posBuffer.push_back(vec2(-1, -1));
 	posBuffer.push_back(vec2(1, -1));
@@ -320,7 +307,6 @@ void FrameBuffer::BeginRender()
 	posBuffer.push_back(vec2(1, 1));
 
 	Geometry::CreateBuffer(posBuffer, GL_ARRAY_BUFFER);
-	GetGame()->Log("}");
 
 	GetGame()->Log(glGetError());
 }
@@ -345,6 +331,7 @@ void FrameBuffer::Render()
 		shader->SetUniform("useDof", GetGame()->scene->mainCamera->useDof);
 	}
 	shader->SetUniform("textureSize", (vec2)GetGame()->window->GetSize());
+	shader->SetUniform("ambientLight", GetGame()->renderer->ambientLight);
 //	GetGame()->Log(glGetError());
 
 	for(uint32 i = 0; i < textures.size(); ++i)

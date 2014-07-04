@@ -430,7 +430,7 @@ struct Var<const T* const> {
 };
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// Used to get and push class instances to and from the stack as SharedPtr
+/// Used to get (as copies) and push (as references) class instances to and from the stack as a SharedPtr
 ///
 /// \tparam T Type of instance (usually doesnt need to be defined explicitly)
 ///
@@ -468,8 +468,8 @@ struct Var<SharedPtr<T> > {
     /// \param value Value to push on to the VM's stack
     ///
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    static void push(HSQUIRRELVM vm, SharedPtr<T> value) {
-        PushVarR(vm, value.Get());
+    static void push(HSQUIRRELVM vm, SharedPtr<T>& value) {
+        PushVarR(vm, *value);
     }
 };
 
@@ -804,41 +804,6 @@ struct Var<string> {
 };
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// Used to get and push string references to and from the stack as copies (strings are always copied)
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template<>
-struct Var<string&> {
-
-    string value; ///< The actual value of get operations
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// Attempts to get the value off the stack at idx as a string
-    ///
-    /// \param vm  Target VM
-    /// \param idx Index trying to be read
-    ///
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    Var(HSQUIRRELVM vm, SQInteger idx) {
-        const SQChar* ret;
-        sq_tostring(vm, idx);
-        sq_getstring(vm, -1, &ret);
-        value = string(ret);
-        sq_pop(vm,1);
-    }
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// Called by Sqrat::PushVarR to put a string on the stack
-    ///
-    /// \param vm    Target VM
-    /// \param value Value to push on to the VM's stack
-    ///
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    static void push(HSQUIRRELVM vm, const string & value) {
-        sq_pushstring(vm, value.c_str(), -1);
-    }
-};
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// Used to get and push const string references to and from the stack as copies (strings are always copied)
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<>
@@ -899,41 +864,6 @@ struct Var<std::string> {
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// Called by Sqrat::PushVar to put a string on the stack
-    ///
-    /// \param vm    Target VM
-    /// \param value Value to push on to the VM's stack
-    ///
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    static void push(HSQUIRRELVM vm, const std::string & value) {
-        sq_pushstring(vm, string_to_wstring(value).c_str(), -1);
-    }
-};
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// Used to get and push std::string references to and from the stack when SQChar is not char (must define SQUNICODE)
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template<>
-struct Var<std::string&> {
-
-    std::string value; ///< The actual value of get operations
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// Attempts to get the value off the stack at idx as a string
-    ///
-    /// \param vm  Target VM
-    /// \param idx Index trying to be read
-    ///
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    Var(HSQUIRRELVM vm, SQInteger idx) {
-        const SQChar* ret;
-        sq_tostring(vm, idx);
-        sq_getstring(vm, -1, &ret);
-        value = wstring_to_string(string(ret));
-        sq_pop(vm,1);
-    }
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// Called by Sqrat::PushVarR to put a string on the stack
     ///
     /// \param vm    Target VM
     /// \param value Value to push on to the VM's stack
@@ -1096,6 +1026,40 @@ public:
 };
 #endif
 
+
+// Non-referencable type definitions
+template<class T> struct is_referencable {static const bool value = true;};
+
+#define SCRAT_MAKE_NONREFERENCABLE( type ) \
+ template<> struct is_referencable<type> {static const bool value = false;};
+
+SCRAT_MAKE_NONREFERENCABLE(unsigned int)
+SCRAT_MAKE_NONREFERENCABLE(signed int)
+SCRAT_MAKE_NONREFERENCABLE(unsigned long)
+SCRAT_MAKE_NONREFERENCABLE(signed long)
+SCRAT_MAKE_NONREFERENCABLE(unsigned short)
+SCRAT_MAKE_NONREFERENCABLE(signed short)
+SCRAT_MAKE_NONREFERENCABLE(unsigned char)
+SCRAT_MAKE_NONREFERENCABLE(signed char)
+SCRAT_MAKE_NONREFERENCABLE(unsigned long long)
+SCRAT_MAKE_NONREFERENCABLE(signed long long)
+SCRAT_MAKE_NONREFERENCABLE(float)
+SCRAT_MAKE_NONREFERENCABLE(double)
+SCRAT_MAKE_NONREFERENCABLE(bool)
+SCRAT_MAKE_NONREFERENCABLE(string)
+
+#ifdef _MSC_VER
+#if defined(__int64)
+SCRAT_MAKE_NONREFERENCABLE(unsigned __int64)
+SCRAT_MAKE_NONREFERENCABLE(signed __int64)
+#endif
+#endif
+
+#ifdef SQUNICODE
+SCRAT_MAKE_NONREFERENCABLE(std::string)
+#endif
+
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// Pushes a value on to a given VM's stack
 ///
@@ -1106,7 +1070,8 @@ public:
 ///
 /// \remarks
 /// What this function does is defined by Sqrat::Var template specializations,
-/// and thus you can create custom functionality for it by making new ones.
+/// and thus you can create custom functionality for it by making new template specializations.
+/// When making a custom type that is not referencable, you must use SCRAT_MAKE_NONREFERENCABLE( type )
 ///
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<class T>
@@ -1134,12 +1099,17 @@ inline void PushVar<int>(HSQUIRRELVM vm, int value) {
 ///
 /// \remarks
 /// What this function does is defined by Sqrat::Var template specializations,
-/// and thus you can create custom functionality for it by making new ones.
+/// and thus you can create custom functionality for it by making new template specializations.
+/// When making a custom type that is not referencable, you must use SCRAT_MAKE_NONREFERENCABLE( type )
 ///
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<class T>
-inline void PushVarR(HSQUIRRELVM vm, T & value) {
-    Var<T&>::push(vm, value);
+inline void PushVarR(HSQUIRRELVM vm, T& value) {
+    if (!is_pointer<T>::value && is_referencable<typename remove_cv<T>::type>::value) {
+        Var<T&>::push(vm, value);
+    } else {
+        PushVar(vm, value);
+    }
 }
 
 }

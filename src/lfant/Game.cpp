@@ -31,7 +31,7 @@
 #include <lfant/OpenCL.h>
 #endif
 
-#include "Game.h"
+//#include "Game.h"
 #include "Scene.h"
 
 // External
@@ -78,7 +78,7 @@ Game::Game() :
 	programFolder(GetProgramDirRaw()),
 	gameFolder(boost::filesystem::canonical(boost::filesystem::path(programFolder+"/../../..")).string())
 
-	,console {new Console(this)}
+//	,console {new Console(this)}
 	,time {new Time(this)}
 //	,fileSystem {new FileSystem(this)}
 	,systemInfo {new SystemInfo(this)}
@@ -119,7 +119,10 @@ string Game::GetProgramDir()
 
 void Game::Init()
 {
-	console->Init();
+//	console->Init();
+
+	logFile.open(GetProgramDir()+"/"+logName);
+	logFile.clear();
 
 	Log("Initing time");
 	time->Init();
@@ -169,20 +172,16 @@ void Game::Update()
 {
 //	network->mutex.lock();
 
-	time->Update();
 	scene->Update();
+	time->Update();
 	physics->Update();
 	input->Update();
 	if(standAlone)
 	{
 		window->Update();
-	}
-//	network->Update();
-
-	if(standAlone)
-	{
 		renderer->Update();
 	}
+//	network->Update();
 //	network->mutex.unlock();
 }
 
@@ -195,23 +194,10 @@ void Game::Update()
 
 void Game::Serialize(Properties* prop)
 {
-	GetGame()->Log("mode: ", (int)prop->mode, ", smode: ", (int)prop->saveMode);
-	for(auto& val : prop->values)
-	{
-		GetGame()->Log("value: ", val.first, " of type '", boost::any_cast<string>(val.second), "'");
-		if(val.first == "orgName")
-		{
-			GetGame()->Log("this is orgname");
-		}
-	}
-	auto iter = prop->values.find("orgName");
-	if(iter != prop->values.end())
-	{
-		GetGame()->Log("we fund it");
-	}
 	prop->Value<string>("orgName", &orgName);
 	prop->Value("gameName", &gameName);
 	prop->Value("defaultScene", &defaultScene);
+	prop->Value("logFile", &logName);
 	GetGame()->Log("Game name: "+gameName);
 	GetGame()->Log("Game loading, default scene is '"+defaultScene+"'.");
 }
@@ -220,6 +206,10 @@ void Game::ScriptBind()
 {
 	Script::Class<Game, Object> inst;
 	/// @todo Figure out how to bind and access smart pointers
+
+	inst.Var("scene", &Game::scene);
+	inst.Var("time", &Game::time);
+	inst.Var("input", &Game::input);
 
 	inst.Bind();
 }
@@ -240,8 +230,10 @@ void Game::Destroy()
 	if(!destroy) destroy = true;
 //	(*threads.end()).join();
 
+
 	Deinit();
-	scene->Destroy(); scene.reset();
+	scene->Destroy(); //scene.reset();
+	delete scene;
 	scriptSystem->Destroy(); scriptSystem.reset();
 	GetGame()->Log("Scene destroyed.");
 //	openCL->Destroy();
@@ -255,7 +247,10 @@ void Game::Destroy()
 	systemInfo->Destroy();
 //	fileSystem->Destroy();
 	time->Destroy();
-	console->Destroy();
+//	console->Destroy();
+	logFile.close();
+	delete time;
+	delete input;
 //	delete this;
 }
 

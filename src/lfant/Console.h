@@ -88,7 +88,7 @@ public:
 		bool readOnly;
 
 		Variable(string name, float val, string help = "", bool readOnly = false) :
-			name(name), value(val), help(help), readOnly(readOnly)
+			name(name), help(help), value(val), readOnly(readOnly)
 		{
 		}
 	};
@@ -105,37 +105,6 @@ public:
 
 	void Input(string line);
 
-	template<typename T = string>
-	void Print(const T& msg)
-	{
-		LinePrint(msg);
-		LinePrint("\n");
-	}
-
-	template<typename T = string>
-	auto LinePrint(T msg)->typename std::enable_if<boost::is_fundamental<T>::value || boost::is_pointer<T>::value || boost::is_same<string, T>::value, void>::type
-	{
-	//	logFile.open(logName, ios_base::app);
-	//	string strMsg = lexical_cast<string>(msg);
-		// Print to console window
-		std::cout << msg;
-		// Append message to file
-		logFile << msg;
-
-	//	logFile.close();
-	}
-
-	template<typename T = string>
-	auto LinePrint(T msg)->typename std::enable_if<!boost::is_fundamental<T>::value && !boost::is_pointer<T>::value && !is_ptr<T>::value && !boost::is_same<string, T>::value, void>::type
-	{
-		LinePrint(lexical_cast<string>(msg));
-	}
-
-	template<typename T>
-	auto LinePrint(const T& msg)->typename std::enable_if<is_ptr<T>::value, void>::type
-	{
-		LinePrint(msg.get());
-	}
 
 	void RegisterCommand(CommandDefault::funcTypeRaw func, string name, string help = "");
 	void RegisterCommand(CommandSimple::funcTypeRaw func, string name, string help = "");
@@ -171,8 +140,6 @@ protected:
 private:
 	std::deque<ptr<Command>> commands;
 
-	string logName = "lfant.log";
-	std::ofstream logFile;
 };
 
 

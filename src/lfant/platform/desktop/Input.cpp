@@ -10,10 +10,10 @@
 // External
 #include <boost/algorithm/string.hpp>
 #include <GLFW/glfw3.h>
-#include <SFML/Window/Keyboard.hpp>
-#include <SFML/Window/Mouse.hpp>
-#include <SFML/Window/Joystick.hpp>
-#include <SFML/Graphics/RenderWindow.hpp>
+//#include <SFML/Window/Keyboard.hpp>
+//#include <SFML/Window/Mouse.hpp>
+//#include <SFML/Window/Joystick.hpp>
+//#include <SFML/Graphics/RenderWindow.hpp>
 
 namespace lfant {
 
@@ -147,7 +147,6 @@ void Input::Init()
 
 void Input::OnKeyPress(int key, int action, int mods)
 {
-//	GetGame()->Log("Key pressed, ", (char)key);
 	TriggerEvent("KeyPress", (uint16)key, action);
 	TriggerEvent("KeyPress", (uint16)key, action, mods);
 	for(auto& axis : axes)

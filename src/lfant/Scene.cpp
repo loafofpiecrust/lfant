@@ -28,6 +28,7 @@
 #include <lfant/Physics.h>
 #include <lfant/Network.h>
 #include <lfant/Renderer.h>
+#include <lfant/ScriptSystem.h>
 
 // External
 
@@ -43,6 +44,16 @@ Scene::~Scene()
 {
 }
 
+void Scene::ScriptBind()
+{
+	Script::Class<Scene, Subsystem, Sqrat::NoCopy<Scene>> inst;
+
+	inst.Func("Clear", &Scene::Clear);
+	inst.Prop("root", &Scene::GetRoot);
+
+	inst.Bind();
+}
+
 void Scene::Init()
 {
 	Subsystem::Init();
@@ -50,7 +61,7 @@ void Scene::Init()
 	root = new Entity(this);
 	if(game->defaultScene != "")
 	{
-		GetGame()->Log("About to load '"+game->defaultScene+"' as default.");
+		GetGame()->Log("Loading scene '"+game->defaultScene+"'...");
 		LoadFile(game->defaultScene);
 	}
 }
@@ -93,7 +104,6 @@ void Scene::Serialize(Properties *prop)
 {
 	double t = game->time->GetTime();
 	currentId = 0;
-	GetGame()->Log("Scene::Serialize: Loading scene node");
 	if(prop->GetMode() == Properties::Mode::Input)
 	{
 		for(uint32 i = 0; i < prop->GetChildCount(); ++i)
@@ -103,7 +113,6 @@ void Scene::Serialize(Properties *prop)
 			{
 				if(p->name == "Physics")
 				{
-					GetGame()->Log("Loading physics from scene");
 					game->physics->Serialize(p);
 				}
 				else if(p->name == "Network")

@@ -264,14 +264,16 @@ public:
 /// \return String containing a nice error message
 ///
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-inline string LastErrorString( HSQUIRRELVM vm ) {
+inline string LastErrorString(HSQUIRRELVM vm) {
     const SQChar* sqErr;
     sq_getlasterror(vm);
-    if(sq_gettype(vm, -1) == OT_NULL) {
+    if (sq_gettype(vm, -1) == OT_NULL) {
+		sq_pop(vm, 1);
         return string();
     }
     sq_tostring(vm, -1);
     sq_getstring(vm, -1, &sqErr);
+    sq_pop(vm, 2);
     return string(sqErr);
 }
 
@@ -505,15 +507,6 @@ public:
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// Checks if there is an associated managed object
-    ///
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    operator bool() const
-    {
-        return m_Ptr != NULL;
-    }
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// Checks if there is NOT an associated managed object
     ///
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -667,6 +660,24 @@ public:
         return m_Ptr;
     }
 };
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// @cond DEV
+/// used internally to get and manipulate the underlying type of variables
+/// retrieved from cppreference.com
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+template<class T> struct remove_const                                                {typedef T type;};
+template<class T> struct remove_const<const T>                                       {typedef T type;};
+template<class T> struct remove_volatile                                             {typedef T type;};
+template<class T> struct remove_volatile<volatile T>                                 {typedef T type;};
+template<class T> struct remove_cv                                                   {typedef typename remove_volatile<typename remove_const<T>::type>::type type;};
+template<class T> struct is_pointer_helper                                           {static const bool value = false;};
+template<class T> struct is_pointer_helper<T*>                                       {static const bool value = true;};
+template<class T> struct is_pointer_helper<SharedPtr<T> >                            {static const bool value = true;};
+template<class T> struct is_pointer : is_pointer_helper<typename remove_cv<T>::type> {};
+template<class T> struct is_reference                                                {static const bool value = false;};
+template<class T> struct is_reference<T&>                                            {static const bool value = true;};
+/// @endcond
 
 }
 

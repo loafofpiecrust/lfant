@@ -10,27 +10,25 @@
 
 namespace lfant {
 
+ScriptComp::~ScriptComp()
+{
+}
+
 ScriptComp* ScriptComp::LoadScript(Game* game, string path)
 {
 //	ScriptComp* comp;
 	Script* script = Script::LoadFile(path);
 	script->Run();
 
-	/*
-	Sqrat::Function func = game->scriptSystem->vm.GetRootTable().GetFunction("Create");
-	if(func.IsNull())
-	{
-		std::cout << "shit we farwqed up\n";
-		return nullptr;
-	}
+	fs::path p {path};
+	string className = p.replace_extension().filename().string();
 
-	auto comp = func.Evaluate<ScriptComp>();
-	std::cout << "ScriptComp*: " << comp.Get() << "\n";
+	Sqrat::Script scr;
+	scr.CompileString("instance <- "+className+"();");
+	scr.Run();
 
-	auto obj = func.Evaluate<Sqrat::Object>();
-	std::cout << "Object: " << obj << "\n";
-	*/
 	Sqrat::Object obj = game->scriptSystem->vm.GetRootTable().GetSlot("instance");
+//	Sqrat::Object obj = scr.GetSlot("instance");
 	if(obj.IsNull())
 	{
 		std::cout << "shit we farwqed up\n";
@@ -38,21 +36,17 @@ ScriptComp* ScriptComp::LoadScript(Game* game, string path)
 	}
 
 	ScriptComp* pcomp = obj.Cast<ScriptComp*>();
-	std::cout << "pointer: " << pcomp << "\n";
+	game->scriptSystem->vm.GetRootTable().SetInstance<ScriptComp*>("instance", nullptr);
+//	Sqrat::Object cls = game->scriptSystem->vm.GetRootTable().GetSlot("Elevator");
 
-//	std::cout << game->scriptSystem->instComp << "\n";
-
-//	ScriptComp* comp = obj.Cast<ScriptComp*>();
-//	std::cout << comp << "\n";
-
-	Sqrat::Object cls = game->scriptSystem->vm.GetRootTable().GetSlot("Elevator");
-
-	std::cout << "pointer: " << cls.GetSize() << "\n";
-
-	pcomp->SetScriptObject(obj);
-//	comp->SetScriptObject(obj);
-//	thread::Sleep(5000);
-//	return comp;
+	if(!pcomp)
+	{
+		std::cout << "we got a null\n";
+	}
+//	pcomp->SetScriptObject(obj);
+	std::cout << "counter: " << pcomp->counter << "\n";
+//	std::cout << "script obj1: " << obj.Cast<Object*>()  << "\n";
+//	thread::Sleep(2000);
 	return pcomp;
 }
 
@@ -71,9 +65,13 @@ void ScriptComp::ScriptBind()
 
 void ScriptComp::SetScriptObject(Sqrat::Object obj)
 {
+	std::cout << "setting up script obj\n";
+//	std::cout << "script obj2: " << obj.Cast<Object*>() << "\n";
 	func_init = Sqrat::Function(obj, "Init");
 	func_update = Sqrat::Function(obj, "Update");
 	func_deinit = Sqrat::Function(obj, "Deinit");
+	func_serial = Sqrat::Function(obj, "Serialize");
+	object = obj;
 
 	if(func_update.IsNull())
 	{
@@ -87,6 +85,7 @@ void ScriptComp::Init()
 //	lfant::Component::Init();
 	if(!func_init.IsNull())
 	{
+		std::cout << "about to init\n";
 		func_init.Execute();
 	}
 }
@@ -94,9 +93,9 @@ void ScriptComp::Init()
 void ScriptComp::Update()
 {
 //	lfant::Component::Update();
+//	std::cout << "calling the shit";
 	if(!func_update.IsNull())
 	{
-	//	std::cout << "calling the shit";
 		func_update.Execute(GetGame()->time->deltaTime);
 	}
 }
@@ -110,9 +109,51 @@ void ScriptComp::Deinit()
 	}
 }
 
-void ScriptComp::ConnectScriptComponent(string name, Sqrat::Object obj)
+void ScriptComp::DestroyFromScript(ScriptComp* comp)
 {
-	ConnectEvent(owner, "SetComponent"+name, obj);
+	if(!comp->object.IsNull())
+	{
+		comp->GetGame()->Log("Releasing object from script.");
+		comp->object.Release();
+	}
+}
+
+void ScriptComp::Serialize(Properties* prop)
+{
+	Component::Serialize(prop);
+	if(!func_serial.IsNull())
+	{
+		func_serial.Execute(prop);
+	}
+/*	auto tb = (Sqrat::Table)object;
+	if(prop->mode == Properties::Mode::Input)
+	{
+		for(auto& val : prop->values)
+		{
+			Sqrat::Object child = tb.GetSlot(val.first.c_str());
+			if(child.IsNull()) continue;
+			string avalue = boost::any_cast<string>(val.second);
+			switch(child.GetType())
+			{
+			case OT_FLOAT: tb.SetValue(val.first.c_str(), lexical_cast<float>(avalue)); break;
+			case OT_INTEGER: tb.SetValue(val.first.c_str(), lexical_cast<int>(avalue)); break;
+			case OT_BOOL: tb.SetValue(val.first.c_str(), lexical_cast<bool>(avalue)); break;
+			case OT_STRING: tb.SetValue(val.first.c_str(), avalue); break;
+			default: break;
+			}
+			GetGame()->Log("\n\nWe saved some stuff\n\n");
+		}
+	}*/
+}
+
+void ScriptComp::ConnectScriptComponent(string name, Sqrat::Table obj, string item)
+{
+	Component* comp = GetOwner()->GetComponent(name);
+	if(comp)
+	{
+		obj.SetInstance(item.c_str(), comp);
+	}
+	ConnectEvent(owner, "SetComponent"+name, obj.GetSlot(item.c_str()));
 //	Component* val = (owner->GetComponent(name));
 /*	if(!val)
 	{

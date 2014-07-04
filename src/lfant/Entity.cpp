@@ -93,7 +93,6 @@ void Entity::Clone(Entity* ent, string name, Entity* parent) const
 
 void Entity::Init()
 {
-	GetGame()->Log("Entity::Init: Touch.");
 	Object::Init();
 
 //	if(!transform)
@@ -228,15 +227,27 @@ void Entity::AddComponent(Component* comp)
 	// @note Needed to call comp->Deinit() here?
 	if(comp->GetOwner())
 	{
-		comp->GetOwner()->RemoveComponent(comp);
+		if(comp->GetOwner() == this)
+		{
+			comp->Init();
+			return;
+		}
+
+		for(auto it = comp->GetOwner()->components.begin(); it != comp->GetOwner()->components.end(); ++it)
+		{
+			if(*it == comp)
+			{
+				*it = nullptr;
+				comp->GetOwner()->components.erase(it);
+				break;
+			}
+		}
 	}
 
 	GetGame()->Log("Entity::AddComponent(", comp, ") to ", this);
 	components.push_back(comp);
 	comp->owner = this;
 	comp->Init();
-//	TriggerEvent("AddComponent", comp);
-	GetGame()->Log("Entity::AddComponent: Calling ", "OnSetComponent"+type::Descope(type::Name(comp)));
 	TriggerEvent("OnSetComponent"+type::Descope(type::Name(comp)), comp);
 	TriggerEvent("AddComponent", comp);
 }
@@ -245,17 +256,25 @@ void Entity::Deinit()
 {
 	Object::Deinit();
 
-	GetGame()->Log("Entity::Destroy: Destroying ", children.size()," children.");
+	GetGame()->Log("Deiniting entity '"+GetName()+"'.");
+
 	for(auto& child : children)
 	{
 		child->Deinit();
 	}
 	children.clear();
 
-	GetGame()->Log("Entity::Destroy: Destroying ", components.size()," components.");
-	for(auto& compo : components)
+	for(auto it = components.begin(); it != components.end(); ++it)
 	{
+		auto& compo = *it;
 		if(compo) compo->Deinit();
+		if(type::Name(compo.get()) == type::Name<ScriptComp>())
+		{
+		//	((ScriptComp*)compo.get())->DestroyFromScript();
+			ScriptComp::DestroyFromScript((ScriptComp*)compo.get());
+			(*it).release();
+		//	components.erase(it);
+		}
 	}
 	components.clear();
 }
@@ -280,11 +299,7 @@ void Entity::DestroyDeadChildren()
 
 void Entity::Destroy()
 {
-	GetGame()->Log("Entity::Destroy: Touch.");
 	Object::Destroy();
-	GetGame()->Log("Entity::Destroy: super called.");
-
-	GetGame()->Log("Entity::Destroy: Removing from parent.");
 	if(parent) parent->RemoveChild(this);
 }
 
@@ -299,8 +314,6 @@ Component* Entity::GetComponent(string name)
 	}
 
 	string ctype = "";
-	std::cout << "comparing " << reg->typeInfo.name() << "\n";
-	std::cout << "size " << components.size() << "\n";
 	for(uint32 i = 0; i < components.size(); ++i)
 	{
 		Component* comp = components[i];
@@ -311,7 +324,6 @@ Component* Entity::GetComponent(string name)
 			continue;
 		}
 		const std::type_info& ti = typeid(*comp);
-		std::cout << "checking comp " << ti.name() << this << "\n";
 
 	//	ctype = type::Name(comp);
 	//	auto reg2 = Component::typeRegistry.Get(typeid(comp));
@@ -354,7 +366,6 @@ void Entity::SetLayer(uint32 layer)
 
 void Entity::RemoveComponent(Component* comp)
 {
-	GetGame()->Log("About to remove comp '", comp, "'.");
 	for(auto i = components.begin(); i != components.end(); ++i)
 	{
 		if(*i == comp)
@@ -362,10 +373,10 @@ void Entity::RemoveComponent(Component* comp)
 			TriggerEvent("RemoveComponent", comp);
 			TriggerEvent("OnSetComponent"+type::Descope(type::Name(comp)), comp);
 			components.erase(i);
+			GetGame()->Log("Removed component ", comp);
 			break;
 		}
 	}
-	GetGame()->Log("Removed component");
 }
 
 template<typename C>
@@ -455,7 +466,7 @@ Game* Entity::GetGame() const
 
 void Entity::Reparent(Entity* ent)
 {
-	GetGame()->Log("Reparenting from ", GetParent());
+//	GetGame()->Log("Reparenting from ", GetParent());
 	GetParent()->RemoveChild(this, false);
 	if(ent)
 		ent->AddChild(this);
@@ -591,38 +602,38 @@ void Entity::Serialize(Properties* prop)
 	prop->Value("active", &enabled);
 	prop->Value("lifetime", &lifetime);
 
-	GetGame()->Log("Entity::Serialize: Loaded basic properties ", this);
-
-	/// @todo Reimplement conversion from string to deque<string>
-/*	std::deque<string> files;
-	prop->Value("files", files);
-	for(auto& file : files)
+	if(prop->mode == Properties::Mode::Input)
 	{
-		GetGame()->Log("Loading entity from file path");
-		Properties fp;
-		fp.LoadFile(file);
-		if(Properties* pc = fp.GetChild(0))
+		std::deque<string> files;
+		prop->Value("files", &files);
+		for(auto& file : files)
 		{
-			Serialize(pc);
+			Properties fp;
+			fp.LoadFile(file);
+			if(Properties* pc = fp.GetChild(0))
+			{
+				pc->SetMode(Properties::Mode::Input);
+				Serialize(pc);
+			}
 		}
-	}*/
+	}
 
 //	prop->ValueArray<ptr<Entity>>("Entity", children, [&](ptr<Entity>& ent, Properties* prop)
-	for(auto& prop : prop->children)
+	for(auto& child : prop->children)
 	{
-		if(!prop->IsType("Entity")) continue;
+		if(!child->IsType("Entity")) continue;
 
 		Entity* ent = nullptr;
-		if(prop->mode == Properties::Mode::Input)
+		if(child->mode == Properties::Mode::Input)
 		{
-			 if((ent = GetChild(prop->name)))
+			 if((ent = GetChild(child->name)))
 			 {
-				 ent->Serialize(prop);
+				 ent->Serialize(child);
 			 }
 			 else
 			 {
-				 ent = AddChild(prop->name);
-				 ent->Serialize(prop);
+				 ent = AddChild(child->name);
+				 ent->Serialize(child);
 			 }
 		}
 		else
@@ -654,14 +665,12 @@ void Entity::Serialize(Properties* prop)
 				}
 				else
 				{
-					GetGame()->Log("Readding transform to ", this);
 					transform = AddComponent<Transform>();
 					transform->Serialize(child);
 				}
 			}
 			else
 			{
-				GetGame()->Log("Entity::Serialize: Component type '"+child->name+"' to ", this);
 				component = GetComponent(child->name);
 				if(component)
 				{
@@ -701,10 +710,22 @@ void Entity::Serialize(Properties* prop, bool init)
 Component *Entity::AddComponent(string type)
 {
 	std::cout << "trying to add comp "+type+"\n";
-	Component* result = Component::NewFromString(type);
+	Component* result = nullptr;
+	result = Component::NewFromString(type);
 	if(result)
 	{
 		AddComponent(result);
+	}
+	else
+	{
+		string type_script = type;
+		replace_all(type_script, "::", "/");
+		fs::path p = GetGame()->GetAssetPath("scripts/"+type_script+".nut");
+		if(fs::exists(p))
+		{
+			result = ScriptComp::LoadScript(GetGame(), p.string());
+			AddComponent(result);
+		}
 	}
 	return result;
 }

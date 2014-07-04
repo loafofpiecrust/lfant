@@ -1,5 +1,7 @@
 project(bullet)
 
+set(PROJECT_OUTPUT_DIR ./lib)
+
 # Source Dir
 file(GLOB_RECURSE SRC_FILES
 	"src/BulletCollision/*.cpp"
@@ -32,6 +34,10 @@ endif()
 # Output Library Info
 add_library(${PROJECT_NAME} SHARED ${SRC_FILES} ${HEADER_FILES})
 
+add_definitions(
+	-DBT_USE_DOUBLE_PRECISION
+)
+
 # Includes
 include_directories(
 	"src"
@@ -42,3 +48,5 @@ target_link_libraries(${PROJECT_NAME}
 	stdc++
 )
 endif()
+
+#add_subdirectory(d)

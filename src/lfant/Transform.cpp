@@ -16,6 +16,7 @@
 // Internal
 
 #include <lfant/Entity.h>
+#include "lfant/Camera.h"
 #include <lfant/util/Math.h>
 
 #include <lfant/Console.h>
@@ -49,7 +50,6 @@ void Transform::Init()
 
 void Transform::Serialize(Properties *prop)
 {
-//	GetGame()->Log("Loading transform from type '"+prop->type+"', id '"+prop->id+"'.");
 	Component::Serialize(prop);
 
 	prop->Value("position", &position);
@@ -59,23 +59,42 @@ void Transform::Serialize(Properties *prop)
 	// Do this to ensure the callbacks are called
 	if(prop->mode == Properties::Mode::Input)
 	{
-		SetPosition(position);
+		TriggerEvent("SetPosition", GetPosition());
 		SetRotation(rotation);
 		SetScale(scale);
 
 		SetMatrix();
-		GetGame()->Log("Loaded position: "+lexical_cast<string>(position));
 	}
 }
 
 void Transform::ScriptBind()
 {
 	{
+		Script::BaseClass<vec2> inst;
+		inst.Var("x", &vec2::x);
+		inst.Var("y", &vec2::y);
+		inst.GetInst().Ctor<float>();
+		inst.GetInst().Ctor<float, float>();
+		inst.Bind("vec2");
+	}
+	{
 		Script::BaseClass<vec3> inst;
+		inst.GetInst().Ctor<float>();
+		inst.GetInst().Ctor<float, float, float>();
 		inst.Var("x", &vec3::x);
 		inst.Var("y", &vec3::y);
 		inst.Var("z", &vec3::z);
 		inst.Bind("vec3");
+	}
+	{
+		Script::BaseClass<vec4> inst;
+		inst.Var("x", &vec4::x);
+		inst.Var("y", &vec4::y);
+		inst.Var("z", &vec4::z);
+		inst.Var("w", &vec4::w);
+		inst.GetInst().Ctor<float>();
+		inst.GetInst().Ctor<float, float, float, float>();
+		inst.Bind("vec4");
 	}
 
 	{
@@ -86,6 +105,18 @@ void Transform::ScriptBind()
 	{
 		Script::Class<Transform, Component> inst;
 		inst.Func("Translate", &Transform::Translate);
+		inst.Func("Rotate", (void (Transform::*)(vec3))&Transform::Rotate);
+		inst.Func("Scale", &Transform::Scale);
+
+		inst.Prop("position", &Transform::GetPosition, &Transform::SetPosition);
+		inst.Prop("worldPosition", &Transform::GetWorldPosition, &Transform::SetWorldPosition);
+		inst.Prop("rotation", &Transform::GetRotation, &Transform::SetRotation);
+		inst.Prop("scale", &Transform::GetScale, &Transform::SetScale);
+
+		inst.Prop("direction", &Transform::GetDirection);
+		inst.Prop("right", &Transform::GetRight);
+		inst.Prop("up", &Transform::GetUp);
+
 		inst.Bind("Transform");
 	}
 }
@@ -94,22 +125,42 @@ void Transform::OnSetWorldPos()
 {
 	TriggerEvent("SetPosition");
 
-//	updateMatrix = true;
+	//	updateMatrix = true;
 }
 
-vec3 Transform::GetPosition()
+/*ivec3 Transform::GetRelativeSector() const
 {
+	return (sector - GetGame()->scene->mainCamera->GetOwner()->transform->sector);
+}*/
+
+dvec3 Transform::GetPosition() const
+{
+//	return dvec3(position) + dvec3(sector * 1000);
 	return position;
 }
 
-void Transform::SetPosition(vec3 pos)
+template <typename T> int sgn(T val) {
+	return (T(0) < val) - (val < T(0));
+}
+
+void Transform::SetPosition(dvec3 pos)
 {
-//	pos.y = -pos.y;
+/*	sector = ivec3(0);
+	for(int i = 0; i < pos.length(); ++i)
+	{
+		while(glm::abs(pos[i]) > 1000.0f)
+		{
+			int sign = sgn(pos[i]);
+			sector[i] += 1 * sign;
+			pos[i] -= 1000.0f * sign;
+		}
+	}*/
 	position = pos;
+
 	TriggerEvent("SetPosition", position);
 }
 
-quat Transform::GetRotationQuat()
+quat Transform::GetRotationQuat() const
 {
 //	vec3 rot = vec3(rotation.x, rotation.y, -(rotation.z));
 //	return quat(rot); // radians
@@ -126,7 +177,7 @@ void Transform::SetRotationQuat(quat rot)
 	TriggerEvent("SetRotation", rot);
 }
 
-vec3 Transform::GetRotation()
+vec3 Transform::GetRotation() const
 {
 	return rotation;
 }
@@ -141,14 +192,13 @@ void Transform::SetRotation(vec3 rot)
 
 	rotation = rot;
 	rotationQuat = quat(radians(rotation));
-//	GetGame()->Log("Setting rotation to ", lexical_cast<string>(rotation));
 
 	TriggerEvent("SetRotation", rot);
 	TriggerEvent("SetRotation", rotationQuat);
 //	TriggerEvent("SetRotation", rotationQuat);
 }
 
-vec3 Transform::GetScale()
+vec3 Transform::GetScale() const
 {
 	return scale;
 }
@@ -159,22 +209,25 @@ void Transform::SetScale(vec3 scl)
 	TriggerEvent("SetScale", scale);
 }
 
-vec3 Transform::GetWorldPosition()
+dvec3 Transform::GetWorldPosition() const
 {
-	return matrix[3].xyz();
-	/*
-	if(owner->GetParent())
+/*	dvec3 pos = (dvec3)matrix[3].xyz();
+	for(int i = 0; i < pos.length(); ++i)
 	{
-		return owner->GetParent()->transform->GetWorldPosition() + GetPosition();
+		while(glm::abs(pos[i]) > 1000.0)
+		{
+			int sign = sgn(pos[i]);
+			pos[i] -= 1000.0 * sign;
+		}
 	}
-	else
-	{
-		return GetPosition();
-	}
-	*/
+	return pos;*/
+	/// @todo Change when relative rendering is implemented
+	return (dvec3)matrix[3].xyz();
+//	return pos + dvec3(sector * 1000);
+
 }
 
-void Transform::SetWorldPosition(vec3 pos)
+void Transform::SetWorldPosition(dvec3 pos)
 {
 	if(owner->GetParent())
 	{
@@ -211,7 +264,7 @@ void Transform::SetWorldRotationQuat(quat rot)
 	}
 }
 
-vec3 Transform::GetWorldRotation()
+vec3 Transform::GetWorldRotation() const
 {
 	if(owner->GetParent())
 	{
@@ -235,7 +288,7 @@ void Transform::SetWorldRotation(vec3 rot)
 	}
 }
 
-vec3 Transform::GetWorldScale()
+vec3 Transform::GetWorldScale() const
 {
 	if(owner->GetParent())
 	{
@@ -261,7 +314,6 @@ void Transform::SetWorldScale(vec3 scl)
 
 void Transform::Update()
 {
-//	GetGame()->Log("Transform updating");
 //	if(updateMatrix)
 	{
 		SetMatrix();
@@ -272,7 +324,6 @@ void Transform::Update()
 
 void Transform::SetMatrix()
 {
-//	vec3 scl = vec3(scale.x, scale.z, scale.y);
 	vec3 scl = GetScale();
 	if(scl == vec3(0))
 	{
@@ -280,11 +331,9 @@ void Transform::SetMatrix()
 		return;
 	}
 
-//	vec3 pos = vec3(-position.x, position.y, position.z);
-	vec3 pos = GetPosition();
+//	vec3 pos = position + vec3(GetRelativeSector() * 1000);
+	vec3 pos = (vec3)GetPosition();
 	quat rot = GetRotationQuat();
-//	vec3 rot = radians(GetRotation());
-//	matrix = mat4(1);
 
 	if(owner->GetParent())
 	{
@@ -368,10 +417,33 @@ void Transform::SetDirection()
 //	direction = vec3(matrix[0][2], matrix[1][2], matrix[2][2]);
 //	up = cross(right, direction);
 }
-
+/*
 void Transform::Translate(vec3 pos)
 {
-//	GetGame()->Log("Translating by ", lexical_cast<string>(vec3(-pos.x, pos.y, pos.z)));
+	position += pos;
+	for(int i = 0; i < position.length(); ++i)
+	{
+		while(glm::abs(position[i]) > 1000.0f)
+		{
+			int sign = sgn(position[i]);
+			sector[i] += 1 * sign;
+			position[i] -= 1000.0f * sign;
+		}
+	}
+}*/
+
+void Transform::Translate(dvec3 pos)
+{
+/*	for(int i = 0; i < pos.length(); ++i)
+	{
+		while(glm::abs(pos[i]) > 1000.0f)
+		{
+			int sign = sgn(pos[i]);
+			sector[i] += 1 * sign;
+			pos[i] -= 1000.0f * sign;
+		}
+	}
+	position += (vec3)pos;*/
 	SetPosition(GetPosition() + pos);
 }
 
@@ -403,21 +475,33 @@ void Transform::Scale(vec3 scl)
 //	TriggerEvent("SetScale", scale);
 }
 
-vec3 Transform::GetDirection()
+vec3 Transform::GetDirection() const
 {
 	return matrix[2].xyz();
 //	return matrix[1].xyz;
 }
 
-vec3 Transform::GetRight()
+vec3 Transform::GetRight() const
 {
 	return vec3(matrix[0].xyz());
 }
 
-vec3 Transform::GetUp()
+vec3 Transform::GetUp() const
 {
 	return matrix[1].xyz();
-//	return matrix[2].xyz;
+	//	return matrix[2].xyz;
+}
+
+vec3 Transform::GetRelativeWorldPosition() const
+{
+//	return GetRelativeWorldPosition(GetGame()->scene->mainCamera->GetOwner());
+	return (vec3)GetWorldPosition();
+}
+
+vec3 Transform::GetRelativeWorldPosition(Entity* ent) const
+{
+	return (vec3)GetWorldPosition();
+//	return matrix[3].xyz() + vec3((sector - ent->transform->sector) * 1000);
 }
 
 }

@@ -213,6 +213,26 @@ public:
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// Checks if the given key exists in the table
+    ///
+    /// \param name Key to check
+    ///
+    /// \return True on success, otherwise false
+    ///
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    bool HasKey(const SQChar* name)
+    {
+        sq_pushobject(vm, obj);
+        sq_pushstring(vm, name, -1);
+        if (SQ_FAILED(sq_get(vm, -2))) {
+            sq_pop(vm, 1);
+            return false;
+        }
+        sq_pop(vm, 2);
+        return true;
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// Returns the value at a given key
     ///
     /// \param name Key of the element
@@ -493,47 +513,14 @@ struct Var<Table> {
 /// Used to get and push Table instances to and from the stack as references (tables are always references in Squirrel)
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<>
-struct Var<Table&> {
-    Table value; ///< The actual value of get operations
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// Attempts to get the value off the stack at idx as a Table
-    ///
-    /// \param vm  Target VM
-    /// \param idx Index trying to be read
-    ///
-    /// \remarks
-    /// This function MUST have its Error handled if it occurred.
-    ///
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    Var(HSQUIRRELVM vm, SQInteger idx) {
-        HSQOBJECT obj;
-        sq_resetobject(&obj);
-        sq_getstackobj(vm,idx,&obj);
-        value = Table(obj, vm);
-#if !defined (SCRAT_NO_ERROR_CHECKING)
-        SQObjectType value_type = sq_gettype(vm, idx);
-        if (value_type != OT_TABLE) {
-            Error::Instance().Throw(vm, Sqrat::Error::FormatTypeError(vm, idx, _SC("table")));
-        }
-#endif
-    }
+struct Var<Table&> : Var<Table> {Var(HSQUIRRELVM vm, SQInteger idx) : Var<Table>(vm, idx) {}};
 
 
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// Called by Sqrat::PushVarR to put an Table on the stack
-    ///
-    /// \param vm    Target VM
-    /// \param value Value to push on to the VM's stack
-    ///
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    static void push(HSQUIRRELVM vm, Table value) {
-        HSQOBJECT obj;
-        sq_resetobject(&obj);
-        obj = value.GetObject();
-        sq_pushobject(vm,obj);
-    }
-};
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// Used to get and push Table instances to and from the stack as references (tables are always references in Squirrel)
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+template<>
+struct Var<const Table&> : Var<Table> {Var(HSQUIRRELVM vm, SQInteger idx) : Var<Table>(vm, idx) {}};
 
 }
 

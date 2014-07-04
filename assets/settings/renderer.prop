@@ -1,17 +1,17 @@
 // Renderer settings
-renderer Rend
+
 {
 	// Window props
-	windowResizable = false
-	windowTitle = Galaga by lazyfox
-	windowPos = 600 x 40
+//	windowResizable = false
+//	windowTitle = DFTF
+//	windowPos = 600 x 40
 
 	// General
-	version = 4.2
-	resolution = 888 x 500
-	fullscreen = false
-	fsaa = 0
-	vsync = false
+//	version = 4.2
+//	resolution = 960 x 540
+//	fullscreen = false
+//	fsaa = 0
+//	vsync = false
 
 	motionBlur = 0
 }

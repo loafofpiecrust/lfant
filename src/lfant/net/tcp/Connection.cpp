@@ -46,7 +46,6 @@ void Connection::SendData(string data)
 
 void Connection::DoSendData(string data)
 {
-	GetGame()->Log("Connection::SendData: Touch.");
 	uint i = 0;
 	for(; i < data.size(); ++i)
 	{
@@ -57,7 +56,7 @@ void Connection::DoSendData(string data)
 		lastData[i] = '\0';
 	}
 
-	GetGame()->Log("Connection::SendData: About to write the data.");
+	GetGame()->Log("Connection::SendData: About to write data.");
 	asio::async_write(socket, boost::asio::buffer(lastData, 256), boost::bind(&Connection::OnSendData, this, asio::placeholders::error, asio::placeholders::bytes_transferred));
 }
 

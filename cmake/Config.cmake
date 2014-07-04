@@ -4,6 +4,7 @@ message("Config file called")
 set(ARCH "x64")
 set(ARCH "x64" CACHE STRING "Architecture to build for. (x86/x64/arm)")
 set(COMPILER "gcc" CACHE STRING "Compiler to use")
+
 set(DEBUG ON CACHE BOOL "Build with debug symbols")
 
 #set(ANDROID_NDK_PATH "" CACHE STRING "Root path of your android ndk")
@@ -79,6 +80,23 @@ if(COMPILER STREQUAL "clang")
 	set(CMAKE_CXX_COMPILER "clang++")
 endif()
 
+if(NOT CMAKE_D_COMPILER STREQUAL "")
+#	get_filename_component(DCOMP_ROOT ${CMAKE_D_COMPILER} DIRECTORY)
+	set(DCOMP_ROOT "${DCOMP_ROOT}/../")
+	message(${DCOMP_ROOT})
+
+	link_directories(
+		${DCOMP_ROOT}/lib
+		${DCOMP_ROOT}/lib64
+	)
+
+#set(CMAKE_D_COMPILER "gdc")
+	set(CMAKE_D_FLAGS "-fPIC -fversion=Phobos -fversion=Build")
+	set(CMAKE_D_LINK_FLAGS "-fPIC -lgphobos2 -lgdruntime")
+
+	message("d path: ${CMAKE_D_PATH}")
+endif()
+
 set(CMAKE_BUILD_TYPE Release)
 set(BASE_FLAGS "-Wall -D__STRICT_ANSI__")
 if(NOT ANDROID)
@@ -108,8 +126,8 @@ if(DEBUG)
 	set(BASE_FLAGS "${BASE_FLAGS} -g")
 endif()
 
-set(CMAKE_SHARED_LINKER_FLAGS "${BASE_FLAGS}")
-set(CMAKE_EXE_LINKER_FLAGS "${BASE_FLAGS}")
+set(CMAKE_SHARED_LINKER_FLAGS "-fPIC ${BASE_FLAGS} ${CMAKE_SHARED_LINKER_FLAGS}")
+set(CMAKE_EXE_LINKER_FLAGS "${BASE_FLAGS} ${CMAKE_EXE_LINKER_FLAGS}")
 
 if(ANDROID)
 	set(BIN "android/bin")

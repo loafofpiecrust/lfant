@@ -20,6 +20,7 @@
 #include <lfant/Mesh.h>
 #include <lfant/Console.h>
 #include <lfant/Rigidbody.h>
+#include <lfant/ScriptSystem.h>
 #include <lfant/physics/MotionState.h>
 
 namespace lfant {
@@ -42,32 +43,30 @@ void Rigidbody::Serialize(Properties* prop)
 
 	prop->Value("mass", &mass);
 	prop->Value("maxSpeed", &maxSpeed);
-	prop->Value("lockPosition", &lockPosition);
-	prop->Value("lockRotation", &lockRotation);
 
 	if(prop->mode == Properties::Mode::Input)
 	{
 		float friction = 0.0f, restitution = 1.0f;
 		vec3 vel(0);
+		vec3 linf(1), angf(1);
 
 		prop->Value("velocity", &vel);
 		prop->Value("isTrigger", &isTrigger);
 		prop->Value("friction", &friction);
 		prop->Value("restitution", &restitution);
-
-
-		GetGame()->Log("Rb loaded, restitution: ", restitution);
+		prop->Value("linearFactor", &linf);
+		prop->Value("angularFactor", &angf);
 
 		if(body)
 		{
+			body->setLinearFactor(vec3_cast<btVector3>(linf));
+			body->setAngularFactor(vec3_cast<btVector3>(angf));
 			body->setFriction(friction);
 			body->setRestitution(restitution);
 			SetMass(mass);
 			body->setLinearVelocity(vec3_cast<btVector3>(vel));
 			SetTrigger(isTrigger);
 		}
-
-		GetGame()->Log("Locked position: ", lexical_cast<string>(lockPosition));
 	}
 	else
 	{
@@ -75,6 +74,8 @@ void Rigidbody::Serialize(Properties* prop)
 		prop->Value("isTrigger", IsTrigger());
 		prop->Value("friction", body->getFriction());
 		prop->Value("restitution", body->getRestitution());
+		prop->Value("linearFactor", vec3_cast<vec3>(body->getLinearFactor()));
+		prop->Value("angularFactor", vec3_cast<vec3>(body->getAngularFactor()));
 	}
 }
 
@@ -110,13 +111,10 @@ void Rigidbody::Init()
 
 	body->forceActivationState(DISABLE_DEACTIVATION);
 	body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
-	GetGame()->Log("Rigidbody is trigger? ", IsTrigger());
 	if(IsTrigger()) SetTrigger(true);
 
 	body->setUserPointer(this);
-	GetGame()->Log("Setting rb pos: ", owner->transform->GetPosition());
 	body->getWorldTransform().setOrigin(vec3_cast<btVector3>(owner->transform->GetWorldPosition()));
-	GetGame()->Log("Rigidbody initial pos: ", vec3_cast<vec3>(body->getWorldTransform().getOrigin()));
 }
 
 void Rigidbody::Update()
@@ -139,7 +137,6 @@ void Rigidbody::Enable(bool on)
 	}
 	else
 	{
-		GetGame()->Log("Disabling rigidbody on ", GetOwner());
 		body->forceActivationState(0);
 		body->setGravity({0.0f,0.0f,0.0f});
 	}
@@ -158,7 +155,6 @@ void Rigidbody::OnSetPos( vec3 pos )
 	{
 		return;
 	}*/
-//	GetGame()->Log("OnSetPos: Touch.");
 	body->getWorldTransform().setOrigin(vec3_cast<btVector3>(pos));
 }
 
@@ -170,7 +166,6 @@ void Rigidbody::OnSetRot( quat rot )
 		return;
 	}
 	body->getWorldTransform().setRotation(q);*/
-//	GetGame()->Log("Setting rot");
 //	rot = radians(rot);
 	body->getWorldTransform().setRotation(quat_cast<btQuaternion>(rot));
 }
@@ -229,8 +224,12 @@ vec3 Rigidbody::GetVelocity() const
 
 void Rigidbody::SetVelocity(vec3 vel)
 {
-	body->setLinearVelocity(vec3_cast<btVector3>(vel));
-//	TriggerEvent("VelocityChanged", vel);
+	body->setLinearVelocity({vel.x, vel.y, vel.z});
+}
+
+void Rigidbody::SetAngularVelocity(vec3 vel)
+{
+	body->setAngularVelocity({vel.x, vel.y, vel.z});
 }
 
 void Rigidbody::OnAddComponent(Component* comp)
@@ -242,7 +241,6 @@ void Rigidbody::OnAddComponent(Component* comp)
 	if(collider)
 	{
 		if(typeid(*body->getCollisionShape()) == typeid(btEmptyShape)) delete body->getCollisionShape();
-		GetGame()->Log("Collider set for entity, setting for rigidbody, type: '", type::Name(collider), "'.");
 		body->setCollisionShape(collider->GetShape());
 		this->collider = collider;
 		body->getWorldTransform().setOrigin(vec3_cast<btVector3>(owner->transform->GetWorldPosition()));
@@ -309,6 +307,16 @@ void Rigidbody::SetTrigger(bool is)
 bool Rigidbody::IsTrigger() const
 {
 	return isTrigger;
+}
+
+void Rigidbody::ScriptBind()
+{
+	Script::Class<Rigidbody, Component, Sqrat::NoCopy<Rigidbody>> inst;
+
+	inst.Func("ApplyForce", &Rigidbody::ApplyForce);
+	inst.Func("ApplyCentralForce", &Rigidbody::ApplyCentralForce);
+
+	inst.Bind();
 }
 
 }

@@ -91,6 +91,8 @@ public:
 
 	int motionBlur = 5;
 
+	float ambientLight = 0.1f;
+
 	ptr<FrameBuffer> frameBuffer;
 	ptr<FrameBuffer> lightBuffer;
 

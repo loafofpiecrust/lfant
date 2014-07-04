@@ -617,16 +617,6 @@ protected:
         return *this;
     }
 
-    void setDefaultCtor()
-    {
-        ClassTypeDataBase *type_data = ClassType<C>::getClassTypeData(vm);
-        if (type_data->ctorCalled == false)
-        {
-            Ctor(); // set up default constructor with the 'constructor' override
-            type_data->ctorCalled = true;
-        }
-    }
-
 /// @endcond
 
 public:
@@ -647,14 +637,13 @@ public:
     ///
     /// \param name Name of the constructor as it will appear in Squirrel (default value creates a traditional constructor)
     ///
-    /// \tparam A1 Type of argument 1 of the constructor (usually doesnt need to be defined explicitly)
+    /// \tparam A1 Type of argument 1 of the constructor (must be defined explicitly)
     ///
     /// \return The Class itself so the call can be chained
     ///
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     template<class A1>
     Class& Ctor(const SQChar *name = 0) {
-        setDefaultCtor();
         return BindConstructor(A::template iNew<A1>,1, name);
     }
 
@@ -663,15 +652,14 @@ public:
     ///
     /// \param name Name of the constructor as it will appear in Squirrel (default value creates a traditional constructor)
     ///
-    /// \tparam A1 Type of argument 1 of the constructor (usually doesnt need to be defined explicitly)
-    /// \tparam A2 Type of argument 2 of the constructor (usually doesnt need to be defined explicitly)
+    /// \tparam A1 Type of argument 1 of the constructor (must be defined explicitly)
+    /// \tparam A2 Type of argument 2 of the constructor (must be defined explicitly)
     ///
     /// \return The Class itself so the call can be chained
     ///
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     template<class A1,class A2>
     Class& Ctor(const SQChar *name = 0) {
-        setDefaultCtor();
         return BindConstructor(A::template iNew<A1,A2>,2, name);
     }
 
@@ -680,16 +668,15 @@ public:
     ///
     /// \param name Name of the constructor as it will appear in Squirrel (default value creates a traditional constructor)
     ///
-    /// \tparam A1 Type of argument 1 of the constructor (usually doesnt need to be defined explicitly)
-    /// \tparam A2 Type of argument 2 of the constructor (usually doesnt need to be defined explicitly)
-    /// \tparam A3 Type of argument 3 of the constructor (usually doesnt need to be defined explicitly)
+    /// \tparam A1 Type of argument 1 of the constructor (must be defined explicitly)
+    /// \tparam A2 Type of argument 2 of the constructor (must be defined explicitly)
+    /// \tparam A3 Type of argument 3 of the constructor (must be defined explicitly)
     ///
     /// \return The Class itself so the call can be chained
     ///
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     template<class A1,class A2,class A3>
     Class& Ctor(const SQChar *name = 0) {
-        setDefaultCtor();
         return BindConstructor(A::template iNew<A1,A2,A3>,3, name);
     }
 
@@ -698,17 +685,16 @@ public:
     ///
     /// \param name Name of the constructor as it will appear in Squirrel (default value creates a traditional constructor)
     ///
-    /// \tparam A1 Type of argument 1 of the constructor (usually doesnt need to be defined explicitly)
-    /// \tparam A2 Type of argument 2 of the constructor (usually doesnt need to be defined explicitly)
-    /// \tparam A3 Type of argument 3 of the constructor (usually doesnt need to be defined explicitly)
-    /// \tparam A4 Type of argument 4 of the constructor (usually doesnt need to be defined explicitly)
+    /// \tparam A1 Type of argument 1 of the constructor (must be defined explicitly)
+    /// \tparam A2 Type of argument 2 of the constructor (must be defined explicitly)
+    /// \tparam A3 Type of argument 3 of the constructor (must be defined explicitly)
+    /// \tparam A4 Type of argument 4 of the constructor (must be defined explicitly)
     ///
     /// \return The Class itself so the call can be chained
     ///
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     template<class A1,class A2,class A3,class A4>
     Class& Ctor(const SQChar *name = 0) {
-        setDefaultCtor();
         return BindConstructor(A::template iNew<A1,A2,A3,A4>,4, name);
     }
 
@@ -717,18 +703,17 @@ public:
     ///
     /// \param name Name of the constructor as it will appear in Squirrel (default value creates a traditional constructor)
     ///
-    /// \tparam A1 Type of argument 1 of the constructor (usually doesnt need to be defined explicitly)
-    /// \tparam A2 Type of argument 2 of the constructor (usually doesnt need to be defined explicitly)
-    /// \tparam A3 Type of argument 3 of the constructor (usually doesnt need to be defined explicitly)
-    /// \tparam A4 Type of argument 4 of the constructor (usually doesnt need to be defined explicitly)
-    /// \tparam A5 Type of argument 5 of the constructor (usually doesnt need to be defined explicitly)
+    /// \tparam A1 Type of argument 1 of the constructor (must be defined explicitly)
+    /// \tparam A2 Type of argument 2 of the constructor (must be defined explicitly)
+    /// \tparam A3 Type of argument 3 of the constructor (must be defined explicitly)
+    /// \tparam A4 Type of argument 4 of the constructor (must be defined explicitly)
+    /// \tparam A5 Type of argument 5 of the constructor (must be defined explicitly)
     ///
     /// \return The Class itself so the call can be chained
     ///
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     template<class A1,class A2,class A3,class A4,class A5>
     Class& Ctor(const SQChar *name = 0) {
-        setDefaultCtor();
         return BindConstructor(A::template iNew<A1,A2,A3,A4,A5>,5, name);
     }
 
@@ -737,19 +722,18 @@ public:
     ///
     /// \param name Name of the constructor as it will appear in Squirrel (default value creates a traditional constructor)
     ///
-    /// \tparam A1 Type of argument 1 of the constructor (usually doesnt need to be defined explicitly)
-    /// \tparam A2 Type of argument 2 of the constructor (usually doesnt need to be defined explicitly)
-    /// \tparam A3 Type of argument 3 of the constructor (usually doesnt need to be defined explicitly)
-    /// \tparam A4 Type of argument 4 of the constructor (usually doesnt need to be defined explicitly)
-    /// \tparam A5 Type of argument 5 of the constructor (usually doesnt need to be defined explicitly)
-    /// \tparam A6 Type of argument 6 of the constructor (usually doesnt need to be defined explicitly)
+    /// \tparam A1 Type of argument 1 of the constructor (must be defined explicitly)
+    /// \tparam A2 Type of argument 2 of the constructor (must be defined explicitly)
+    /// \tparam A3 Type of argument 3 of the constructor (must be defined explicitly)
+    /// \tparam A4 Type of argument 4 of the constructor (must be defined explicitly)
+    /// \tparam A5 Type of argument 5 of the constructor (must be defined explicitly)
+    /// \tparam A6 Type of argument 6 of the constructor (must be defined explicitly)
     ///
     /// \return The Class itself so the call can be chained
     ///
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     template<class A1,class A2,class A3,class A4,class A5,class A6>
     Class& Ctor(const SQChar *name = 0) {
-        setDefaultCtor();
         return BindConstructor(A::template iNew<A1,A2,A3,A4,A5,A6>,6, name);
     }
 
@@ -758,20 +742,19 @@ public:
     ///
     /// \param name Name of the constructor as it will appear in Squirrel (default value creates a traditional constructor)
     ///
-    /// \tparam A1 Type of argument 1 of the constructor (usually doesnt need to be defined explicitly)
-    /// \tparam A2 Type of argument 2 of the constructor (usually doesnt need to be defined explicitly)
-    /// \tparam A3 Type of argument 3 of the constructor (usually doesnt need to be defined explicitly)
-    /// \tparam A4 Type of argument 4 of the constructor (usually doesnt need to be defined explicitly)
-    /// \tparam A5 Type of argument 5 of the constructor (usually doesnt need to be defined explicitly)
-    /// \tparam A6 Type of argument 6 of the constructor (usually doesnt need to be defined explicitly)
-    /// \tparam A7 Type of argument 7 of the constructor (usually doesnt need to be defined explicitly)
+    /// \tparam A1 Type of argument 1 of the constructor (must be defined explicitly)
+    /// \tparam A2 Type of argument 2 of the constructor (must be defined explicitly)
+    /// \tparam A3 Type of argument 3 of the constructor (must be defined explicitly)
+    /// \tparam A4 Type of argument 4 of the constructor (must be defined explicitly)
+    /// \tparam A5 Type of argument 5 of the constructor (must be defined explicitly)
+    /// \tparam A6 Type of argument 6 of the constructor (must be defined explicitly)
+    /// \tparam A7 Type of argument 7 of the constructor (must be defined explicitly)
     ///
     /// \return The Class itself so the call can be chained
     ///
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     template<class A1,class A2,class A3,class A4,class A5,class A6,class A7>
     Class& Ctor(const SQChar *name = 0) {
-        setDefaultCtor();
         return BindConstructor(A::template iNew<A1,A2,A3,A4,A5,A6,A7>,7, name);
     }
 
@@ -780,21 +763,20 @@ public:
     ///
     /// \param name Name of the constructor as it will appear in Squirrel (default value creates a traditional constructor)
     ///
-    /// \tparam A1 Type of argument 1 of the constructor (usually doesnt need to be defined explicitly)
-    /// \tparam A2 Type of argument 2 of the constructor (usually doesnt need to be defined explicitly)
-    /// \tparam A3 Type of argument 3 of the constructor (usually doesnt need to be defined explicitly)
-    /// \tparam A4 Type of argument 4 of the constructor (usually doesnt need to be defined explicitly)
-    /// \tparam A5 Type of argument 5 of the constructor (usually doesnt need to be defined explicitly)
-    /// \tparam A6 Type of argument 6 of the constructor (usually doesnt need to be defined explicitly)
-    /// \tparam A7 Type of argument 7 of the constructor (usually doesnt need to be defined explicitly)
-    /// \tparam A8 Type of argument 8 of the constructor (usually doesnt need to be defined explicitly)
+    /// \tparam A1 Type of argument 1 of the constructor (must be defined explicitly)
+    /// \tparam A2 Type of argument 2 of the constructor (must be defined explicitly)
+    /// \tparam A3 Type of argument 3 of the constructor (must be defined explicitly)
+    /// \tparam A4 Type of argument 4 of the constructor (must be defined explicitly)
+    /// \tparam A5 Type of argument 5 of the constructor (must be defined explicitly)
+    /// \tparam A6 Type of argument 6 of the constructor (must be defined explicitly)
+    /// \tparam A7 Type of argument 7 of the constructor (must be defined explicitly)
+    /// \tparam A8 Type of argument 8 of the constructor (must be defined explicitly)
     ///
     /// \return The Class itself so the call can be chained
     ///
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     template<class A1,class A2,class A3,class A4,class A5,class A6,class A7,class A8>
     Class& Ctor(const SQChar *name = 0) {
-        setDefaultCtor();
         return BindConstructor(A::template iNew<A1,A2,A3,A4,A5,A6,A7,A8>,8, name);
     }
 
@@ -803,22 +785,21 @@ public:
     ///
     /// \param name Name of the constructor as it will appear in Squirrel (default value creates a traditional constructor)
     ///
-    /// \tparam A1 Type of argument 1 of the constructor (usually doesnt need to be defined explicitly)
-    /// \tparam A2 Type of argument 2 of the constructor (usually doesnt need to be defined explicitly)
-    /// \tparam A3 Type of argument 3 of the constructor (usually doesnt need to be defined explicitly)
-    /// \tparam A4 Type of argument 4 of the constructor (usually doesnt need to be defined explicitly)
-    /// \tparam A5 Type of argument 5 of the constructor (usually doesnt need to be defined explicitly)
-    /// \tparam A6 Type of argument 6 of the constructor (usually doesnt need to be defined explicitly)
-    /// \tparam A7 Type of argument 7 of the constructor (usually doesnt need to be defined explicitly)
-    /// \tparam A8 Type of argument 8 of the constructor (usually doesnt need to be defined explicitly)
-    /// \tparam A9 Type of argument 9 of the constructor (usually doesnt need to be defined explicitly)
+    /// \tparam A1 Type of argument 1 of the constructor (must be defined explicitly)
+    /// \tparam A2 Type of argument 2 of the constructor (must be defined explicitly)
+    /// \tparam A3 Type of argument 3 of the constructor (must be defined explicitly)
+    /// \tparam A4 Type of argument 4 of the constructor (must be defined explicitly)
+    /// \tparam A5 Type of argument 5 of the constructor (must be defined explicitly)
+    /// \tparam A6 Type of argument 6 of the constructor (must be defined explicitly)
+    /// \tparam A7 Type of argument 7 of the constructor (must be defined explicitly)
+    /// \tparam A8 Type of argument 8 of the constructor (must be defined explicitly)
+    /// \tparam A9 Type of argument 9 of the constructor (must be defined explicitly)
     ///
     /// \return The Class itself so the call can be chained
     ///
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     template<class A1,class A2,class A3,class A4,class A5,class A6,class A7,class A8,class A9>
     Class& Ctor(const SQChar *name = 0) {
-        setDefaultCtor();
         return BindConstructor(A::template iNew<A1,A2,A3,A4,A5,A6,A7,A8,A9>,9, name);
     }
 };

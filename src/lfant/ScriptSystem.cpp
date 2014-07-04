@@ -7,14 +7,20 @@
 #include <lfant/FileSystem.h>
 #include <lfant/Time.h>
 #include <lfant/Random.h>
+#include <lfant/Thread.h>
+#include <lfant/Input.h>
 #include "Entity.h"
 #include "Component.h"
 #include "Transform.h"
 #include "ScriptComp.h"
 
+#include <lfant/Scene.h>
+#include <lfant/Time.h>
+
 // External
 #include <sqrat.h>
 #include <sqrat/sqratVM.h>
+#include <sqratimport.h>
 #include <boost/chrono.hpp>
 
 namespace lfant
@@ -58,22 +64,8 @@ void Script::Run()
 	string err = "";
 	inst.Run(err);
 	std::cout << "squirrel error? " << err << "\n";
+	ran = true;
 }
-
-void TestFunc()
-{
-	int i = random::Range(0, 999);
-	int k = random::Range(9999, 99999999);
-	i += k;
-	k -= i;
-	i -= k;
-	k *= i;
-//	GetGame()->Log("\t\ti = ", i);
-//	GetGame()->Log("k = ", k);
-}
-
-
-int myint = 2;
 
 ScriptSystem::ScriptSystem(Game* game) :
 	Subsystem(game)
@@ -81,31 +73,45 @@ ScriptSystem::ScriptSystem(Game* game) :
 
 }
 
-void printyli(int i)
-{
-}
-
-void createShiz(ScriptComp* comp)
-{
-	std::cout << comp->counter << " thingy\n";
-}
-
-void printVec3(vec3 v)
-{
-	std::cout << lexical_cast<string>(v) << "\n";
-}
-
 void ScriptSystem::Init()
 {
 	Subsystem::Init();
 
 	Sqrat::DefaultVM::Set(vm.GetVM());
+	sqstd_register_systemlib(vm.GetVM());
+	sqrat_register_importlib(vm.GetVM());
+
+	/////
+	/// @brief 'random' namespace
+	/////
+/*	Sqrat::Table tb_rand(vm.GetVM());
+	vm.GetRootTable().Bind("random", tb_rand);
+
+	tb_rand.Overload<float (*)(float, float)>("Range", &random::Range);
+	tb_rand.Overload<int (*)(int, int)>("Range", &random::Range);
+	tb_rand.Overload<vec3 (*)(vec3, vec3)>("Range", &random::Range);
+
+	/////
+	/// @brief 'thread' namespace
+	/////
+	Sqrat::Table tb_thread(vm.GetVM());
+	vm.GetRootTable().Bind("thread", tb_thread);
+
+	tb_rand.Func("Sleep", &thread::Sleep);*/
 
 	Object::ScriptBind();
 	Entity::ScriptBind();
 	Component::ScriptBind();
 	Transform::ScriptBind();
 	ScriptComp::ScriptBind();
+
+	Subsystem::ScriptBind();
+	Scene::ScriptBind();
+	Time::ScriptBind();
+	Input::ScriptBind();
+	Game::ScriptBind();
+
+	Properties::ScriptBind();
 }
 
 void ScriptSystem::Deinit()

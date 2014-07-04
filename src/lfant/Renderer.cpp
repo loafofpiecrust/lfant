@@ -65,13 +65,10 @@ Renderer::~Renderer()
 void Renderer::Serialize(Properties* prop)
 {
 	Subsystem::Serialize(prop);
-//	GetGame()->Log("Renderer::Serialize: Got root child, '", prop->Value(""), "'.");
 
 	prop->Value("vsync", &vsync);
 	prop->Value("motionBlur", &motionBlur);
 
-//	GetGame()->Log("Window title: '"+windowTitle+"'.");
-//	GetGame()->Log("OpenGL Version loaded: ", lexical_cast<string>(version));
 }
 
 /*******************************************************************************
@@ -84,8 +81,6 @@ ivec2 res;
 void Renderer::Init()
 {
 	LoadFile("settings/renderer.prop");
-
-//	GetGame()->Log("Renderer::Init: About to start GLFW");
 
 	glShadeModel(GL_SMOOTH);
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
@@ -122,7 +117,7 @@ void Renderer::Init()
 	frameBuffer->AddDepthTexture("depthTex");
 
 	res = game->window->GetSize();
-	GetGame()->Log("making framebuffer of size ", res);
+	GetGame()->Log("Making framebuffer of size ", res);
 	frameBuffer->SetRect({0,0,(uint32)res.x,(uint32)res.y});
 	frameBuffer->Init();
 
@@ -232,6 +227,16 @@ void Renderer::Update()
 		glDisable(GL_BLEND);
 		glDisable(GL_STENCIL_TEST);
 	}
+//	glStencilFunc(GL_NOTEQUAL, 0, 0xFF);
+
+	glDisable(GL_DEPTH_TEST);
+//	glEnable(GL_BLEND);
+//	glBlendEquation(GL_FUNC_ADD);
+//	glBlendFunc(GL_ONE, GL_ONE);
+
+//	glEnable(GL_CULL_FACE);
+//	glCullFace(GL_FRONT);
+//	}
 
 	Resize(res);
 
@@ -246,7 +251,6 @@ void Renderer::Deinit()
 {
 	frameBuffer->Deinit();
 //	Texture::textureCache.clear();
-	GetGame()->Log("Renderer::Deinit(): Touch");
 }
 
 /*******************************************************************************

@@ -1,5 +1,4 @@
-#ifndef LFANT_CAPSULECOLLIDER_H
-#define LFANT_CAPSULECOLLIDER_H
+#pragma once
 
 #include <lfant/Collider.h>
 
@@ -23,6 +22,4 @@ private:
 	ptr<btCapsuleShape> shape;
 };
 
-} // namespace lfant
-
-#endif // LFANT_CAPSULECOLLIDER_H
+}

@@ -249,6 +249,13 @@ string lexical_cast<string, vec3>(const vec3& src)
 }
 
 template<>
+string lexical_cast<string, dvec3>(const dvec3& src)
+{
+	return "("+lexical_cast<string>(src.x)+","+lexical_cast<string>(src.y)+","+
+			lexical_cast<string>(src.z)+")";
+}
+
+template<>
 string lexical_cast<string, bvec3>(const bvec3& src)
 {
 	return "("+lexical_cast<string>(src.x)+","+lexical_cast<string>(src.y)+","+
@@ -439,9 +446,7 @@ vec3 lexical_cast<vec3, string>(const string& val)
 			valstr.erase(i, 1);
 		}
 	}*/
-//	GetGame()->Log("First char in vec3 lexcast: '", (int)val[0], "'");
 	std::deque<string> str = lfant::Split(valstr, " x:,()");
-//	GetGame()->Log("Lexcasting vec3, size: ", str.size());
 	result.x = lexical_cast<float>(str[0]);
 	if(str.size() > 1)
 	{
@@ -456,7 +461,18 @@ vec3 lexical_cast<vec3, string>(const string& val)
 		result.y = result.x;
 		result.z = result.x;
 	}
-//	GetGame()->Log("Lexcast vec3(", result.x, ",", result.y, ",", result.z, ")");
+	return result;
+}
+
+template<>
+dvec3 lexical_cast<dvec3, string>(const string& val)
+{
+	dvec3 result(0);
+	std::deque<string> str = lfant::Split(val, " x:,()");
+	for(int i = 0; i < str.size(); ++i)
+	{
+		result[i] = lexical_cast<double>(str[i]);
+	}
 	return result;
 }
 
@@ -485,7 +501,6 @@ template<>
 vec4 lexical_cast<vec4, string>(const string& src)
 {
 	vec4 result(0);
-//	GetGame()->Log("lexcasting vec4 '", src, "'");
 	deque<string> str = lfant::Split(src, " x,()");
 	result.r = lexical_cast<float>(str[0]);
 	if(str.size() > 1)
@@ -550,7 +565,6 @@ Range<vec3> lexical_cast<Range<vec3>, string>(const string &src)
 template<>
 Range<vec4> lexical_cast<Range<vec4>, string>(const string &src)
 {
-//	GetGame()->Log("lexcasting Range<vec4> '", src, "'");
 	Range<vec4> result(vec4(0));
 	deque<string> str = lfant::Split(src, " -");
 	result.min = lexical_cast<vec4>(str[0]);
@@ -577,7 +591,6 @@ Range<Range<float>> lexical_cast<Range<Range<float>>, string>(const string& src)
 template<>
 Range<Range<vec4>> lexical_cast<Range<Range<vec4>>, string>(const string& src)
 {
-//	GetGame()->Log("lexcasting Range<Range<vec4>> '", src, "'");
 	Range<Range<vec4>> result;
 	deque<string> str = lfant::Split(src, " -");
 	result.min = lexical_cast<Range<vec4>>(str[0]+"-"+str[1]);

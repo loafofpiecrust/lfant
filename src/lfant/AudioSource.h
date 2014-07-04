@@ -36,7 +36,7 @@ private:
 	void OnSetPosition(vec3 pos);
 
 	float volume = 1.0f;
-	std::vector<irrklang::ISound*> sounds;
+//	std::vector<irrklang::ISound*> sounds;
 
 	// Comps
 	Rigidbody* rigidbody;

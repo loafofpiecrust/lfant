@@ -10,9 +10,9 @@
 #include <Gwen/Controls/DockedTabControl.h>
 #include <Gwen/Controls/WindowControl.h>
 //#include <Gwen/Input/GLFW.h>
-#include <SFML/Graphics/RenderWindow.hpp>
-#include <SFML/Graphics/Text.hpp>
-#include <SFML/Graphics/CircleShape.hpp>
+//#include <SFML/Graphics/RenderWindow.hpp>
+//#include <SFML/Graphics/Text.hpp>
+//#include <SFML/Graphics/CircleShape.hpp>
 
 //#include <ft2build.h>
 //#include <freetype/freetype.h>
@@ -20,7 +20,7 @@
 #include <GL/glew.h>
 
 #include "lfant/gui/gwen/UserInterface.h"
-#include "SFML2.h"
+//#include "SFML2.h"
 
 #include "lfant/Game.h"
 #include "lfant/Window.h"
@@ -61,7 +61,6 @@ void UserInterface::Init()
 
 	auto res = game->window->GetSize();
 	canvas = new Gwen::Controls::Canvas(skin);
-	GetGame()->Log("supposed window size: ", res);
 	canvas->SetSize(res.x, res.y);
 	canvas->SetDrawBackground(false);
 	canvas->SetBackgroundColor(Gwen::Color(150, 170, 170, 255));
@@ -118,7 +117,7 @@ void UserInterface::Render()
 //	GetGame()->window->GetHandle()->pushGLStates();
 //	glDisable(GL_DEPTH_TEST);
 	canvas->RenderCanvas();
-	
+
 //	GetGame()->window->GetHandle()->popGLStates();
 //	glEnable(GL_DEPTH_TEST);
 }
@@ -145,13 +144,11 @@ void UserInterface::OnChar(char key)
 
 void UserInterface::OnMouseButton(uint16 btn, int mode, int mods)
 {
-	GetGame()->Log("mus bottn ", btn, ". duwn? ", (bool)mode);
 	canvas->InputMouseButton(btn, mode);
 }
 
 void UserInterface::OnMouseMove(ivec2 pos)
 {
-//	GetGame()->Log("mus mov", pos);
 	ivec2 delta = pos - prevMousePos;
 //	ivec2 res = game->window->GetSize();
 	canvas->InputMouseMoved(pos.x, pos.y, delta.x, delta.y);

@@ -23,6 +23,7 @@
 // Internal
 #include <lfant/Game.h>
 #include <lfant/Scene.h>
+#include <lfant/ScriptSystem.h>
 
 // External
 
@@ -41,6 +42,13 @@ Subsystem::~Subsystem()
 void Subsystem::Init()
 {
 	Object::Init();
+}
+
+void Subsystem::ScriptBind()
+{
+//	Script::Class<Subsystem, Object> inst;
+	Script::ClassBase<Subsystem, Sqrat::DerivedClass<Subsystem, Object, Sqrat::NoCopy<Subsystem>>> inst;
+	inst.Bind();
 }
 
 Game* Subsystem::GetGame() const

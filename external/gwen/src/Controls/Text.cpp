@@ -112,7 +112,7 @@ Gwen::Rect Text::GetCharacterPosition( int iChar )
 		Gwen::Rect rect = pLine->GetCharacterPosition( pLine->Length() );
 		rect.x += pLine->X();
 		rect.y += pLine->Y();
-		return rect; 
+		return rect;
 	}
 
 	if ( Length() == 0 || iChar == 0 )
@@ -140,7 +140,7 @@ Gwen::Rect Text::GetLineBox( int i )
 		return Gwen::Rect(0, 0, Clamp(p.x, 1,p.x), Clamp(p.y, 1,p.y) );
 	}
 }
- 
+
 
 int Text::GetClosestCharacter( Gwen::Point p )
 {
@@ -228,7 +228,7 @@ void Text::SplitWords(const Gwen::UnicodeString &s, std::vector<Gwen::UnicodeStr
 	Gwen::UnicodeString str;
 
 	int w = GetParent()->Width() - GetParent()->GetPadding().left-GetParent()->GetPadding().right;
-	for ( int i=0; i<(int)s.length(); i++ ) 
+	for ( int i=0; i<(int)s.length(); i++ )
 	{
 		if ( s[i] == L'\n' )
 		{
@@ -251,7 +251,7 @@ void Text::SplitWords(const Gwen::UnicodeString &s, std::vector<Gwen::UnicodeStr
 
 		//if adding character makes the word bigger than the textbox size
 		Gwen::Point p = GetSkin()->GetRender()->MeasureText( GetFont(), str );
-		if ( p.x > w ) 
+		if ( p.x > w )
 		{
 			int addSum = GetPadding().left+GetPadding().right;
 			//split words
@@ -289,7 +289,7 @@ void Text::RefreshSizeWrap()
 	}
 
 	Point pFontSize = GetSkin()->GetRender()->MeasureText( GetFont(), L" " );
-	int w = GetParent()->Width() - GetParent()->GetPadding().left-GetParent()->GetPadding().right; 
+	int w = GetParent()->Width() - GetParent()->GetPadding().left-GetParent()->GetPadding().right;
 	int x = 0, y = 0;
 	Gwen::UnicodeString strLine;
 
@@ -330,7 +330,7 @@ void Text::RefreshSizeWrap()
 				t->SetString( strLine.substr( 0, strLine.length()) );
 				//new line is empty
 				strLine.clear();
-			} 
+			}
 			t->RefreshSize();
 			t->SetPos( x, y );
 			m_Lines.push_back( t );

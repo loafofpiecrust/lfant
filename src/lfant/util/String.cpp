@@ -53,7 +53,6 @@ deque<string> SplitParens(string str, string dropDelim, string keepDelim)
 	deque<string> result = Split(str, dropDelim, keepDelim);
 	for(uint i = 0; i < result.size(); ++i)
 	{
-//		GetGame()->Log("SplitParens: result[", i, "] = ", result[i]);
 		if(uint pos = result[i].find("(("))
 		{
 			result[i].erase(pos+1);
@@ -70,7 +69,6 @@ deque<string> SplitParens(string str, string dropDelim, string keepDelim)
 		{
 			result[i].erase(result[i].end());
 		}
-//		GetGame()->Log("SplitParens: result[", i, "] = ", result[i]);
 	}
 	return result;
 	/*

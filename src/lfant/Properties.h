@@ -16,11 +16,16 @@
 #include <lfant/util/lexical_cast.h>
 
 // External
+#include <sqrat/sqratObject.h>
 #include <map>
 #include <iostream>
 #include <functional>
 #include <boost/any.hpp>
 //#include <json/value.h>
+
+namespace YAML {
+class Node;
+}
 
 namespace lfant {
 
@@ -66,6 +71,8 @@ public:
 	void SaveFile(string path);
 	void LoadFile(string path);
 
+	void LoadFileYaml(string path);
+
 	void LoadStream(std::istream& stream);
 	void SaveStream(std::ostream& stream);
 
@@ -74,22 +81,22 @@ public:
 	template<typename T>
 	void Value(string name, T* value)
 	{
-		std::cout << "momo1\n";
+	//	std::cout << "momo1\n";
 		if(mode == Mode::Output)
 		{
-			std::cout << "saving " << name << "\n";
+		//	std::cout << "saving " << name << "\n";
 			if(saveMode == SaveMode::Value) values[name] = *value;
 			else values[name] = value;
 		}
 		else
 		{
-			std::cout << "momo2\n";
+		//	std::cout << "momo2\n";
 			auto iter = values.find(name);
 			if(iter != values.end())
 			{
-				std::cout << "here we are\n";
+			//	std::cout << "here we are\n";
 				boost::any& ref = iter->second;
-				std::cout << "type of cast: " << ref.type().name() << "\n";
+			//	std::cout << "type of cast: " << ref.type().name() << "\n";
 				if(ref.type() == typeid(std::string))
 				{
 					*value = lexical_cast<T>(boost::any_cast<std::string>(ref));
@@ -106,7 +113,7 @@ public:
 	template<typename T>
 	void Value(string name, const T& value)
 	{
-		std::cout << "value value\n";
+	//	std::cout << "value value\n";
 		if(mode == Mode::Output)
 		{
 			values[name] = value;
@@ -140,6 +147,8 @@ public:
 	}
 
 	void Value(string name, Entity*& ent, Scene* scene);
+
+	void Value(string name, Sqrat::Object obj);
 
 	Properties* GetParent();
 	Properties* GetTopParent();

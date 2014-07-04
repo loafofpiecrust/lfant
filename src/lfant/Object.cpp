@@ -102,7 +102,6 @@ void Object::LoadFile(string path)
 {
 	if(path.empty()) return;
 
-//	GetGame()->Log(type::Name(this), " loading file '", path, "'.");
 	auto rp = GetGame()->GetAssetPath(path);
 	if(!fs::exists(rp)) return;
 
@@ -114,14 +113,11 @@ void Object::LoadFile(string path)
 
 //	string type = type::Descope(type::Name(this));
 //	to_lower(type);
-//	GetGame()->Log("Checking for first child");
 	if(Properties* pc = prop.GetChild(0))
 	{
-	//	GetGame()->Log("Loading first child");
 		std::cout << "\nMOAR CHILDS: " << pc << " " << pc->GetChildCount() << "\n";
 		Serialize(pc);
 	}
-//	GetGame()->Log("Done loading file");
 }
 
 void Object::Serialize(Properties *prop)
@@ -154,6 +150,7 @@ void Object::ScriptBind()
 //	inst.Func("Save", &Object::Save);
 	inst.Func("LoadFile", &Object::LoadFile);
 	inst.Func("SaveFile", &Object::SaveFile);
+	inst.Prop("game", &Object::GetGame);
 
 	inst.Bind();
 }

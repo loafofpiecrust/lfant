@@ -17,6 +17,7 @@
 #include <lfant/Properties.h>
 #include <lfant/Console.h>
 #include <lfant/UserInterface.h>
+#include <lfant/ScriptSystem.h>
 
 // External
 #include <iostream>
@@ -121,7 +122,6 @@ void Input::Serialize(Properties* prop)
 {
 	Subsystem::Serialize(prop);
 
-	GetGame()->Log("Loading input props...");
 //	deque<Properties*> binds = prop->GetChildren("axis");
 //	Properties* binds = prop->GetChild("axes");
 
@@ -134,7 +134,6 @@ void Input::Serialize(Properties* prop)
 			b->Value("negative", &neg);
 			axis.positive = Key[pos];
 			axis.negative = Key[neg];
-			std::cout << "axis positive " << pos << " to " << axis.positive << "\n";
 		}
 		else
 		{
@@ -167,6 +166,15 @@ void Input::Serialize(Properties* prop)
 			addAxisFunc(axis, prop->Child("axis", axis.name));
 		}
 	}
+}
+
+void Input::ScriptBind()
+{
+	Script::Class<Input, Subsystem, Sqrat::NoCopy<Input>> inst;
+	inst.Func("GetButtonDown", &Input::GetButtonDown);
+	inst.Func("GetButtonUp", &Input::GetButtonUp);
+	inst.Func("GetButton", &Input::GetButton);
+	inst.Bind();
 }
 
 

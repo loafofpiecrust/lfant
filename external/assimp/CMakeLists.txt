@@ -1,5 +1,7 @@
 project(assimp)
 
+set(PROJECT_OUTPUT_DIR ./lib)
+
 # Source Dir
 file(GLOB SRC_FILES
 	code/*.cpp
@@ -62,3 +64,6 @@ target_link_libraries(${PROJECT_NAME}
 	rt
 	)
 endif()
+
+
+#add_subdirectory(d)

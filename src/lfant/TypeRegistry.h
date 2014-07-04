@@ -129,6 +129,8 @@ public:
 
 	typedef EntryBase entryType;
 
+	~TypeRegistry() {}
+
 	template<typename C>
 	void Register(string name, entryType* inst)
 	{
@@ -140,7 +142,7 @@ public:
 		}
 		else
 		{
-			data.insert(make_pair(name, std::unique_ptr<entryType>(inst)));
+			data.insert(make_pair(name, inst));
 			dataReverse[typeid(C)] = inst;
 		}
 	}
@@ -151,7 +153,7 @@ public:
 		if(it == data.end())
 			return nullptr;
 		else
-			return it->second.get();
+			return it->second;
 	}
 
 	entryType* Get(const std::type_info& ti)
@@ -170,7 +172,7 @@ public:
 	}
 
 protected:
-	std::unordered_map<string, std::unique_ptr<entryType>> data;
+	std::unordered_map<string, entryType*> data;
 	std::unordered_map<std::type_index, entryType*> dataReverse;
 };
 

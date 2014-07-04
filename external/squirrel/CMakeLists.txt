@@ -4,7 +4,8 @@ project(squirrel)
 file(GLOB SRC_FILES
 	squirrel/*.cpp
 	sqstdlib/*.cpp
-	sqratthread/*.cpp
+	sqimport/*.cpp
+#	sqratthread/*.cpp
 	)
 
 # Output Library Info
@@ -12,6 +13,6 @@ add_library(${PROJECT_NAME} STATIC ${SRC_FILES})
 
 # Includes
 include_directories(
-	include
+	./include
 	)
 

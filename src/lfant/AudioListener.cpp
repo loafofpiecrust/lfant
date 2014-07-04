@@ -44,12 +44,12 @@ void AudioListener::OnSetPosition(vec3 pos)
 	{
 		vel = rigidbody->GetVelocity();
 	}
-	
-	GetGame()->audio->engine->setListenerPosition(vec3_cast<irrklang::vec3df>(owner->transform->GetWorldPosition()),
-								    vec3_cast<irrklang::vec3df>(owner->transform->GetDirection()),
-								    vec3_cast<irrklang::vec3df>(vel),
-								    vec3_cast<irrklang::vec3df>(owner->transform->GetUp())
-								   );
+
+/*	GetGame()->audio->engine->setListenerPosition({0.0f, 0.0f, 0.0f},
+									vec3_cast<irrklang::vec3df>(owner->transform->GetDirection()),
+									vec3_cast<irrklang::vec3df>(vel),
+									vec3_cast<irrklang::vec3df>(owner->transform->GetUp())
+								   );*/
 }
 
 

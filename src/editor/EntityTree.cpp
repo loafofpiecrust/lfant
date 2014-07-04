@@ -37,7 +37,7 @@ void EntityTree::SetGame(Game* game)
 {
 	qDebug() << "tree game set";
 	this->game = game;
-	ConnectEvent(SENDER(game->scene.get(), AddEntity), RECEIVER(this, EntityAdded));
+	ConnectEvent(SENDER((Scene*)game->scene, AddEntity), RECEIVER(this, EntityAdded));
 
 	EntityAdded(game->scene->GetRoot());
 }

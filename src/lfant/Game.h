@@ -14,21 +14,25 @@
 #include <functional>
 
 // Internal
-#include <lfant/ptr.h>
+#include "lfant/ptr.h"
 
-#include <lfant/Subsystem.h>
-#include <lfant/Console.h>
-#include <lfant/util/Path.h>
+#include "lfant/Subsystem.h"
+#include "lfant/Console.h"
+#include <lfant/Time.h>
+#include "lfant/Input.h"
+#include "lfant/Scene.h"
+#include "lfant/FileSystem.h"
+#include "lfant/util/Path.h"
 
 namespace lfant {
 
 class Renderer;
-class Input;
-class Time;
+//class Input;
+//class Time;
 class Physics;
 class Audio;
-class Scene;
-class FileSystem;
+//class Scene;
+//class FileSystem;
 //class Console;
 class SystemInfo;
 class UserInterface;
@@ -57,26 +61,26 @@ public:
 	Game(const Game& other);
 	virtual ~Game();
 
-	virtual void Serialize(Properties *prop);
+	virtual void Serialize(Properties *prop) override;
 
 	static void ScriptBind();
 
-	virtual Game* GetGame() const;
+	virtual Game* GetGame() const override;
 
 	/**
 	 *	This function is called right when the game is launched.
 	 */
-	virtual void Init();
+	virtual void Init() override;
 
 	/**
 	 *	Called every frame to update the game and its subsystems
 	 */
-	virtual void Update();
+	virtual void Update() override;
 
 	/**
 	 *	Destroys the game instance.
 	 */
-	virtual void Destroy();
+	virtual void Destroy() override;
 
 	/**
 	 *	Schedules the game to be exited at the end of this frame.
@@ -91,16 +95,48 @@ public:
 
 	bool IsExited();
 
+	template<typename T = string>
+	void Print(const T& msg)
+	{
+		LinePrint(msg);
+		LinePrint("\n");
+	}
+
+	template<typename T = string>
+	auto LinePrint(T msg)->typename std::enable_if<boost::is_fundamental<T>::value || boost::is_pointer<T>::value || boost::is_same<string, T>::value, void>::type
+	{
+	//	logFile.open(logName, ios_base::app);
+	//	string strMsg = lexical_cast<string>(msg);
+		// Print to console window
+		std::cout << msg;
+		// Append message to file
+		logFile << msg;
+
+	//	logFile.close();
+	}
+
+	template<typename T = string>
+	auto LinePrint(T msg)->typename std::enable_if<!boost::is_fundamental<T>::value && !boost::is_pointer<T>::value && !is_ptr<T>::value && !boost::is_same<string, T>::value, void>::type
+	{
+		LinePrint(lexical_cast<string>(msg));
+	}
+
+	template<typename T>
+	auto LinePrint(const T& msg)->typename std::enable_if<is_ptr<T>::value, void>::type
+	{
+		LinePrint(msg.get());
+	}
+
 	template<typename T = const char*>
 	void Log(T msg)
 	{
-		console->Print(msg);
+		Print(msg);
 	}
 
 	template<typename T, typename P, typename ... A>
 	void Log(T msg, P msg2, A... args)
 	{
-		console->LinePrint(msg);
+		LinePrint(msg);
 		Log(msg2, args...);
 	}
 
@@ -122,12 +158,12 @@ public:
 	string userFolder;
 
 	// Subsystems
-	ptr<Console> console;
-	ptr<Time> time;
+//	ptr<Console> console;
+	Time* time;
 	ptr<SystemInfo> systemInfo;
 	ptr<Window> window;
 	ptr<Renderer> renderer;
-	ptr<Input> input;
+	Input* input;
 
 	ptr<Physics> physics;
 	ptr<Network> network;
@@ -137,7 +173,7 @@ public:
 #if !ANDROID
 	ptr<OpenCL> openCL;
 #endif
-	ptr<Scene> scene;
+	Scene* scene;
 
 	bool standAlone = true;
 
@@ -145,6 +181,8 @@ private:
 	bool destroy = false;
 	std::deque<std::thread> threads;
 
+	string logName = "lfant.log";
+	std::ofstream logFile;
 };
 
 //extern Game* game;

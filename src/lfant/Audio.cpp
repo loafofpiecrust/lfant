@@ -24,6 +24,7 @@
 // Internal
 #include <lfant/Game.h>
 #include <lfant/Audio.h>
+#include "lfant/AudioListener.h"
 
 // External
 #include <irrKlang.h>
@@ -45,8 +46,8 @@ Audio::~Audio()
 void Audio::Init()
 {
 	Subsystem::Init();
-	engine = irrklang::createIrrKlangDevice();
-	if(!engine)
+//	engine = irrklang::createIrrKlangDevice();
+//	if(!engine)
 	{
 		// Something went wrong
 		GetGame()->Log("Failed to create audio engine.");
@@ -60,12 +61,12 @@ void Audio::Update()
 
 void Audio::Deinit()
 {
-	engine->drop();
+//	engine->drop();
 }
 
 void Audio::PlaySound(string file, bool loop)
 {
-	engine->play2D(file.c_str(), loop);
+//	engine->play2D(file.c_str(), loop);
 }
 
 }

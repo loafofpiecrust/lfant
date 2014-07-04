@@ -29,6 +29,8 @@
 #include "ScriptSystem.h"
 
 // External
+#include <yaml-cpp/yaml.h>
+#include <yaml-cpp/node/iterator.h>
 
 namespace lfant {
 
@@ -45,8 +47,8 @@ Properties::Properties(string path)
 }
 
 Properties::Properties(Properties* parent, string type, string name) :
-	type(type),
 	name(name),
+	type(type),
 	parent(parent)
 {
 	to_lower(type);
@@ -61,8 +63,77 @@ Properties::~Properties()
 
 void Properties::LoadFile(string path)
 {
-	ifstream stream(path);
-	LoadStream(stream);
+	fs::path p(path);
+	if(p.extension().string() == ".yaml")
+	{
+		LoadFileYaml(path);
+	}
+	else
+	{
+		ifstream stream(path);
+		LoadStream(stream);
+	}
+}
+
+static string indent = "";
+
+static Properties* LoadYaml(Properties* prop, YAML::Node& node)
+{
+	std::cout << indent << "yaml type " << node.Type() << " ";
+//	if(node.Isstd::cout << " '" << node.Tag() << "'";
+	std::cout << "size: " << node.size() << "\n";
+	indent.push_back('\t');
+
+	auto n = new Properties(prop, "", "");
+	prop->children.push_back(n);
+
+//	std::cout << "has physics? " << node["physics"].IsDefined() << "\n";
+	for(YAML::const_iterator it = node.begin(); it != node.end(); ++it)
+	{
+		if(node.IsMap())
+		{
+		//	child = it->second;
+			YAML::Node child = it->second;
+			string key = it->first.as<string>();
+
+			if(child.IsScalar() || child.IsNull())
+			{
+				n->Value(key, child.as<string>());
+				std::cout << indent+"yaml value '" << key << "'\n";
+			}
+			else
+			{
+				std::cout << indent+"yaml struct '" << key << "'\n";
+				auto added = LoadYaml(n, child);
+				added->type = key;
+				added->name = key;
+			}
+		}
+		else
+		{
+			YAML::Node child = *it;
+
+			if(child.IsScalar() || child.IsNull())
+			{
+			//	n->Value(child.Tag(), child.as<string>());
+				std::cout << indent+"yaml value '" << child.Tag() << "'\n";
+			}
+			else
+			{
+				std::cout << indent+"yaml struct '" << child.Tag() << "'\n";
+				LoadYaml(n, child);
+			}
+		}
+	}
+	indent.pop_back();
+	return n;
+}
+
+void Properties::LoadFileYaml(string path)
+{
+	YAML::Node node = YAML::LoadFile(path);
+	indent = "";
+	LoadYaml(this, node);
 }
 
 void Properties::SaveFile(string path)
@@ -301,7 +372,7 @@ void Properties::SaveStream(ostream &stream)
 		stream << "\n"+ind+"{\n";
 	}
 
-	for(auto& i : values)
+//	for(auto& i : values)
 	{
 	//	stream << ind+"\t" << i.first << " = " << i.second << "\n";
 	}
@@ -383,6 +454,76 @@ string Properties::GetString(string name)
 
 	return boost::any_cast<string>(values[name]);
 	*/
+	return "";
+}
+
+void Properties::Value(string name, Sqrat::Object obj)
+{
+	Sqrat::Table tb (obj, obj.GetVM());
+	auto cname = name.c_str();
+
+
+	std::cout << "types table: \n" <<
+				 "float: " << OT_FLOAT << "\n" <<
+				 "int: " << OT_INTEGER << "\n" <<
+				 "string: " << OT_STRING << "\n" <<
+				 "class: " << OT_CLASS << "\n" <<
+				 "instance: " << OT_INSTANCE << "\n" <<
+				 "table: " << OT_TABLE << "\n\n";
+
+	std::cout << "value name: '" << cname << "'.\n";
+
+	if(!obj.IsNull())
+	{
+		std::cout << "obj type: " << obj.GetType() << "\n";
+		if(!tb.IsNull())
+		{
+			std::cout << "table type: " << tb.GetType() << "\n";
+		}
+		else
+		{
+			std::cout << "table is null\n";
+		}
+	}
+
+	auto slot = tb.GetSlot(cname);
+	if(slot.IsNull())
+	{
+		std::cout << "slot is null\n";
+	}
+	else
+	{
+		std::cout << "slot type: " << slot.GetType() << "\n";
+	}
+	if(mode == Mode::Input)
+	{
+		string s="";
+		switch(slot.GetType())
+		{
+		case OT_FLOAT:
+		{
+			float f; Value(name, &f); tb.SetValue(cname, f);
+			tb.Bind(cname, slot);
+			std::cout << "we set a float val with " << f << " to " << *(tb.GetValue<float>(cname).Get()) << "\n";
+			break;
+		}
+		case OT_INTEGER: int i; Value(name, &i); tb.SetValue(cname, i); break;
+		case OT_BOOL: bool b; Value(name, &b); tb.SetValue(cname, b); break;
+		case OT_STRING: Value(name, &s); tb.SetValue(cname, s); break;
+		default: break;
+		}
+	}
+	else
+	{
+		switch(slot.GetType())
+		{
+		case OT_FLOAT: Value(name, tb.GetValue<float>(cname).Get()); break;
+		case OT_INTEGER: Value(name, tb.GetValue<int>(cname).Get()); break;
+		case OT_BOOL: Value(name, tb.GetValue<bool>(cname).Get()); break;
+		case OT_STRING: Value(name, tb.GetValue<string>(cname).Get()); break;
+		default: break;
+		}
+	}
 }
 
 void Properties::Value(string name, Entity*& ent, Scene* scene)
@@ -422,6 +563,7 @@ Properties* Properties::GetChild(uint32 idx)
 	if(children.size() <= idx)
 	{
 		children.push_back(new Properties(this, "", ""));
+		return children.back();
 	}
 	else
 	{
@@ -438,7 +580,6 @@ Properties* Properties::Child(string type, string name)
 		{
 			if(child->IsType(type) && (name.empty() || child->name == name))
 			{
-	//			GetGame()->Log("ValueProperties::GetChild: Got child namespace '"+child->type+"'.");
 				return child;
 			}
 		}
@@ -456,6 +597,7 @@ void Properties::ScriptBind()
 {
 	Script::ClassBase<Properties, Sqrat::Class<Properties, Sqrat::NoCopy<Properties>>> inst;
 	/// @todo Implement Properties::Value() for scripts
+	inst.Func<void (Properties::*)(string, Sqrat::Object)>("Value", &Properties::Value);
 /*	inst.Func("ValueString", (string (Properties::*)(string))&Properties::Value<string>);
 	inst.Func("ValueInt", (int (Properties::*)(string))&Properties::Value<int>);
 	inst.Func("ValueFloat", (float (Properties::*)(string))&Properties::Value<float>);

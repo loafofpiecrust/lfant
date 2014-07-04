@@ -50,13 +50,8 @@ vec3 Collider::GetSize() const
 
 void Collider::SetSize(vec3 size)
 {
-	GetGame()->Log("Collider::SetSize(", GetOwner()->GetName(), ")");
-	GetGame()->Log("transform scale: ", owner->transform->GetWorldScale());
-	GetGame()->Log("collider size: ", size);
 	btVector3 newSize = vec3_cast<btVector3>(owner->transform->GetWorldScale()*size);
 	GetShape()->setLocalScaling(newSize);
-	GetGame()->Log("Final shape scaling: ", vec3_cast<vec3>(GetShape()->getLocalScaling()), ")");
-
 	this->size = size;
 }
 

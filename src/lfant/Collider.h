@@ -46,13 +46,13 @@ protected:
 	{
 	}
 
-	
+
 	virtual void Serialize(Properties* prop);
 
 	virtual void Init();
 	virtual void OnSetScale(vec3 scale);
 
-	virtual btCollisionShape* GetShape() {};
+	virtual btCollisionShape* GetShape() = 0;
 
 	vec3 GetSize() const;
 	virtual void SetSize(vec3 size);

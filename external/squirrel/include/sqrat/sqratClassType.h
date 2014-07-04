@@ -49,10 +49,9 @@ struct ClassTypeDataBase {
     COPYFUNC    copyFunc;
     string        className;
     ClassTypeDataBase* baseClass;
-    bool        ctorCalled;
     virtual ~ClassTypeDataBase() {}
     virtual SQUserPointer Cast(SQUserPointer ptr, SQUserPointer classType) = 0;
-    ClassTypeDataBase() : ctorCalled(false){}
+    ClassTypeDataBase() {}
 };
 
 // Keeps track of the nearest base class and the class associated with a ClassTypeDataBase in order to cast pointers to the right base class

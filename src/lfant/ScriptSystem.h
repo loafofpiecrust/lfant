@@ -82,8 +82,8 @@ public:
 			if(type.empty()) type = type::Descope(type::Name<C>(), "lfant");
 			Sqrat::RootTable().Bind(type.c_str(), inst);
 		}
-		
-		const CC& GetInst()
+
+		CC& GetInst()
 		{
 			return inst;
 		}
@@ -97,8 +97,8 @@ public:
 	{
 	};
 
-	template<typename C, typename P>
-	class Class : public ClassBase<C, Sqrat::DerivedClass<C, P>>
+	template<typename C, typename B, typename A = Sqrat::DefaultAllocator<C>>
+	class Class : public ClassBase<C, Sqrat::DerivedClass<C, B, A>>
 	{
 	};
 
@@ -110,6 +110,7 @@ public:
 
 	Sqrat::Script& GetInst() { return inst; }
 
+	bool ran = false;
 private:
 	Script(string p);
 

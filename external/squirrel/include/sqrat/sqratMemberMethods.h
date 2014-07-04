@@ -5213,7 +5213,7 @@ inline SQInteger sqDefaultGet(HSQUIRRELVM vm) {
     sq_getuserdata(vm, -1, (SQUserPointer*)&memberPtr, NULL); // Get Member...
     M member = *memberPtr;
 
-    PushVar(vm, ptr->*member);
+    PushVarR(vm, ptr->*member);
 
     return 1;
 }
@@ -5226,7 +5226,7 @@ inline SQInteger sqStaticGet(HSQUIRRELVM vm) {
     sq_getuserdata(vm, -1, (SQUserPointer*)&memberPtr, NULL); // Get Member...
     M member = *memberPtr;
 
-    PushVar(vm, *member);
+    PushVarR(vm, *member);
 
     return 1;
 }
@@ -5276,7 +5276,11 @@ inline SQInteger sqDefaultSet(HSQUIRRELVM vm) {
     sq_getuserdata(vm, -1, (SQUserPointer*)&memberPtr, NULL); // Get Member...
     M member = *memberPtr;
 
-    ptr->*member = Var<V>(vm, 2).value;
+    if (is_pointer<V>::value || is_reference<V>::value) {
+        ptr->*member = Var<V>(vm, 2).value;
+    } else {
+        ptr->*member = Var<const V&>(vm, 2).value;
+    }
     return 0;
 }
 
@@ -5287,7 +5291,11 @@ inline SQInteger sqStaticSet(HSQUIRRELVM vm) {
     sq_getuserdata(vm, -1, (SQUserPointer*)&memberPtr, NULL); // Get Member...
     M member = *memberPtr;
 
-    *member = Var<V>(vm, 2).value;
+    if (is_pointer<V>::value || is_reference<V>::value) {
+        *member = Var<V>(vm, 2).value;
+    } else {
+        *member = Var<const V&>(vm, 2).value;
+    }
     return 0;
 }
 

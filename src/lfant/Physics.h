@@ -161,7 +161,7 @@ private:
 //	static bool OnCollideExit(void* userPersistentData);
 	static void OnCollideExit(btPersistentManifold* manifold);
 
-	static void OnTick(btDynamicsWorld* world, float delta);
+	static void OnTick(btDynamicsWorld* world, double delta);
 
 	ptr<btDiscreteDynamicsWorld> world;
 	ptr<btBroadphaseInterface> broadphase;

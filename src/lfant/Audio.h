@@ -23,6 +23,7 @@ namespace lfant
 {
 
 class Sound;
+class AudioListener;
 
 /**	@addtogroup Game
  *	@{
@@ -46,6 +47,7 @@ public:
 
 	void PlaySound(string file, bool loop = false);
 
+	AudioListener* mainListener;
 	uint8 maxChannels = 10;
 
 protected:
@@ -54,7 +56,7 @@ protected:
 
 private:
 	std::deque<std::shared_ptr<Sound>> sounds;
-	irrklang::ISoundEngine* engine = nullptr;
+//	irrklang::ISoundEngine* engine = nullptr;
 };
 
 }

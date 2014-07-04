@@ -13,23 +13,15 @@ project "lfant"
 		EXTERNAL.."/boost",
 		EXTERNAL.."/bullet/src",
 		EXTERNAL.."/glew/include",
-		EXTERNAL.."/glfw/include",
-		EXTERNAL.."/rocket/Include",
-		EXTERNAL.."/fmod/api/inc",
-		EXTERNAL.."/angelscript/include",
-		EXTERNAL.."/angelscript/add_on",
-		EXTERNAL.."/devil/include"
+		EXTERNAL.."/glfw/include"
 	}
 	
 	links {
-		"angelscript",
 		"assimp",
 		"glew",
 		"glfw",
-		"fmod",
 		"boost",
 		"bullet",
-		"rocket",
 		"png",
 		"z",
 		"rt"

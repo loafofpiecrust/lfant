@@ -1,0 +1,442 @@
+
+#include "Gwen/Utility.h"
+#include "Gwen/Font.h"
+#include "Gwen/Texture.h"
+#include "Gwen/WindowProvider.h"
+
+#include <math.h>
+#include <iostream>
+#include <cstddef>
+
+#include "lfant/gui/gwen/OpenGL.h"
+#include "GL/glew.h"
+#include <glm/gtc/matrix_transform.hpp>
+#include "FreeImage/FreeImage.h"
+#include <lfant/Shader.h>
+#include <lfant/Window.h>
+#include <lfant/Console.h>
+#include <lfant/Texture.h>
+#include <lfant/Random.h>
+#include <lfant/Thread.h>
+#include <lfant/Game.h>
+#include <lfant/Input.h>
+
+//#include <SFML/Graphics.hpp>
+//#include <SFML/System.hpp>
+
+
+namespace Gwen
+{
+	namespace Renderer
+	{
+		OpenGL::OpenGL(lfant::Window* window) :
+			window(window)
+		{
+			m_pContext = NULL;
+			::FreeImage_Initialise();
+		}
+
+		OpenGL::~OpenGL()
+		{
+			::FreeImage_DeInitialise();
+		}
+
+		void Gwen::Renderer::OpenGL::Init()
+		{
+			glGenBuffers(1, &m_VertBuffer);
+
+			shader = lfant::Shader::LoadFile("shaders/UserInterface.vert", "shaders/UserInterface.frag");
+			vec2 res;
+
+			res = ((vec2)(this->window->GetSize()/2));
+			projection = glm::ortho(res.x, -res.x, res.y, -res.y, 0.0f, 3.0f);
+
+			res = ((vec2)(this->window->GetSize()));
+			altproj = glm::ortho(res.x, 0.0f, res.y, 0.0f, 0.0f, 3.0f);
+		//	altproj = glm::ortho(0.0f, -res.x, res.y, 0.0f, 0.0f, 3.0f);
+
+			shader->AddUniform("textureSampler");
+			shader->AddUniform("resolution");
+			shader->AddUniform("color");
+			shader->AddUniform("projection");
+		}
+
+		void OpenGL::Begin()
+		{
+		//	std::cout << "begin()\n";
+			glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+			glAlphaFunc( GL_GREATER, 1.0f );
+			glEnable( GL_BLEND );
+		}
+
+		void OpenGL::End()
+		{
+		//	std::cout << "end()\n";
+			Flush();
+		}
+
+		void OpenGL::Flush()
+		{
+			if ( m_Vertices.size() == 0 ) { return; }
+
+		//	std::cout << "About to render...\n";
+		/*	for(int i = 0; i < m_Vertices.size(); ++i)
+			{
+				std::cout << "vert at "<<i<<" is {"<<m_Vertices[i].x<<","<<m_Vertices[i].y<<"}\n";
+			}*/
+
+			shader->Bind();
+
+			if(window->GetGame()->input->GetAxis("ShowLoc")->GetValue() >= 1.0f)
+			{
+				shader->SetUniform("projection", projection);
+			}
+			else
+			{
+				shader->SetUniform("projection", altproj);
+			}
+
+			shader->SetUniform("resolution", lfant::vec2_cast<vec2>(window->GetSize()));
+			glUniform4f(shader->GetUniform("color"), ((float)m_Color.r)/255.0f, ((float)m_Color.g)/255.0f, ((float)m_Color.b)/255.0f, ((float)m_Color.a)/255.0f);
+		//	glBindTexture(GL_TEXTURE_2D, texture);
+			if(texture)
+			{
+				texture->Bind();
+				shader->SetUniform("textureSampler", (int)texture->GetIndex());
+			}
+
+			glBindBuffer(GL_ARRAY_BUFFER, m_VertBuffer);
+			glBufferData(GL_ARRAY_BUFFER, m_Vertices.size()*sizeof(Vertex), &m_Vertices[0], GL_STATIC_DRAW);
+
+
+			glEnableVertexAttribArray(0);
+			glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, x));
+
+		//	glEnableVertexAttribArray(1);
+		//	glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, r));
+
+			glEnableVertexAttribArray(1);
+			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, u));
+
+			/*
+			glVertexPointer( 3, GL_FLOAT,  sizeof( Vertex ), ( void* ) &m_Vertices[0].x );
+			glEnableClientState( GL_VERTEX_ARRAY );
+			glColorPointer( 4, GL_UNSIGNED_BYTE, sizeof( Vertex ), ( void* ) &m_Vertices[0].r );
+			glEnableClientState( GL_COLOR_ARRAY );
+			glTexCoordPointer( 2, GL_FLOAT, sizeof( Vertex ), ( void* ) &m_Vertices[0].u );
+			glEnableClientState( GL_TEXTURE_COORD_ARRAY );
+			*/
+
+			glDrawArrays( GL_TRIANGLES, 0, m_Vertices.size() );
+
+			m_Vertices.clear();
+		//	glFlush();
+
+		//	shader->Unbind();
+		}
+
+		void OpenGL::AddVert( int x, int y, float u, float v )
+		{
+			if ( m_Vertices.size() >= MaxVerts - 1 )
+			{
+				Flush();
+			}
+
+			m_Vertices.emplace_back();
+			int m_iVertNum = m_Vertices.size()-1;
+
+			m_Vertices[ m_iVertNum ].x = ( float ) x;
+			m_Vertices[ m_iVertNum ].y = ( float ) y;
+		//	m_Vertices[ m_iVertNum ].z = 0.5f;
+			if(texture == nullptr)
+			{
+				u = 3;
+				v = 3;
+			}
+			m_Vertices[ m_iVertNum ].u = max(u,0.001f);
+		//	m_Vertices[ m_iVertNum ].u = lfant::random::Range(0.001f,1.0f);
+			m_Vertices[ m_iVertNum ].v = max(v,0.001f);
+		//	m_Vertices[ m_iVertNum ].v = lfant::random::Range(0.001f,1.0f);
+
+		//	lfant::GetGame()->Log("adding vertex to render uv", vec2(u, v));
+
+		//	m_Vertices[ m_iVertNum ].r = m_Color.r;
+		//	m_Vertices[ m_iVertNum ].g = m_Color.g;
+		//	m_Vertices[ m_iVertNum ].b = m_Color.b;
+		//	m_Vertices[ m_iVertNum ].a = m_Color.a;
+		//	m_iVertNum++;
+		}
+
+		void OpenGL::DrawFilledRect( Gwen::Rect rect )
+		{
+		//	std::cout << "filled rect\n";
+		//	std::cout << "drawing filled rect ["<<rect.x<<", "<<rect.y<<", "<<rect.w<<", "<<rect.h<<"]\n";
+		//	std::cout << "our render offset: "<< GetRenderOffset().x<<", "<<GetRenderOffset().y<<"\n";
+		//	GLboolean texturesOn;
+		//	glGetBooleanv( GL_TEXTURE_2D, &texturesOn );
+
+			if ( texture )
+			{
+				Flush();
+				texture = nullptr;
+			//	glDisable( GL_TEXTURE_2D );
+			}
+
+			Translate( rect );
+			AddVert( rect.x, rect.y );
+			AddVert( rect.x + rect.w, rect.y );
+			AddVert( rect.x, rect.y + rect.h );
+			AddVert( rect.x + rect.w, rect.y );
+			AddVert( rect.x + rect.w, rect.y + rect.h );
+			AddVert( rect.x, rect.y + rect.h );
+		}
+
+		void OpenGL::SetDrawColor( Gwen::Color color )
+		{
+		//	glColor4ubv( ( GLubyte* ) &color );
+			m_Color = color;
+		}
+
+		void OpenGL::StartClip()
+		{
+			Flush();
+		/*	Gwen::Rect rect = ClipRegion();
+			// OpenGL's coords are from the bottom left
+			// so we need to translate them here.
+			{
+				GLint view[4];
+				glGetIntegerv( GL_VIEWPORT, &view[0] );
+				rect.y = view[3] - ( rect.y + rect.h );
+			}
+			glScissor( rect.x * Scale(), rect.y * Scale(), rect.w * Scale(), rect.h * Scale() );
+			glEnable( GL_SCISSOR_TEST );
+			*/
+		};
+
+		void OpenGL::EndClip()
+		{
+			Flush();
+		//	glDisable( GL_SCISSOR_TEST );
+		};
+
+		void OpenGL::DrawTexturedRect( Gwen::Texture* pTexture, Gwen::Rect rect, float u1, float v1, float u2, float v2 )
+		{
+		//	std::cout << "Tex rect\n";
+		//	GLuint* tex = ( GLuint* ) pTexture->data;
+			std::shared_ptr<lfant::Texture>& tex = *((std::shared_ptr<lfant::Texture>*)pTexture->data);
+
+		//	std::cout << "drawing tex rect ["<<rect.x<<", "<<rect.y<<", "<<rect.w<<", "<<rect.h<<"]\n";
+
+			// Missing image, not loaded properly?
+			if ( !tex )
+			{
+				std::cout << "IMSAGER MSSNIG!\n";
+				return DrawMissingImage( rect );
+			}
+
+			Translate( rect );
+		//	GLuint boundtex;
+		//	GLboolean texturesOn;
+		//	glGetBooleanv( GL_TEXTURE_2D, &texturesOn );
+		//	glGetIntegerv( GL_TEXTURE_BINDING_2D, ( GLint* ) &boundtex );
+
+			if ( !texture || lfant::Texture::GetCurrent() != tex.get() )
+			{
+				Flush();
+			//	glBindTexture( GL_TEXTURE_2D, tex->GetId() );
+				tex->Bind();
+			//	glEnable( GL_TEXTURE_2D );
+			//	std::cout << "BNID TXTRUE\n";
+				texture = tex.get();
+			}
+
+			AddVert( rect.x, rect.y,			u1, v1 );
+			AddVert( rect.x + rect.w, rect.y,		u2, v1 );
+			AddVert( rect.x, rect.y + rect.h,	u1, v2 );
+			AddVert( rect.x + rect.w, rect.y,		u2, v1 );
+			AddVert( rect.x + rect.w, rect.y + rect.h, u2, v2 );
+			AddVert( rect.x, rect.y + rect.h, u1, v2 );
+		}
+
+		void OpenGL::LoadTexture( Gwen::Texture* pTexture )
+		{
+//			lfant::GetGame()->Log("LODING texture ", pTexture->name.c_str(), ", hi.\n");
+
+			auto ltex = new std::shared_ptr<lfant::Texture>(lfant::Texture::LoadFile(pTexture->name.c_str()));
+			(*ltex)->SetIndex(0);
+			pTexture->data = (void*)ltex;
+			pTexture->width = (*ltex)->size.x;
+			pTexture->height = (*ltex)->size.y;
+			return;
+
+			// unused
+
+			const wchar_t* wFileName = pTexture->name.GetUnicode().c_str();
+			FREE_IMAGE_FORMAT imageFormat = FreeImage_GetFileTypeU( wFileName );
+
+			if ( imageFormat == FIF_UNKNOWN )
+			{ imageFormat = FreeImage_GetFIFFromFilenameU( wFileName ); }
+
+			// Image failed to load..
+			if ( imageFormat == FIF_UNKNOWN )
+			{
+				pTexture->failed = true;
+				return;
+			}
+
+			// Try to load the image..
+			FIBITMAP* bits = FreeImage_LoadU( imageFormat, wFileName );
+
+			if ( !bits )
+			{
+				pTexture->failed = true;
+				return;
+			}
+
+			// Convert to 32bit
+			FIBITMAP* bits32 = FreeImage_ConvertTo32Bits( bits );
+			FreeImage_Unload( bits );
+
+			if ( !bits32 )
+			{
+				pTexture->failed = true;
+				return;
+			}
+
+			// Flip
+			::FreeImage_FlipVertical( bits32 );
+			// Create a little texture pointer..
+			GLuint* pglTexture = new GLuint;
+			// Sort out our GWEN texture
+			pTexture->data = pglTexture;
+			pTexture->width = FreeImage_GetWidth( bits32 );
+			pTexture->height = FreeImage_GetHeight( bits32 );
+			// Create the opengl texture
+			glGenTextures( 1, pglTexture );
+			glBindTexture( GL_TEXTURE_2D, *pglTexture );
+			glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+			glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+#ifdef FREEIMAGE_BIGENDIAN
+			GLenum format = GL_RGBA;
+#else
+			GLenum format = GL_BGRA;
+#endif
+			glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, pTexture->width, pTexture->height, 0, format, GL_UNSIGNED_BYTE, ( const GLvoid* ) FreeImage_GetBits( bits32 ) );
+			FreeImage_Unload( bits32 );
+		}
+
+		void OpenGL::FreeTexture( Gwen::Texture* pTexture )
+		{
+			delete ((std::shared_ptr<lfant::Texture>*)pTexture->data);
+			return;
+
+			GLuint* tex = ( GLuint* ) pTexture->data;
+
+			if ( !tex ) { return; }
+
+			glDeleteTextures( 1, tex );
+			delete tex;
+			pTexture->data = NULL;
+		}
+
+		Gwen::Color OpenGL::PixelColour( Gwen::Texture* pTexture, unsigned int x, unsigned int y, const Gwen::Color & col_default )
+		{
+		//	GLuint* tex = ( GLuint* ) pTexture->data;
+			std::shared_ptr<lfant::Texture>& tex = *((std::shared_ptr<lfant::Texture>*)pTexture->data);
+
+			if ( !tex ) { return col_default; }
+
+			unsigned int iPixelSize = sizeof( unsigned char ) * 4;
+			glBindTexture( GL_TEXTURE_2D, tex->GetId() );
+			unsigned char* data = ( unsigned char* ) malloc( iPixelSize * pTexture->width * pTexture->height );
+			glGetTexImage( GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, data );
+			unsigned int iOffset = ( y * pTexture->width + x ) * 4;
+			Gwen::Color c;
+//			lfant::GetGame()->Log("getting pixel clr: {", (uint)data[0], ",",(uint)data[1],",",(uint)data[2],",",(uint)data[3],"}");
+			c.r = data[0 + iOffset];
+			c.g = data[1 + iOffset];
+			c.b = data[2 + iOffset];
+			c.a = data[3 + iOffset];
+			//
+			// Retrieving the entire texture for a single pixel read
+			// is kind of a waste - maybe cache this pointer in the texture
+			// data and then release later on? It's never called during runtime
+			// - only during initialization.
+			//
+			free( data );
+			return c;
+		}
+
+		bool OpenGL::BeginContext( Gwen::WindowProvider* pWindow )
+		{
+			glClearColor( 0.5f, 0.5f, 0.5f, 1.0f );
+			glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+			return true;
+		}
+
+		bool OpenGL::EndContext( Gwen::WindowProvider* pWindow )
+		{
+			return true;
+		}
+
+		void OpenGL::LoadFont(Gwen::Font* font)
+		{
+			return;
+
+		/*	font->realsize = font->size * Scale();
+
+			sf::Font* pFont = new sf::Font();
+
+			if ( !pFont->loadFromFile( Utility::UnicodeToString( font->facename ) ) )
+			{
+				// Ideally here we should be setting the font to a system default font here.
+				std::cout << "deltin funt\n";
+				delete pFont;
+				pFont = NULL; // SFML 2 doesn't have a default font anymore
+			}
+
+			font->data = pFont;*/
+		}
+
+		void OpenGL::FreeFont(Gwen::Font* pFont)
+		{
+			return;
+
+		/*	if ( !pFont->data ) return;
+			sf::Font* font = reinterpret_cast<sf::Font*>( pFont->data );
+			delete font;
+			pFont->data = NULL;*/
+		}
+
+
+		void OpenGL::RenderText(Gwen::Font* pFont, Gwen::Point pos, const Gwen::UnicodeString& text)
+		{
+			return;
+
+		/*	Flush();
+
+			Translate( pos.x, pos.y );
+
+			// If the font doesn't exist, or the font size should be changed
+			if ( !pFont->data || fabs( pFont->realsize - pFont->size * Scale() ) > 2 )
+			{
+				FreeFont( pFont );
+				LoadFont( pFont );
+			}
+
+			const sf::Font* pSFFont = reinterpret_cast<sf::Font*>( pFont->data );
+
+			sf::Text sfStr;
+			sfStr.setString( text );
+			sfStr.setFont( *pSFFont );
+			sfStr.move( pos.x, pos.y );
+			sfStr.setCharacterSize( pFont->realsize );
+			sfStr.setColor( {m_Color.r, m_Color.g, m_Color.b, m_Color.a} );
+
+			/// @todo reimplement drawing of sf::Text somewhere
+		//	window->GetHandle()->pushGLStates();
+		//	window->GetHandle()->draw(sfStr);
+		//	window->GetHandle()->popGLStates();*/
+		}
+	}
+}

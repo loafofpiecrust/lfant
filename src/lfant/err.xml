@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<results>
+<error id="toomanyconfigs" severity="style" msg="Too many #ifdef configurations - cppcheck only checks 12 configurations. Use --force to check all configurations. For more details, use --enable=information."/>
+</results>

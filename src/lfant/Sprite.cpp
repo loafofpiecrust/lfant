@@ -112,7 +112,6 @@ void Sprite::Update()
 
 void Sprite::Serialize(Properties *props)
 {
-	GetGame()->Log("Loading a sprite from props");
 //	Mesh::Serialize(props);
 	if(props->mode == Properties::Mode::Input)
 	{

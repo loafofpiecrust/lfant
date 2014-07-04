@@ -28,13 +28,15 @@ namespace lfant
 class Subsystem : public Object
 {
 public:
+	virtual ~Subsystem();
 	Game* GetGame() const;
 	virtual void Destroy();
 protected:
 	Subsystem(Game* game);
-	virtual ~Subsystem();
 
 	virtual void Init();
+
+	static void ScriptBind();
 
 	Game* game = nullptr;
 

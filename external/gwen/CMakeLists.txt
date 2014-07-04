@@ -8,7 +8,7 @@ file(GLOB SRC_FILES
 	)
 
 # Output Library Info
-add_library(${PROJECT_NAME} STATIC ${SRC_FILES})
+add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
 
 # Includes
 include_directories(

@@ -34,6 +34,8 @@ public:
 	Scene(Game* game);
 	virtual ~Scene();
 
+	static void ScriptBind();
+
 	virtual void Init();
 	virtual void Update();
 	virtual void Render();
@@ -55,7 +57,7 @@ public:
 	void Clear();
 
 	Camera* mainCamera = nullptr;
-	string name = "Scene";
+//	string name = "Scene";
 	string currentFile = "";
 
 protected:

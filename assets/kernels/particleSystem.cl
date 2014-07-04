@@ -36,13 +36,14 @@ __kernel void Update (
 		return;
 	}
 
-	printf("Updating life: %f\n", lifetime[i]);
-	printf("Updating pos: %v4f\n", position[i]);
+//	printf("Updating life: %f\n", lifetime[i]);
+//	printf("pos before: %v4f\n", position[i]);
 
 	velocity[i] += (accel[i]/* + gravity*/) * dt;
 	color[i] = color[i] + colorChange[i] * dt;
 	size[i] = size[i] + sizeChange[i] * dt;
 	position[i] = position[i] + velocity[i] * dt;
+//	printf("pos after: %v4f\n", position[i]);
 	lifetime[i] -= dt;
 }
 
@@ -82,7 +83,7 @@ __kernel void Emit (
 	lifetime[idx] = init->life;
 
 	// Allocate data
-	position[idx] = init->pos;
+	position[idx] = init->pos+(float4)(idx,idx,idx,idx);
 	printf("Position: %v4f\n", position[idx]);
 	color[idx] = init->color;
 	size[idx] = init->size;

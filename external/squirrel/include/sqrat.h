@@ -35,6 +35,11 @@
  *
  * Sqrat only contains C++ headers so for installation you just need to copy the files in the include directory to some common header path.
  *
+ * \section sec_faq Frequently Asked Questions
+ *
+ * Q: My application is crashing when I call sq_close. Why is this happening?<br>
+ * A: All Sqrat::Object instances and derived type instances must be destroyed before calling sq_close.
+ *
  * \section discuss_sec Discussion and User Support
  *
  * Discussion about Sqrat happens at the Squirrel language forum, the Bindings section
@@ -44,6 +49,8 @@
  *
  * Bug reports or feature enhancement requests and patches can be submitted at the SourceForge Sqrat site
  * https://sourceforge.net/p/scrat/sqrat/
+ *
+ * You're invited to make documentation suggestions for Sqrat. Together, we can make Sqrat as easy to understand as possible!
  */
 
 #if !defined(_SCRAT_MAIN_H_)

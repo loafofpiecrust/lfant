@@ -57,11 +57,9 @@ void Mesh::Init()
 {
 	Renderable::Init();
 
-	GetGame()->Log("Mesh::Init()");
-
 	if(!mesh)
 	{
-		GetGame()->Log("No mesh. Disabling");
+		GetGame()->Log("Mesh::Init(): No mesh. Disabling");
 	//	Enable(false);
 		return;
 	}
@@ -99,7 +97,6 @@ void Mesh::Render()
 
 	if(material.texture)
 	{
-	//	GetGame()->Log("Setting texture uniforms.");
 		material.shader->SetUniform("tiling", material.tiling);
 
 		material.shader->SetUniform("textureSampler", material.texture.get());

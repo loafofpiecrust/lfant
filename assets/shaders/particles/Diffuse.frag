@@ -4,15 +4,22 @@
 uniform sampler2D textureSampler;
 
 // inputs
-//in vec4 fragColor;
+in vec3 geomPosition;
 
 // outputs
-out vec4 colorOut;
+layout(location=0) out vec4 diffuseColor;
+layout(location=1) out vec3 positionColor;
+layout(location=2) out vec3 normalColor;
 
 void main()
 {
-//	colorOut = vec4(vec3(texture2D( textureSampler, gl_TexCoord[0].st ) * gl_Color), 1);
-//	colorOut = vec4(gl_TexCoord[0].st, 1, 1);
-	colorOut = vec4(0.0f, 0.0f, 0.5f, 0.75f);
-//	colorOut = vec4(gl_Color.rgb, 1);
+/*	vec4 color = texture2D( textureSampler, gl_TexCoord[0].st );
+	if(color.a <= 0.1f)
+	{
+		discard;
+	}
+	diffuseColor = color * gl_Color;*/
+	diffuseColor = gl_Color;
+	positionColor = geomPosition;
+	normalColor = vec3(0,0,1);
 }

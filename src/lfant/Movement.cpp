@@ -63,6 +63,7 @@ void Movement::Init()
 void Movement::Update()
 {
 	Component::Update();
+//	std::cout << "hi we're here '"+GetOwner()->GetName()+"'\n";
 }
 
 void Movement::FixedUpdate()
@@ -71,7 +72,6 @@ void Movement::FixedUpdate()
 
 void Movement::Move(vec3 velocity)
 {
-//	GetGame()->Log("Movement::Move(", velocity, "): final(", velocity*movementSpeed);
 	if(rigidbody && usePhysics)
 	{
 		rigidbody->ApplyCentralForce(velocity * movementSpeed * GetGame()->time->deltaTime);
@@ -79,7 +79,7 @@ void Movement::Move(vec3 velocity)
 	}
 	else
 	{
-		owner->transform->Translate(velocity * movementSpeed * GetGame()->time->deltaTime);
+		owner->transform->Translate((dvec3)(velocity * movementSpeed * GetGame()->time->deltaTime));
 	}
 }
 

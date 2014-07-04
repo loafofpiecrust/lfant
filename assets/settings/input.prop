@@ -1,14 +1,24 @@
 // Input Settings
-input
 {
 	// Standard Movement axes
+	
 	axis Horizontal
+	{
+		positive = right
+		negative = left
+	}
+	axis Vertical
+	{
+		positive = up
+		negative = down
+	}
+	
+	axis HorizontalCam
 	{
 		positive = D
 		negative = A
 	}
-	
-	axis Vertical
+	axis VerticalCam
 	{
 		positive = W
 		negative = S
@@ -17,39 +27,20 @@ input
 	// Rotational axes
 	axis VRotation
 	{
-		positive = up
-		negative = down
+		positive = i
+		negative = k
 	}
 	
 	axis HRotation
 	{
-		positive = right
-		negative = left
+		positive = l
+		negative = j
 	}
 
 	axis ZRotation
 	{
 		positive = M
 		negative = N
-	}
-
-	// Object Rotational axes
-	axis VRotation2
-	{
-		positive = i
-		negative = k
-	}
-	
-	axis HRotation2
-	{
-		positive = l
-		negative = j
-	}
-
-	axis ZRotation2
-	{
-		positive = o
-		negative = u
 	}
 	
 	// Misc Logging axes
@@ -62,66 +53,16 @@ input
 		positive = E
 	}
 	
-	axis Reload 
-	{
-		positive = R
-	}
-	
 	axis ShowFPS
 	{
 		positive = P
-	}
-	
-	// Player controls
-	axis Jump
-	{
-		positive = Space
-	}
-	
-	axis Fire
-	{
-		positive = F
-	}
-
-	// Console variable testing
-	axis TesterSetVar
-	{
-		positive = X
-	}
-	
-	axis TesterGetVar
-	{
-		positive = Z
-	}
-	
-	axis TesterHelpMe
-	{
-		positive = H
+		negative = O
 	}
 	
 	// General
-	axis Quit
+	axis Exit
 	{ 
 		positive = esc
-	}
-	
-	axis NextItem
-	{
-		positive = 1
-	}
-	axis PreviousItem
-	{
-		positive = 2
-	}
-
-	axis DropItem
-	{
-		positive = Q
-	}
-
-	axis ToggleInventory
-	{
-		positive = I
 	}
 
 	axis SetFocalDepth
@@ -145,5 +86,10 @@ input
 	axis ShowDof
 	{
 		positive = c
+	}
+	
+	axis SwitchRendering
+	{
+		positive = m
 	}
 }

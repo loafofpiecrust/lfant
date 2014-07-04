@@ -535,47 +535,13 @@ struct Var<Array> {
 /// Used to get and push Array instances to and from the stack as references (arrays are always references in Squirrel)
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<>
-struct Var<Array&> {
+struct Var<Array&> : Var<Array> {Var(HSQUIRRELVM vm, SQInteger idx) : Var<Array>(vm, idx) {}};
 
-    Array value; ///< The actual value of get operations
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// Attempts to get the value off the stack at idx as an Array
-    ///
-    /// \param vm  Target VM
-    /// \param idx Index trying to be read
-    ///
-    /// \remarks
-    /// This function MUST have its Error handled if it occurred.
-    ///
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    Var(HSQUIRRELVM vm, SQInteger idx) {
-        HSQOBJECT obj;
-        sq_resetobject(&obj);
-        sq_getstackobj(vm,idx,&obj);
-        value = Array(obj, vm);
-        SQObjectType value_type = sq_gettype(vm, idx);
-#if !defined (SCRAT_NO_ERROR_CHECKING)
-        if (value_type != OT_ARRAY) {
-            Error::Instance().Throw(vm, Sqrat::Error::FormatTypeError(vm, idx, _SC("array")));
-        }
-#endif
-    }
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// Called by Sqrat::PushVarR to put an Array on the stack
-    ///
-    /// \param vm    Target VM
-    /// \param value Value to push on to the VM's stack
-    ///
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    static void push(HSQUIRRELVM vm, Array value) {
-        HSQOBJECT obj;
-        sq_resetobject(&obj);
-        obj = value.GetObject();
-        sq_pushobject(vm,obj);
-    }
-};
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// Used to get and push Array instances to and from the stack as references (arrays are always references in Squirrel)
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+template<>
+struct Var<const Array&> : Var<Array> {Var(HSQUIRRELVM vm, SQInteger idx) : Var<Array>(vm, idx) {}};
 
 }
 

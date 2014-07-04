@@ -54,6 +54,8 @@ public:
 	Time(Game* game);
 	~Time();
 
+	static void ScriptBind();
+
 	virtual void Init();
 	virtual void Update();
 
