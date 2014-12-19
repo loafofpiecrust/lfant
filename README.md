@@ -1,3 +1,5 @@
+NOTE: I'm not working on this, because I've realized that I like other languages more and need more creative project names. It can do some things, not extremely well, but it _can_ do things.
+
 lfant
 =========
 A cross-platform, OpenGL game engine that uses an Entity-Component model, fairly similar Unity3D, where
